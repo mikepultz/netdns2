@@ -50,12 +50,35 @@
 
 class Net_DNS2_Packet_Response extends Net_DNS2_Packet
 {
+    /**
+     * Constructor - builds a new Net_DNS2_Packet_Response object
+     *
+     * @param   string	$data	binary DNS packet
+	 * @param	integer	$size	the length of the DNS packet
+	 * @return	boolean
+     * @throws  InvalidArgumentException
+	 * @access	public
+     *
+     */
 	public function __construct($data, $size)
 	{
 		$this->set($data, $size);
 	}
+
+    /**
+     * builds a new Net_DNS2_Packet_Response object
+     *
+     * @param   string	$data	binary DNS packet
+	 * @param	integer	$size	the length of the DNS packet
+	 * @return	boolean
+     * @throws  InvalidArgumentException
+	 * @access	public
+     *
+     */
 	public function set($data, $size)
 	{
+		// TODO: check the size and throw an exception
+
 		//
 		// store the full packet
 		//

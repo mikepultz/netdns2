@@ -46,28 +46,26 @@
  * @version    SVN: $Id$
  * @link       http://pear.php.net/package/Net_DNS2
  * @since      File available since Release 1.0.0
+ *
+ *
+ *  DNS header format - RFC1035 section 4.1.1
+ *
+ *      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                      ID                       |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |QR|   Opcode  |AA|TC|RD|RA|   Z    |   RCODE   |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                    QDCOUNT                    |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                    ANCOUNT                    |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                    NSCOUNT                    |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                    ARCOUNT                    |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *
  */
-
-
-//
-// DNS header format - RFC1035 section 4.1.1
-//
-//      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                      ID                       |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |QR|   Opcode  |AA|TC|RD|RA|   Z    |   RCODE   |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                    QDCOUNT                    |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                    ANCOUNT                    |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                    NSCOUNT                    |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                    ARCOUNT                    |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//
-//
 class Net_DNS2_Header
 {
 	public $id;			// 16 bit 	- identifier
@@ -84,6 +82,14 @@ class Net_DNS2_Header
 	public $nscount;	// 16 bit	- name server resource records in the authority records section
 	public $arcount;	// 16 bit	- resource records in the additional records section
 
+	/**
+	 * Constructor - builds a new Net_DNS2_Header object
+	 *
+	 * @param	mixed						either a Net_DNS2_Packet object or null
+	 * @throws	InvalidArgumentException
+	 * @access	public
+	 *
+	 */
 	public function __construct(Net_DNS2_Packet &$packet = null)
 	{
 		if (!is_null($packet)) {
@@ -106,6 +112,14 @@ class Net_DNS2_Header
 			$this->arcount	= 0;
 		}
 	}
+
+	/**
+	 * returns the next available packet id
+	 *
+	 * @return	integer
+	 * @access	private
+	 *
+	 */
 	private function _nextPacketId()
 	{
 		if (++Net_DNS2_Lookups::$next_packet_id > 65535) {
@@ -114,7 +128,15 @@ class Net_DNS2_Header
 		}
 		return Net_DNS2_Lookups::$next_packet_id;
 	}
-	public function string()
+
+	/**
+	 * magic __toString() method to return the header as a string
+	 *
+	 * @return	string
+	 * @access	public
+	 *
+	 */
+	public function __toString()
 	{
 		$output = ";;\n;; Header:\n";
 
@@ -134,6 +156,16 @@ class Net_DNS2_Header
 
 		return $output;
 	}
+
+	/**
+	 * constructs a Net_DNS2_Header from a Net_DNS2_Packet object
+	 *
+	 * @param	Net_DNS2_Packet Object
+	 * @return	boolean
+	 * @throws	InvalidArgumentException
+	 * @access	public
+	 *
+	 */
 	public function set(Net_DNS2_Packet &$packet)
 	{
 		//
@@ -170,6 +202,15 @@ class Net_DNS2_Header
 
 		return true;
 	}
+
+	/**
+	 * returns a binary packed DNS Header
+	 *
+	 * @return	string
+	 * @throws	InvalidArgumentException
+	 * @access	public
+	 *
+	 */
 	public function get()
 	{
 		// TODO: validate the header data and throw an exeception if it's "broken"

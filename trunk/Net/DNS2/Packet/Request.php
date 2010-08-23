@@ -50,10 +50,32 @@
 
 class Net_DNS2_Packet_Request extends Net_DNS2_Packet
 {
+    /**
+     * Constructor - builds a new Net_DNS2_Packet_Request object
+     *
+     * @param   string	$name	the domain name for the packet
+	 * @param	string	$type	the DNS RR type for the packet
+	 * @param	string	$class	the DNS class for the packet
+     * @throws  InvalidArgumentException
+	 * @access	public
+     *
+     */
 	public function __construct($name, $type = null, $class = null)
 	{
 		$this->set($name, $type, $class);
 	}
+
+    /**
+     * builds a new Net_DNS2_Packet_Request object
+     *
+     * @param   string	$name	the domain name for the packet
+	 * @param	string	$type	the DNS RR type for the packet
+	 * @param	string	$class	the DNS class for the packet
+	 * @return	boolean
+     * @throws  InvalidArgumentException
+	 * @access	public
+     *
+     */
 	public function set($name, $type = 'A', $class = 'IN')
 	{
 		//

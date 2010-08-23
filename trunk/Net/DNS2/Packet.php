@@ -46,8 +46,17 @@
  * @version    SVN: $Id$
  * @link       http://pear.php.net/package/Net_DNS2
  * @since      File available since Release 1.0.0
+ *
+ * This file contains code based off the Net::DNS Perl module by
+ * Michael Fuhr.
+ *
+ * This is the copyright notice from the PERL Net::DNS module:
+ *
+ * Copyright (c) 1997-2000 Michael Fuhr.  All rights reserved.  This
+ * program is free software; you can redistribute it and/or modify it
+ * under the same terms as Perl itself.
+ *
  */
-
 class Net_DNS2_Packet
 {
 	//
@@ -91,29 +100,45 @@ class Net_DNS2_Packet
 	//
 	private $_compressed = array();
 
+    /**
+     * magic __toString() method to return the Net_DNS2_Packet as a string
+     *
+	 * @return	string
+	 * @access	public
+     *
+     */
 	public function __toString()
 	{
-		$output = $this->header->string();
+		$output = $this->header->__toString();
 
 		foreach($this->question as $x) {
 
-			$output .= $x->string();
+			$output .= $x->__toString();
 		}
 		foreach($this->answer as $x) {
 
-			$output .= $x->string();
+			$output .= $x->__toString();
 		}
 		foreach($this->authority as $x) {
 
-			$output .= $x->string();
+			$output .= $x->__toString();
 		}
 		foreach($this->additional as $x) {
 
-			$output .= $x->string();
+			$output .= $x->__toString();
 		}
 
 		return $output;
 	}
+
+    /**
+     * returns a full binary DNS packet
+     *
+	 * @return	string
+     * @throws  InvalidArgumentException
+	 * @access	public
+     *
+     */
 	public function get()
 	{
 		$data = $this->header->get();
@@ -137,6 +162,18 @@ class Net_DNS2_Packet
 
 		return $data;
 	}
+
+    /**
+     * applies a standard DNS name compression on the given name/offset
+	 *
+	 * This logic was based on the Net::DNS::Packet::dn_comp() function by Michanel Fuhr
+     *
+	 * @param	string	$name	- the name to be compressed
+	 * @param	integer	$offset	- the offset into the given packet object
+	 * @return	string
+	 * @access	public
+     *
+     */
 	public function compress($name, $offset)
 	{
 		$names = explode('.', $name);
@@ -167,6 +204,18 @@ class Net_DNS2_Packet
 
 		return $compname;
 	}
+
+    /**
+     * expands the domain name stored at a given offset in a DNS Packet
+	 *
+	 * This logic was based on the Net::DNS::Packet::dn_expand() function by Michanel Fuhr
+     *
+	 * @param	Net_DNS2_Packet	$packet		the DNS packet to look in for the domain name
+	 * @param	integer			$offset		the offset into the given packet object
+	 * @return	mixed						either the domain name or null if it's not found.
+	 * @access	public
+     *
+     */
 	public static function expand(Net_DNS2_Packet &$packet, &$offset)
 	{
 		$name = '';
@@ -218,6 +267,16 @@ class Net_DNS2_Packet
 
 		return trim($name, '.');
 	}
+
+    /**
+     * parses a domain label from a DNS Packet at the given offset
+	 *
+	 * @param	Net_DNS2_Packet	$packet		the DNS packet to look in for the domain name
+	 * @param	integer			$offset		the offset into the given packet object
+	 * @return	mixed						either the domain name or null if it's not found.
+	 * @access	public
+     *
+     */
 	public static function label(Net_DNS2_Packet &$packet, &$offset)
 	{
 		$name = '';
