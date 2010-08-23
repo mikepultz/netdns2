@@ -43,7 +43,7 @@
  * @author     Mike Pultz <mike@mikepultz.com>
  * @copyright  2010 Mike Pultz <mike@mikepultz.com>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id: Resolver.php 63 2010-08-23 05:35:49Z mike $
+ * @version    SVN: $Id$
  * @link       http://pear.php.net/package/Net_DNS2
  * @since      File available since Release 1.0.0
  */
