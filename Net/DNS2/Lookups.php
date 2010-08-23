@@ -46,8 +46,8 @@
  * @version    SVN: $Id$
  * @link       http://pear.php.net/package/Net_DNS2
  * @since      File available since Release 1.0.0
+ *
  */
-
 class Net_DNS2_Lookups
 {
 	//
@@ -109,7 +109,7 @@ class Net_DNS2_Lookups
 	const DNSSEC_RSA_SHA1	= 5;
 
 	//
-	//
+	// The packet id used when sending requests
 	//
 	public static $next_packet_id;
 
@@ -280,6 +280,12 @@ class Net_DNS2_Lookups
 		self::DNSSEC_RSA_SHA1	=> 'RSA/SHA-1 [RSASHA1]'	// RFC 3110
 	);
 
+    /**
+     * Constructor - generates some static arrays 
+     *
+	 * @access	public
+	 *
+     */
 	public function __construct()
 	{
 		//

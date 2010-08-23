@@ -46,32 +46,31 @@
  * @version    SVN: $Id$
  * @link       http://pear.php.net/package/Net_DNS2
  * @since      File available since Release 1.0.0
+ *
+ *
+ * DNS resource record format - RFC1035 section 4.1.3
+ *
+ *      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                                               |
+ *    /                                               /
+ *    /                      NAME                     /
+ *    |                                               |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                      TYPE                     |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                     CLASS                     |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                      TTL                      |
+ *    |                                               |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                   RDLENGTH                    |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--|
+ *    /                     RDATA                     /
+ *    /                                               /
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *
  */
-
-//
-// DNS resource record format - RFC1035 section 4.1.3
-//
-//      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                                               |
-//    /                                               /
-//    /                      NAME                     /
-//    |                                               |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                      TYPE                     |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                     CLASS                     |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                      TTL                      |
-//    |                                               |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                   RDLENGTH                    |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--|
-//    /                     RDATA                     /
-//    /                                               /
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//
-//
 abstract class Net_DNS2_RR
 {
 	public $name;
@@ -81,17 +80,54 @@ abstract class Net_DNS2_RR
 	public $rdlength;
 	public $rdata;
 
-	//
-	// abstract functions defined in sub-classes
-	//
+    /**
+     * abstract definition - magic __toString() method to return a RR as a string
+     *
+	 * @return	string
+     * @access	protected
+	 *
+     */
 	abstract protected function _toString();
+
+    /**
+     * abstract definition - parses a RR from a standard DNS config line
+     *
+	 * @param	array		$rdata	a string split line of values for the rdata
+	 * @return	boolean
+     * @access	protected
+	 *
+     */
 	abstract protected function _fromString(array $rdata);
+
+    /**
+     * abstract definition - sets a Net_DNS2_RR from a Net_DNS2_Packet object
+     *
+	 * @param	Net_DNS2_Packet	$packet		a Net_DNS2_Packet packet to parse the RR from
+	 * @return	boolean
+     * @access	protected
+	 *
+     */
 	abstract protected function _set(Net_DNS2_Packet &$packet);
+
+    /**
+     * abstract definition - returns a binary packet DNS RR object
+     *
+	 * @param	Net_DNS2_Packet	$packet		a Net_DNS2_Packet packet use for compressed names
+	 * @return	mixed						either returns a binary packed string or null on failure
+     * @access	protected
+	 *
+     */
 	abstract protected function _get(Net_DNS2_Packet &$packet);
 
-	//
-	// common functions
-	//
+    /**
+     * Constructor - builds a new Net_DNS2_RR object
+     *
+     * @param	Net_DNS2_Packet	$packet		a Net_DNS2_Packet packet or null to create an empty object
+	 * @param	array			$rr			an array with RR parse values or null to create an empty object
+     * @throws  InvalidArgumentException
+     * @access	public
+     *
+     */
 	public function __construct(Net_DNS2_Packet &$packet = null, array $rr = null)
 	{
 		if ( (!is_null($packet)) && (!is_null($rr)) ) {
@@ -108,15 +144,28 @@ abstract class Net_DNS2_RR
 			$this->ttl		= 86400;
 		}
 	}
+
+    /**
+     * magic __toString() method to return the Net_DNS2_RR object object as a string
+     *
+	 * @return	string
+     * @access	public
+     *
+     */
 	public function __toString()
 	{
-		return $this->toString();
+		return $this->name . '. ' . $this->ttl . ' ' . $this->class . ' ' . $this->type . ' ' . $this->_toString();
 	}
 
-	//
-	// return a formatted string; if a string has spaces in it, then return it with double
-	// quotes around it, otherwise, return it as it was passed in.
-	//
+    /**
+     * return a formatted string; if a string has spaces in it, then return it with double
+	 * quotes around it, otherwise, return it as it was passed in.
+     *
+	 * @param	string		$string		the string to format
+	 * @return	string
+     * @access	protected
+     *
+     */
 	protected function _formatString($string)
 	{
 		//
@@ -131,9 +180,14 @@ abstract class Net_DNS2_RR
 		return $s;
 	}
 	
-	//
-	// 
-	//
+    /**
+	 * builds an array of strings from an array of chunks of text split by spaces
+     *
+	 * @param	array		$chunks		an array of chunks of text split by spaces
+	 * @return	array
+     * @access	protected
+     *
+     */
 	protected function _buildString(array $chunks)
 	{
 		$data = array();
@@ -176,6 +230,15 @@ abstract class Net_DNS2_RR
 		return $data;
 	}
 
+    /**
+     * builds a new Net_DNS2_RR object
+     *
+     * @param	Net_DNS2_Packet	$packet		a Net_DNS2_Packet packet or null to create an empty object
+	 * @param	array			$rr			an array with RR parse values or null to create an empty object
+     * @throws  InvalidArgumentException
+     * @access	public
+     *
+     */
 	public function set(Net_DNS2_Packet &$packet, array $rr)
 	{
 		$this->name 		= $rr['name'];
@@ -187,6 +250,16 @@ abstract class Net_DNS2_RR
 
 		return $this->_set($packet);
 	}
+
+    /**
+     * returns a binary packed DNS RR object
+     *
+     * @param	Net_DNS2_Packet	$packet		a Net_DNS2_Packet packet used for compressing names
+	 * @return	string
+     * @throws  InvalidArgumentException
+     * @access	public
+     *
+     */
 	public function get(Net_DNS2_Packet &$packet)
 	{
 		$data = '';
@@ -225,6 +298,17 @@ abstract class Net_DNS2_RR
 
 		return $data;
 	}
+
+    /**
+     * parses a binary packet, and returns the appropriate Net_DNS2_RR object, based on the
+	 * RR type of the binary content.
+     *
+     * @param	Net_DNS2_Packet	$packet		a Net_DNS2_Packet packet used for decompressing names
+	 * @return	mixed						returns a new Net_DNS2_RR_* object for the given RR
+     * @throws  InvalidArgumentException
+     * @access	public
+     *
+     */
 	public static function parse(Net_DNS2_Packet &$packet)
 	{
 		$object = array();
@@ -281,26 +365,26 @@ abstract class Net_DNS2_RR
 		return $o;
 	}
 
-	//
-	// format the display for this object
-	//
-	public function toString()
-	{
-		return $this->name . '. ' . $this->ttl . ' ' . $this->class . ' ' . $this->type . ' ' . $this->_toString();
-	}
 
-	//
-	// parses a standard RR format lines, as defined by rfc1035 (kinda)
-	//
-	// In our implementation, the domain *must* be specified- format must be
-	//
-	//		<name> [<ttl>] [<class>] <type> <rdata>
-	// or
-	//		<name> [<class>] [<ttl>] <type> <rdata>
-	//
-	// name, title, class and type are parsed by this function, rdata is passed to the
-	// RR specific classes for parsing.
-	//
+    /**
+	 *
+	 * parses a standard RR format lines, as defined by rfc1035 (kinda)
+	 *
+	 * In our implementation, the domain *must* be specified- format must be
+	 *
+	 *		<name> [<ttl>] [<class>] <type> <rdata>
+	 * or
+	 *		<name> [<class>] [<ttl>] <type> <rdata>
+	 *
+	 * name, title, class and type are parsed by this function, rdata is passed to the
+	 * RR specific classes for parsing.
+	 *
+     * @param	string	$line				a standard DNS config line		
+	 * @return	mixed						returns a new Net_DNS2_RR_* object for the given RR
+     * @throws  InvalidArgumentException
+     * @access	public
+     *
+     */
 	public static function fromString($line)
 	{
 		if (strlen($line) == 0) {
@@ -387,7 +471,6 @@ abstract class Net_DNS2_RR
 
 		return $o;
 	}
-
 }
 
 /*

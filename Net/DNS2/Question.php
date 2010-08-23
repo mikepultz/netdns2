@@ -46,29 +46,38 @@
  * @version    SVN: $Id$
  * @link       http://pear.php.net/package/Net_DNS2
  * @since      File available since Release 1.0.0
+ *
+ *
+ * DNS question format - RFC1035 section 4.1.2
+ *
+ *      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                                               |
+ *    /                     QNAME                     /
+ *    /                                               /
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                     QTYPE                     |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                     QCLASS                    |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *
  */
-
-//
-// DNS question format - RFC1035 section 4.1.2
-//
-//      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                                               |
-//    /                     QNAME                     /
-//    /                                               /
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                     QTYPE                     |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                     QCLASS                    |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//
-//
 class Net_DNS2_Question
 {
 	public $qname;
 	public $qtype;
 	public $qclass;
 
+    /**
+     * Constructor - builds a new Net_DNS2_Question object
+     *
+     * @param   mixed	$packet			either a Net_DNS2_Packet object, or null to build an empty object
+     * @throws  InvalidArgumentException
+	 * @access	public
+	 *
+     * TODO: update this
+	 *
+     */
 	public function __construct(Net_DNS2_Packet &$packet = null)
 	{
 		if (!is_null($packet)) {
@@ -81,10 +90,28 @@ class Net_DNS2_Question
 			$this->qclass 	= 'IN';
 		}
 	}
-	public function string()
+
+    /**
+     * magic __toString() function to return the Net_DNS2_Question object as a string
+     *
+	 * @return	string
+	 * @access	public
+     *
+     */
+	public function __toString()
 	{
 		return ';;\n;; Question:\n;;\t ' . $this->qname . '. ' . $this->qtype . ' ' . $this->qclass . "\n";
 	}
+
+    /**
+     * builds a new Net_DNS2_Header object from a Net_DNS2_Packet object
+     *
+     * @param	Net_DNS2_Packet	$packet		a Net_DNS2_Packet object
+	 * @return	boolean
+     * @throws  InvalidArgumentException
+	 * @access	public
+     *
+     */
 	public function set(Net_DNS2_Packet &$packet)
 	{
 		//
@@ -93,6 +120,7 @@ class Net_DNS2_Question
 		$this->qname = $packet->expand($packet, $packet->offset);
 		if ($packet->rdlength < ($packet->offset + 4)) {
 
+			// TODO: throw exception
 			return false;
 		}
 
@@ -109,6 +137,19 @@ class Net_DNS2_Question
 
 		return true;
 	}
+
+    /**
+     * returns a binary packed Net_DNS2_Question object
+     *
+     * @param	Net_DNS2_Packet	$packet		the Net_DNS2_Packet object this question is part of. This needs to
+	 *										be passed in so that the compressed qname value can be packed in with
+	 *										the names of the other parts of the packet.
+	 * @param	integer			$offset		the offset into the packet.
+	 * @return	string
+     * @throws  InvalidArgumentException
+	 * @access	public
+     *
+     */
 	public function get(Net_DNS2_Packet &$packet, $offset)
 	{
 		// TODO: validate the type/class and throw an exception if they're not found.
