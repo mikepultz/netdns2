@@ -174,9 +174,10 @@ abstract class Net_DNS2_RR
 			$this->set($packet, $rr);
 		} else {
 
-			if (isset(Net_DNS2_Lookups::$rr_types_class_to_id[get_called_class()])) {
+			$class = Net_DNS2_Lookups::$rr_types_class_to_id[get_called_class()];
+			if (isset($class)) {
 
-				$this->type	= Net_DNS2_Lookups::$rr_types_by_id[Net_DNS2_Lookups::$rr_types_class_to_id[get_called_class()]];
+				$this->type	= Net_DNS2_Lookups::$rr_types_by_id[$class];
 			}
 
 			$this->class	= 'IN';
@@ -376,7 +377,6 @@ abstract class Net_DNS2_RR
 
 		$object['rdlength']	= ord($packet->rdata[$packet->offset++]) << 8 | ord($packet->rdata[$packet->offset++]);
 
-
 		if ($packet->rdlength < ($packet->offset + $object['rdlength'])) {
 			return null;
 		}
@@ -384,11 +384,10 @@ abstract class Net_DNS2_RR
 		//
 		// lookup the class to use
 		//
-		$o = null;
+		$o 		= null;
+		$class 	= Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']];
 
-		if (isset(Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']])) {
-
-			$class = Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']];
+		if (isset($class)) {
 
 			$o = new $class($packet, $object);
 			if ($o) {
@@ -401,7 +400,6 @@ abstract class Net_DNS2_RR
 
 		return $o;
 	}
-
 
     /**
 	 *
@@ -418,14 +416,14 @@ abstract class Net_DNS2_RR
 	 *
      * @param	string	$line				a standard DNS config line		
 	 * @return	mixed						returns a new Net_DNS2_RR_* object for the given RR
-     * @throws  InvalidArgumentException
+     * @throws  InvalidArgumentException, Net_DNS2_Exception
      * @access	public
      *
      */
 	public static function fromString($line)
 	{
 		if (strlen($line) == 0) {
-			// TODO: throw exception;
+			throw new InvalidArgumentException('empty config line provided.');
 		}
 
 		$name 	= '';
@@ -439,7 +437,7 @@ abstract class Net_DNS2_RR
 		$values = preg_split('/[\s]+/', $line);
 		if (count($values) < 3) {
 
-			// TODO: throw execption- we should have at least three values
+			throw new InvalidArgumentException('failed to parse config line: minimum of name, type and rdata required.');
 		}
 
 		//
@@ -470,19 +468,20 @@ abstract class Net_DNS2_RR
 
 				break;
 				default:
-					// TODO: throw execption; this shouldn't happen
+					throw new InvalidArgumentException('invalid config line provided: unknown file: ' . $value);
 			}
 		}
 
 		//
 		// lookup the class to use
 		//
-		$o = null;
+		$o 		= null;
+		$class 	= Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]];
 
-		if (isset(Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]])) {
+		if (isset($class)) {
 
-			$o = new Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]];
-			if ($o) {
+			$o = new $class;
+			if (!is_null($o)) {
 
 				//
 				// set the parsed values
@@ -495,15 +494,15 @@ abstract class Net_DNS2_RR
 				// parse the rdata
 				//
 				if ($o->_fromString($values) === false) {
-					// TODO: throw exception
+					throw new Net_DNS2_Exception('failed to parse rdata for config: ' . $line);
 				}
 
 			} else {
-				// TODO: throw exception
+				throw new Net_DNS2_Exception('failed to create new RR record for type: ' . $type);
 			}
 
 		} else {
-			// TODO: throw un-implemented RR exception
+			throw new Net_DNS2_Exception('un-implemented resource record type: '. $type);
 		}
 
 		return $o;

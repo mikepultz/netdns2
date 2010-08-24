@@ -161,15 +161,18 @@ class Net_DNS2_Question
 		//
 		// validate it
 		//
-		if ( (!isset(Net_DNS2_Lookups::$rr_types_by_id[$type])) || (!isset(Net_DNS2_Lookups::$classes_by_id[$class])) ) {
+		$type_name 	= Net_DNS2_Lookups::$rr_types_by_id[$type];
+		$class_name	= Net_DNS2_Lookups::$classes_by_id[$class];		
+
+		if ( (!isset($type_name)) || (!isset($class_name)) ) {
 			throw new InvalidArgumentException('invalid question section: invalid type (' . $type . ') or class (' . $class . ') specified.');
 		}
 
 		//
 		// store it
 		//
-		$this->qtype 	= Net_DNS2_Lookups::$rr_types_by_id[$type];
-		$this->qclass	= Net_DNS2_Lookups::$classes_by_id[$class];
+		$this->qtype 	= $type_name;
+		$this->qclass	= $class_name;
 
 		return true;
 	}
@@ -191,14 +194,14 @@ class Net_DNS2_Question
 		//
 		// validate the type and class
 		//
-		if ( (!isset(Net_DNS2_Lookups::$rr_types_by_name[$this->qtype])) || (!isset(Net_DNS2_Lookups::$classes_by_name[$this->qclass])) ) {
+		$type 	= Net_DNS2_Lookups::$rr_types_by_name[$this->qtype];
+		$class	= Net_DNS2_Lookups::$classes_by_name[$this->qclass];
+
+		if ( (!isset($type)) || (!isset($class)) ) {
 			throw new InvalidArgumentException('invalid question section: invalid type (' . $this->qtype . ') or class (' . $this->qclass . ') specified.');
 		}
 
-		// TODO: get rid of pack()
-		//
-		return $packet->compress($this->qname, $offset) . 
-			pack('nn', Net_DNS2_Lookups::$rr_types_by_name[$this->qtype], Net_DNS2_Lookups::$classes_by_name[$this->qclass]);
+		return $packet->compress($this->qname, $offset) . chr($type << 8) . chr($type) . chr($class << 8) . chr($class);
 	}
 }
 

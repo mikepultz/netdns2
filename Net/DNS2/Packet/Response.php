@@ -160,4 +160,3 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
  * End:
  */
 ?>
-

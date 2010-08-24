@@ -143,6 +143,13 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
      */
 	public function write($data)
 	{
+		$length = strlen($data);
+		if ($length == 0) {
+
+			$this->last_error = 'empty data on write()';
+			return false;
+		}
+
 		$read 	= NULL;
 		$write 	= array($this->_sock);
 		$except = NULL;
@@ -169,19 +176,9 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
 		//
 		if ($this->_type == SOCK_STREAM) {
 
-			// TODO: get rid of pack()
+			$s = chr($length << 8) . chr($length);
 
-			$length = pack('n', strlen($data));
-
-			$s = strlen($data);
-
-echo "length=" . base64_encode($length) . ", " . $s . "\n";
-
-$r = ($s << 16);
-
-echo "length=" . base64_encode($r) . ", " . $s . "\n";
-
-			if (@socket_write($this->_sock, $length) === FALSE) {
+			if (@socket_write($this->_sock, $s) === FALSE) {
 
 				$this->last_error = socket_strerror(socket_last_error());
 				return false;
@@ -192,7 +189,7 @@ echo "length=" . base64_encode($r) . ", " . $s . "\n";
 		// write the data to the socket
 		//
 		$size = @socket_write($this->_sock, $data);
-		if ( ($size === FALSE) || ($size != strlen($data)) ) {
+		if ( ($size === FALSE) || ($size != $length) ) {
 
 			$this->last_error = socket_strerror(socket_last_error());
 			return false;
@@ -246,14 +243,10 @@ echo "length=" . base64_encode($r) . ", " . $s . "\n";
 				$this->last_error = socket_strerror(socket_last_error());
 				return false;
 			}
-			
-			// TODO: get rid of unpack()
 
-			$x = unpack('nlength', $data);
-			$data = '';
-
-			$length = $x['length'];
+			$length = ord($data[0]) << 8 | ord($data[1]);
 			if ($length < 12) {
+
 				return false;
 			}
 		}

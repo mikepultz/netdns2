@@ -106,6 +106,7 @@ class Net_DNS2_RR_NS extends Net_DNS2_RR
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
 		if ($this->rdlength > 0) {
+
 			$offset = $packet->offset;
 			$this->nsdname = Net_DNS2_Packet::expand($packet, $offset);
 		}
