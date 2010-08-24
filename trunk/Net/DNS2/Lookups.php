@@ -59,6 +59,16 @@
 class Net_DNS2_Lookups
 {
 	/*
+	 * size (in bytes) of a header in a standard DNS packet
+	 */
+	const DNS_HEADER_SIZE	= 12;
+
+	/*
+	 * max size of a UDP packet
+	 */
+	const DNS_MAX_UDP_SIZE	= 512;
+	
+	/*
 	 * Query/Response flag
 	 */
 	const QR_QUERY			= 0;		// RFC 1035
