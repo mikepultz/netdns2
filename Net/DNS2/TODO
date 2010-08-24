@@ -11,22 +11,22 @@ Net_DNS2 TODO List
 
 - finish DNSSEC RR's
 
-- parse BIND style input and set all the appropriate values of the RR object
+DONE - parse BIND style input and set all the appropriate values of the RR object
 
-- parse and read a resolv.conf file
+DONE - parse and read a resolv.conf file
 
 - fix up all teh exception handling
 
-- add proper function comments at the head of each method
+DONE - add proper function comments at the head of each method
 
 DONE - change the defines() to class constants
 
-- add proper licensing at the top of each file
-	- change to BSD licensing
+DONE - add proper licensing at the top of each file
+	DONE - change to BSD licensing
 
 - test classes
 
-- inverse_query
+DONE - inverse_query
 
 
                          +-----------------------------------------+

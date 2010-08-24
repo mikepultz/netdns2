@@ -73,45 +73,55 @@ $GLOBALS['_Net_DNS2_Lookups'] = new Net_DNS2_Lookups();
  */
 class Net_DNS2
 {
-	//
-	// use TCP only (true/false)
-	//
+	/*
+	 * use TCP only (true/false)
+	 */
 	public $use_tcp = false;
 
-	//
-	// DNS Port to use (53)
-	//
+	/*
+	 * DNS Port to use (53)
+	 */
 	public $dns_port = 53;
 
-	//
-	// the ip/port for use as a local socket
-	//
+	/*
+	 * the ip/port for use as a local socket
+	 */
 	public $local_host = '';
 	public $local_port = 0;
 
-	//
-	// timeout value for socket connections
-	//
+	/*
+	 * timeout value for socket connections
+	 */
 	public $timeout = 5;
 
-	//
-	// randomize the name servers list
-	//
+	/*
+	 * randomize the name servers list
+	 */
 	public $ns_random = false;
 
-	//
-	// local sockets
-	//
+	/*
+	 * default domains
+	 */
+	public $domain = '';
+
+	/*
+	 * domain search list - not actually used right now
+	 */
+	public $search_list = array();
+
+	/*
+	 * local sockets
+	 */
 	protected $_sockets = array('udp' => array(), 'tcp' => array());
 
-	//
-	// name server list
-	//
+	/*
+	 * name server list
+	 */
 	protected $_nameservers = array();
 
-	//
-	// if the socket extension is loaded
-	//
+	/*
+	 * if the socket extension is loaded
+	 */
 	protected $_sockets_enabled = false;
 
     /**
@@ -180,10 +190,68 @@ class Net_DNS2
 		//
 		// otherwise, see if it's a path to a resolv.conf file and if so, load it
 		//
-		// TODO: load the file
-		//
 		} else {
-			
+
+			//
+			// check to see if the file is readable
+			//
+			if (is_readable($nameservers) === TRUE) {
+	
+				$data = file_get_contents($nameservers);
+				if ($data === FALSE) {
+					// TODO: throw exception
+				}
+
+				$lines = explode("\n", $data);
+
+				foreach($lines as $line) {
+					
+					$line = trim($line);
+
+					if (strlen($line) == 0) {
+						continue;
+					}
+
+					list($key, $value) = preg_split('/\s+/', $line, 2);
+
+					$key 	= trim(strtolower($key));
+					$value	= trim(strtolower($value));
+
+					switch($key)
+					{
+						case 'nameserver':
+						{
+							if (preg_match('/^[0-9\.]{7,15}$/', $value)) {
+
+								$this->_nameservers[] = $value;
+							}
+						}
+						break;
+						case 'domain':
+						{
+							$this->domain = $value;
+						}
+						break;
+						case 'search':
+						{
+							$this->search_list = preg_split('/\s+/', $value);
+						}
+						break;
+					}
+				}
+
+				//
+				// if we don't have a domain, but we have a search list, then
+				// take the first entry on the search list as the domain
+				//
+				if ( (strlen($this->domain) == 0) && (count($this->search_list) > 0) ) {
+
+					$this->domain = $this->search_list[0];
+				}
+
+			} else {
+				// TODO: throw exception
+			}
 		}
 
 		//
