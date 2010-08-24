@@ -223,16 +223,13 @@ class Net_DNS2_Header
 	 */
 	public function get()
 	{
-		//
-		// pack and return the header as binary
-		//
-		$x1 = ($this->qr << 7) | ($this->opcode << 3) | ($this->aa << 2) | ($this->tc << 1) | ($this->rd);
-		$x2 = ($this->ra << 7) | $this->rcode;
-
-		// TODO: get rid of pack()
-		//
-		return pack('nC2n4', $this->id, $x1, $x2, 
-			$this->qdcount, $this->ancount, $this->nscount, $this->arcount);
+		return pack('n', $this->id) . 
+			chr(($this->qr << 7) | ($this->opcode << 3) | ($this->aa << 2) | ($this->tc << 1) | ($this->rd)) .
+			chr(($this->ra << 7) | $this->rcode) .
+			chr($this->qdcount << 8) . chr($this->qdcount) .
+			chr($this->ancount << 8) . chr($this->ancount) . 
+			chr($this->nscount << 8) . chr($this->nscount) .
+			chr($this->arcount << 8) . chr($this->arcount);
 	}
 }
 

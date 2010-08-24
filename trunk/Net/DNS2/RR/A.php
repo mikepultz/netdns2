@@ -119,7 +119,7 @@ class Net_DNS2_RR_A extends Net_DNS2_RR
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
 		if ($this->rdlength > 0) {
-			
+
 			$this->address = ord($this->rdata[0]) . '.' . ord($this->rdata[1]) . '.' . 
 				ord($this->rdata[2]) . '.' . ord($this->rdata[3]);
 		}

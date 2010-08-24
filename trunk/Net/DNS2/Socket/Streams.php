@@ -161,6 +161,13 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
      */
 	public function write($data)
 	{
+		$length = strlen($data);
+		if ($length == 0) {
+
+			$this->last_error = 'empty data on write()';
+			return false;
+		}
+
 		$read = null;
 		$write = array($this->_sock);
 		$except = null;
@@ -187,11 +194,9 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 		//		
 		if ($this->_type == SOCK_STREAM) {
 
-			// TODO: get rid of pack()
+			$s = chr($length << 8) . chr($length);
 
-			$length = pack('n', strlen($data));
-
-			if (@fwrite($this->_sock, $length) === FALSE) {
+			if (@fwrite($this->_sock, $s) === FALSE) {
 
 				$this->last_error = 'failed to fwrite() 16bit length';
 				return false;
@@ -202,7 +207,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 		// write the data to the socket
 		//
 		$size = @fwrite($this->_sock, $data);
-		if ( ($size === FALSE) || ($size != strlen($data)) ) {
+		if ( ($size === FALSE) || ($size != $length) ) {
 		
 			$this->last_error = 'failed to fwrite() packet';
 			return false;
@@ -257,13 +262,9 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 				return false;
 			}
 		
-			// TODO: get rid of unpack()
-
-			$x = unpack('nlength', $data);
-			$data = '';
-
-			$length = $x['length'];
+			$length = ord($data[0]) << 8 | ord($data[1]);
 			if ($length < 12) {
+
 				return false;
 			}
 		}
