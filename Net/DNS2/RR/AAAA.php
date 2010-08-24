@@ -49,6 +49,25 @@
  *
  */
 
+/*
+ * A Resource Record - RFC1035 section 3.4.1
+ *
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                                               |       
+ *    |                                               |       
+ *    |                                               |       
+ *    |                    ADDRESS                    |       
+ *    |                                               |       
+ *    |                   (128 bit)                   |       
+ *    |                                               |       
+ *    |                                               |       
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ * 
+ * @package     Net_DNS2
+ * @author      Mike Pultz <mike@mikepultz.com>
+ * @see         Net_DNS2_RR
+ *
+ */
 class Net_DNS2_RR_AAAA extends Net_DNS2_RR
 {
     /**
