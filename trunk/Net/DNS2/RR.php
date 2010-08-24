@@ -38,15 +38,27 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   Networking
- * @package    Net_DNS2
- * @author     Mike Pultz <mike@mikepultz.com>
- * @copyright  2010 Mike Pultz <mike@mikepultz.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
- * @link       http://pear.php.net/package/Net_DNS2
- * @since      File available since Release 1.0.0
+ * @category	Networking
+ * @package		Net_DNS2
+ * @author		Mike Pultz <mike@mikepultz.com>
+ * @copyright	2010 Mike Pultz <mike@mikepultz.com>
+ * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version		SVN: $Id$
+ * @link		http://pear.php.net/package/Net_DNS2
+ * @since		File available since Release 1.0.0
  *
+ */
+
+
+/**
+ * This is the base class for DNS Resource Records
+ *
+ * Each resource record type (defined in RR/*.php) extends this class for
+ * base functionality.
+ *
+ * This class handles parsing and constructing the common parts of the DNS
+ * resource records, while the RR specific functionality is handled in each
+ * child class.
  *
  * DNS resource record format - RFC1035 section 4.1.3
  *
@@ -70,14 +82,40 @@
  *    /                                               /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @package     Net_DNS2
+ * @author      Mike Pultz <mike@mikepultz.com>
+ *
  */
 abstract class Net_DNS2_RR
 {
+	/*
+	 * The name of the resource record
+	 */
 	public $name;
+
+	/*
+	 * The resource record type
+	 */
 	public $type;
+
+	/*
+	 * The resouce record class
+	 */
 	public $class;
+
+	/*
+	 * The time to live for this resource record
+	 */
 	public $ttl;
+
+	/*
+	 * The length of the rdata field
+	 */
 	public $rdlength;
+
+	/*
+	 * The resource record specific data as a packed binary string
+	 */
 	public $rdata;
 
     /**

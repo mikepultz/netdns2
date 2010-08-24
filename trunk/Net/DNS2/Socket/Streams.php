@@ -38,20 +38,40 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   Networking
- * @package    Net_DNS2
- * @author     Mike Pultz <mike@mikepultz.com>
- * @copyright  2010 Mike Pultz <mike@mikepultz.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
- * @link       http://pear.php.net/package/Net_DNS2
- * @since      File available since Release 1.0.0
+ * @category	Networking
+ * @package		Net_DNS2
+ * @author		Mike Pultz <mike@mikepultz.com>
+ * @copyright	2010 Mike Pultz <mike@mikepultz.com>
+ * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version		SVN: $Id$
+ * @link		http://pear.php.net/package/Net_DNS2
+ * @since		File available since Release 1.0.0
+ *
  */
 
+/**
+ * Socket handling class using the PHP Streams
+ *
+ * The sockets extension is faster than the stream functions in PHP, but it's            
+ * not standard. So if the extension is loaded, then the Net_DNS_Socket_Sockets
+ * class it used, otherwise, this class it used.
+ *   
+ * @package		Net_DNS2
+ * @author  	Mike Pultz <mike@mikepultz.com>
+ * @see			Net_DNS2_Socket
+ *
+ */
 class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 {
 	private $_context;
 
+    /**
+     * opens a socket connection to the DNS server
+     *
+     * @return  boolean
+     * @access  public
+     *
+     */
 	public function open()
 	{
 		//
@@ -114,6 +134,14 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 
 		return true;
 	}
+
+    /**
+     * closes a socket connection to the DNS server
+     *
+     * @return  boolean
+     * @access  public
+     *
+     */
 	public function close()
 	{
 		if (is_resource($this->_sock) === TRUE) {
@@ -122,6 +150,15 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 		}
 		return true;
 	}
+
+    /**
+     * writes the given string to the DNS server socket
+     *
+     * @param   string  $data       a binary packed DNS packet
+     * @return  boolean
+     * @access  public
+     *
+     */
 	public function write($data)
 	{
 		$read = null;
@@ -171,6 +208,15 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 
 		return true;
 	}
+
+    /**
+     * reads a response from a DNS server
+     *
+     * @param   integer $size       the size of the DNS packet read is passed back
+     * @return  mixed               returns the data on success and false on error
+     * @access  public
+     *
+     */
 	public function read(&$size)
 	{
 		$read = array($this->_sock);

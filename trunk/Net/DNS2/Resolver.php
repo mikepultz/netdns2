@@ -38,26 +38,50 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   Networking
- * @package    Net_DNS2
- * @author     Mike Pultz <mike@mikepultz.com>
- * @copyright  2010 Mike Pultz <mike@mikepultz.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
- * @link       http://pear.php.net/package/Net_DNS2
- * @since      File available since Release 1.0.0
+ * @category	Networking
+ * @package		Net_DNS2
+ * @author		Mike Pultz <mike@mikepultz.com>
+ * @copyright	2010 Mike Pultz <mike@mikepultz.com>
+ * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version		SVN: $Id$
+ * @link		http://pear.php.net/package/Net_DNS2
+ * @since		File available since Release 1.0.0
+ *
  */
 
+/**
+ * This is the main resolver class, providing DNS query functions.
+ *
+ * @package     Net_DNS2
+ * @author      Mike Pultz <mike@mikepultz.com>
+ * @see			Net_DNS2
+ *
+ */
 class Net_DNS2_Resolver extends Net_DNS2
 {
+	/**
+     * Constructor - creates a new Net_DNS2_Resolver object
+     *
+     * @param   mixed                       either an array with options or null
+     * @access	public
+     *
+     */
 	public function __construct(array $options = null)
 	{
 		parent::__construct($options);
 	}
 
-	//
-	// do a basic lookup query
-	//
+	/**
+     * does a basic DNS lookup query
+     *
+     * @param	string	$name		the DNS name to loookup
+	 * @param	string	$type		the name of the RR type to lookup
+	 * @param	string	$class		the name of the RR class to lookup
+	 * @return	Net_DNS_RR object
+	 * @throws	
+     * @access	public
+     *
+     */
 	public function query($name, $type = 'A', $class = 'IN')
 	{
 		//

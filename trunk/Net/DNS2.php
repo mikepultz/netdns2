@@ -46,8 +46,18 @@
  * @version    SVN: $Id$
  * @link       http://pear.php.net/package/Net_DNS2
  * @since      File available since Release 1.0.0
+ *
  */
 
+/**
+ * This is the base class for the Net_DNS2_Resolver and Net_DNS2_Updater
+ * classes.
+ *
+ * @package     Net_DNS2
+ * @author      Mike Pultz <mike@mikepultz.com>
+ * @see         Net_DNS2_Resolver, Net_DNS2_Updater
+ *
+ */
 class Net_DNS2
 {
 	//
