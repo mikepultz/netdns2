@@ -49,6 +49,19 @@
  *
  */
 
+/*
+ * register the auto-load function
+ *
+ */
+spl_autoload_register('Net_DNS2::autoload');
+
+/*
+ * generate the lookups so they're available everwhere
+ *
+ */
+$GLOBALS['_Net_DNS2_Lookups'] = new Net_DNS2_Lookups();
+
+
 /**
  * This is the base class for the Net_DNS2_Resolver and Net_DNS2_Updater
  * classes.
@@ -101,14 +114,13 @@ class Net_DNS2
 	//
 	protected $_sockets_enabled = false;
 
-	static public function autoload($name)
-	{
-		require str_replace('_', '/', $name) . '.php';
-	}
-
-	//
-	// Public functions
-	//
+    /**
+     * Constructor - base constructor for the Resolver and Updater
+     *
+	 * @param	mixed	$options	array of options or null for none
+     * @access  public
+     *
+     */
 	public function __construct(array $options = null)
 	{
 		//
@@ -134,9 +146,28 @@ class Net_DNS2
 		}
 	}
 
-	//
-	// Private functions
-	//
+    /**
+     * autoload call-back function; used to auto-load classes
+     *
+	 * @param	string	$name	the name of the class
+     * @access  public
+     *
+     */
+	static public function autoload($name)
+	{
+		require str_replace('_', '/', $name) . '.php';
+	}
+
+    /**
+     * sets the name servers to be used
+     *
+	 * @param	mixed	$nameservers	either an array of name servers, or a file name to parse, assuming it's
+	 *									in the resolv.conf format
+	 * @return	boolean
+	 * @throws	
+     * @access  public
+     *
+     */
 	public function setServers($nameservers)
 	{
 		//
@@ -162,6 +193,15 @@ class Net_DNS2
 
 		return true;
 	}
+
+    /**
+     * checks the list of name servers to make sure they're set
+     *
+	 * @return	boolean
+	 * @throws	Net_DNS2_NameServer_Exception
+     * @access  protected
+     *
+     */
 	protected function _checkServers()
 	{
 		if (empty($this->_nameservers)) {
@@ -171,6 +211,17 @@ class Net_DNS2
 	
 		return true;
 	}
+
+    /**
+     * sends a standard Net_DNS2_Packet_Request packet
+     *
+	 * @param	Net_DNS2_Packet	$request	a Net_DNS2_Packet_Request object
+	 * @param	boolean			$use_tcp	true/false if the function should use TCP for the request
+	 * @return	mixed						returns a Net_DNS2_Packet_Response object, or false on error
+	 * @throws
+     * @access  protected
+     *
+     */
 	protected function _sendPacket(Net_DNS2_Packet $request, $use_tcp)
 	{
 		//
@@ -379,15 +430,7 @@ class Net_DNS2
 	}
 }
 
-//
-// register the auto-load functino
-//
-spl_autoload_register('Net_DNS2::autoload');
 
-//
-// generate the lookups so they're available everwhere
-//
-$GLOBALS['_Net_DNS2_Lookups'] = new Net_DNS2_Lookups();
 
 /*
  * Local variables:
