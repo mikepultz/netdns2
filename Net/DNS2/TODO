@@ -20,7 +20,7 @@ DONE - parse BIND style input and set all the appropriate values of the RR objec
 
 DONE - parse and read a resolv.conf file
 
-- fix up all teh exception handling
+DONE - fix up all teh exception handling
 
 DONE - add proper function comments at the head of each method
 

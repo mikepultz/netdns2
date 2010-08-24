@@ -229,7 +229,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
 		}
 	
 		$data = '';
-		$length = 512;
+		$length = Net_DNS2_Lookups::DNS_MAX_UDP_SIZE;
 
 		//
 		// if it's a TCP socket, then the first two bytes is the length of the DNS
@@ -245,7 +245,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
 			}
 
 			$length = ord($data[0]) << 8 | ord($data[1]);
-			if ($length < 12) {
+			if ($length < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
 
 				return false;
 			}

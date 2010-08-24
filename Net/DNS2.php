@@ -296,7 +296,7 @@ class Net_DNS2
 		// get the data from the packet
 		//
 		$data = $request->get();
-		if (strlen($data) < 12) {
+		if (strlen($data) < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
 
 			throw new InvalidArgumentException('invalid or empty packet for sending!');
 		}
@@ -327,6 +327,7 @@ class Net_DNS2
 
 				$ns = each($this->_nameservers);
 				if ($ns === FALSE) {
+
 					throw new Net_DNS2_Exception('every name server provided has failed.');
 				}
 
@@ -337,7 +338,7 @@ class Net_DNS2
 			// if the use TCP flag (force TCP) is set, or the packet is bigger than 512 bytes,
 			// use TCP for sending the packet
 			//
-			if ( ($use_tcp == true) || (strlen($data) > 512) || ($tcp_fallback == true) ) {
+			if ( ($use_tcp == true) || (strlen($data) > Net_DNS2_Lookups::DNS_MAX_UDP_SIZE) || ($tcp_fallback == true) ) {
 
 				$tcp_fallback = false;
 
@@ -385,7 +386,7 @@ class Net_DNS2
 				$size = 0;
 
 				$result = $this->_sockets['tcp'][$ns]->read($size);
-				if ( ($result === false) ||  ($size < 12) ) {
+				if ( ($result === false) ||  ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
 
 					continue;
 				}
@@ -442,7 +443,7 @@ class Net_DNS2
 				$size = 0;
 
 				$result = $this->_sockets['udp'][$ns]->read($size);
-				if (( $result === false) || ($size < 12) ) {
+				if (( $result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
 
 					continue;
 				}
@@ -475,6 +476,7 @@ class Net_DNS2
 		// make sure header id's match between the request and response
 		//
 		if ($request->header->id != $response->header->id) {
+
 			throw new Net_DNS2_Exception('invalid response header: the request id does not match the response id');
 		}
 
@@ -484,6 +486,7 @@ class Net_DNS2
 		// 0 = query, 1 = response
 		//
 		if ($response->header->qr != Net_DNS2_Lookups::QR_RESPONSE) {
+
 			throw new Net_DNS2_Exception('invalid response header: the response provided is not a response packet.');
 		}
 
@@ -491,6 +494,7 @@ class Net_DNS2
 		// make sure the response code in the header is ok
 		//
 		if ($response->header->rcode != Net_DNS2_Lookups::RCODE_NOERROR) {
+
 			throw new Net_DNS2_Exception('DNS request failed: ' . Net_DNS2_Lookups::$result_code_messages[$response->header->rcode]);
 		}
 

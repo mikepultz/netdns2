@@ -183,7 +183,7 @@ class Net_DNS2_Header
 		//
 		// the header must be at least 12 bytes long.
 		//
-		if ($packet->rdlength < 12) {
+		if ($packet->rdlength < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
 			throw new InvalidArgumentException('invalid header data provided; to small');
 		}
 

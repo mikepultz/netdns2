@@ -102,7 +102,7 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
 		// invalid.
 		//
 		$this->header = new Net_DNS2_Header($this);
-		$this->offset = 12;
+		$this->offset = Net_DNS2_Lookups::DNS_HEADER_SIZE;
 
 		//
 		// parse the questions
