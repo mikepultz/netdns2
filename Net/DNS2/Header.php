@@ -38,16 +38,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   Networking
- * @package    Net_DNS2
- * @author     Mike Pultz <mike@mikepultz.com>
- * @copyright  2010 Mike Pultz <mike@mikepultz.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
- * @link       http://pear.php.net/package/Net_DNS2
- * @since      File available since Release 1.0.0
+ * @category	Networking
+ * @package		Net_DNS2
+ * @author		Mike Pultz <mike@mikepultz.com>
+ * @copyright	2010 Mike Pultz <mike@mikepultz.com>
+ * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version		SVN: $Id$
+ * @link		http://pear.php.net/package/Net_DNS2
+ * @since		File available since Release 1.0.0
  *
+ */
+
+
+/**
+ * DNS Packet Header class
  *
+ * This class handles parsing and constructing DNS Packet Headers as defined
+ * by section 4.1.1 of RFC1035.
+ * 
  *  DNS header format - RFC1035 section 4.1.1
  *
  *      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
@@ -64,6 +72,9 @@
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *    |                    ARCOUNT                    |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *
+ * @package		Net_DNS2
+ * @author		Mike Pultz <mike@mikepultz.com>
  *
  */
 class Net_DNS2_Header
@@ -221,6 +232,8 @@ class Net_DNS2_Header
 		$x1 = ($this->qr << 7) | ($this->opcode << 3) | ($this->aa << 2) | ($this->tc << 1) | ($this->rd);
 		$x2 = ($this->ra << 7) | $this->rcode;
 
+		// TODO: get rid of pack()
+		//
 		return pack('nC2n4', $this->id, $x1, $x2, 
 			$this->qdcount, $this->ancount, $this->nscount, $this->arcount);
 	}

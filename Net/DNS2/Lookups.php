@@ -38,45 +38,53 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   Networking
- * @package    Net_DNS2
- * @author     Mike Pultz <mike@mikepultz.com>
- * @copyright  2010 Mike Pultz <mike@mikepultz.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
- * @link       http://pear.php.net/package/Net_DNS2
- * @since      File available since Release 1.0.0
+ * @category	Networking
+ * @package		Net_DNS2
+ * @author		Mike Pultz <mike@mikepultz.com>
+ * @copyright	2010 Mike Pultz <mike@mikepultz.com>
+ * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version		SVN: $Id$
+ * @link		http://pear.php.net/package/Net_DNS2
+ * @since		File available since Release 1.0.0
  *
+ */
+
+/**
+ * This class provides simple lookups used througout the Net_DNS2 code
+ * 
+ * @package     Net_DNS2
+ * @author      Mike Pultz <mike@mikepultz.com>
+ * 
  */
 class Net_DNS2_Lookups
 {
-	//
-	// Query/Response flag
-	//
+	/*
+	 * Query/Response flag
+	 */
 	const QR_QUERY			= 0;		// RFC 1035
 	const QR_RESPONSE		= 1;		// RFC 1035
 
-	//
-	// DNS Op Codes
-	//
+	/*
+	 * DNS Op Codes
+	 */
 	const OPCODE_QUERY	 	= 0; 		// RFC 1035
 	const OPCODE_IQUER		= 1; 		// RFC 1035, RFC 3425
 	const OPCODE_STATUS		= 2; 		// RFC 1035
 	const OPCODE_NOTIFY		= 4; 		// RFC 1996
 	const OPCODE_UPDATE		= 5; 		// RFC 2136
 
-	//
-	// RR Class
-	//
+	/*
+	 * Resource Record Classes
+	 */
 	const RR_CLASS_IN		= 1;		// RFC 1035
 	const RR_CLASS_CH		= 3;		// RFC 1035
 	const RR_CLASS_HS		= 4;		// RFC 1035
 	const RR_CLASS_NONE		= 254;		// RFC 2136
 	const RR_CLASS_ANY		= 255;		// RFC 1035
 
-	//
-	// DNS Response Codes
-	//
+	/*
+	 * DNS Response Codes
+	 */
 	const RCODE_NOERROR		= 0;		// RFC 1035
 	const RCODE_FORMERR		= 1; 		// RFC 1035
 	const RCODE_SERVFAIL	= 2; 		// RFC 1035
@@ -99,20 +107,23 @@ class Net_DNS2_Lookups
 	const RCODE_BADALG		= 21;		// RFC 2930
 	const RCODE_BADTRUNC	= 22;		// RFC 4635
 	
-	//
-	// DNSSEC Algorithms
-	//
+	/*
+	 * DNSSEC Algorithms
+	 */
 	const DNSSEC_RSA_MD5	= 1;
 	const DNSSEC_DH			= 2;
 	const DNSSEC_DSA_SHA1	= 3;
 	const DNSSEC_ECC		= 4;
 	const DNSSEC_RSA_SHA1	= 5;
 
-	//
-	// The packet id used when sending requests
-	//
+	/*
+	 * The packet id used when sending requests
+	 */
 	public static $next_packet_id;
 
+	/*
+	 * Used to map resource record types to their id's, and back
+	 */
 	public static $rr_types_by_id = array();
 	public static $rr_types_by_name = array(
 
@@ -187,6 +198,9 @@ class Net_DNS2_Lookups
 		'DLV'		=> 32769
 	);
 
+	/*
+	 * used to map resource record id's to RR class names
+	 */
 	public static $rr_types_class_to_id = array();
 	public static $rr_types_id_to_class = array(
 
@@ -238,6 +252,9 @@ class Net_DNS2_Lookups
 		32769	=> 'Net_DNS2_RR_DLV'
 	);
 
+	/*
+	 * used to map resource record class names to their id's, and back
+	 */
 	public static $classes_by_id = array();
 	public static $classes_by_name = array(
 
@@ -248,6 +265,9 @@ class Net_DNS2_Lookups
 		'ANY'	=> self::RR_CLASS_ANY		// RFC 1035
 	);
 
+	/*
+	 * maps response codes to error messages
+	 */
 	public static $result_code_messages = array(
 
 		self::RCODE_NOERROR		=> 'The request completed successfully.',
@@ -271,6 +291,9 @@ class Net_DNS2_Lookups
 		self::RCODE_BADTRUNC	=> 'Bad truncation.'
 	);
 
+	/*
+	 * maps DNS SEC alrorithms to their names
+	 */
 	public static $dns_sec_algorithms = array(
 	
 		self::DNSSEC_RSA_MD5	=> 'RSA/MD5 [RSAMD5]',		// RFC 2537

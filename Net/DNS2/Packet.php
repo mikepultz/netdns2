@@ -38,14 +38,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   Networking
- * @package    Net_DNS2
- * @author     Mike Pultz <mike@mikepultz.com>
- * @copyright  2010 Mike Pultz <mike@mikepultz.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
- * @link       http://pear.php.net/package/Net_DNS2
- * @since      File available since Release 1.0.0
+ * @category	Networking
+ * @package		Net_DNS2
+ * @author		Mike Pultz <mike@mikepultz.com>
+ * @copyright	2010 Mike Pultz <mike@mikepultz.com>
+ * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version		SVN: $Id$
+ * @link		http://pear.php.net/package/Net_DNS2
+ * @since		File available since Release 1.0.0
  *
  * This file contains code based off the Net::DNS Perl module by
  * Michael Fuhr.
@@ -57,47 +57,68 @@
  * under the same terms as Perl itself.
  *
  */
+
+/**
+ * This is the base class that holds a standard DNS packet.
+ *
+ * The Net_DNS2_Packet_Request and Net_DNS2_Packet_Response classes extend this
+ * class.
+ *
+ * @package     Net_DNS2
+ * @author      Mike Pultz <mike@mikepultz.com>
+ * @see			Net_DNS2_Packet_Request, Net_DNS2_Packet_Response
+ *
+ */
 class Net_DNS2_Packet
 {
-	//
-	// the full binary data for this packet
-	//
+	/*
+	 * the full binary data and length for this packet
+	 */
 	public $rdata;
 	public $rdlength;
 
-	//
-	// the offset pointer used when building/parsing packets
-	//
+	/*
+	 * the offset pointer used when building/parsing packets
+	 */
 	public $offset;
 
-	//
-	// the DNS packet header
-	//
+	/*
+	 * Net_DNS2_Header object with the DNS packet header
+	 */
 	public $header;
 
-	//
-	// array of Net_DNS2_Question objects
-	//
+	/*
+	 * array of Net_DNS2_Question objects
+	 *
+	 * used as "zone" for updates per RFC2136
+	 *
+	 */
 	public $question = array();
 
-	//
-	// array of Net_DNS2_RR Objects for Answers
-	//
+	/*
+	 * array of Net_DNS2_RR Objects for Answers
+	 * 
+	 * used as "prerequisite" for updates per RFC2136
+	 *
+	 */
 	public $answer = array();
 
-	//
-	// array of Net_DNS2_RR Objects for Authority
-	//
+	/*
+	 * array of Net_DNS2_RR Objects for Authority
+	 *
+	 * used as "update" for updates per RFC2136
+	 *
+	 */
 	public $authority = array();
 
-	//
-	// array of Net_DNS2_RR Objects for Addtitional
-	//
+	/*
+	 * array of Net_DNS2_RR Objects for Addtitional
+	 */
 	public $additional = array();
 
-	//
-	// array of compressed labeles
-	//
+	/*
+	 * array of compressed labeles
+	 */
 	private $_compressed = array();
 
     /**

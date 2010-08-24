@@ -38,15 +38,22 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   Networking
- * @package    Net_DNS2
- * @author     Mike Pultz <mike@mikepultz.com>
- * @copyright  2010 Mike Pultz <mike@mikepultz.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
- * @link       http://pear.php.net/package/Net_DNS2
- * @since      File available since Release 1.0.0
+ * @category	Networking
+ * @package		Net_DNS2
+ * @author		Mike Pultz <mike@mikepultz.com>
+ * @copyright	2010 Mike Pultz <mike@mikepultz.com>
+ * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version		SVN: $Id$
+ * @link		http://pear.php.net/package/Net_DNS2
+ * @since		File available since Release 1.0.0
  *
+ */
+
+/**
+ * This class handles parsing and constructing the question sectino of DNS
+ * packets.
+ *
+ * This is referred to as the "zone" for update per RFC2136
  *
  * DNS question format - RFC1035 section 4.1.2
  *
@@ -61,11 +68,35 @@
  *    |                     QCLASS                    |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @package     Net_DNS2
+ * @author      Mike Pultz <mike@mikepultz.com>
+ * @see         Net_DNS2_Packet
+ *
  */
 class Net_DNS2_Question
 {
+	/*
+	 * The name of the question
+	 *
+	 * referred to as "zname" for updates per RFC2136
+	 *
+	 * /
 	public $qname;
+
+	/*
+	 * The RR type for the questino
+	 *
+	 * referred to as "ztype" for updates per RFC2136
+	 *
+	 */
 	public $qtype;
+	
+	/*
+	 * The RR class for the questino
+	 *
+	 * referred to as "zclass" for updates per RFC2136
+	 *
+	 */
 	public $qclass;
 
     /**
@@ -74,8 +105,6 @@ class Net_DNS2_Question
      * @param   mixed	$packet			either a Net_DNS2_Packet object, or null to build an empty object
      * @throws  InvalidArgumentException
 	 * @access	public
-	 *
-     * TODO: update this
 	 *
      */
 	public function __construct(Net_DNS2_Packet &$packet = null)
@@ -154,6 +183,8 @@ class Net_DNS2_Question
 	{
 		// TODO: validate the type/class and throw an exception if they're not found.
 
+		// TODO: get rid of pack()
+		//
 		return $packet->compress($this->qname, $offset) . 
 			pack('nn', Net_DNS2_Lookups::$rr_types_by_name[$this->qtype], Net_DNS2_Lookups::$classes_by_name[$this->qclass]);
 	}
