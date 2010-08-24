@@ -48,8 +48,7 @@
  * @since      File available since Release 1.0.0
  */
 
-class Net_DNS2_NameServer_Exception extends Exception {}
-class Net_DNS2_Socket_Exception extends Exception {}
+class Net_DNS2_Exception extends Exception {}
 
 /*
  * Local variables:

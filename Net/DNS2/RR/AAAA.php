@@ -89,7 +89,7 @@ class Net_DNS2_RR_AAAA extends Net_DNS2_RR
      * @access  protected
      *
      */
-	protected function _fromString($line)
+	protected function _fromString(array $rdata)
 	{
 	}
 

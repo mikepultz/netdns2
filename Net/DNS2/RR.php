@@ -344,7 +344,7 @@ abstract class Net_DNS2_RR
      *
      * @param	Net_DNS2_Packet	$packet		a Net_DNS2_Packet packet used for decompressing names
 	 * @return	mixed						returns a new Net_DNS2_RR_* object for the given RR
-     * @throws  InvalidArgumentException
+     * @throws  Net_DNS2_Exception
      * @access	public
      *
      */
@@ -358,13 +358,11 @@ abstract class Net_DNS2_RR
 		$object['name'] = $packet->expand($packet, $packet->offset);
 		if (is_null($object['name'])) {
 
-			// TODO: throw exception
-			return null;
+			throw new Net_DNS2_Exception('failed to parse resource record: failed to expand name.');
 		}
 		if ($packet->rdlength < ($packet->offset + 10)) {
 
-			// TODO: throw exception
-			return null;
+			throw new Net_DNS2_Exception('failed to parse resource record: packet too small.');
 		}
 
 		//
@@ -398,7 +396,7 @@ abstract class Net_DNS2_RR
 				$packet->offset += $object['rdlength'];
 			}
 		} else {
-			// TODO: throw un-implemented RR exception
+			throw new Net_DNS2_Exception('un-implemented resource record type: ' . $object['type']);
 		}
 
 		return $o;

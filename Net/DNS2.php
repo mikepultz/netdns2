@@ -166,6 +166,7 @@ class Net_DNS2
 	static public function autoload($name)
 	{
 		require str_replace('_', '/', $name) . '.php';
+		return;
 	}
 
     /**
@@ -174,7 +175,7 @@ class Net_DNS2
 	 * @param	mixed	$nameservers	either an array of name servers, or a file name to parse, assuming it's
 	 *									in the resolv.conf format
 	 * @return	boolean
-	 * @throws	
+	 * @throws	Net_DNS2_Exception
      * @access  public
      *
      */
@@ -199,7 +200,7 @@ class Net_DNS2
 	
 				$data = file_get_contents($nameservers);
 				if ($data === FALSE) {
-					// TODO: throw exception
+					throw new Net_DNS2_Exception('failed to read contents of file: ' . $nameservers);
 				}
 
 				$lines = explode("\n", $data);
@@ -250,7 +251,7 @@ class Net_DNS2
 				}
 
 			} else {
-				// TODO: throw exception
+				throw new Net_DNS2_Exception('resolver file file provided is not readable: ' . $nameservers);
 			}
 		}
 
@@ -266,15 +267,14 @@ class Net_DNS2
      * checks the list of name servers to make sure they're set
      *
 	 * @return	boolean
-	 * @throws	Net_DNS2_NameServer_Exception
+	 * @throws	Net_DNS2_Exception
      * @access  protected
      *
      */
 	protected function _checkServers()
 	{
 		if (empty($this->_nameservers)) {
-
-			throw new Net_DNS2_NameServer_Exception('Empty name servers list');
+			throw new Net_DNS2_Exception('emtpy name servers list; you must provide a list of name servers, or the path to a resolv.conf file.');
 		}
 	
 		return true;
@@ -286,7 +286,7 @@ class Net_DNS2
 	 * @param	Net_DNS2_Packet	$request	a Net_DNS2_Packet_Request object
 	 * @param	boolean			$use_tcp	true/false if the function should use TCP for the request
 	 * @return	mixed						returns a Net_DNS2_Packet_Response object, or false on error
-	 * @throws
+	 * @throws	InvalidArgumentException, Net_DNS2_Exception, Net_DNS2_Socket_Exception
      * @access  protected
      *
      */
@@ -327,9 +327,9 @@ class Net_DNS2
 
 				$ns = each($this->_nameservers);
 				if ($ns === FALSE) {
-
-					throw new Net_DNS2_Socket_Exception('exhausted name server list');
+					throw new Net_DNS2_Exception('every name server provided has failed.');
 				}
+
 				$ns = $ns[1];
 			}
 
@@ -475,7 +475,7 @@ class Net_DNS2
 		// make sure header id's match between the request and response
 		//
 		if ($request->header->id != $response->header->id) {
-			// TODO: throw new exception
+			throw new Net_DNS2_Exception('invalid response header: the request id does not match the response id');
 		}
 
 		//
@@ -483,22 +483,20 @@ class Net_DNS2
 		// 
 		// 0 = query, 1 = response
 		//
-		if ($response->header->qr != Net_DNS2_Lookups::QR_QUERY) {
-			// TODO: throw new exception
+		if ($response->header->qr != Net_DNS2_Lookups::QR_RESPONSE) {
+			throw new Net_DNS2_Exception('invalid response header: the response provided is not a response packet.');
 		}
 
 		//
 		// make sure the response code in the header is ok
 		//
 		if ($response->header->rcode != Net_DNS2_Lookups::RCODE_NOERROR) {
-			// TODO: throw new exception - include error message
+			throw new Net_DNS2_Exception('DNS request failed: ' . Net_DNS2_Lookups::$result_code_messages[$response->header->rcode]);
 		}
 
 		return $response;
 	}
 }
-
-
 
 /*
  * Local variables:

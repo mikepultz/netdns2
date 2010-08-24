@@ -169,6 +169,8 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
 		//
 		if ($this->_type == SOCK_STREAM) {
 
+			// TODO: get rid of pack()
+
 			$length = pack('n', strlen($data));
 
 			$s = strlen($data);
@@ -245,6 +247,8 @@ echo "length=" . base64_encode($r) . ", " . $s . "\n";
 				return false;
 			}
 			
+			// TODO: get rid of unpack()
+
 			$x = unpack('nlength', $data);
 			$data = '';
 

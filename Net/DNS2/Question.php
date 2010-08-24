@@ -149,8 +149,7 @@ class Net_DNS2_Question
 		$this->qname = $packet->expand($packet, $packet->offset);
 		if ($packet->rdlength < ($packet->offset + 4)) {
 
-			// TODO: throw exception
-			return false;
+			throw new InvalidArgumentException('invalid question question section: to small');
 		}
 
 		//
@@ -159,8 +158,16 @@ class Net_DNS2_Question
 		$type 			= ord($packet->rdata[$packet->offset++]) << 8 | ord($packet->rdata[$packet->offset++]);
 		$class 			= ord($packet->rdata[$packet->offset++]) << 8 | ord($packet->rdata[$packet->offset++]);
 
-		// TODO: validate the type/class and throw an exception if they're not found.
+		//
+		// validate it
+		//
+		if ( (!isset(Net_DNS2_Lookups::$rr_types_by_id[$type])) || (!isset(Net_DNS2_Lookups::$classes_by_id[$class])) ) {
+			throw new InvalidArgumentException('invalid question section: invalid type (' . $type . ') or class (' . $class . ') specified.');
+		}
 
+		//
+		// store it
+		//
 		$this->qtype 	= Net_DNS2_Lookups::$rr_types_by_id[$type];
 		$this->qclass	= Net_DNS2_Lookups::$classes_by_id[$class];
 
@@ -181,7 +188,12 @@ class Net_DNS2_Question
      */
 	public function get(Net_DNS2_Packet &$packet, $offset)
 	{
-		// TODO: validate the type/class and throw an exception if they're not found.
+		//
+		// validate the type and class
+		//
+		if ( (!isset(Net_DNS2_Lookups::$rr_types_by_name[$this->qtype])) || (!isset(Net_DNS2_Lookups::$classes_by_name[$this->qclass])) ) {
+			throw new InvalidArgumentException('invalid question section: invalid type (' . $this->qtype . ') or class (' . $this->qclass . ') specified.');
+		}
 
 		// TODO: get rid of pack()
 		//

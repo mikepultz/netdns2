@@ -88,8 +88,6 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
      */
 	public function set($data, $size)
 	{
-		// TODO: check the size and throw an exception
-
 		//
 		// store the full packet
 		//
@@ -98,6 +96,10 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
 
 		//
 		// parse the header
+		// 
+		// we don't bother checking the size earlier, because the first thing the
+		// header class does, it check the size and throw and exception if it's
+		// invalid.
 		//
 		$this->header = new Net_DNS2_Header($this);
 		$this->offset = 12;
