@@ -11,6 +11,11 @@ Net_DNS2 TODO List
 
 - finish DNSSEC RR's
 
+- finish missing RR's
+
+	- NSAP, NSAP_PTR, SIG, EID, NIMLOC, KX, CERT, DNAME, OPT, APL, SSHFP,
+	  IPSECKEY, NSEC, DHCID, NSEC3, NSEC3PARAM, HIP
+
 DONE - parse BIND style input and set all the appropriate values of the RR object
 
 DONE - parse and read a resolv.conf file
