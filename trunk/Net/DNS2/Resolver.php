@@ -98,6 +98,14 @@ class Net_DNS2_Resolver extends Net_DNS2
 		}
 
 		//
+		// if the name *looks* too short, then append the domain from the config
+		//
+		if (strpos($name, '.') === FALSE) {
+
+			$name .= '.' . strtolower($this->domain);
+		}
+
+		//
 		// create a new packet based on the input
 		//
 		$packet = new Net_DNS2_Packet_Request($name, $type, $class);
@@ -106,6 +114,51 @@ class Net_DNS2_Resolver extends Net_DNS2
 		// send the packet and get back the response
 		//
 		return $this->_sendPacket($packet, ($type == 'AXFR') ? true : $this->use_tcp);
+	}
+
+	/**
+     * does an inverse query for the given RR; most DNS servers do not implement 
+	 * inverse queries, but they should be able to return "not implemented"
+     *
+	 * @param	Net_DNS2_RR		$rr		the RR object to lookup
+	 * @return	Net_DNS_RR object
+	 * @throws	
+     * @access	public
+     *
+     */
+	public function iquery(Net_DNS2_RR $rr)
+	{
+		//
+		// make sure we have some name servers set
+		//
+		$this->_checkServers();
+
+		//
+		// create an empty packet
+		//
+		$packet = new Net_DNS2_Packet_Request($rr->name, 'A', 'IN');
+
+		//
+		// unset the question
+		//
+		$packet->question = array();
+		$packet->header->qdcount = 0;
+
+		//
+		// set the opcode to IQUERY
+		//
+		$packet->header->opcode = Net_DNS2_Lookups::OPCODE_IQUERY;
+
+		//
+		// add the given RR as the answer
+		//
+		$packet->answer[] = $rr;
+		$packet->header->ancount = 1;
+
+		//
+		// send the packet and get back the response
+		//
+		return $this->_sendPacket($packet, $this->use_tcp);
 	}
 }
 

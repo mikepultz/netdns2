@@ -68,7 +68,7 @@ class Net_DNS2_Lookups
 	 * DNS Op Codes
 	 */
 	const OPCODE_QUERY	 	= 0; 		// RFC 1035
-	const OPCODE_IQUER		= 1; 		// RFC 1035, RFC 3425
+	const OPCODE_IQUERY		= 1; 		// RFC 1035, RFC 3425
 	const OPCODE_STATUS		= 2; 		// RFC 1035
 	const OPCODE_NOTIFY		= 4; 		// RFC 1996
 	const OPCODE_UPDATE		= 5; 		// RFC 2136
