@@ -78,7 +78,7 @@ class Net_DNS2_Resolver extends Net_DNS2
 	 * @param	string	$type		the name of the RR type to lookup
 	 * @param	string	$class		the name of the RR class to lookup
 	 * @return	Net_DNS_RR object
-	 * @throws	
+	 * @throws	InvalidArgumentException, Net_DNS2_Exception, Net_DNS2_Socket_Exception
      * @access	public
      *
      */
@@ -94,6 +94,7 @@ class Net_DNS2_Resolver extends Net_DNS2
 		// zone transfer can be returned
 		//
 		if ($type == 'IXFR') {
+
 			$type = 'AXFR';
 		}
 
@@ -122,7 +123,7 @@ class Net_DNS2_Resolver extends Net_DNS2
      *
 	 * @param	Net_DNS2_RR		$rr		the RR object to lookup
 	 * @return	Net_DNS_RR object
-	 * @throws	
+	 * @throws	InvalidArgumentException, Net_DNS2_Exception, Net_DNS2_Socket_Exception
      * @access	public
      *
      */

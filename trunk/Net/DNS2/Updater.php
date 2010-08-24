@@ -102,15 +102,19 @@ class Net_DNS2_Updater extends Net_DNS2
      *
      * @param	string	$name		The name to be checked.
 	 * @return	boolean
+	 * @throws	InvalidArgumentException
      * @access	private
      *
      */
 	private function _checkName($name)
 	{
-		if (preg_match('/' . $this->_packet->question[0]->qname . '$/', $name) == 1) {
-			return true;
+		if (!preg_match('/' . $this->_packet->question[0]->qname . '$/', $name)) {
+			
+			throw new InvalidArgumentException('name provided (' . $name . ') does not match zone name (' 
+				$this->_packet->question[0]->qname . ')');
 		}
-		return false;
+	
+		return true;
 	}
 
 	//
@@ -131,17 +135,17 @@ class Net_DNS2_Updater extends Net_DNS2
 	 *
 	 * @param	Net_DNS2_RR		$rr		the Net_DNS2_RR object to be added to the zone
 	 * @return	boolean
-	 * @throws	
+	 * @throws	InvalidArgumentException
 	 * @access	public
 	 *
 	 */
 	public function add(Net_DNS2_RR $rr)
 	{
-		if ($this->_checkName($rr->name) == false) {
+		$this->_checkName($rr->name);
 
-			// TODO: throw exception;
-		}
-
+		//
+		// add the RR to the "update" section
+		//
 		$this->_packet->authority[] = $rr;
 		return true;
 	}
@@ -158,20 +162,20 @@ class Net_DNS2_Updater extends Net_DNS2
 	 *
 	 * @param	Net_DNS2_RR		$rr		the Net_DNS2_RR object to be deleted from the zone
 	 * @return	boolean
-	 * @throws	
+	 * @throws	InvalidArgumentException
 	 * @access	public
 	 *
 	 */
 	public function delete(Net_DNS2_RR $rr)
 	{
-		if ($this->_checkName($rr->name) == false) {
-
-			// TODO: throw exception;
-		}
+		$this->_checkName($rr->name);
 
 		$rr->ttl 	= 0;
 		$rr->class	= 'NONE';
 
+		//
+		// add the RR to the "update" section
+		//
 		$this->_packet->authority[] = $rr;
 		return true;
 	}
@@ -189,18 +193,17 @@ class Net_DNS2_Updater extends Net_DNS2
 	 * @param	string		$name	the RR name to be removed from the zone
 	 * @param	string		$type	the RR type to be removed from the zone
 	 * @return	boolean
-	 * @throws	
+	 * @throws	InvalidArgumentException
 	 * @access	public
 	 *
 	 */
 	public function deleteAny($name, $type)
 	{
-		if ($this->_checkName($name) == false) {
-			// TODO: throw exception;
-		}
+		$this->_checkName($name);
 
 		if (!isset(Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]])) {
-			// TODO: throw execption
+
+			throw new InvalidArgumentException('unknown or un-supported resource record type: ' . $type);
 		}
 	
 		$rr 			= new Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]];
@@ -211,6 +214,9 @@ class Net_DNS2_Updater extends Net_DNS2
 		$rr->rdlength	= -1;
 		$rr->rdata		= '';	
 
+		//
+		// add the RR to the "update" section
+		//
 		$this->_packet->authority[] = $rr;
 		return true;
 	}
@@ -227,17 +233,18 @@ class Net_DNS2_Updater extends Net_DNS2
 	 *
 	 * @param	string		$name	the RR name to be removed from the zone
 	 * @return	boolean
-	 * @throws	
+	 * @throws	InvalidArgumentException
 	 * @access	public
 	 *
 	 */
 	public function deleteAll($name)
 	{
-		if ($this->_checkName($name) == false) {
+		$this->_checkName($name);
 
-			// TODO: throw exception;
-		}
-
+		//
+		// the Net_DNS2_RR_ANY class is just an empty stub class used for these
+		// cases only
+		//
 		$rr = new Net_DNS2_RR_ANY;
 
 		$rr->name		= $name;
@@ -247,6 +254,9 @@ class Net_DNS2_Updater extends Net_DNS2
 		$rr->rdlength	= -1;
 		$rr->rdata		= '';
 
+		//
+		// add the RR to the "update" section
+		//
 		$this->_packet->authority[] = $rr;
 		return true;
 	}
@@ -267,18 +277,17 @@ class Net_DNS2_Updater extends Net_DNS2
 	 * @param	string		$name	the RR name for the prerequisite
 	 * @param	string		$type	the RR type for the prerequisite
 	 * @return	boolean
-	 * @throws	
+	 * @throws	InvalidArgumentException
 	 * @access	public
 	 *
 	 */
 	public function checkExists($name, $type)
 	{
-		if ($this->_checkName($name) == false) {
-			// TODO: throw exception;
-		}
+		$this->_checkName($name);
 
 		if (!isset(Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]])) {
-			// TODO: throw execption
+
+			throw new InvalidArgumentException('unknown or un-supported resource record type: ' . $type);
 		}
 	
 		$rr 			= new Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]];
@@ -289,6 +298,9 @@ class Net_DNS2_Updater extends Net_DNS2
 		$rr->rdlength	= -1;
 		$rr->rdata		= '';	
 
+		//
+		// add the RR to the "prerequisite" section
+		//
 		$this->_packet->answer[] = $rr;
 		return true;
 	}
@@ -310,19 +322,19 @@ class Net_DNS2_Updater extends Net_DNS2
 	 *
 	 * @param	Net_DNS2_RR	$rr		the RR object to be used as a prerequisite
 	 * @return	boolean
-	 * @throws	
+	 * @throws	InvalidArgumentException
 	 * @access	public
 	 *
 	 */
 	public function checkValueExists(Net_DNS2_RR $rr)
 	{
-		if ($this->_checkName($rr->name) == false) {
-
-			// TODO: throw exception;
-		}
+		$this->_checkName($rr->name);
 
 		$rr->ttl = 0;
 
+		//
+		// add the RR to the "prerequisite" section
+		//
 		$this->_packet->answer[] = $rr;
 		return true;
 	}
@@ -344,18 +356,17 @@ class Net_DNS2_Updater extends Net_DNS2
 	 * @param	string		$name	the RR name for the prerequisite
 	 * @param	string		$type	the RR type for the prerequisite
 	 * @return	boolean
-	 * @throws	
+	 * @throws	InvalidArgumentException
 	 * @access	public
 	 *
 	 */
 	public function checkNotExists($name, $type)
 	{
-		if ($this->_checkName($name) == false) {
-			// TODO: throw exception;
-		}
+		$this->_checkName($name);
 
 		if (!isset(Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]])) {
-			// TODO: throw execption
+
+			throw new InvalidArgumentException('unknown or un-supported resource record type: ' . $type);
 		}
 	
 		$rr 			= new Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]];
@@ -366,6 +377,9 @@ class Net_DNS2_Updater extends Net_DNS2
 		$rr->rdlength	= -1;
 		$rr->rdata		= '';	
 
+		//
+		// add the RR to the "prerequisite" section
+		//
 		$this->_packet->answer[] = $rr;
 		return true;
 	}
@@ -387,16 +401,18 @@ class Net_DNS2_Updater extends Net_DNS2
 	 *
 	 * @param	string		$name	the RR name for the prerequisite
 	 * @return	boolean
-	 * @throws	
+	 * @throws	InvalidArgumentException
 	 * @access	public
 	 *
 	 */
 	public function checkNameInUse($name)
 	{
-		if ($this->_checkName($name) == false) {
-			// TODO: throw exception;
-		}
+		$this->_checkName($name);
 
+		//
+		// the Net_DNS2_RR_ANY class is just an empty stub class used for these
+		// cases only
+		//
 		$rr = new Net_DNS2_RR_ANY;
 
 		$rr->name		= $name;
@@ -406,6 +422,9 @@ class Net_DNS2_Updater extends Net_DNS2
 		$rr->rdlength	= -1;
 		$rr->rdata		= '';
 
+		//
+		// add the RR to the "prerequisite" section
+		//
 		$this->_packet->answer[] = $rr;
 		return true;
 	}
@@ -424,16 +443,18 @@ class Net_DNS2_Updater extends Net_DNS2
 	 *
 	 * @param	string		$name	the RR name for the prerequisite
 	 * @return	boolean
-	 * @throws	
+	 * @throws	InvalidArgumentException
 	 * @access	public
 	 *
 	 */
 	public function checkNameNotInUse($name)
 	{
-		if ($this->_checkName($name) == false) {
-			// TODO: throw exception;
-		}
+		$this->_checkName($name);
 
+		//
+		// the Net_DNS2_RR_ANY class is just an empty stub class used for these
+		// cases only
+		//
 		$rr = new Net_DNS2_RR_ANY;
 
 		$rr->name		= $name;
@@ -443,6 +464,9 @@ class Net_DNS2_Updater extends Net_DNS2
 		$rr->rdlength	= -1;
 		$rr->rdata		= '';
 
+		//
+		// add the RR to the "prerequisite" section
+		//
 		$this->_packet->answer[] = $rr;
 		return true;
 	}
@@ -451,7 +475,7 @@ class Net_DNS2_Updater extends Net_DNS2
 	 * executes the update request with the object informaton
 	 *
 	 * @return	boolean
-	 * @throws	
+	 * @throws	InvalidArgumentException, Net_DNS2_Exception, Net_DNS2_Socket_Exception
 	 * @access	public
 	 *
 	 */
@@ -474,7 +498,7 @@ class Net_DNS2_Updater extends Net_DNS2
 		// make sure we have some data to send
 		//
 		if ( ($this->_packet->header->qdcount == 0) || ($this->_packet->header->nscount == 0) ) {
-			// TODO: throw execption
+			throw new InvalidArgumentException('empty headers- nothing to send!');
 		}
 
 		//

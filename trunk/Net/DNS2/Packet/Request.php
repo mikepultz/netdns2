@@ -92,7 +92,7 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
 		//
 		// generate a new header
 		//
-		$this->header       = new Net_DNS2_Header();
+		$this->header = new Net_DNS2_Header();
 
 		//
 		// add a new question

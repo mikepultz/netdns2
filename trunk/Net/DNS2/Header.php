@@ -137,6 +137,7 @@ class Net_DNS2_Header
 
 			Net_DNS2_Lookups::$next_packet_id = 1;
 		}
+
 		return Net_DNS2_Lookups::$next_packet_id;
 	}
 
@@ -183,7 +184,6 @@ class Net_DNS2_Header
 		// the header must be at least 12 bytes long.
 		//
 		if ($packet->rdlength < 12) {
-
 			throw new InvalidArgumentException('invalid header data provided; to small');
 		}
 
@@ -218,14 +218,11 @@ class Net_DNS2_Header
 	 * returns a binary packed DNS Header
 	 *
 	 * @return	string
-	 * @throws	InvalidArgumentException
 	 * @access	public
 	 *
 	 */
 	public function get()
 	{
-		// TODO: validate the header data and throw an exeception if it's "broken"
-
 		//
 		// pack and return the header as binary
 		//

@@ -222,7 +222,7 @@ class Net_DNS2_Lookups
 	//	24		=> 'Net_DNS2_RR_SIG',
 		25		=> 'Net_DNS2_RR_KEY',
 		26		=> 'Net_DNS2_RR_PX',
-	//	28		=> 'Net_DNS2_RR_AAAA',
+		28		=> 'Net_DNS2_RR_AAAA',
 	//	29		=> 'Net_DNS2_RR_LOC',
 	//	31		=> 'Net_DNS2_RR_EID',
 	//	32		=> 'Net_DNS2_RR_NIMLOC',

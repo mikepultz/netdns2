@@ -187,6 +187,8 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 		//		
 		if ($this->_type == SOCK_STREAM) {
 
+			// TODO: get rid of pack()
+
 			$length = pack('n', strlen($data));
 
 			if (@fwrite($this->_sock, $length) === FALSE) {
@@ -255,6 +257,8 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 				return false;
 			}
 		
+			// TODO: get rid of unpack()
+
 			$x = unpack('nlength', $data);
 			$data = '';
 
