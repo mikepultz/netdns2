@@ -38,31 +38,56 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   Networking
- * @package    Net_DNS2
- * @author     Mike Pultz <mike@mikepultz.com>
- * @copyright  2010 Mike Pultz <mike@mikepultz.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
- * @link       http://pear.php.net/package/Net_DNS2
- * @since      File available since Release 1.0.0
+ * @category	Networking
+ * @package		Net_DNS2
+ * @author		Mike Pultz <mike@mikepultz.com>
+ * @copyright	2010 Mike Pultz <mike@mikepultz.com>
+ * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version		SVN: $Id$
+ * @link		http://pear.php.net/package/Net_DNS2
+ * @since		File available since Release 1.0.0
+ *
  */
 
-//
-// A Resource Record - RFC1035 section 3.4.1
-//
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//    |                    ADDRESS                    |
-//    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//
+/*
+ * A Resource Record - RFC1035 section 3.4.1
+ *
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    |                    ADDRESS                    |
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *
+ * @package     Net_DNS2
+ * @author      Mike Pultz <mike@mikepultz.com>
+ * @see         Net_DNS2_RR
+ *
+ */
 class Net_DNS2_RR_A extends Net_DNS2_RR
 {
+	/*
+	 * The IPv4 address in quad-dotted notation
+	 */
 	public $address;
 
+    /**
+     * method to return the rdata portion of the packet as a string
+     *
+     * @return  string
+     * @access  protected
+     *
+     */
 	protected function _toString()
 	{
 		return $this->address;
 	}
+
+    /**
+     * parses the rdata portion from a standard DNS config line
+     *
+     * @param   array       $rdata  a string split line of values for the rdata
+     * @return  boolean
+     * @access  protected
+     *
+     */
 	protected function _fromString(array $rdata)
 	{
 		$value = array_shift($rdata);
@@ -82,6 +107,15 @@ class Net_DNS2_RR_A extends Net_DNS2_RR
 
 		return false;
 	}
+
+    /**
+     * parses the rdata of the Net_DNS2_Packet object
+     *
+     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet to parse the RR from
+     * @return  boolean
+     * @access  protected
+     * 
+     */
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
 		if ($this->rdlength > 0) {
@@ -92,6 +126,15 @@ class Net_DNS2_RR_A extends Net_DNS2_RR
 
 		return true;
 	}
+
+    /**
+     * returns the rdata portion of the DNS packet
+     * 
+     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet use for compressed names
+     * @return  mixed                       either returns a binary packed string or null on failure
+     * @access  protected
+     * 
+     */
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
 		$x = explode('.', $this->address);

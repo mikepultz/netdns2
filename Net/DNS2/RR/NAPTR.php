@@ -38,49 +38,95 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   Networking
- * @package    Net_DNS2
- * @author     Mike Pultz <mike@mikepultz.com>
- * @copyright  2010 Mike Pultz <mike@mikepultz.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
- * @link       http://pear.php.net/package/Net_DNS2
- * @since      File available since Release 1.0.0
+ * @category	Networking
+ * @package		Net_DNS2
+ * @author		Mike Pultz <mike@mikepultz.com>
+ * @copyright	2010 Mike Pultz <mike@mikepultz.com>
+ * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version		SVN: $Id$
+ * @link		http://pear.php.net/package/Net_DNS2
+ * @since		File available since Release 1.0.0
+ *
  */
 
-//
-// NAPTR Resource Record - RFC2915
-//
-//	  0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
-//   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//   |                     ORDER                     |
-//   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//   |                   PREFERENCE                  |
-//   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//   /                     FLAGS                     /
-//   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//   /                   SERVICES                    /
-//   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//   /                    REGEXP                     /
-//   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//   /                  REPLACEMENT                  /
-//   /                                               /
-//   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-//
+/*
+ * NAPTR Resource Record - RFC2915
+ *
+ *	  0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+ *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *   |                     ORDER                     |
+ *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *   |                   PREFERENCE                  |
+ *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *   /                     FLAGS                     /
+ *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *   /                   SERVICES                    /
+ *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *   /                    REGEXP                     /
+ *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *   /                  REPLACEMENT                  /
+ *   /                                               /
+ *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *
+ * @package     Net_DNS2
+ * @author      Mike Pultz <mike@mikepultz.com>
+ * @see         Net_DNS2_RR
+ *
+ */
 class Net_DNS2_RR_NAPTR extends Net_DNS2_RR
 {
+	/*
+	 * the order in which the NAPTR records MUST be processed
+	 */
 	public $order;
+
+	/*
+	 * specifies the order in which NAPTR records with equal "order" values SHOULD be processed
+	 */
 	public $preference;
+
+	/*
+	 * rewrite flags
+	 */
 	public $flags;
+
+	/* 
+	 * Specifies the service(s) available down this rewrite path
+	 */
 	public $services;
+
+	/*
+	 * regular expression
+	 */
 	public $regexp;
+
+	/* 
+	 * The next NAME to query for NAPTR, SRV, or address records
+     * depending on the value of the flags field
+	 */
 	public $replacement;
 
+    /**
+     * method to return the rdata portion of the packet as a string
+     *
+     * @return  string
+     * @access  protected
+     *
+     */
 	protected function _toString()
 	{
 		return $this->order . ' ' . $this->preference . ' ' . $this->_formatString($this->flags) . ' ' . 
 			$this->_formatString($this->services) . ' ' . $this->_formatString($this->regexp) . ' ' . $this->replacement . '.';
 	}
+
+    /**
+     * parses the rdata portion from a standard DNS config line
+     *
+     * @param   array       $rdata  a string split line of values for the rdata
+     * @return  boolean
+     * @access  protected
+     *
+     */
 	protected function _fromString(array $rdata)
 	{
 		$this->order 		= array_shift($rdata);
@@ -99,6 +145,15 @@ class Net_DNS2_RR_NAPTR extends Net_DNS2_RR
 
 		return false;
 	}
+
+    /**
+     * parses the rdata of the Net_DNS2_Packet object
+     *
+     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet to parse the RR from
+     * @return  boolean
+     * @access  protected
+     * 
+     */
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
 		if ($this->rdlength > 0) {
@@ -122,6 +177,15 @@ class Net_DNS2_RR_NAPTR extends Net_DNS2_RR
 
 		return true;
 	}
+
+    /**
+     * returns the rdata portion of the DNS packet
+     * 
+     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet use for compressed names
+     * @return  mixed                       either returns a binary packed string or null on failure
+     * @access  protected
+     * 
+     */
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
 		if ( (isset($this->order)) && (strlen($this->services) > 0) ) {
