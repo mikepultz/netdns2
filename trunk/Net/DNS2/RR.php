@@ -119,7 +119,8 @@ abstract class Net_DNS2_RR
 	public $rdata;
 
     /**
-     * abstract definition - magic __toString() method to return a RR as a string
+     * abstract definition - method to return a RR as a string; not to be confused with the __toString()
+ 	 *						 magic method.
      *
 	 * @return	string
      * @access	protected

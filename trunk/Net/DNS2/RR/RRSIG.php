@@ -38,38 +38,70 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   Networking
- * @package    Net_DNS2
- * @author     Mike Pultz <mike@mikepultz.com>
- * @copyright  2010 Mike Pultz <mike@mikepultz.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
- * @link       http://pear.php.net/package/Net_DNS2
- * @since      File available since Release 1.0.0
+ * @category	Networking
+ * @package		Net_DNS2
+ * @author		Mike Pultz <mike@mikepultz.com>
+ * @copyright	2010 Mike Pultz <mike@mikepultz.com>
+ * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version		SVN: $Id$
+ * @link		http://pear.php.net/package/Net_DNS2
+ * @since		File available since Release 1.0.0
+ *
+ * This file contains code based off the Net::DNS::SEC Perl module by
+ * Olaf M. Kolkman
+ *
+ * This is the copyright notice from the PERL Net::DNS::SEC module:
+ *
+ * Copyright (c) 2001 - 2005  RIPE NCC.  Author Olaf M. Kolkman 
+ * Copyright (c) 2007 - 2008  NLnet Labs.  Author Olaf M. Kolkman 
+ * <olaf@net-dns.org>
+ *
+ * All Rights Reserved
+ *
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for any purpose and without fee is hereby granted,
+ * provided that the above copyright notice appear in all copies and that
+ * both that copyright notice and this permission notice appear in
+ * supporting documentation, and that the name of the author not be
+ * used in advertising or publicity pertaining to distribution of the
+ * software without specific, written prior permission.
+ *
+ * THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+ * ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
+ * AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+ * DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+ * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
  */
 
-//
-// RRSIG Resource Record - RFC4034 sction 3.1
-//
-//    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-//   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//   |        Type Covered           |  Algorithm    |     Labels    |
-//   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//   |                         Original TTL                          |
-//   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//   |                      Signature Expiration                     |
-//   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//   |                      Signature Inception                      |
-//   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//   |            Key Tag            |                               /
-//   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+         Signer's Name         /
-//   /                                                               /
-//   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//   /                                                               /
-//   /                            Signature                          /
-//   /                                                               /
-//   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-//
+/*
+ * RRSIG Resource Record - RFC4034 sction 3.1
+ *
+ *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *   |        Type Covered           |  Algorithm    |     Labels    |
+ *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *   |                         Original TTL                          |
+ *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *   |                      Signature Expiration                     |
+ *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *   |                      Signature Inception                      |
+ *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *   |            Key Tag            |                               /
+ *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+         Signer's Name         /
+ *   /                                                               /
+ *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *   /                                                               /
+ *   /                            Signature                          /
+ *   /                                                               /
+ *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ * @package     Net_DNS2
+ * @author      Mike Pultz <mike@mikepultz.com>
+ * @see         Net_DNS2_RR
+ *
+ */
 class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
 {
 	public $typecovered;
@@ -82,11 +114,27 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
 	public $signname;
 	public $signature;
 
+    /**
+     * method to return the rdata portion of the packet as a string
+     *
+     * @return  string
+     * @access  protected
+     *
+     */
 	protected function _toString()
 	{
 		return $this->typecovered . ' ' . $this->algorithm . ' ' . $this->labels . ' ' . $this->origttl . ' ' .
 			$this->sigexp . ' ' . $this->sigincep . ' ' . $this->keytag . ' ' . $this->signname . '. ' . $this->signature;
 	}
+
+    /**
+     * parses the rdata portion from a standard DNS config line
+     *
+     * @param   array       $rdata  a string split line of values for the rdata
+     * @return  boolean
+     * @access  protected
+     *
+     */
 	protected function _fromString(array $rdata)
 	{
 		$this->typecovered		= strtoupper(array_shift($rdata));
@@ -106,6 +154,15 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
 
 		return true;
 	}
+
+    /**
+     * parses the rdata of the Net_DNS2_Packet object
+     *
+     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet to parse the RR from
+     * @return  boolean
+     * @access  protected
+     * 
+     */
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
 		if ($this->rdlength > 0) {
@@ -145,6 +202,15 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
 
 		return true;
 	}
+
+    /**
+     * returns the rdata portion of the DNS packet
+     * 
+     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet use for compressed names
+     * @return  mixed                       either returns a binary packed string or null on failure
+     * @access  protected
+     * 
+     */
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
 		if (strlen($this->signature) > 0) {
