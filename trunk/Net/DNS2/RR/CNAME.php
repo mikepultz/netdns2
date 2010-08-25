@@ -106,6 +106,7 @@ class Net_DNS2_RR_CNAME extends Net_DNS2_RR
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
 		if ($this->rdlength > 0) {
+
 			$offset = $packet->offset;
 			$this->cname = Net_DNS2_Packet::expand($packet, $offset);
 		}
@@ -123,6 +124,7 @@ class Net_DNS2_RR_CNAME extends Net_DNS2_RR
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
 		if (strlen($this->cname) > 0) {
+
 			return $packet->compress($this->cname, $packet->offset);
 		}
 		return null;

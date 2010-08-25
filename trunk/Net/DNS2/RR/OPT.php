@@ -50,21 +50,14 @@
  */
 
 /*
- * NSEC Resource Record - RFC3845 section 2.1
+ * OPT Resource Record - RFC2929 section 3.1
  *
- *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *   /                      Next Domain Name                         /
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *   /                   List of Type Bit Map(s)                     /
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * 
  * @package     Net_DNS2
  * @author      Mike Pultz <mike@mikepultz.com>
  * @see         Net_DNS2_RR
  *
  */
-class Net_DNS2_RR_NSEC extends Net_DNS2_RR
+class Net_DNS2_RR_OPT extends Net_DNS2_RR
 {
     /**
      * method to return the rdata portion of the packet as a string

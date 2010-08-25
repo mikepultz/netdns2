@@ -50,21 +50,23 @@
  */
 
 /*
- * NSEC Resource Record - RFC3845 section 2.1
+ * CERT Resource Record - RFC4398 section 2
  *
- *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *   /                      Next Domain Name                         /
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *   /                   List of Type Bit Map(s)                     /
- *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |             type              |             key tag           |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |   algorithm   |                                               /
+ *  +---------------+            certificate or CRL                 /
+ *  /                                                               /
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
  * 
  * @package     Net_DNS2
  * @author      Mike Pultz <mike@mikepultz.com>
  * @see         Net_DNS2_RR
  *
  */
-class Net_DNS2_RR_NSEC extends Net_DNS2_RR
+class Net_DNS2_RR_CERT extends Net_DNS2_RR
 {
     /**
      * method to return the rdata portion of the packet as a string
