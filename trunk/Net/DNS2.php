@@ -124,6 +124,12 @@ class Net_DNS2
 	 */
 	protected $_sockets_enabled = false;
 
+	/*
+	 * the last erro message returned by the sockets class
+	 */
+	private $_last_socket_error = '';
+
+
     /**
      * Constructor - base constructor for the Resolver and Updater
      *
@@ -328,7 +334,7 @@ class Net_DNS2
 				$ns = each($this->_nameservers);
 				if ($ns === FALSE) {
 
-					throw new Net_DNS2_Exception('every name server provided has failed.');
+					throw new Net_DNS2_Exception('every name server provided has failed: ' . $this->_last_socket_error);
 				}
 
 				$ns = $ns[1];
@@ -369,6 +375,7 @@ class Net_DNS2
 				//
 				if ($this->_sockets['tcp'][$ns]->open() === false) {
 
+					$this->_last_socket_error = $this->_sockets['tcp'][$ns]->last_error;
 					continue;
 				}
 
@@ -377,6 +384,7 @@ class Net_DNS2
 				//
 				if ($this->_sockets['tcp'][$ns]->write($data) === false) {
 
+					$this->_last_socket_error = $this->_sockets['tcp'][$ns]->last_error;
 					continue;
 				}
 
@@ -388,6 +396,7 @@ class Net_DNS2
 				$result = $this->_sockets['tcp'][$ns]->read($size);
 				if ( ($result === false) ||  ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
 
+					$this->_last_socket_error = $this->_sockets['tcp'][$ns]->last_error;
 					continue;
 				}
 
@@ -426,6 +435,7 @@ class Net_DNS2
 				//
 				if ($this->_sockets['udp'][$ns]->open() === false) {
 
+					$this->_last_socket_error = $this->_sockets['udp'][$ns]->last_error;
 					continue;
 				}
 
@@ -434,6 +444,7 @@ class Net_DNS2
 				//
 				if ($this->_sockets['udp'][$ns]->write($data) === false) {
 
+					$this->_last_socket_error = $this->_sockets['udp'][$ns]->last_error;
 					continue;
 				}
 
@@ -445,6 +456,7 @@ class Net_DNS2
 				$result = $this->_sockets['udp'][$ns]->read($size);
 				if (( $result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
 
+					$this->_last_socket_error = $this->_sockets['udp'][$ns]->last_error;
 					continue;
 				}
 

@@ -13,7 +13,7 @@ Net_DNS2 TODO List
 
 - finish missing RR's
 
-	- NSAP, NSAP_PTR, SIG, EID, NIMLOC, KX, CERT, DNAME, OPT, APL, SSHFP,
+	- AAAA, NSAP, SIG, LOC, KX, CERT, DNAME, OPT, APL, SSHFP,
 	  IPSECKEY, NSEC, DHCID, NSEC3, NSEC3PARAM, HIP
 
 DONE - parse BIND style input and set all the appropriate values of the RR object
