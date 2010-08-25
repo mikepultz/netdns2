@@ -50,32 +50,34 @@
  */
 
 /*
- * MX Resource Record - RFC1035 section 3.3.9
+ * SIG Resource Record - RFC2535 section 4.1
  *
- *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *    |                  PREFERENCE                   |
- *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *    /                   EXCHANGE                    /
- *    /                                               /
- *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *
+ *      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |        type covered           |  algorithm    |     labels    |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |                         original TTL                          |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |                      signature expiration                     |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |                      signature inception                      |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *     |            key  tag           |                               |
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+         signer's name         +
+ *     |                                                               /
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-/
+ *     /                                                               /
+ *     /                            signature                          /
+ *     /                                                               /
+ *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * 
  * @package     Net_DNS2
  * @author      Mike Pultz <mike@mikepultz.com>
  * @see         Net_DNS2_RR
  *
  */
-class Net_DNS2_RR_MX extends Net_DNS2_RR
+class Net_DNS2_RR_SIG extends Net_DNS2_RR
 {
-	/*
-	 * the preference for this mail exchanger
-	 */
-	public $preference;
-
-	/*
-	 * the hostname of the mail exchanger
-	 */
-	public $exchange;
-
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -85,7 +87,6 @@ class Net_DNS2_RR_MX extends Net_DNS2_RR
      */
 	protected function _toString()
 	{
-		return $this->preference . ' ' . $this->exchange . '.';
 	}
 
     /**
@@ -98,10 +99,6 @@ class Net_DNS2_RR_MX extends Net_DNS2_RR
      */
 	protected function _fromString(array $rdata)
 	{
-		$this->preference 	= $rdata[0];
-		$this->exchange		= strtolower(trim($rdata[1], '.'));
-
-		return true;
 	}
 
     /**
@@ -114,22 +111,6 @@ class Net_DNS2_RR_MX extends Net_DNS2_RR
      */
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
-		if ($this->rdlength > 0) {
-
-			//
-			// parse the preference
-			//
-			$x = unpack('npreference', $this->rdata);
-			$this->preference = $x['preference'];
-
-			//
-			// get the exchange entry server)
-			//
-			$offset = $packet->offset + 2;
-			$this->exchange = Net_DNS2_Packet::expand($packet, $offset);
-		}
-
-		return true;
 	}
 
     /**
@@ -142,19 +123,6 @@ class Net_DNS2_RR_MX extends Net_DNS2_RR
      */
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
-		if (strlen($this->exchange) > 0) {
-			
-			// TODO: get rid of pack()
-			//
-			$data = pack('n', $this->preference);
-			$packet->offset += 2;
-
-			$data .= $packet->compress($this->exchange, $packet->offset);
-
-			return $data;
-		}
-
-		return null;
 	}
 }
 
