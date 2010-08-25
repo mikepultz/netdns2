@@ -120,11 +120,15 @@ class Net_DNS2_Lookups
 	/*
 	 * DNSSEC Algorithms
 	 */
-	const DNSSEC_RSA_MD5	= 1;
-	const DNSSEC_DH			= 2;
-	const DNSSEC_DSA_SHA1	= 3;
-	const DNSSEC_ECC		= 4;
-	const DNSSEC_RSA_SHA1	= 5;
+	const DNSSEC_ALGORITHM_RES			= 0;
+	const DNSSEC_ALGORITHM_RSAMD5		= 1;
+	const DNSSEC_ALGORITHM_DH			= 2;
+	const DNSSEC_ALGORITHM_DSA			= 3;
+	const DNSSEC_ALGORITHM_ECC			= 4;
+	const DNSSEC_ALGORITHM_RSASHA1		= 5;
+	const DNSSEC_ALGORITHM_INDIRECT		= 252;
+	const DNSSEC_ALGORITHM_PRIVATEDNS	= 253;
+	const DNSSEC_ALGORITHM_PRIVATEOID	= 254;
 
 	/*
 	 * The packet id used when sending requests
@@ -303,15 +307,20 @@ class Net_DNS2_Lookups
 	);
 
 	/*
-	 * maps DNS SEC alrorithms to their names
+	 * maps DNS SEC alrorithms to their mnemonics
 	 */
-	public static $dns_sec_algorithms = array(
+	public static $dnssec_algorithm_name_to_id = array();
+	public static $dnssec_algorithm_id_to_name = array(
 	
-		self::DNSSEC_RSA_MD5	=> 'RSA/MD5 [RSAMD5]',		// RFC 2537
-		self::DNSSEC_DH			=> 'Diffie-Hellman [DH]',	// RFC 2539
-		self::DNSSEC_DSA_SHA1	=> 'DSA/SHA-1 [DSA]',		// RFC 2536
-		self::DNSSEC_ECC		=> 'Elliptic Curve [ECC]',	// 
-		self::DNSSEC_RSA_SHA1	=> 'RSA/SHA-1 [RSASHA1]'	// RFC 3110
+		self::DNSSEC_ALGORITHM_RES			=> 'RES',
+		self::DNSSEC_ALGORITHM_RSAMD5		=> 'RSAMD5',
+		self::DNSSEC_ALGORITHM_DH			=> 'DH',
+		self::DNSSEC_ALGORITHM_DSA			=> 'DSA',
+		self::DNSSEC_ALGORITHM_ECC			=> 'ECC',
+		self::DNSSEC_ALGORITHM_RSASHA1		=> 'RSASHA1',
+		self::DNSSEC_ALGORITHM_INDIRECT		=> 'INDIRECT',
+		self::DNSSEC_ALGORITHM_PRIVATEDNS	=> 'PRIVATEDNS',
+		self::DNSSEC_ALGORITHM_PRIVATEOID	=> 'PRIVATEOID'
 	);
 
     /**
@@ -331,9 +340,10 @@ class Net_DNS2_Lookups
 		// build the reverse lookup tables; this is just so we don't have to
 		// have duplicate static content laying around.
 		//
-		self::$rr_types_by_id 		= array_flip(self::$rr_types_by_name);
-		self::$classes_by_id 		= array_flip(self::$classes_by_name);
-		self::$rr_types_class_to_id	= array_flip(self::$rr_types_id_to_class);
+		self::$rr_types_by_id 				= array_flip(self::$rr_types_by_name);
+		self::$classes_by_id 				= array_flip(self::$classes_by_name);
+		self::$rr_types_class_to_id			= array_flip(self::$rr_types_id_to_class);
+		self::$dnssec_algorithm_name_to_id	= array_flip(self::$dnssec_algorithm_id_to_name);
 	}
 }
 

@@ -69,6 +69,22 @@
  */
 class Net_DNS2_RR_DHCID extends Net_DNS2_RR
 {
+	/*
+	 * Identifier type
+	 */
+	public $id_type;
+
+	/*
+	 * Digest Type
+	 */
+	public $digest_type;
+
+	/*
+	 * The digest
+	 */
+	public $digest;
+
+	
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -78,6 +94,7 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
      */
 	protected function _toString()
 	{
+		return base64_encode(pack('nC', $this->id_type, $this->digest_type) . base64_decode($this->digest));	
 	}
 
     /**
@@ -90,6 +107,26 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
      */
 	protected function _fromString(array $rdata)
 	{
+		$data = base64_decode(array_shift($rdata));
+		if (strlen($data) > 0) {
+
+				//
+				// unpack the id type and digest type
+				//
+				$x = unpack('nid_type/Cdigest_type', $data);
+
+				$this->id_type 		= $x['id_type'];
+				$this->digest_type	= $x['digest_type'];
+
+				//
+				// copy out the digest
+				//
+				$this->digest		= base64_encode(substr($data, 3, strlen($data) - 3));
+
+				return true;
+		}
+
+		return false;
 	}
 
     /**
@@ -102,6 +139,25 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
      */
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
+			if ($this->rdlength > 0) {
+
+				//
+				// unpack the id type and digest type
+				//
+				$x = unpack('nid_type/Cdigest_type', $this->rdata);
+
+				$this->id_type 		= $x['id_type'];
+				$this->digest_type	= $x['digest_type'];
+
+				//
+				// copy out the digest
+				//
+				$this->digest		= base64_encode(substr($this->rdata, 3, $this->rdlength - 3));
+
+				return true;
+			}
+
+			return false;
 	}
 
     /**
@@ -114,6 +170,12 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
      */
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
+		if (strlen($this->digest) > 0) {
+
+			return pack('nC', $this->id_type, $this->digest_type) . base64_decode($this->digest);
+		}
+	
+		return null;
 	}
 }
 
