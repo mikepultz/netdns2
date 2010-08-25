@@ -23,6 +23,7 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
 			'RT'		=> 'example.com. 300 IN RT 2 relay.prime.com.',
 			'KEY'		=> 'example.com. 300 IN KEY 256 3 7 AwEAAYCXh/ZABi8kiJIDXYmyUlHzC0CHeBzqcpyZAIjC7dK1wkRYVcUvIlpTOpnOVVfcC3Py9Ui/x45qKb0LytvK7WYAe3WyOOwk5klwIqRC/0p4luafbd2yhRMF7quOBVqYrLoHwv8i9LrV+r8dhB7rXv/lkTSI6mEZsg5rDfee8Yy1',
 			'PX'		=> 'example.com. 300 IN PX 10 ab.net2.it. o-ab.prmd-net2.admdb.c-it.',
+			'AAAA'		=> 'example.com. 300 IN AAAA 1080:0:0:0:8:800:200c:417a',
 			'SRV'		=> 'example.com. 300 IN SRV 20 0 5269 xmpp-server2.l.google.com.',
 			'NAPTR'		=> 'example.com. 300 IN NAPTR 100 10 S SIP+D2U !^.*$!sip:customer-service@example.com! _sip._udp.example.com.',
 			'KX'		=> 'example.com. 300 IN KX 10 mx1.mrhost.ca.',

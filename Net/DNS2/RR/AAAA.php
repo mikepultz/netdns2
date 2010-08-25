@@ -70,6 +70,13 @@
  */
 class Net_DNS2_RR_AAAA extends Net_DNS2_RR
 {
+	/*
+	 * the IPv6 address in the preferred hexadecimal values of the eight 16-bit pieces 
+	 * per RFC1884
+	 *
+	 */
+	public $address;
+
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -79,6 +86,7 @@ class Net_DNS2_RR_AAAA extends Net_DNS2_RR
      */
 	protected function _toString()
 	{
+		return $this->address;
 	}
 
     /**
@@ -91,7 +99,27 @@ class Net_DNS2_RR_AAAA extends Net_DNS2_RR
      */
 	protected function _fromString(array $rdata)
 	{
+		$address = array_shift($rdata);
+
+		//
+		// expand out compressed formats
+		//
+		if (strpos($address, '::') !== false) {
+
+			$address = str_replace('::', str_repeat(':0', 8 - substr_count($address, ':')).':', $address);
+		}
+		if (strpos($address, ':') === 0) {
+
+			$address = '0' . $address;
+		}
+
+		$this->address = $address;
+			
+		return true;
 	}
+
+private function ExpandIPv6Notation($Ip) {
+}
 
     /**
      * parses the rdata of the Net_DNS2_Packet object
@@ -103,6 +131,24 @@ class Net_DNS2_RR_AAAA extends Net_DNS2_RR
      */
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
+		//
+		// must be 8 x 16bit chunks, or 16 x 8bit
+		//
+		if ($this->rdlength == 16) {
+
+			//
+			// PHP's inet_ntop returns IPv6 addresses in their compressed form, but we want
+			// to keep with the preferred standard, so we'll parse it manually.
+			//
+			$x = unpack('n8', $this->rdata);
+			if (count($x) == 8) {
+
+				$this->address = vsprintf("%x:%x:%x:%x:%x:%x:%x:%x", $x);
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
     /**
@@ -115,6 +161,7 @@ class Net_DNS2_RR_AAAA extends Net_DNS2_RR
      */
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
+		return inet_pton($this->address);
 	}
 }
 
