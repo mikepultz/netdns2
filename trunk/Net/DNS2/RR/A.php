@@ -120,11 +120,14 @@ class Net_DNS2_RR_A extends Net_DNS2_RR
 	{
 		if ($this->rdlength > 0) {
 
-			$this->address = ord($this->rdata[0]) . '.' . ord($this->rdata[1]) . '.' . 
-				ord($this->rdata[2]) . '.' . ord($this->rdata[3]);
+			$this->address = inet_ntop($this->rdata);
+			if ($this->address !== FALSE) {
+			
+				return true;
+			}
 		}
 
-		return true;
+		return false;
 	}
 
     /**
@@ -137,13 +140,7 @@ class Net_DNS2_RR_A extends Net_DNS2_RR
      */
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
-		$x = explode('.', $this->address);
-		if (count($x) == 4) {
-
-			return chr($x[0]) . chr($x[1]) . chr($x[2]) . chr($x[3]);
-		}
-		
-		return null; 
+		return inet_pton($this->address);
 	}
 }
 
