@@ -50,35 +50,25 @@
  */
 
 /*
- * TSIG Resource Record - RFC 2845
+ * DNAME Resource Record - RFC2672 section 3
  *
- *      0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
- *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *     /                          algorithm                            /
- *     /                                                               /
- *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *     |                          time signed                          |
- *     |                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *     |                               |              fudge            |
- *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *     |            mac size           |                               /
- *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               /
- *     /                              mac                              /
- *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *     |           original id         |              error            |
- *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *     |          other length         |                               /
- *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               /
- *     /                          other data                           /
- *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *    /                     DNAME                     /
+ *    /                                               /
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  * @package     Net_DNS2
  * @author      Mike Pultz <mike@mikepultz.com>
  * @see         Net_DNS2_RR
  *
  */
-class Net_DNS2_RR_TSIG extends Net_DNS2_RR
+class Net_DNS2_RR_DNAME extends Net_DNS2_RR
 {
+	/*
+	 * The target name 
+	 */
+	public $dname;
+
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -88,6 +78,7 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      */
 	protected function _toString()
 	{
+		return $this->dname . '.';
 	}
 
     /**
@@ -100,6 +91,8 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      */
 	protected function _fromString(array $rdata)
 	{
+		$this->dname = strtolower(trim(array_shift($rdata), '.'));
+		return true;
 	}
 
     /**
@@ -112,6 +105,12 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      */
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
+		if ($this->rdlength > 0) {
+
+			$offset = $packet->offset;
+			$this->dname = Net_DNS2_Packet::expand($packet, $offset);
+		}
+		return true;
 	}
 
     /**
@@ -124,6 +123,11 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      */
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
+		if (strlen($this->dname) > 0) {
+
+			return $packet->compress($this->dname, $packet->offset);
+		}
+		return null;
 	}
 }
 

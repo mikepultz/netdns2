@@ -238,26 +238,28 @@ class Net_DNS2_Lookups
 		33		=> 'Net_DNS2_RR_SRV',
 		35		=> 'Net_DNS2_RR_NAPTR',
 		36		=> 'Net_DNS2_RR_KX',
-	//	37		=> 'Net_DNS2_RR_CERT',
-	//	39		=> 'Net_DNS2_RR_DNAME',
-	//	41		=> 'Net_DNS2_RR_OPT',
-	//	42		=> 'Net_DNS2_RR_APL',
+		37		=> 'Net_DNS2_RR_CERT',
+		39		=> 'Net_DNS2_RR_DNAME',
+		41		=> 'Net_DNS2_RR_OPT',
+		42		=> 'Net_DNS2_RR_APL',
 		43		=> 'Net_DNS2_RR_DS',
-	//	44		=> 'Net_DNS2_RR_SSHFP',
-	//	45		=> 'Net_DNS2_RR_IPSECKEY',
+		44		=> 'Net_DNS2_RR_SSHFP',
+		45		=> 'Net_DNS2_RR_IPSECKEY',
 		46		=> 'Net_DNS2_RR_RRSIG',
-	//	47		=> 'Net_DNS2_RR_NSEC',
+		47		=> 'Net_DNS2_RR_NSEC',
 		48		=> 'Net_DNS2_RR_DNSKEY',
-	//	49		=> 'Net_DNS2_RR_DHCID',
-	//	50		=> 'Net_DNS2_RR_NSEC3',
-	//	51		=> 'Net_DNS2_RR_NSEC3PARAM',
-	//	55		=> 'Net_DNS2_RR_HIP',
+		49		=> 'Net_DNS2_RR_DHCID',
+		50		=> 'Net_DNS2_RR_NSEC3',
+		51		=> 'Net_DNS2_RR_NSEC3PARAM',
+		55		=> 'Net_DNS2_RR_HIP',
 		99		=> 'Net_DNS2_RR_SPF',
-	//	249		=> 'Net_DNS2_RR_TKEY',
-	//	250		=> 'Net_DNS2_RR_TSIG',
+		249		=> 'Net_DNS2_RR_TKEY',
+		250		=> 'Net_DNS2_RR_TSIG',
+
 	//	251			- IXFR - handled as a full zone transfer (252)
 	//	252			- AXFR - handled as a function call
 	//	255			- ANY - used only for queries
+
 		32769	=> 'Net_DNS2_RR_DLV'
 	);
 
