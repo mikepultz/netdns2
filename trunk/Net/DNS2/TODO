@@ -9,12 +9,11 @@ Net_DNS2 TODO List
 	- need TSIG RR
 	- flag to upadate all or any name servers specified
 
-- finish DNSSEC RR's
-
 - finish missing RR's
 
-	- NSAP, SIG, LOC, CERT, OPT, APL, SSHFP,
-	  IPSECKEY, NSEC, DHCID, NSEC3, NSEC3PARAM, HIP
+	APL, DNSKEY, DS, HIP, IPSECKEY, LOC, NSAP, 
+	NSEC, NSEC3, NSEC3PARAM, OPT, RRSIG, SIG, SSHFP, TKEY,
+	TSIG, 
 
 DONE - parse BIND style input and set all the appropriate values of the RR object
 

@@ -118,9 +118,6 @@ class Net_DNS2_RR_AAAA extends Net_DNS2_RR
 		return true;
 	}
 
-private function ExpandIPv6Notation($Ip) {
-}
-
     /**
      * parses the rdata of the Net_DNS2_Packet object
      *

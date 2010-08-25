@@ -54,7 +54,7 @@
  *
  *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *  |             type              |             key tag           |
+ *  |            format             |             key tag           |
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *  |   algorithm   |                                               /
  *  +---------------+            certificate or CRL                 /
@@ -68,6 +68,72 @@
  */
 class Net_DNS2_RR_CERT extends Net_DNS2_RR
 {
+	/*
+	 * format's allowed for certificates
+	 */
+	const CERT_FORMAT_RES		= 0;
+	const CERT_FORMAT_PKIX		= 1;
+	const CERT_FORMAT_SPKI		= 2;
+	const CERT_FORMAT_PGP		= 3;
+	const CERT_FORMAT_IPKIX		= 4;
+	const CERT_FORMAT_ISPKI		= 5;
+	const CERT_FORMAT_IPGP		= 6;
+	const CERT_FORMAT_ACPKIX	= 7;
+	const CERT_FORMAT_IACPKIX	= 8;
+	const CERT_FORMAT_URI		= 253;
+	const CERT_FORMAT_OID		= 254;
+
+	public $cert_format_name_to_id = array();
+	public $cert_format_id_to_name = array(
+
+		self::CERT_FORMAT_RES		=> 'Reserved',
+		self::CERT_FORMAT_PKIX		=> 'PKIX',
+		self::CERT_FORMAT_SPKI		=> 'SPKI',
+		self::CERT_FORMAT_PGP		=> 'PGP',
+		self::CERT_FORMAT_IPKIX		=> 'IPKIX',
+		self::CERT_FORMAT_ISPKI		=> 'ISPKI',
+		self::CERT_FORMAT_IPGP		=> 'IPGP',
+		self::CERT_FORMAT_ACPKIX	=> 'ACPKIX',
+		self::CERT_FORMAT_IACPKIX	=> 'IACPKIX',
+		self::CERT_FORMAT_URI		=> 'URI',
+		self::CERT_FORMAT_OID		=> 'OID'
+	);
+
+	/*
+ 	 * certificate format
+	 */
+	public $format;
+
+	/*
+	 * key tag
+	 */
+	public $keytag;
+
+	/*
+	 * The algorithm used for the CERt
+	 */
+	public $algorithm;
+
+	/*
+	 * certificate
+	 */
+	public $certificate;
+
+	/*
+ 	 * we have our own constructor so that we can load our certificate
+	 * information for parsing.
+	 *
+	 */
+	public function __construct(Net_DNS2_Packet &$packet = null, array $rr = null)
+	{
+		parent::__construct($packet, $rr);
+	
+		//
+		// load the lookup values
+		//
+		$this->cert_format_name_to_id = array_flip($this->cert_format_id_to_name);
+	}
+
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -77,6 +143,7 @@ class Net_DNS2_RR_CERT extends Net_DNS2_RR
      */
 	protected function _toString()
 	{
+		return $this->format . ' ' . $this->keytag . ' ' . $this->algorithm . ' ' . base64_encode($this->certificate);
 	}
 
     /**
@@ -89,6 +156,59 @@ class Net_DNS2_RR_CERT extends Net_DNS2_RR
      */
 	protected function _fromString(array $rdata)
 	{
+		//
+		// load and check the format; can be an int, or a mnemonic symbol
+		//
+		$this->format = array_shift($rdata);
+		if (!is_numeric($this->format)) {
+
+			$mnemonic = strtoupper(trim($this->format));
+			if (!isset($this->cert_format_name_to_id[$mnemonic])) {
+
+				return false;
+			}
+
+			$this->format = $this->cert_format_name_to_id[$mnemonic];
+		} else {
+
+			if (!isset($this->cert_format_id_to_name[$this->format])) {
+
+				return false;
+			}
+		}
+	
+		$this->keytag = array_shift($rdata);
+
+		//
+		// parse and check the algorithm; can be an int, or a mnemonic symbol
+		//
+		$this->algorithm = array_shift($rdata);
+		if (!is_numeric($this->algorithm)) {
+
+			$mnemonic = strtoupper(trim($this->algorithm));
+			if (!isset(Net_DNS2_Lookups::$dnssec_algorithm_name_to_id[$mnemonic])) {
+
+				return false;
+			}
+
+			$this->algorithm = Net_DNS2_Lookups::$dnssec_algorithm_name_to_id[$mnemonic];
+		} else {
+
+			if (!isset(Net_DNS2_Lookups::$dnssec_algorithm_id_to_name[$this->algorithm])) {
+
+				return false;
+			}
+		}
+
+		//
+		// parse and base64 decode the certificate
+		//
+		// certificates MUST be provided base64 encoded, if not, everything will
+		// be broken after this point, as we assume it's base64 encoded.
+		//
+		$this->certificate = base64_decode(implode(' ', $rdata));
+
+		return true;
 	}
 
     /**
@@ -101,6 +221,26 @@ class Net_DNS2_RR_CERT extends Net_DNS2_RR
      */
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
+		if ($this->rdlength > 0) {
+
+			//
+			// unpack the format, keytag and algorithm
+			//
+			$x = unpack('nformat/nkeytag/Calgorithm', $this->rdata);
+
+			$this->format 		= $x['format'];
+			$this->keytag		= $x['keytag'];
+			$this->algorithm	= $x['algorithm'];
+
+			//
+			// copy the certificate
+			//
+			$this->certificate	= substr($this->rdata, 5, $this->rdlength - 5);
+
+			return true;
+		}
+
+		return false;
 	}
 
     /**
@@ -113,6 +253,12 @@ class Net_DNS2_RR_CERT extends Net_DNS2_RR
      */
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
+		if (strlen($this->certificate) > 0) {
+
+			return pack('nnC', $this->format, $this->keytag, $this->algorithm) . $this->certificate;
+		}
+
+		return null;
 	}
 }
 
