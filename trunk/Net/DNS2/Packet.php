@@ -322,6 +322,28 @@ class Net_DNS2_Packet
 
 		return $name;
 	}
+
+	/*
+	 * formats an IPv6 IP address in the preferred format
+	 *
+	 * @param	string	$address	The IPv6 IP address to format
+	 * @return	string				The IPv6 IP address formatted in the new format
+	 * @access	public
+	 *
+	 */
+	public static function formatIPv6($address)
+	{
+		if (strpos($address, '::') !== false) {
+		
+			$address = str_replace('::', str_repeat(':0', 8 - substr_count($address, ':')).':', $address);
+		}
+		if (strpos($address, ':') === 0) {
+			
+			$address = '0' . $address;
+		}
+
+		return $address;
+	}
 }
 
 /*

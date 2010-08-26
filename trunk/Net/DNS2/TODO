@@ -11,8 +11,12 @@ Net_DNS2 TODO List
 
 - finish missing RR's
 
-	APL, DNSKEY, DS, HIP, IPSECKEY, LOC, NSEC, NSEC3, NSEC3PARAM, 
-	OPT, RRSIG, SIG, SSHFP, TKEY, TSIG, 
+	- main
+		APL, HIP, LOC, OPT, SSHFP, TKEY, TSIG, 
+	
+	- dnssec
+		DNSKEY, DS, NSEC, NSEC3, NSEC3PARAM, RRSIG, SIG
+
 
 DONE - parse BIND style input and set all the appropriate values of the RR object
 
