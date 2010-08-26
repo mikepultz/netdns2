@@ -21,6 +21,7 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
 			'X25'		=> 'example.com. 300 IN X25 "311 06 17 0 09 56"',
 			'ISDN'		=> 'example.com. 300 IN ISDN "150 862 028 003 217" 42',
 			'RT'		=> 'example.com. 300 IN RT 2 relay.prime.com.',
+			'NSAP'		=> 'example.com. 300 IN NSAP 0x47.0005.80.005a00.0000.0001.e133.aaaaaa000151.00',
 			'KEY'		=> 'example.com. 300 IN KEY 256 3 7 AwEAAYCXh/ZABi8kiJIDXYmyUlHzC0CHeBzqcpyZAIjC7dK1wkRYVcUvIlpTOpnOVVfcC3Py9Ui/x45qKb0LytvK7WYAe3WyOOwk5klwIqRC/0p4luafbd2yhRMF7quOBVqYrLoHwv8i9LrV+r8dhB7rXv/lkTSI6mEZsg5rDfee8Yy1',
 			'PX'		=> 'example.com. 300 IN PX 10 ab.net2.it. o-ab.prmd-net2.admdb.c-it.',
 			'AAAA'		=> 'example.com. 300 IN AAAA 1080:0:0:0:8:800:200c:417a',

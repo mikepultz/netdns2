@@ -69,6 +69,16 @@
  */
 class Net_DNS2_RR_NSAP extends Net_DNS2_RR
 {
+	public $afi;
+	public $idi;
+	public $dfi;
+	public $aa;
+	public $rsvd;
+	public $rd;
+	public $area;
+	public $id;
+	public $sel;
+
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -78,6 +88,8 @@ class Net_DNS2_RR_NSAP extends Net_DNS2_RR
      */
 	protected function _toString()
 	{
+		return $this->afi . '.' . $this->idi . '.' . $this->dfi . '.' . $this->aa . '.' . $this->rsvd . '.' .
+			$this->rd . '.' . $this->area . '.' . $this->id . '.' . $this->sel;
 	}
 
     /**
@@ -90,6 +102,39 @@ class Net_DNS2_RR_NSAP extends Net_DNS2_RR
      */
 	protected function _fromString(array $rdata)
 	{
+		$data = strtolower(trim(array_shift($rdata)));
+
+		//
+		// there is no real standard for format, so we can't rely on the fact that the
+		// value will come in with periods separating the values- so strip them out if
+		// they're included, and parse without them.
+		//	
+		$data = str_replace(array('.', '0x'), '', $data);
+
+		//
+		// unpack it as ascii characters
+		//
+		$x = unpack('A2afi/A4idi/A2dfi/A6aa/A4rsvd/A4rd/A4area/A12id/A2sel', $data);
+		
+		//
+		// make sure the afi value is 47
+		//
+		if ($x['afi'] == 47) {
+
+			$this->afi		= '0x' . $x['afi'];
+			$this->idi		= $x['idi'];
+			$this->dfi		= $x['dfi'];
+			$this->aa		= $x['aa'];
+			$this->rsvd		= $x['rsvd'];
+			$this->rd		= $x['rd'];
+			$this->area		= $x['area'];
+			$this->id		= $x['id'];
+			$this->sel		= $x['sel'];
+
+			return true;
+		}
+
+		return false;
 	}
 
     /**
@@ -102,6 +147,38 @@ class Net_DNS2_RR_NSAP extends Net_DNS2_RR
      */
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
+		if ($this->rdlength == 20) {
+
+			//
+			// get the AFI value
+			//
+			$this->afi = dechex(ord($this->rdata[0]));
+
+			//
+			// we only support AFI 47- there arent' any others defined.
+			//
+			if ($this->afi == 47) {
+
+				//
+				// unpack the rest of the values
+				//
+				$x = unpack('Cafi/nidi/Cdfi/C3aa/nrsvd/nrd/narea/Nidh/nidl/Csel', $this->rdata);
+
+				$this->afi		= sprintf("0x%02x", $x['afi']);
+				$this->idi		= sprintf("%04x", $x['idi']);
+				$this->dfi		= sprintf("%02x", $x['dfi']);
+				$this->aa		= sprintf("%06x", $x['aa1'] << 16 | $x['aa2'] << 8 | $x['aa3']);
+				$this->rsvd		= sprintf("%04x", $x['rsvd']);
+				$this->rd		= sprintf("%04x", $x['rd']);
+				$this->area		= sprintf("%04x", $x['area']);
+				$this->id		= sprintf("%08x", $x['idh']) . sprintf("%04x", $x['idl']);
+				$this->sel		= sprintf("%02x", $x['sel']);
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
     /**
@@ -114,6 +191,40 @@ class Net_DNS2_RR_NSAP extends Net_DNS2_RR
      */
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
+		if ($this->afi == 0x47) {
+
+			//
+			// build the aa field
+			//
+			$aa = unpack('A2x/A2y/A2z', $this->aa);
+
+			//
+			// build the id field
+			//
+			$id = unpack('A8a/A4b', $this->id);
+
+			//
+			$out = pack('CnCCCCnnnNnC', 
+				hexdec($this->afi), 
+				hexdec($this->idi),
+				hexdec($this->dfi),
+				hexdec($aa['x']),
+				hexdec($aa['y']),
+				hexdec($aa['z']),
+				hexdec($this->rsvd),
+				hexdec($this->rd),
+				hexdec($this->area),
+				hexdec($id['a']),
+				hexdec($id['b']),
+				hexdec($this->sel));
+
+			if (strlen($out) == 20) {
+				
+				return $out;
+			}
+		}
+
+		return null;
 	}
 }
 
