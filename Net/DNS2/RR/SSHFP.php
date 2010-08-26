@@ -69,6 +69,21 @@
 class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
 {
 	/*
+	 * the algorithm used
+	 */
+	public $algorithm;
+
+	/*
+	 * The finger print type
+	 */
+	public $fp_type;
+
+	/*
+	 * the finger print data
+	 */
+	public $fingerprint;
+
+	/*
 	 * Algorithms
 	 */
 	const SSHFP_ALGORITHM_RES	= 0;
@@ -91,6 +106,7 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
      */
 	protected function _toString()
 	{
+		return $this->algorithm . ' ' . $this->fp_type . ' ' . $this->fingerprint;
 	}
 
     /**
@@ -103,6 +119,33 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
      */
 	protected function _fromString(array $rdata)
 	{
+		//
+		// "The use of mnemonics instead of numbers is not allowed." - RFC4255 section 3.2
+		//
+		$algorithm		= array_shift($rdata);
+		$fp_type		= array_shift($rdata);
+		$fingerprint 	= strtolower(implode('', $rdata));
+
+		//
+		// There are only two algorithm's defined 
+		//
+		if ( ($algorithm != self::SSHFP_ALGORITHM_RSA) && ($algorithm != self::SSHFP_ALGORITHM_DSS) ) {
+			return false;
+		}
+
+		//
+		// there's only one fingerprint type currently implemented, so if it's not
+		// that, then fail.
+		//
+		if ($fp_type != self::SSHFP_FPTYPE_SHA1) {
+			return false;
+		}
+
+		$this->algorithm	= $algorithm;
+		$this->fp_type		= $fp_type;
+		$this->fingerprint 	= $fingerprint;
+
+		return true;
 	}
 
     /**
@@ -115,6 +158,41 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
      */
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
+		if ($this->rdlength > 0) {
+
+			//
+			// unpack the algorithm and finger print type
+			//
+			$x = unpack('Calgorithm/Cfp_type', $this->rdata);
+
+			$this->algorithm	= $x['algorithm'];
+			$this->fp_type		= $x['fp_type'];
+
+			//
+			// There are only two algorithm's defined 
+			//
+			if ( ($this->algorithm != self::SSHFP_ALGORITHM_RSA) && ($this->algorithm != self::SSHFP_ALGORITHM_DSS) ) {
+				return false;
+			}
+
+			//
+			// there's only one fingerprint type currently implemented, so if it's not
+			// that, then fail.
+			//
+			if ($this->fp_type != self::SSHFP_FPTYPE_SHA1) {
+				return false;
+			}
+			
+			//
+			// parse the finger print; this assumes SHA-1
+			//
+			$fp = unpack('H*a', substr($this->rdata, 2));
+			$this->fingerprint = strtolower($fp['a']);
+
+			return true;
+		}
+
+		return false;
 	}
 
     /**
@@ -127,6 +205,12 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
      */
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
+		if (strlen($this->fingerprint) > 0) {
+
+			return pack('CCH*', $this->algorithm, $this->fp_type, $this->fingerprint);
+		}
+
+		return null;
 	}
 }
 

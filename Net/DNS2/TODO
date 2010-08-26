@@ -12,7 +12,7 @@ Net_DNS2 TODO List
 - finish missing RR's
 
 	- main
-		APL, HIP, LOC, OPT, SSHFP, TKEY, TSIG, 
+		APL, HIP, LOC, OPT, TKEY, TSIG, 
 	
 	- dnssec
 		DNSKEY, DS, NSEC, NSEC3, NSEC3PARAM, RRSIG, SIG
