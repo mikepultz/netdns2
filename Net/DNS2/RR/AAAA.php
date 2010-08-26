@@ -99,21 +99,10 @@ class Net_DNS2_RR_AAAA extends Net_DNS2_RR
      */
 	protected function _fromString(array $rdata)
 	{
-		$address = array_shift($rdata);
-
 		//
 		// expand out compressed formats
 		//
-		if (strpos($address, '::') !== false) {
-
-			$address = str_replace('::', str_repeat(':0', 8 - substr_count($address, ':')).':', $address);
-		}
-		if (strpos($address, ':') === 0) {
-
-			$address = '0' . $address;
-		}
-
-		$this->address = $address;
+		$this->address = Net_DNS2_Packet::formatIPv6(array_shift($rdata));
 			
 		return true;
 	}
