@@ -38,14 +38,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category	Networking
- * @package		Net_DNS2
- * @author		Mike Pultz <mike@mikepultz.com>
- * @copyright	2010 Mike Pultz <mike@mikepultz.com>
- * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version		SVN: $Id$
- * @link		http://pear.php.net/package/Net_DNS2
- * @since		File available since Release 1.0.0
+ * @category  Networking
+ * @package   Net_DNS2
+ * @author    Mike Pultz <mike@mikepultz.com>
+ * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version   SVN: $Id$
+ * @link      http://pear.php.net/package/Net_DNS2
+ * @since     File available since Release 1.0.0
  *
  */
 
@@ -53,46 +53,49 @@
  * This is the abstract base class for the two sockets classes; this simply
  * provides the class definition for the two sockets classes.
  *
- * @package     Net_DNS2
- * @author      Mike Pultz <mike@mikepultz.com>
- * @see			Net_DNS2_Socket_Sockets, Net_DNS2_Socket_Streams
+ * @category Networking
+ * @package  Net_DNS2
+ * @author   Mike Pultz <mike@mikepultz.com>
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link     http://pear.php.net/package/Net_DNS2
+ * @see      Net_DNS2_Socket_Sockets, Net_DNS2_Socket_Streams
  *
  */
 abstract class Net_DNS2_Socket
 {
-	private $_sock;
+    private $_sock;
 
-	protected $_type;
-	protected $_host;
-	protected $_port;
-	protected $_timeout;
+    protected $type;
+    protected $host;
+    protected $port;
+    protected $timeout;
 
-	protected $_local_host;
-	protected $_local_port;
+    protected $local_host;
+    protected $local_port;
 
-	public $last_error;
+    public $last_error;
 
-	public function __construct($type, $host, $port, $timeout)
-	{
-		$this->_type 		= $type;
-		$this->_host 		= $host;
-		$this->_port 		= $port;
-		$this->_timeout 	= $timeout;
-	}
-	public function __destruct()
-	{
-		$this->close();
-	}
-	public function bindAddress($address, $port = 0) {
+    public function __construct($type, $host, $port, $timeout)
+    {
+        $this->type     = $type;
+        $this->host     = $host;
+        $this->port     = $port;
+        $this->timeout  = $timeout;
+    }
+    public function __destruct()
+    {
+        $this->close();
+    }
+    public function bindAddress($address, $port = 0)
+    {
+        $this->local_host = $address;
+        $this->local_port = $port;
+    }
 
-		$this->_local_host = $address;
-		$this->_local_port = $port;
-	}
-
-	abstract public function open();
-	abstract public function close();
-	abstract public function write($data);
-	abstract public function read(&$size);
+    abstract public function open();
+    abstract public function close();
+    abstract public function write($data);
+    abstract public function read(&$size);
 }
 
 /*

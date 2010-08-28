@@ -38,14 +38,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   Networking
- * @package    Net_DNS2
- * @author     Mike Pultz <mike@mikepultz.com>
- * @copyright  2010 Mike Pultz <mike@mikepultz.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
- * @link       http://pear.php.net/package/Net_DNS2
- * @since      File available since Release 1.0.0
+ * @category  Networking
+ * @package   Net_DNS2
+ * @author    Mike Pultz <mike@mikepultz.com>
+ * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version   SVN: $Id$
+ * @link      http://pear.php.net/package/Net_DNS2
+ * @since     File available since Release 1.0.0
  *
  */
 
@@ -66,452 +66,458 @@ $GLOBALS['_Net_DNS2_Lookups'] = new Net_DNS2_Lookups();
  * This is the base class for the Net_DNS2_Resolver and Net_DNS2_Updater
  * classes.
  *
- * @package     Net_DNS2
- * @author      Mike Pultz <mike@mikepultz.com>
- * @see         Net_DNS2_Resolver, Net_DNS2_Updater
+ * @category Networking
+ * @package  Net_DNS2
+ * @author   Mike Pultz <mike@mikepultz.com>
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link     http://pear.php.net/package/Net_DNS2
+ * @see      Net_DNS2_Resolver, Net_DNS2_Updater
  *
  */
 class Net_DNS2
 {
-	/*
-	 * use TCP only (true/false)
-	 */
-	public $use_tcp = false;
+    /*
+     * use TCP only (true/false)
+     */
+    public $use_tcp = false;
 
-	/*
-	 * DNS Port to use (53)
-	 */
-	public $dns_port = 53;
+    /*
+     * DNS Port to use (53)
+     */
+    public $dns_port = 53;
 
-	/*
-	 * the ip/port for use as a local socket
-	 */
-	public $local_host = '';
-	public $local_port = 0;
+    /*
+     * the ip/port for use as a local socket
+     */
+    public $local_host = '';
+    public $local_port = 0;
 
-	/*
-	 * timeout value for socket connections
-	 */
-	public $timeout = 5;
+    /*
+     * timeout value for socket connections
+     */
+    public $timeout = 5;
 
-	/*
-	 * randomize the name servers list
-	 */
-	public $ns_random = false;
+    /*
+     * randomize the name servers list
+     */
+    public $ns_random = false;
 
-	/*
-	 * default domains
-	 */
-	public $domain = '';
+    /*
+     * default domains
+     */
+    public $domain = '';
 
-	/*
-	 * domain search list - not actually used right now
-	 */
-	public $search_list = array();
+    /*
+     * domain search list - not actually used right now
+     */
+    public $search_list = array();
 
-	/*
-	 * local sockets
-	 */
-	protected $_sockets = array('udp' => array(), 'tcp' => array());
+    /*
+     * local sockets
+     */
+    protected $sockets = array('udp' => array(), 'tcp' => array());
 
-	/*
-	 * name server list
-	 */
-	protected $_nameservers = array();
+    /*
+     * name server list
+     */
+    protected $nameservers = array();
 
-	/*
-	 * if the socket extension is loaded
-	 */
-	protected $_sockets_enabled = false;
+    /*
+     * if the socket extension is loaded
+     */
+    protected $sockets_enabled = false;
 
-	/*
-	 * the last erro message returned by the sockets class
-	 */
-	private $_last_socket_error = '';
+    /*
+     * the last erro message returned by the sockets class
+     */
+    private $_last_socket_error = '';
 
 
     /**
      * Constructor - base constructor for the Resolver and Updater
      *
-	 * @param	mixed	$options	array of options or null for none
-     * @access  public
+     * @param mixed $options array of options or null for none
+     *
+     * @access public
      *
      */
-	public function __construct(array $options = null)
-	{
-		//
-		// check for the sockets extension
-		//
-		$this->_sockets_enabled = extension_loaded('sockets');
+    public function __construct(array $options = null)
+    {
+        //
+        // check for the sockets extension
+        //
+        $this->sockets_enabled = extension_loaded('sockets');
 
-		//
-		// load any options that were provided
-		//
-		if (!empty($options)) {
+        //
+        // load any options that were provided
+        //
+        if (!empty($options)) {
 
-			foreach($options as $key => $value) {
+            foreach ($options as $key => $value) {
 
-				if ($key == 'nameservers') {
+                if ($key == 'nameservers') {
 
-					$this->setServers($value);
-				} else {
+                    $this->setServers($value);
+                } else {
 
-					$this->$key = $value;
-				}
-			}
-		}
-	}
+                    $this->$key = $value;
+                }
+            }
+        }
+    }
 
     /**
      * autoload call-back function; used to auto-load classes
      *
-	 * @param	string	$name	the name of the class
-     * @access  public
+     * @param string $name the name of the class
+     *
+     * @return void
+     * @access public
      *
      */
-	static public function autoload($name)
-	{
-		require str_replace('_', '/', $name) . '.php';
-		return;
-	}
+    static public function autoload($name)
+    {
+        require str_replace('_', '/', $name) . '.php';
+        return;
+    }
 
     /**
      * sets the name servers to be used
      *
-	 * @param	mixed	$nameservers	either an array of name servers, or a file name to parse, assuming it's
-	 *									in the resolv.conf format
-	 * @return	boolean
-	 * @throws	Net_DNS2_Exception
-     * @access  public
+     * @param mixed $nameservers either an array of name servers, or a file name to parse, assuming it's
+                                 in the resolv.conf format
+     *
+     * @return boolean
+     * @throws Net_DNS2_Exception
+     * @access public
      *
      */
-	public function setServers($nameservers)
-	{
-		//
-		// if it's an array, then use it directly
-		//
-		if (is_array($nameservers)) {
+    public function setServers($nameservers)
+    {
+        //
+        // if it's an array, then use it directly
+        //
+        if (is_array($nameservers)) {
 
-			$this->_nameservers = $nameservers;
-		
-		//
-		// otherwise, see if it's a path to a resolv.conf file and if so, load it
-		//
-		} else {
+            $this->nameservers = $nameservers;
 
-			//
-			// check to see if the file is readable
-			//
-			if (is_readable($nameservers) === TRUE) {
-	
-				$data = file_get_contents($nameservers);
-				if ($data === FALSE) {
-					throw new Net_DNS2_Exception('failed to read contents of file: ' . $nameservers);
-				}
+        //
+        // otherwise, see if it's a path to a resolv.conf file and if so, load it
+        //
+        } else {
 
-				$lines = explode("\n", $data);
+            //
+            // check to see if the file is readable
+            //
+            if (is_readable($nameservers) === true) {
+    
+                $data = file_get_contents($nameservers);
+                if ($data === false) {
+                    throw new Net_DNS2_Exception('failed to read contents of file: ' . $nameservers);
+                }
 
-				foreach($lines as $line) {
-					
-					$line = trim($line);
+                $lines = explode("\n", $data);
 
-					if (strlen($line) == 0) {
-						continue;
-					}
+                foreach ($lines as $line) {
+                    
+                    $line = trim($line);
 
-					list($key, $value) = preg_split('/\s+/', $line, 2);
+                    if (strlen($line) == 0) {
+                        continue;
+                    }
 
-					$key 	= trim(strtolower($key));
-					$value	= trim(strtolower($value));
+                    list($key, $value) = preg_split('/\s+/', $line, 2);
 
-					switch($key)
-					{
-						case 'nameserver':
-						{
-							if (preg_match('/^[0-9\.]{7,15}$/', $value)) {
+                    $key     = trim(strtolower($key));
+                    $value    = trim(strtolower($value));
 
-								$this->_nameservers[] = $value;
-							}
-						}
-						break;
-						case 'domain':
-						{
-							$this->domain = $value;
-						}
-						break;
-						case 'search':
-						{
-							$this->search_list = preg_split('/\s+/', $value);
-						}
-						break;
-					}
-				}
+                    switch($key) {
+                    case 'nameserver':
+                        if (preg_match('/^[0-9\.]{7,15}$/', $value)) {
 
-				//
-				// if we don't have a domain, but we have a search list, then
-				// take the first entry on the search list as the domain
-				//
-				if ( (strlen($this->domain) == 0) && (count($this->search_list) > 0) ) {
+                            $this->nameservers[] = $value;
+                        }
+                        break;
 
-					$this->domain = $this->search_list[0];
-				}
+                    case 'domain':
+                        $this->domain = $value;
+                        break;
 
-			} else {
-				throw new Net_DNS2_Exception('resolver file file provided is not readable: ' . $nameservers);
-			}
-		}
+                    case 'search':
+                        $this->search_list = preg_split('/\s+/', $value);
+                        break;
 
-		//
-		// check the name servers
-		//
-		$this->_checkServers();
+                    default:
+                        ;
+                    }
+                }
 
-		return true;
-	}
+                //
+                // if we don't have a domain, but we have a search list, then
+                // take the first entry on the search list as the domain
+                //
+                if ( (strlen($this->domain) == 0) && (count($this->search_list) > 0) ) {
+
+                    $this->domain = $this->search_list[0];
+                }
+
+            } else {
+                throw new Net_DNS2_Exception('resolver file file provided is not readable: ' . $nameservers);
+            }
+        }
+
+        //
+        // check the name servers
+        //
+        $this->checkServers();
+
+        return true;
+    }
 
     /**
      * checks the list of name servers to make sure they're set
      *
-	 * @return	boolean
-	 * @throws	Net_DNS2_Exception
-     * @access  protected
+     * @return boolean
+     * @throws Net_DNS2_Exception
+     * @access protected
      *
      */
-	protected function _checkServers()
-	{
-		if (empty($this->_nameservers)) {
-			throw new Net_DNS2_Exception('emtpy name servers list; you must provide a list of name servers, or the path to a resolv.conf file.');
-		}
-	
-		return true;
-	}
+    protected function checkServers()
+    {
+        if (empty($this->nameservers)) {
+            throw new Net_DNS2_Exception('emtpy name servers list; you must provide a list of name servers, or the path to a resolv.conf file.');
+        }
+    
+        return true;
+    }
 
     /**
      * sends a standard Net_DNS2_Packet_Request packet
      *
-	 * @param	Net_DNS2_Packet	$request	a Net_DNS2_Packet_Request object
-	 * @param	boolean			$use_tcp	true/false if the function should use TCP for the request
-	 * @return	mixed						returns a Net_DNS2_Packet_Response object, or false on error
-	 * @throws	InvalidArgumentException, Net_DNS2_Exception, Net_DNS2_Socket_Exception
-     * @access  protected
+     * @param Net_DNS2_Packet $request a Net_DNS2_Packet_Request object
+     * @param boolean         $use_tcp true/false if the function should use TCP for the request
+     *
+     * @return mixed returns a Net_DNS2_Packet_Response object, or false on error
+     * @throws InvalidArgumentException, Net_DNS2_Exception, Net_DNS2_Socket_Exception
+     * @access protected
      *
      */
-	protected function _sendPacket(Net_DNS2_Packet $request, $use_tcp)
-	{
-		//
-		// get the data from the packet
-		//
-		$data = $request->get();
-		if (strlen($data) < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
+    protected function sendPacket(Net_DNS2_Packet $request, $use_tcp)
+    {
+        //
+        // get the data from the packet
+        //
+        $data = $request->get();
+        if (strlen($data) < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
 
-			throw new InvalidArgumentException('invalid or empty packet for sending!');
-		}
+            throw new InvalidArgumentException('invalid or empty packet for sending!');
+        }
 
-		reset($this->_nameservers);
-		
-		//
-		// randomize the name server list if it's asked for
-		//
-		if ($this->ns_random == true) {
+        reset($this->nameservers);
+        
+        //
+        // randomize the name server list if it's asked for
+        //
+        if ($this->ns_random == true) {
 
-			shuffle($this->_nameservers);
-		}
+            shuffle($this->nameservers);
+        }
 
-		//
-		// loop so we can handle server errors
-		//
-		$response = null;
-		$ns = '';
-		$tcp_fallback = false;
+        //
+        // loop so we can handle server errors
+        //
+        $response = null;
+        $ns = '';
+        $tcp_fallback = false;
 
-		while(1)
-		{
-			//
-			// grab the next DNS server
-			//
-			if ($tcp_fallback == false) {
+        while (1) {
 
-				$ns = each($this->_nameservers);
-				if ($ns === FALSE) {
+            //
+            // grab the next DNS server
+            //
+            if ($tcp_fallback == false) {
 
-					throw new Net_DNS2_Exception('every name server provided has failed: ' . $this->_last_socket_error);
-				}
+                $ns = each($this->nameservers);
+                if ($ns === false) {
 
-				$ns = $ns[1];
-			}
+                    throw new Net_DNS2_Exception('every name server provided has failed: ' . $this->_last_socket_error);
+                }
 
-			//
-			// if the use TCP flag (force TCP) is set, or the packet is bigger than 512 bytes,
-			// use TCP for sending the packet
-			//
-			if ( ($use_tcp == true) || (strlen($data) > Net_DNS2_Lookups::DNS_MAX_UDP_SIZE) || ($tcp_fallback == true) ) {
+                $ns = $ns[1];
+            }
 
-				$tcp_fallback = false;
+            //
+            // if the use TCP flag (force TCP) is set, or the packet is bigger than 512 bytes,
+            // use TCP for sending the packet
+            //
+            if ( ($use_tcp == true) || (strlen($data) > Net_DNS2_Lookups::DNS_MAX_UDP_SIZE) || ($tcp_fallback == true) ) {
 
-				//
-				// create the socket object
-				//
-				if ( (!isset($this->_sockets['tcp'][$ns])) || (!($this->_sockets['tcp'][$ns] instanceof Net_DNS2_Socket)) ) {
+                $tcp_fallback = false;
 
-					if ($this->_sockets_enabled === TRUE) {
+                //
+                // create the socket object
+                //
+                if ( (!isset($this->sockets['tcp'][$ns])) || (!($this->sockets['tcp'][$ns] instanceof Net_DNS2_Socket)) ) {
 
-						$this->_sockets['tcp'][$ns] = new Net_DNS2_Socket_Sockets(SOCK_STREAM, $ns, $this->dns_port, $this->timeout);
-					} else {
+                    if ($this->sockets_enabled === true) {
 
-						$this->_sockets['tcp'][$ns] = new Net_DNS2_Socket_Streams(SOCK_STREAM, $ns, $this->dns_port, $this->timeout);
-					}
-				}			
+                        $this->sockets['tcp'][$ns] = new Net_DNS2_Socket_Sockets(SOCK_STREAM, $ns, $this->dns_port, $this->timeout);
+                    } else {
 
-				//
-				// if a local IP address / port is set, then add it
-				//
-				if (strlen($this->local_host) > 0) {
+                        $this->sockets['tcp'][$ns] = new Net_DNS2_Socket_Streams(SOCK_STREAM, $ns, $this->dns_port, $this->timeout);
+                    }
+                }            
 
-					$this->_sockets['tcp'][$ns]->bindAddress($this->local_host, $this->local_port);
-				}
+                //
+                // if a local IP address / port is set, then add it
+                //
+                if (strlen($this->local_host) > 0) {
 
-				//
-				// open it; if it fails, continue in the while loop
-				//
-				if ($this->_sockets['tcp'][$ns]->open() === false) {
+                    $this->sockets['tcp'][$ns]->bindAddress($this->local_host, $this->local_port);
+                }
 
-					$this->_last_socket_error = $this->_sockets['tcp'][$ns]->last_error;
-					continue;
-				}
+                //
+                // open it; if it fails, continue in the while loop
+                //
+                if ($this->sockets['tcp'][$ns]->open() === false) {
 
-				//
-				// write the data to the socket; if it fails, continue on the while loop
-				//
-				if ($this->_sockets['tcp'][$ns]->write($data) === false) {
+                    $this->_last_socket_error = $this->sockets['tcp'][$ns]->last_error;
+                    continue;
+                }
 
-					$this->_last_socket_error = $this->_sockets['tcp'][$ns]->last_error;
-					continue;
-				}
+                //
+                // write the data to the socket; if it fails, continue on the while loop
+                //
+                if ($this->sockets['tcp'][$ns]->write($data) === false) {
 
-				//
-				// read the content, using select to wait for a response
-				//
-				$size = 0;
+                    $this->_last_socket_error = $this->sockets['tcp'][$ns]->last_error;
+                    continue;
+                }
 
-				$result = $this->_sockets['tcp'][$ns]->read($size);
-				if ( ($result === false) ||  ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
+                //
+                // read the content, using select to wait for a response
+                //
+                $size = 0;
 
-					$this->_last_socket_error = $this->_sockets['tcp'][$ns]->last_error;
-					continue;
-				}
+                $result = $this->sockets['tcp'][$ns]->read($size);
+                if ( ($result === false) ||  ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
 
-				//
-				// create the packet object
-				//
-				$response = new Net_DNS2_Packet_Response($result, $size);
-				break;
+                    $this->_last_socket_error = $this->sockets['tcp'][$ns]->last_error;
+                    continue;
+                }
 
-			} else {
+                //
+                // create the packet object
+                //
+                $response = new Net_DNS2_Packet_Response($result, $size);
+                break;
 
-				//
-				// create the socket object
-				//
-				if ( (!isset($this->_sockets['udp'][$ns])) || (!($this->_sockets['udp'][$ns] instanceof Net_DNS2_Socket)) ) {
+            } else {
 
-					if ($this->_sockets_enabled === TRUE) {
+                //
+                // create the socket object
+                //
+                if ( (!isset($this->sockets['udp'][$ns])) || (!($this->sockets['udp'][$ns] instanceof Net_DNS2_Socket)) ) {
 
-						$this->_sockets['udp'][$ns] = new Net_DNS2_Socket_Sockets(SOCK_DGRAM, $ns, $this->dns_port, $this->timeout);
-					} else {
+                    if ($this->sockets_enabled === true) {
 
-						$this->_sockets['udp'][$ns] = new Net_DNS2_Socket_Streams(SOCK_DGRAM, $ns, $this->dns_port, $this->timeout);
-					}
-				}			
+                        $this->sockets['udp'][$ns] = new Net_DNS2_Socket_Sockets(SOCK_DGRAM, $ns, $this->dns_port, $this->timeout);
+                    } else {
 
-				//
-				// if a local IP address / port is set, then add it
-				//
-				if (strlen($this->local_host) > 0) {
+                        $this->sockets['udp'][$ns] = new Net_DNS2_Socket_Streams(SOCK_DGRAM, $ns, $this->dns_port, $this->timeout);
+                    }
+                }            
 
-					$this->_sockets['udp'][$ns]->bindAddress($this->local_host, $this->local_port);
-				}
+                //
+                // if a local IP address / port is set, then add it
+                //
+                if (strlen($this->local_host) > 0) {
 
-				//
-				// open it
-				//
-				if ($this->_sockets['udp'][$ns]->open() === false) {
+                    $this->sockets['udp'][$ns]->bindAddress($this->local_host, $this->local_port);
+                }
 
-					$this->_last_socket_error = $this->_sockets['udp'][$ns]->last_error;
-					continue;
-				}
+                //
+                // open it
+                //
+                if ($this->sockets['udp'][$ns]->open() === false) {
 
-				//
-				// write the data to the socket
-				//
-				if ($this->_sockets['udp'][$ns]->write($data) === false) {
+                    $this->_last_socket_error = $this->sockets['udp'][$ns]->last_error;
+                    continue;
+                }
 
-					$this->_last_socket_error = $this->_sockets['udp'][$ns]->last_error;
-					continue;
-				}
+                //
+                // write the data to the socket
+                //
+                if ($this->sockets['udp'][$ns]->write($data) === false) {
 
-				//
-				// read the content, using select to wait for a response
-				//
-				$size = 0;
+                    $this->_last_socket_error = $this->sockets['udp'][$ns]->last_error;
+                    continue;
+                }
 
-				$result = $this->_sockets['udp'][$ns]->read($size);
-				if (( $result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
+                //
+                // read the content, using select to wait for a response
+                //
+                $size = 0;
 
-					$this->_last_socket_error = $this->_sockets['udp'][$ns]->last_error;
-					continue;
-				}
+                $result = $this->sockets['udp'][$ns]->read($size);
+                if (( $result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
 
-				//
-				// create the packet object
-				//
-				$response = new Net_DNS2_Packet_Response($result, $size);
+                    $this->_last_socket_error = $this->sockets['udp'][$ns]->last_error;
+                    continue;
+                }
 
-				//
-				// check the packet header for a trucated bit; if it was truncated, then
-				// re-send the request as TCP.
-				//
-				if ($response->header->tc == 1) {
+                //
+                // create the packet object
+                //
+                $response = new Net_DNS2_Packet_Response($result, $size);
 
-					$tcp_fallback = true;
-					continue;
-				}
+                //
+                // check the packet header for a trucated bit; if it was truncated, then
+                // re-send the request as TCP.
+                //
+                if ($response->header->tc == 1) {
 
-				break;
-			}
-		}
+                    $tcp_fallback = true;
+                    continue;
+                }
 
-		if (is_null($response)) {
+                break;
+            }
+        }
 
-			return false;
-		}
+        if (is_null($response)) {
 
-		//
-		// make sure header id's match between the request and response
-		//
-		if ($request->header->id != $response->header->id) {
+            return false;
+        }
 
-			throw new Net_DNS2_Exception('invalid response header: the request id does not match the response id');
-		}
+        //
+        // make sure header id's match between the request and response
+        //
+        if ($request->header->id != $response->header->id) {
 
-		//
-		// make sure the response is actually a response
-		// 
-		// 0 = query, 1 = response
-		//
-		if ($response->header->qr != Net_DNS2_Lookups::QR_RESPONSE) {
+            throw new Net_DNS2_Exception('invalid response header: the request id does not match the response id');
+        }
 
-			throw new Net_DNS2_Exception('invalid response header: the response provided is not a response packet.');
-		}
+        //
+        // make sure the response is actually a response
+        // 
+        // 0 = query, 1 = response
+        //
+        if ($response->header->qr != Net_DNS2_Lookups::QR_RESPONSE) {
 
-		//
-		// make sure the response code in the header is ok
-		//
-		if ($response->header->rcode != Net_DNS2_Lookups::RCODE_NOERROR) {
+            throw new Net_DNS2_Exception('invalid response header: the response provided is not a response packet.');
+        }
 
-			throw new Net_DNS2_Exception('DNS request failed: ' . Net_DNS2_Lookups::$result_code_messages[$response->header->rcode]);
-		}
+        //
+        // make sure the response code in the header is ok
+        //
+        if ($response->header->rcode != Net_DNS2_Lookups::RCODE_NOERROR) {
 
-		return $response;
-	}
+            throw new Net_DNS2_Exception('DNS request failed: ' . Net_DNS2_Lookups::$result_code_messages[$response->header->rcode]);
+        }
+
+        return $response;
+    }
 }
 
 /*
