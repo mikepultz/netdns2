@@ -38,17 +38,29 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category   Networking
- * @package    Net_DNS2
- * @author     Mike Pultz <mike@mikepultz.com>
- * @copyright  2010 Mike Pultz <mike@mikepultz.com>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version    SVN: $Id$
- * @link       http://pear.php.net/package/Net_DNS2
- * @since      File available since Release 1.0.0
+ * @category  Networking
+ * @package   Net_DNS2
+ * @author    Mike Pultz <mike@mikepultz.com>
+ * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version   SVN: $Id$
+ * @link      http://pear.php.net/package/Net_DNS2
+ * @since     File available since Release 1.0.0
  */
 
-class Net_DNS2_Exception extends Exception {}
+/**
+ * Exception handler used by Net_DNS2
+ *
+ * @category Networking
+ * @package  Net_DNS2
+ * @author   Mike Pultz <mike@mikepultz.com>
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link     http://pear.php.net/package/Net_DNS2
+ * 
+ */
+class Net_DNS2_Exception extends Exception
+{
+}
 
 /*
  * Local variables:

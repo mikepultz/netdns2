@@ -88,6 +88,15 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      */
 	protected function _toString()
 	{
+		$out = $this->algorithm . '. ' . $this->time_signed . ' ' . $this->fudge . ' ' . $this->mac_size . ' ' .
+			$this->mac . ' ' . $this->orignal_id . ' ' . $this->error . ' '. $this->other_length;
+
+		if ($this->other_length > 0) {
+
+			$out .= ' ' . $this->other_data;
+		}
+
+		return $out;
 	}
 
     /**
@@ -100,6 +109,31 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      */
 	protected function _fromString(array $rdata)
 	{
+		//
+		// the only value passed in is the key-
+		//
+		$this->key = preg_replace('/\s+/', '', array_shift($rdata));
+
+		//
+		// the rest of the data is set to default
+		//
+		$this->algorithm	= 'HMAC-MD5.SIG-ALG.REG.INT';
+		$this->time_signed	= time();
+		$this->fudge		= 300;
+		$this->mac_size		= 0;
+		$this->mac			= '';
+		$this->orignal_id	= 0;
+		$this->error		= 0;
+		$this->other_length	= 0;
+		$this->other_data	= '';
+
+		//
+		// per RFC 2845 section 2.3
+		//
+		$this->class		= 'ANY';
+		$this->ttl		 	= 0;
+
+		return true;
 	}
 
     /**
@@ -112,6 +146,66 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      */
 	protected function _set(Net_DNS2_Packet &$packet)
 	{
+		if ($this->rdlength > 0) {
+
+			$offset = 0;
+
+			//
+			// expand the algorithm
+			//
+			$this->algorithm = $packet->expand($packet, $offset);
+
+			//
+			// unpack time, fudge and mac_size
+			//
+			$x = unpack('@' . $offset. '/ntime_high/Ntime_low/nfudge/nmac_size', $this->rdata);
+
+			$this->time_signed	= $x['time_low'];
+			$this->fudge		= $x['fudge'];
+			$this->mac_size		= $x['mac_size'];
+
+			$offset += 10;
+
+			//
+			// copy out the mac
+			//
+			$this->mac = substr($this->rdata, $offset, $this->mac_size);
+			$offset += $this->mac_size;
+
+			//
+			// unpack the original id, error, and other_length values
+			//
+			$x = unpack('noriginal_id/nerror/nother_length', $this->rdata);
+		
+			$this->original_id	= $x['original_id'];
+			$this->error		= $x['error'];
+			$this->other_length	= $x['other_length'];
+
+			//
+			// the only time there is actually any "other data", is when there's a BADTIME
+			// error code.
+			//
+			// The other length should be 6, and the other data field includes the servers
+			// current time - per RFC 2845 section 4.5.2
+			//
+			if ($this->error == Net_DNS2_Lookups::RCODE_BADTIME)
+			{
+				if ($this->other_length != 6) {
+
+					return false;
+				}
+
+				//
+				// other data is a 48bit timestamp
+				//
+				$x = unpack('nhigh/nlow', substr($this->rdata, $offset + 6, $this->other_length);
+				$this->other_data = $x['low'];
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
     /**
@@ -124,6 +218,54 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      */
 	protected function _get(Net_DNS2_Packet &$packet)
 	{
+		if (strlen($this->key) > 0) {
+
+			//
+			//
+			//
+
+			//
+			// compress the algorithm
+			//
+			$packet->offset = 0;
+			$data = $packet->compress($this->algorithm, $packet->offset);
+
+			//
+			// pack the time, fudge and mac size
+			//
+			$data .= pack('nNnn', 0, $this->time_signed, $this->fudge, $this->mac_size);
+			$data .= $this->mac;
+
+			//
+			// check the error and other_length
+			//
+			if ($this->error == Net_DNS2_Lookups::RCODE_BADTIME) {
+
+				$this->other_length = strlen($this->other_data);
+				if ($this->other_lenth != 6) {
+
+					return null;
+				}
+			} else {
+
+				$this->other_length = 0;
+				$this->other_data = '';
+			}
+
+			//
+			// pack the id, error and other_length
+			//
+			$data .= pack('nnn', $packet->header->id, $this->error, $this->other_length);
+
+			if ($this->other_length > 0) {
+
+				$data .= pack('nN', 0, $this->other_data);
+			}
+
+			return $data;
+		}
+
+		return null;
 	}
 }
 

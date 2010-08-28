@@ -38,14 +38,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category	Networking
- * @package		Net_DNS2
- * @author		Mike Pultz <mike@mikepultz.com>
- * @copyright	2010 Mike Pultz <mike@mikepultz.com>
- * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version		SVN: $Id$
- * @link		http://pear.php.net/package/Net_DNS2
- * @since		File available since Release 1.0.0
+ * @category  Networking
+ * @package   Net_DNS2
+ * @author    Mike Pultz <mike@mikepultz.com>
+ * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version   SVN: $Id$
+ * @link      http://pear.php.net/package/Net_DNS2
+ * @since     File available since Release 1.0.0
  *
  */
 
@@ -54,9 +54,12 @@
  * This class handles building new DNS request packets; packets used for DNS
  * queries and updates.
  * 
- * @package     Net_DNS2
- * @author      Mike Pultz <mike@mikepultz.com>
- * @see         Net_DNS2_Packet
+ * @category Networking
+ * @package  Net_DNS2
+ * @author   Mike Pultz <mike@mikepultz.com>
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link     http://pear.php.net/package/Net_DNS2
+ * @see      Net_DNS2_Packet
  *   
  */
 class Net_DNS2_Packet_Request extends Net_DNS2_Packet
@@ -64,97 +67,106 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
     /**
      * Constructor - builds a new Net_DNS2_Packet_Request object
      *
-     * @param   string	$name	the domain name for the packet
-	 * @param	string	$type	the DNS RR type for the packet
-	 * @param	string	$class	the DNS class for the packet
-     * @throws  InvalidArgumentException
-	 * @access	public
+     * @param string $name  the domain name for the packet
+     * @param string $type  the DNS RR type for the packet
+     * @param string $class the DNS class for the packet
+     *
+     * @throws InvalidArgumentException
+     * @access public
      *
      */
-	public function __construct($name, $type = null, $class = null)
-	{
-		$this->set($name, $type, $class);
-	}
+    public function __construct($name, $type = null, $class = null)
+    {
+        $this->set($name, $type, $class);
+    }
 
     /**
      * builds a new Net_DNS2_Packet_Request object
      *
-     * @param   string	$name	the domain name for the packet
-	 * @param	string	$type	the DNS RR type for the packet
-	 * @param	string	$class	the DNS class for the packet
-	 * @return	boolean
-     * @throws  InvalidArgumentException
-	 * @access	public
+     * @param string $name  the domain name for the packet
+     * @param string $type  the DNS RR type for the packet
+     * @param string $class the DNS class for the packet
+     *
+     * @return boolean
+     * @throws InvalidArgumentException
+     * @access public
      *
      */
-	public function set($name, $type = 'A', $class = 'IN')
-	{
-		//
-		// generate a new header
-		//
-		$this->header = new Net_DNS2_Header;
+    public function set($name, $type = 'A', $class = 'IN')
+    {
+        //
+        // generate a new header
+        //
+        $this->header = new Net_DNS2_Header;
 
-		//
-		// add a new question
-		//
-		$q = new Net_DNS2_Question();
+        //
+        // add a new question
+        //
+        $q = new Net_DNS2_Question();
 
-		$name	= trim($name, " \t\n\r\0\x0B.");
-		$type	= strtoupper(trim($type));
-		$class	= strtoupper(trim($class));
+        $name   = trim($name, " \t\n\r\0\x0B.");
+        $type   = strtoupper(trim($type));
+        $class  = strtoupper(trim($class));
 
-		//
-		// check that the input string has some data in it
-		//
-		if (empty($name)) {
+        //
+        // check that the input string has some data in it
+        //
+        if (empty($name)) {
 
-			throw new InvalidArgumentException('empty query string provided');
-		}
+            throw new InvalidArgumentException('empty query string provided');
+        }
 
-		//
-		// if the type is "*", rename it to "ANY"- both are acceptable.
-		//
-		if ($type == '*') {
+        //
+        // if the type is "*", rename it to "ANY"- both are acceptable.
+        //
+        if ($type == '*') {
 
-			$type = 'ANY';
-		}
+            $type = 'ANY';
+        }
 
-		//
-		// check that the type and class are valid
-		//    
-		if ( (!isset(Net_DNS2_Lookups::$rr_types_by_name[$type])) || (!isset(Net_DNS2_Lookups::$classes_by_name[$class])) ) {
+        //
+        // check that the type and class are valid
+        //    
+        if (   (!isset(Net_DNS2_Lookups::$rr_types_by_name[$type])) 
+            || (!isset(Net_DNS2_Lookups::$classes_by_name[$class])) 
+        ) {
+            throw new InvalidArgumentException('invalid type (' . $type . 
+                ') or class (' . $class . ') specified.');
+        }
 
-			throw new InvalidArgumentException('invalid type (' . $type . ') or class (' . $class . ') specified.');
-		}
+        //
+        // if it's a PTR request for an IP address, then make sure we tack on 
+        // the arpa domain
+        //
+        // TODO: handle IPv6
+        // TODO: move to a function
+        //
+        if ( ($type == 'PTR') 
+            && (preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $name, $a)) 
+        ) {
+            $name = $a[4] . '.' . $a[3] . '.' . $a[2] . '.' . 
+                $a[1] . '.in-addr.arpa';
+        }
 
-		//
-		// if it's a PTR request for an IP address, then make sure we tack on the arpa domain
-		//
-		// TODO: handle IPv6
-		//
-		if ( ($type == 'PTR') && (preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $name, $a)) ) {
-			$name = $a[4] . '.' . $a[3] . '.' . $a[2] . '.' . $a[1] . '.in-addr.arpa';
-		}
+        //
+        // store the data
+        //
+        $q->qname           = $name;
+        $q->qtype           = $type;
+        $q->qclass          = $class;        
 
-		//
-		// store the data
-		//
-		$q->qname    = $name;
-		$q->qtype    = $type;
-		$q->qclass   = $class;		
+        $this->question[]   = $q;
 
-		$this->question[]   = $q;
+        //
+        // the answer, authority and additional are empty; they can be modified
+        // after the request is created for UPDATE requests if needed.
+        //
+        $this->answer       = array();
+        $this->authority    = array();
+        $this->additional   = array();
 
-		//
-		// the answer, authority and additional are empty; they can be modified
-		// after the request is created for UPDATE requests if needed.
-		//
-		$this->answer       = array();
-		$this->authority    = array();
-		$this->additional   = array();
-
-		return true;
-	}
+        return true;
+    }
 }
 
 /*

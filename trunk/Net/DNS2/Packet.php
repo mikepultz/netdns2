@@ -38,14 +38,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category	Networking
- * @package		Net_DNS2
- * @author		Mike Pultz <mike@mikepultz.com>
- * @copyright	2010 Mike Pultz <mike@mikepultz.com>
- * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version		SVN: $Id$
- * @link		http://pear.php.net/package/Net_DNS2
- * @since		File available since Release 1.0.0
+ * @category  Networking
+ * @package   Net_DNS2
+ * @author    Mike Pultz <mike@mikepultz.com>
+ * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version   SVN: $Id$
+ * @link      http://pear.php.net/package/Net_DNS2
+ * @since     File available since Release 1.0.0
  *
  * This file contains code based off the Net::DNS Perl module by
  * Michael Fuhr.
@@ -64,286 +64,295 @@
  * The Net_DNS2_Packet_Request and Net_DNS2_Packet_Response classes extend this
  * class.
  *
- * @package     Net_DNS2
- * @author      Mike Pultz <mike@mikepultz.com>
- * @see			Net_DNS2_Packet_Request, Net_DNS2_Packet_Response
+ * @category Networking
+ * @package  Net_DNS2
+ * @author   Mike Pultz <mike@mikepultz.com>
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link     http://pear.php.net/package/Net_DNS2
+ * @see      Net_DNS2_Packet_Request, Net_DNS2_Packet_Response
  *
  */
 class Net_DNS2_Packet
 {
-	/*
-	 * the full binary data and length for this packet
-	 */
-	public $rdata;
-	public $rdlength;
+    /*
+     * the full binary data and length for this packet
+     */
+    public $rdata;
+    public $rdlength;
 
-	/*
-	 * the offset pointer used when building/parsing packets
-	 */
-	public $offset;
+    /*
+     * the offset pointer used when building/parsing packets
+     */
+    public $offset;
 
-	/*
-	 * Net_DNS2_Header object with the DNS packet header
-	 */
-	public $header;
+    /*
+     * Net_DNS2_Header object with the DNS packet header
+     */
+    public $header;
 
-	/*
-	 * array of Net_DNS2_Question objects
-	 *
-	 * used as "zone" for updates per RFC2136
-	 *
-	 */
-	public $question = array();
+    /*
+     * array of Net_DNS2_Question objects
+     *
+     * used as "zone" for updates per RFC2136
+     *
+     */
+    public $question = array();
 
-	/*
-	 * array of Net_DNS2_RR Objects for Answers
-	 * 
-	 * used as "prerequisite" for updates per RFC2136
-	 *
-	 */
-	public $answer = array();
+    /*
+     * array of Net_DNS2_RR Objects for Answers
+     * 
+     * used as "prerequisite" for updates per RFC2136
+     *
+     */
+    public $answer = array();
 
-	/*
-	 * array of Net_DNS2_RR Objects for Authority
-	 *
-	 * used as "update" for updates per RFC2136
-	 *
-	 */
-	public $authority = array();
+    /*
+     * array of Net_DNS2_RR Objects for Authority
+     *
+     * used as "update" for updates per RFC2136
+     *
+     */
+    public $authority = array();
 
-	/*
-	 * array of Net_DNS2_RR Objects for Addtitional
-	 */
-	public $additional = array();
+    /*
+     * array of Net_DNS2_RR Objects for Addtitional
+     */
+    public $additional = array();
 
-	/*
-	 * array of compressed labeles
-	 */
-	private $_compressed = array();
+    /*
+     * array of compressed labeles
+     */
+    private $_compressed = array();
 
     /**
      * magic __toString() method to return the Net_DNS2_Packet as a string
      *
-	 * @return	string
-	 * @access	public
+     * @return string
+     * @access public
      *
      */
-	public function __toString()
-	{
-		$output = $this->header->__toString();
+    public function __toString()
+    {
+        $output = $this->header->__toString();
 
-		foreach($this->question as $x) {
+        foreach ($this->question as $x) {
 
-			$output .= $x->__toString();
-		}
-		foreach($this->answer as $x) {
+            $output .= $x->__toString();
+        }
+        foreach ($this->answer as $x) {
 
-			$output .= $x->__toString();
-		}
-		foreach($this->authority as $x) {
+            $output .= $x->__toString();
+        }
+        foreach ($this->authority as $x) {
 
-			$output .= $x->__toString();
-		}
-		foreach($this->additional as $x) {
+            $output .= $x->__toString();
+        }
+        foreach ($this->additional as $x) {
 
-			$output .= $x->__toString();
-		}
+            $output .= $x->__toString();
+        }
 
-		return $output;
-	}
+        return $output;
+    }
 
     /**
      * returns a full binary DNS packet
      *
-	 * @return	string
-     * @throws  InvalidArgumentException
-	 * @access	public
+     * @return string
+     * @throws InvalidArgumentException
+     * @access public
      *
      */
-	public function get()
-	{
-		$data = $this->header->get();
+    public function get()
+    {
+        $data = $this->header->get();
 
-		foreach($this->question as $x) {
+        foreach ($this->question as $x) {
 
-			$data .= $x->get($this, strlen($data));
-		}
-		foreach($this->answer as $x) {
+            $data .= $x->get($this, strlen($data));
+        }
+        foreach ($this->answer as $x) {
 
-			$data .= $x->get($this, strlen($data));
-		}
-		foreach($this->authority as $x) {
+            $data .= $x->get($this, strlen($data));
+        }
+        foreach ($this->authority as $x) {
 
-			$data .= $x->get($this, strlen($data));
-		}
-		foreach($this->additional as $x) {
+            $data .= $x->get($this, strlen($data));
+        }
+        foreach ($this->additional as $x) {
 
-			$data .= $x->get($this, $strlen($data));
-		}
+            $data .= $x->get($this, $strlen($data));
+        }
 
-		return $data;
-	}
+        return $data;
+    }
 
     /**
      * applies a standard DNS name compression on the given name/offset
-	 *
-	 * This logic was based on the Net::DNS::Packet::dn_comp() function by Michanel Fuhr
      *
-	 * @param	string	$name	- the name to be compressed
-	 * @param	integer	$offset	- the offset into the given packet object
-	 * @return	string
-	 * @access	public
+     * This logic was based on the Net::DNS::Packet::dn_comp() function 
+     * by Michanel Fuhr
+     *
+     * @param string  $name   the name to be compressed
+     * @param integer $offset the offset into the given packet object
+     *
+     * @return string
+     * @access public
      *
      */
-	public function compress($name, $offset)
-	{
-		$names = explode('.', $name);
-		$compname = '';
+    public function compress($name, $offset)
+    {
+        $names = explode('.', $name);
+        $compname = '';
 
-		while(!empty($names)) {
+        while (!empty($names)) {
 
-			$dname = join('.', $names);
+            $dname = join('.', $names);
 
-			if (isset($this->_compressed[$dname])) {
+            if (isset($this->_compressed[$dname])) {
 
-				$compname .= pack('n', 0xc000 | $this->_compressed[$dname]);
-				break;
-			}
+                $compname .= pack('n', 0xc000 | $this->_compressed[$dname]);
+                break;
+            }
 
-			$this->_compressed[$dname] = $offset;
+            $this->_compressed[$dname] = $offset;
 
-			$first = array_shift($names);
-			$length = strlen($first);
+            $first = array_shift($names);
+            $length = strlen($first);
 
-			$compname .= pack('Ca*', $length, $first);
-			$offset += $length + 1;
-		}
+            $compname .= pack('Ca*', $length, $first);
+            $offset += $length + 1;
+        }
 
-		if (empty($names)) {
-			$compname .= "\0";
-		}
+        if (empty($names)) {
+            $compname .= "\0";
+        }
 
-		return $compname;
-	}
+        return $compname;
+    }
 
     /**
      * expands the domain name stored at a given offset in a DNS Packet
-	 *
-	 * This logic was based on the Net::DNS::Packet::dn_expand() function by Michanel Fuhr
      *
-	 * @param	Net_DNS2_Packet	$packet		the DNS packet to look in for the domain name
-	 * @param	integer			$offset		the offset into the given packet object
-	 * @return	mixed						either the domain name or null if it's not found.
-	 * @access	public
+     * This logic was based on the Net::DNS::Packet::dn_expand() function
+     * by Michanel Fuhr
+     *
+     * @param Net_DNS2_Packet &$packet the DNS packet to look in for the domain name
+     * @param integer         &$offset the offset into the given packet object
+     *
+     * @return mixed either the domain name or null if it's not found.
+     * @access public
      *
      */
-	public static function expand(Net_DNS2_Packet &$packet, &$offset)
-	{
-		$name = '';
+    public static function expand(Net_DNS2_Packet &$packet, &$offset)
+    {
+        $name = '';
 
-		while(1) {
-			if ($packet->rdlength < ($offset + 1)) {
-				return null;
-			}
-			
-			$xlen = ord($packet->rdata[$offset]);
-			if ($xlen == 0) {
+        while (1) {
+            if ($packet->rdlength < ($offset + 1)) {
+                return null;
+            }
+            
+            $xlen = ord($packet->rdata[$offset]);
+            if ($xlen == 0) {
 
-				++$offset;
-				break;
+                ++$offset;
+                break;
 
-			} else if (($xlen & 0xc0) == 0xc0) {
-				if ($packet->rdlength < ($offset + 2)) {
+            } else if (($xlen & 0xc0) == 0xc0) {
+                if ($packet->rdlength < ($offset + 2)) {
 
-					return null;
-				}
+                    return null;
+                }
 
-				$ptr = ord($packet->rdata[$offset]) << 8 | ord($packet->rdata[$offset+1]);
-				$ptr = $ptr & 0x3fff;
+                $ptr = ord($packet->rdata[$offset]) << 8 | ord($packet->rdata[$offset+1]);
+                $ptr = $ptr & 0x3fff;
 
-				$name2 = Net_DNS2_Packet::expand($packet, $ptr);
-				if (is_null($name2)) {
+                $name2 = Net_DNS2_Packet::expand($packet, $ptr);
+                if (is_null($name2)) {
 
-					return null;
-				}
+                    return null;
+                }
 
-				$name .= $name2;
-				$offset += 2;
-	
-				break;
-			} else {
-				++$offset;
+                $name .= $name2;
+                $offset += 2;
+    
+                break;
+            } else {
+                ++$offset;
 
-				if ($packet->rdlength < ($offset + $xlen)) {
+                if ($packet->rdlength < ($offset + $xlen)) {
 
-					return null;
-				}
+                    return null;
+                }
 
-				$elem = '';
-				$elem = substr($packet->rdata, $offset, $xlen);
-				$name .= $elem . '.';
-				$offset += $xlen;
-			}
-		}
+                $elem = '';
+                $elem = substr($packet->rdata, $offset, $xlen);
+                $name .= $elem . '.';
+                $offset += $xlen;
+            }
+        }
 
-		return trim($name, '.');
-	}
+        return trim($name, '.');
+    }
 
     /**
      * parses a domain label from a DNS Packet at the given offset
-	 *
-	 * @param	Net_DNS2_Packet	$packet		the DNS packet to look in for the domain name
-	 * @param	integer			$offset		the offset into the given packet object
-	 * @return	mixed						either the domain name or null if it's not found.
-	 * @access	public
+     *
+     * @param Net_DNS2_Packet &$packet the DNS packet to look in for the domain name
+     * @param integer         &$offset the offset into the given packet object
+     *
+     * @return mixed either the domain name or null if it's not found.
+     * @access public
      *
      */
-	public static function label(Net_DNS2_Packet &$packet, &$offset)
-	{
-		$name = '';
+    public static function label(Net_DNS2_Packet &$packet, &$offset)
+    {
+        $name = '';
 
-		if ($packet->rdlength < ($offset + 1)) {
+        if ($packet->rdlength < ($offset + 1)) {
 
-			return null;
-		}
+            return null;
+        }
 
-		$xlen = ord($packet->rdata[$offset]);
-		++$offset;
+        $xlen = ord($packet->rdata[$offset]);
+        ++$offset;
 
-		if (($xlen + $offset) > $packet->rdlength) {
+        if (($xlen + $offset) > $packet->rdlength) {
 
-			$name = substr($packet->rdata, $offset);
-			$offset = $packet->rdlength;
-		} else {
+            $name = substr($packet->rdata, $offset);
+            $offset = $packet->rdlength;
+        } else {
 
-			$name = substr($packet->rdata, $offset, $xlen);
-			$offset += $xlen;
-		}
+            $name = substr($packet->rdata, $offset, $xlen);
+            $offset += $xlen;
+        }
 
-		return $name;
-	}
+        return $name;
+    }
 
-	/*
-	 * formats an IPv6 IP address in the preferred format
-	 *
-	 * @param	string	$address	The IPv6 IP address to format
-	 * @return	string				The IPv6 IP address formatted in the new format
-	 * @access	public
-	 *
-	 */
-	public static function formatIPv6($address)
-	{
-		if (strpos($address, '::') !== false) {
-		
-			$address = str_replace('::', str_repeat(':0', 8 - substr_count($address, ':')).':', $address);
-		}
-		if (strpos($address, ':') === 0) {
-			
-			$address = '0' . $address;
-		}
+    /**
+     * formats an IPv6 IP address in the preferred format
+     *
+     * @param string $address The IPv6 IP address to format
+     *
+     * @return string The IPv6 IP address formatted in the new format
+     * @access public
+     *
+     */
+    public static function formatIPv6($address)
+    {
+        if (strpos($address, '::') !== false) {
+        
+            $address = str_replace('::', str_repeat(':0', 8 - substr_count($address, ':')).':', $address);
+        }
+        if (strpos($address, ':') === 0) {
+            
+            $address = '0' . $address;
+        }
 
-		return $address;
-	}
+        return $address;
+    }
 }
 
 /*

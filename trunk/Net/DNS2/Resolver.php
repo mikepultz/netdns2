@@ -38,129 +38,137 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category	Networking
- * @package		Net_DNS2
- * @author		Mike Pultz <mike@mikepultz.com>
- * @copyright	2010 Mike Pultz <mike@mikepultz.com>
- * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version		SVN: $Id$
- * @link		http://pear.php.net/package/Net_DNS2
- * @since		File available since Release 1.0.0
+ * @category  Networking
+ * @package   Net_DNS2
+ * @author    Mike Pultz <mike@mikepultz.com>
+ * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version   SVN: $Id$
+ * @link      http://pear.php.net/package/Net_DNS2
+ * @since     File available since Release 1.0.0
  *
  */
 
 /**
  * This is the main resolver class, providing DNS query functions.
  *
- * @package     Net_DNS2
- * @author      Mike Pultz <mike@mikepultz.com>
- * @see			Net_DNS2
+ * @category Networking
+ * @package  Net_DNS2
+ * @author   Mike Pultz <mike@mikepultz.com>
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link     http://pear.php.net/package/Net_DNS2
+ * @see      Net_DNS2
  *
  */
 class Net_DNS2_Resolver extends Net_DNS2
 {
-	/**
+    /**
      * Constructor - creates a new Net_DNS2_Resolver object
      *
-     * @param   mixed                       either an array with options or null
-     * @access	public
+     * @param mixed $options either an array with options or null
+     *
+     * @access public
      *
      */
-	public function __construct(array $options = null)
-	{
-		parent::__construct($options);
-	}
+    public function __construct(array $options = null)
+    {
+        parent::__construct($options);
+    }
 
-	/**
+    /**
      * does a basic DNS lookup query
      *
-     * @param	string	$name		the DNS name to loookup
-	 * @param	string	$type		the name of the RR type to lookup
-	 * @param	string	$class		the name of the RR class to lookup
-	 * @return	Net_DNS_RR object
-	 * @throws	InvalidArgumentException, Net_DNS2_Exception, Net_DNS2_Socket_Exception
-     * @access	public
+     * @param string $name  the DNS name to loookup
+     * @param string $type  the name of the RR type to lookup
+     * @param string $class the name of the RR class to lookup
+     *
+     * @return Net_DNS_RR object
+     * @throws InvalidArgumentException, Net_DNS2_Exception, 
+     *         Net_DNS2_Socket_Exception
+     * @access  public
      *
      */
-	public function query($name, $type = 'A', $class = 'IN')
-	{
-		//
-		// make sure we have some name servers set
-		//
-		$this->_checkServers();
+    public function query($name, $type = 'A', $class = 'IN')
+    {
+        //
+        // make sure we have some name servers set
+        //
+        $this->checkServers();
 
-		//
-		// we dont' support incrmental zone tranfers; so if it's requested, a full
-		// zone transfer can be returned
-		//
-		if ($type == 'IXFR') {
+        //
+        // we dont' support incrmental zone tranfers; so if it's requested, a full
+        // zone transfer can be returned
+        //
+        if ($type == 'IXFR') {
 
-			$type = 'AXFR';
-		}
+            $type = 'AXFR';
+        }
 
-		//
-		// if the name *looks* too short, then append the domain from the config
-		//
-		if (strpos($name, '.') === FALSE) {
+        //
+        // if the name *looks* too short, then append the domain from the config
+        //
+        if (strpos($name, '.') === false) {
 
-			$name .= '.' . strtolower($this->domain);
-		}
+            $name .= '.' . strtolower($this->domain);
+        }
 
-		//
-		// create a new packet based on the input
-		//
-		$packet = new Net_DNS2_Packet_Request($name, $type, $class);
+        //
+        // create a new packet based on the input
+        //
+        $packet = new Net_DNS2_Packet_Request($name, $type, $class);
 
-		//
-		// send the packet and get back the response
-		//
-		return $this->_sendPacket($packet, ($type == 'AXFR') ? true : $this->use_tcp);
-	}
+        //
+        // send the packet and get back the response
+        //
+        return $this->sendPacket($packet, ($type == 'AXFR') ? true : $this->use_tcp);
+    }
 
-	/**
+    /**
      * does an inverse query for the given RR; most DNS servers do not implement 
-	 * inverse queries, but they should be able to return "not implemented"
+     * inverse queries, but they should be able to return "not implemented"
      *
-	 * @param	Net_DNS2_RR		$rr		the RR object to lookup
-	 * @return	Net_DNS_RR object
-	 * @throws	InvalidArgumentException, Net_DNS2_Exception, Net_DNS2_Socket_Exception
-     * @access	public
+     * @param Net_DNS2_RR $rr the RR object to lookup
+     * 
+     * @return Net_DNS_RR object
+     * @throws InvalidArgumentException, Net_DNS2_Exception, 
+     *         Net_DNS2_Socket_Exception
+     * @access public
      *
      */
-	public function iquery(Net_DNS2_RR $rr)
-	{
-		//
-		// make sure we have some name servers set
-		//
-		$this->_checkServers();
+    public function iquery(Net_DNS2_RR $rr)
+    {
+        //
+        // make sure we have some name servers set
+        //
+        $this->checkServers();
 
-		//
-		// create an empty packet
-		//
-		$packet = new Net_DNS2_Packet_Request($rr->name, 'A', 'IN');
+        //
+        // create an empty packet
+        //
+        $packet = new Net_DNS2_Packet_Request($rr->name, 'A', 'IN');
 
-		//
-		// unset the question
-		//
-		$packet->question = array();
-		$packet->header->qdcount = 0;
+        //
+        // unset the question
+        //
+        $packet->question = array();
+        $packet->header->qdcount = 0;
 
-		//
-		// set the opcode to IQUERY
-		//
-		$packet->header->opcode = Net_DNS2_Lookups::OPCODE_IQUERY;
+        //
+        // set the opcode to IQUERY
+        //
+        $packet->header->opcode = Net_DNS2_Lookups::OPCODE_IQUERY;
 
-		//
-		// add the given RR as the answer
-		//
-		$packet->answer[] = $rr;
-		$packet->header->ancount = 1;
+        //
+        // add the given RR as the answer
+        //
+        $packet->answer[] = $rr;
+        $packet->header->ancount = 1;
 
-		//
-		// send the packet and get back the response
-		//
-		return $this->_sendPacket($packet, $this->use_tcp);
-	}
+        //
+        // send the packet and get back the response
+        //
+        return $this->sendPacket($packet, $this->use_tcp);
+    }
 }
 
 /*
