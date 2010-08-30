@@ -4,6 +4,45 @@ require_once 'Net/DNS2.php';
 
 class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
 {
+    public function testTSIG()
+    {
+        //
+        // create a new packet
+        //
+        $request = new Net_DNS2_Packet_Request('example.com', 'SOA', 'IN');
+
+        //
+        // add a A record to the authority section, like an update request
+        //
+        $request->authority[] = Net_DNS2_RR::fromString('test.example.com A 10.10.10.10');
+        $request->header->nscount = 1;
+
+        //
+        // add the TSIG as additional
+        //
+        $request->additional[] = Net_DNS2_RR::fromString('mykey TSIG Zm9vYmFy');
+        $request->header->arcount = 1;
+
+        $line = $request->additional[0]->name . '. ' . $request->additional[0]->ttl . ' ' . 
+            $request->additional[0]->class . ' ' . $request->additional[0]->type . ' ' . 
+            $request->additional[0]->algorithm . '. ' . $request->additional[0]->time_signed  . ' '.
+            $request->additional[0]->fudge;
+
+		//
+		// get the binary packet data
+		//
+		$data = $request->get();
+			
+		//
+		// parse the binary
+		//
+		$response = new Net_DNS2_Packet_Response($data, strlen($data));
+
+		//
+		// the answer data in the response, should match our initial line exactly
+		//
+		$this->assertSame($line, substr($response->additional[0]->__toString(), 0, 58));
+    }
 	public function testParser()
 	{
 		$rrs = array(
@@ -34,7 +73,7 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
 // BROKEN			'RRSIG'		=> 'example.com. 300 IN RRSIG DNSKEY 7 1 86400 20100827211706 20100822211706 57970 gov. KoWPhMtLHp8sWYZSgsMiYJKB9P71CQmh9CnxJCs5GutKfo7Jpw+nNnDL iNnsd6U1JSkf99rYRWCyOTAPC47xkHr+2Uh7n6HDJznfdCzRa/v9uwEc bXIxCZ7KfzNJewW3EvYAxDIrW6sY/4MAsjS5XM/O9LaWzw6pf7TX5obB bLI+zRECbPNTdY+RF6Fl9K0GVaEZJNYi2PRXnATwvwca2CNRWxeMT/dF5STUram3cWjH0Pkm19Gc1jbdzlZVDbUudDauWoHcc0mfH7PV1sMpe80N qK7yQ24AzAkXSiknO13itHsCe4LECUu0/OtnhHg2swwXaVTf5hqHYpzi 3bQenw==',
 			'SSHFP'		=> 'example.com. 300 IN SSHFP 2 1 123456789abcdef67890123456789abcdef67890',
 			'IPSECKEY'	=> 'example.com. 300 IN IPSECKEY 10 2 2 2001:db8:0:8002:0:0:2000:1 AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ==',
-			'DNSKEY'	=> 'example.com. 300 IN DNSKEY 256 3 7 AwEAAYCXh/ZABi8kiJIDXYmyUlHzC0CHeBzqcpyZAIjC7dK1wkRYVcUvIlpTOpnOVVfcC3Py9Ui/x45qKb0LytvK7WYAe3WyOOwk5klwIqRC/0p4luafbd2yhRMF7quOBVqYrLoHwv8i9LrV+r8dhB7rXv/lkTSI6mEZsg5rDfee8Yy1',
+		    'DNSKEY'	=> 'example.com. 300 IN DNSKEY 256 3 7 AwEAAYCXh/ZABi8kiJIDXYmyUlHzC0CHeBzqcpyZAIjC7dK1wkRYVcUvIlpTOpnOVVfcC3Py9Ui/x45qKb0LytvK7WYAe3WyOOwk5klwIqRC/0p4luafbd2yhRMF7quOBVqYrLoHwv8i9LrV+r8dhB7rXv/lkTSI6mEZsg5rDfee8Yy1',
 			'DHCID'		=> 'example.com. 300 IN DHCID AAIBY2/AuCccgoJbsaxcQc9TUapptP69lOjxfNuVAA2kjEA=',
 			'SPF'		=> 'example.com. 300 IN SPF "v=spf1 ip4:192.168.0.1/24 mx ?all"',
 // BROKEN			'DLV'		=> 'example.com. 300 IN DS 21366 7 2 96EEB2FFD9B00CD4694E78278B5EFDAB0A80446567B69F634DA078F0 D90F01BA',

@@ -122,7 +122,7 @@ class Net_DNS2_Packet
     /*
      * array of compressed labeles
      */
-    private $_compressed = array();
+    public $compressed = array();
 
     /**
      * magic __toString() method to return the Net_DNS2_Packet as a string
@@ -181,7 +181,7 @@ class Net_DNS2_Packet
         }
         foreach ($this->additional as $x) {
 
-            $data .= $x->get($this, $strlen($data));
+            $data .= $x->get($this, strlen($data));
         }
 
         return $data;
@@ -209,13 +209,47 @@ class Net_DNS2_Packet
 
             $dname = join('.', $names);
 
-            if (isset($this->_compressed[$dname])) {
+            if (isset($this->compressed[$dname])) {
 
-                $compname .= pack('n', 0xc000 | $this->_compressed[$dname]);
+                $compname .= pack('n', 0xc000 | $this->compressed[$dname]);
                 break;
             }
 
-            $this->_compressed[$dname] = $offset;
+            $this->compressed[$dname] = $offset;
+
+            $first = array_shift($names);
+            $length = strlen($first);
+
+            $compname .= pack('Ca*', $length, $first);
+            $offset += $length + 1;
+        }
+
+        if (empty($names)) {
+            $compname .= "\0";
+        }
+
+        return $compname;
+    }
+
+    /**
+     * applies a standard DNS name compression on the given name/offset
+     *
+     * This logic was based on the Net::DNS::Packet::dn_comp() function 
+     * by Michanel Fuhr
+     *
+     * @param string  $name   the name to be compressed
+     *
+     * @return string
+     * @access public
+     *
+     */
+    public static function pack($name)
+    {
+        $offset = 0;
+        $names = explode('.', $name);
+        $compname = '';
+
+        while (!empty($names)) {
 
             $first = array_shift($names);
             $length = strlen($first);
