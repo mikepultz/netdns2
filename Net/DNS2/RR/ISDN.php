@@ -38,18 +38,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category	Networking
- * @package		Net_DNS2
- * @author		Mike Pultz <mike@mikepultz.com>
- * @copyright	2010 Mike Pultz <mike@mikepultz.com>
- * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version		SVN: $Id$
- * @link		http://pear.php.net/package/Net_DNS2
- * @since		File available since Release 1.0.0
+ * @category  Networking
+ * @package   Net_DNS2
+ * @author    Mike Pultz <mike@mikepultz.com>
+ * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version   SVN: $Id$
+ * @link      http://pear.php.net/package/Net_DNS2
+ * @since     File available since Release 1.0.0
  *
  */
 
-/*
+/**
  * ISDN Resource Record - RFC1183 section 3.2
  *
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
@@ -58,22 +58,25 @@
  *    /                    SA                         /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
- * @package     Net_DNS2
- * @author      Mike Pultz <mike@mikepultz.com>
- * @see         Net_DNS2_RR
+ * @category Networking
+ * @package  Net_DNS2
+ * @author   Mike Pultz <mike@mikepultz.com>
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link     http://pear.php.net/package/Net_DNS2
+ * @see      Net_DNS2_RR
  *
  */
 class Net_DNS2_RR_ISDN extends Net_DNS2_RR
 {
-	/*
-	 * ISDN Number
-	 */
-	public $isdnaddress;
-	
-	/*
-	 * Sub-Address
-	 */
-	public $sa;
+    /*
+     * ISDN Number
+     */
+    public $isdnaddress;
+    
+    /*
+     * Sub-Address
+     */
+    public $sa;
 
     /**
      * method to return the rdata portion of the packet as a string
@@ -82,89 +85,95 @@ class Net_DNS2_RR_ISDN extends Net_DNS2_RR
      * @access  protected
      *
      */
-	protected function _toString()
-	{
-		return $this->_formatString($this->isdnaddress) . ' ' . $this->_formatString($this->sa);
-	}
+    protected function rrToString()
+    {
+        return $this->formatString($this->isdnaddress) . ' ' . 
+            $this->formatString($this->sa);
+    }
 
     /**
      * parses the rdata portion from a standard DNS config line
      *
-     * @param   array       $rdata  a string split line of values for the rdata
-     * @return  boolean
-     * @access  protected
+     * @param array $rdata a string split line of values for the rdata
+     *
+     * @return boolean
+     * @access protected
      *
      */
-	protected function _fromString(array $rdata)
-	{
-		$data = $this->_buildString($rdata);
-		if (count($data) >= 1) {
+    protected function rrFromString(array $rdata)
+    {
+        $data = $this->buildString($rdata);
+        if (count($data) >= 1) {
 
-			$this->isdnaddress = $data[0];
-			if (isset($data[1])) {
-				
-				$this->sa = $data[1];
-			}
+            $this->isdnaddress = $data[0];
+            if (isset($data[1])) {
+                
+                $this->sa = $data[1];
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
     /**
      * parses the rdata of the Net_DNS2_Packet object
      *
-     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet to parse the RR from
-     * @return  boolean
-     * @access  protected
-     * 
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     *
+     * @return boolean
+     * @access protected
+     *
      */
-	protected function _set(Net_DNS2_Packet &$packet)
-	{
-		if ($this->rdlength > 0) {
+    protected function rrSet(Net_DNS2_Packet &$packet)
+    {
+        if ($this->rdlength > 0) {
 
-			$this->isdnaddress = Net_DNS2_Packet::label($packet, $packet->offset);
+            $this->isdnaddress = Net_DNS2_Packet::label($packet, $packet->offset);
 
-			//
-			// look for a SA (sub address) - it's optional
-			//
-			if ( (strlen($this->isdnaddress) + 1) < $this->rdlength) {
+            //
+            // look for a SA (sub address) - it's optional
+            //
+            if ( (strlen($this->isdnaddress) + 1) < $this->rdlength) {
 
-				$this->sa = Net_DNS2_Packet::label($packet, $packet->offset);
-			} else {
-			
-				$this->sa = '';
-			}
-		}
+                $this->sa = Net_DNS2_Packet::label($packet, $packet->offset);
+            } else {
+            
+                $this->sa = '';
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
     /**
      * returns the rdata portion of the DNS packet
-     * 
-     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet use for compressed names
-     * @return  mixed                       either returns a binary packed string or null on failure
-     * @access  protected
-     * 
+     *
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     *                                 compressed names
+     *
+     * @return mixed                   either returns a binary packed
+     *                                 string or null on failure
+     * @access protected
+     *
      */
-	protected function _get(Net_DNS2_Packet &$packet)
-	{
-		if (strlen($this->isdnaddress) > 0) {
+    protected function rrGet(Net_DNS2_Packet &$packet)
+    {
+        if (strlen($this->isdnaddress) > 0) {
 
-			$data = chr(strlen($this->isdnaddress)) . $this->isdnaddress;
-			if (!empty($this->sa)) {
+            $data = chr(strlen($this->isdnaddress)) . $this->isdnaddress;
+            if (!empty($this->sa)) {
 
-				$data .= chr(strlen($this->sa));
-				$data .= $this->sa;
-			}
+                $data .= chr(strlen($this->sa));
+                $data .= $this->sa;
+            }
 
-			return $data;
-		}
-		
-		return null; 
-	}
+            return $data;
+        }
+        
+        return null; 
+    }
 }
 
 /*

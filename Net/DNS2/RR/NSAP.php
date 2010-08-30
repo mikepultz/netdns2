@@ -38,18 +38,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category	Networking
- * @package		Net_DNS2
- * @author		Mike Pultz <mike@mikepultz.com>
- * @copyright	2010 Mike Pultz <mike@mikepultz.com>
- * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version		SVN: $Id$
- * @link		http://pear.php.net/package/Net_DNS2
- * @since		File available since Release 1.0.0
+ * @category  Networking
+ * @package   Net_DNS2
+ * @author    Mike Pultz <mike@mikepultz.com>
+ * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version   SVN: $Id$
+ * @link      http://pear.php.net/package/Net_DNS2
+ * @since     File available since Release 1.0.0
  *
  */
 
-/*
+/**
  * NSAP Resource Record - RFC1706
  *
  *             |--------------|
@@ -62,22 +62,25 @@
  *      octets |  1  |   2    |  1  | 3  |  2  | 2  |  2  | 6  | 1  |
  *             |-----|--------|-----|----|-----|----|-----|----|----|
  * 
- * @package     Net_DNS2
- * @author      Mike Pultz <mike@mikepultz.com>
- * @see         Net_DNS2_RR
+ * @category Networking
+ * @package  Net_DNS2
+ * @author   Mike Pultz <mike@mikepultz.com>
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link     http://pear.php.net/package/Net_DNS2
+ * @see      Net_DNS2_RR
  *
  */
 class Net_DNS2_RR_NSAP extends Net_DNS2_RR
 {
-	public $afi;
-	public $idi;
-	public $dfi;
-	public $aa;
-	public $rsvd;
-	public $rd;
-	public $area;
-	public $id;
-	public $sel;
+    public $afi;
+    public $idi;
+    public $dfi;
+    public $aa;
+    public $rsvd;
+    public $rd;
+    public $area;
+    public $id;
+    public $sel;
 
     /**
      * method to return the rdata portion of the packet as a string
@@ -86,146 +89,154 @@ class Net_DNS2_RR_NSAP extends Net_DNS2_RR
      * @access  protected
      *
      */
-	protected function _toString()
-	{
-		return $this->afi . '.' . $this->idi . '.' . $this->dfi . '.' . $this->aa . '.' . $this->rsvd . '.' .
-			$this->rd . '.' . $this->area . '.' . $this->id . '.' . $this->sel;
-	}
+    protected function rrToString()
+    {
+        return $this->afi . '.' . $this->idi . '.' . $this->dfi . '.' . $this->aa . 
+            '.' . $this->rsvd . '.' . $this->rd . '.' . $this->area . '.' . 
+            $this->id . '.' . $this->sel;
+    }
 
     /**
      * parses the rdata portion from a standard DNS config line
      *
-     * @param   array       $rdata  a string split line of values for the rdata
-     * @return  boolean
-     * @access  protected
+     * @param array $rdata a string split line of values for the rdata
+     *
+     * @return boolean
+     * @access protected
      *
      */
-	protected function _fromString(array $rdata)
-	{
-		$data = strtolower(trim(array_shift($rdata)));
+    protected function rrFromString(array $rdata)
+    {
+        $data = strtolower(trim(array_shift($rdata)));
 
-		//
-		// there is no real standard for format, so we can't rely on the fact that the
-		// value will come in with periods separating the values- so strip them out if
-		// they're included, and parse without them.
-		//	
-		$data = str_replace(array('.', '0x'), '', $data);
+        //
+        // there is no real standard for format, so we can't rely on the fact that
+        // the value will come in with periods separating the values- so strip 
+        // them out if they're included, and parse without them.
+        //    
+        $data = str_replace(array('.', '0x'), '', $data);
 
-		//
-		// unpack it as ascii characters
-		//
-		$x = unpack('A2afi/A4idi/A2dfi/A6aa/A4rsvd/A4rd/A4area/A12id/A2sel', $data);
-		
-		//
-		// make sure the afi value is 47
-		//
-		if ($x['afi'] == 47) {
+        //
+        // unpack it as ascii characters
+        //
+        $x = unpack('A2afi/A4idi/A2dfi/A6aa/A4rsvd/A4rd/A4area/A12id/A2sel', $data);
+        
+        //
+        // make sure the afi value is 47
+        //
+        if ($x['afi'] == 47) {
 
-			$this->afi		= '0x' . $x['afi'];
-			$this->idi		= $x['idi'];
-			$this->dfi		= $x['dfi'];
-			$this->aa		= $x['aa'];
-			$this->rsvd		= $x['rsvd'];
-			$this->rd		= $x['rd'];
-			$this->area		= $x['area'];
-			$this->id		= $x['id'];
-			$this->sel		= $x['sel'];
+            $this->afi  = '0x' . $x['afi'];
+            $this->idi  = $x['idi'];
+            $this->dfi  = $x['dfi'];
+            $this->aa   = $x['aa'];
+            $this->rsvd = $x['rsvd'];
+            $this->rd   = $x['rd'];
+            $this->area = $x['area'];
+            $this->id   = $x['id'];
+            $this->sel  = $x['sel'];
 
-			return true;
-		}
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
     /**
      * parses the rdata of the Net_DNS2_Packet object
      *
-     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet to parse the RR from
-     * @return  boolean
-     * @access  protected
-     * 
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     *
+     * @return boolean
+     * @access protected
+     *
      */
-	protected function _set(Net_DNS2_Packet &$packet)
-	{
-		if ($this->rdlength == 20) {
+    protected function rrSet(Net_DNS2_Packet &$packet)
+    {
+        if ($this->rdlength == 20) {
 
-			//
-			// get the AFI value
-			//
-			$this->afi = dechex(ord($this->rdata[0]));
+            //
+            // get the AFI value
+            //
+            $this->afi = dechex(ord($this->rdata[0]));
 
-			//
-			// we only support AFI 47- there arent' any others defined.
-			//
-			if ($this->afi == 47) {
+            //
+            // we only support AFI 47- there arent' any others defined.
+            //
+            if ($this->afi == 47) {
 
-				//
-				// unpack the rest of the values
-				//
-				$x = unpack('Cafi/nidi/Cdfi/C3aa/nrsvd/nrd/narea/Nidh/nidl/Csel', $this->rdata);
+                //
+                // unpack the rest of the values
+                //
+                $x = unpack('Cafi/nidi/Cdfi/C3aa/nrsvd/nrd/narea/Nidh/nidl/Csel', $this->rdata);
 
-				$this->afi		= sprintf("0x%02x", $x['afi']);
-				$this->idi		= sprintf("%04x", $x['idi']);
-				$this->dfi		= sprintf("%02x", $x['dfi']);
-				$this->aa		= sprintf("%06x", $x['aa1'] << 16 | $x['aa2'] << 8 | $x['aa3']);
-				$this->rsvd		= sprintf("%04x", $x['rsvd']);
-				$this->rd		= sprintf("%04x", $x['rd']);
-				$this->area		= sprintf("%04x", $x['area']);
-				$this->id		= sprintf("%08x", $x['idh']) . sprintf("%04x", $x['idl']);
-				$this->sel		= sprintf("%02x", $x['sel']);
+                $this->afi  = sprintf("0x%02x", $x['afi']);
+                $this->idi  = sprintf("%04x", $x['idi']);
+                $this->dfi  = sprintf("%02x", $x['dfi']);
+                $this->aa   = sprintf("%06x", $x['aa1'] << 16 | $x['aa2'] << 8 | $x['aa3']);
+                $this->rsvd = sprintf("%04x", $x['rsvd']);
+                $this->rd   = sprintf("%04x", $x['rd']);
+                $this->area = sprintf("%04x", $x['area']);
+                $this->id   = sprintf("%08x", $x['idh']) . sprintf("%04x", $x['idl']);
+                $this->sel  = sprintf("%02x", $x['sel']);
 
-				return true;
-			}
-		}
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
     /**
      * returns the rdata portion of the DNS packet
-     * 
-     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet use for compressed names
-     * @return  mixed                       either returns a binary packed string or null on failure
-     * @access  protected
-     * 
+     *
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     *                                 compressed names
+     *
+     * @return mixed                   either returns a binary packed
+     *                                 string or null on failure
+     * @access protected
+     *
      */
-	protected function _get(Net_DNS2_Packet &$packet)
-	{
-		if ($this->afi == 0x47) {
+    protected function rrGet(Net_DNS2_Packet &$packet)
+    {
+        if ($this->afi == 0x47) {
 
-			//
-			// build the aa field
-			//
-			$aa = unpack('A2x/A2y/A2z', $this->aa);
+            //
+            // build the aa field
+            //
+            $aa = unpack('A2x/A2y/A2z', $this->aa);
 
-			//
-			// build the id field
-			//
-			$id = unpack('A8a/A4b', $this->id);
+            //
+            // build the id field
+            //
+            $id = unpack('A8a/A4b', $this->id);
 
-			//
-			$out = pack('CnCCCCnnnNnC', 
-				hexdec($this->afi), 
-				hexdec($this->idi),
-				hexdec($this->dfi),
-				hexdec($aa['x']),
-				hexdec($aa['y']),
-				hexdec($aa['z']),
-				hexdec($this->rsvd),
-				hexdec($this->rd),
-				hexdec($this->area),
-				hexdec($id['a']),
-				hexdec($id['b']),
-				hexdec($this->sel));
+            //
+            $out = pack(
+                'CnCCCCnnnNnC', 
+                hexdec($this->afi), 
+                hexdec($this->idi),
+                hexdec($this->dfi),
+                hexdec($aa['x']),
+                hexdec($aa['y']),
+                hexdec($aa['z']),
+                hexdec($this->rsvd),
+                hexdec($this->rd),
+                hexdec($this->area),
+                hexdec($id['a']),
+                hexdec($id['b']),
+                hexdec($this->sel)
+            );
 
-			if (strlen($out) == 20) {
-				
-				return $out;
-			}
-		}
+            if (strlen($out) == 20) {
+                
+                return $out;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 }
 
 /*

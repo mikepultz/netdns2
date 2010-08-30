@@ -38,18 +38,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category	Networking
- * @package		Net_DNS2
- * @author		Mike Pultz <mike@mikepultz.com>
- * @copyright	2010 Mike Pultz <mike@mikepultz.com>
- * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version		SVN: $Id$
- * @link		http://pear.php.net/package/Net_DNS2
- * @since		File available since Release 1.0.0
+ * @category  Networking
+ * @package   Net_DNS2
+ * @author    Mike Pultz <mike@mikepultz.com>
+ * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version   SVN: $Id$
+ * @link      http://pear.php.net/package/Net_DNS2
+ * @since     File available since Release 1.0.0
  *
  */
 
-/*
+/**
  * DS Resource Record - RFC4034 sction 5.1
  *
  *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -61,32 +61,35 @@
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- * @package     Net_DNS2
- * @author      Mike Pultz <mike@mikepultz.com>
- * @see         Net_DNS2_RR
+ * @category Networking
+ * @package  Net_DNS2
+ * @author   Mike Pultz <mike@mikepultz.com>
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link     http://pear.php.net/package/Net_DNS2
+ * @see      Net_DNS2_RR
  *
  */
 class Net_DNS2_RR_DS extends Net_DNS2_RR
 {
-	/*
-	 * key tag
-	 */
-	public $keytag;
+    /*
+     * key tag
+     */
+    public $keytag;
 
-	/*
-	 * algorithm number
-	 */
-	public $algorithm;
+    /*
+     * algorithm number
+     */
+    public $algorithm;
 
-	/*
-	 * algorithm used to construct the digest
-	 */
-	public $digesttype;
+    /*
+     * algorithm used to construct the digest
+     */
+    public $digesttype;
 
-	/*
-	 * the digest data
-	 */
-	public $digest;
+    /*
+     * the digest data
+     */
+    public $digest;
 
     /**
      * method to return the rdata portion of the packet as a string
@@ -95,88 +98,94 @@ class Net_DNS2_RR_DS extends Net_DNS2_RR
      * @access  protected
      *
      */
-	protected function _toString()
-	{
-		return $this->keytag . ' ' . $this->algorithm . ' ' . $this->digesttype . ' ' . $this->digest;
-	}
+    protected function rrToString()
+    {
+        return $this->keytag . ' ' . $this->algorithm . ' ' . 
+            $this->digesttype . ' ' . $this->digest;
+    }
 
     /**
      * parses the rdata portion from a standard DNS config line
      *
-     * @param   array       $rdata  a string split line of values for the rdata
-     * @return  boolean
-     * @access  protected
+     * @param array $rdata a string split line of values for the rdata
+     *
+     * @return boolean
+     * @access protected
      *
      */
-	protected function _fromString(array $rdata)
-	{
-		$this->keytag		= array_shift($rdata);
-		$this->algorithm	= array_shift($rdata);
-		$this->digesttype	= array_shift($rdata);
-		$this->digest		= implode(' ', $rdata);
+    protected function rrFromString(array $rdata)
+    {
+        $this->keytag       = array_shift($rdata);
+        $this->algorithm    = array_shift($rdata);
+        $this->digesttype   = array_shift($rdata);
+        $this->digest       = implode(' ', $rdata);
 
-		return true;
-	}
+        return true;
+    }
 
     /**
      * parses the rdata of the Net_DNS2_Packet object
      *
-     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet to parse the RR from
-     * @return  boolean
-     * @access  protected
-     * 
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     *
+     * @return boolean
+     * @access protected
+     *
      */
-	protected function _set(Net_DNS2_Packet &$packet)
-	{
-		if ($this->rdlength > 0) {
+    protected function rrSet(Net_DNS2_Packet &$packet)
+    {
+        if ($this->rdlength > 0) {
 
-			//
-			// unpack the keytag, algorithm and digesttype
-			//
-			$x = unpack('nkeytag/Calgorithm/Cdigesttype', $this->rdata);
+            //
+            // unpack the keytag, algorithm and digesttype
+            //
+            $x = unpack('nkeytag/Calgorithm/Cdigesttype', $this->rdata);
 
-			$this->keytag		= $x['keytag'];
-			$this->algorithm	= $x['algorithm'];
-			$this->digesttype	= $x['digesttype'];
+            $this->keytag       = $x['keytag'];
+            $this->algorithm    = $x['algorithm'];
+            $this->digesttype   = $x['digesttype'];
 
-			//
-			// figure out the digest size
-			//
-			$digest_size = 0;
-			if ($this->digesttype == 1) {
-				$digest_size = 20; // SHA1
+            //
+            // figure out the digest size
+            //
+            $digest_size = 0;
+            if ($this->digesttype == 1) {
+                $digest_size = 20; // SHA1
 
-			} else if ($this->digesttype == 2) {
-				$digest_size = 32; // SHA256
+            } else if ($this->digesttype == 2) {
+                $digest_size = 32; // SHA256
 
-			}
+            }
 
-			//
-			// copy the digest
-			//
-			$this->digest 		= unpack('H*', substr($this->rdata, 4, $digest_size));
-		}
+            //
+            // copy the digest
+            //
+            $this->digest = unpack('H*', substr($this->rdata, 4, $digest_size));
+        }
 
-		return true;
-	}
+        return true;
+    }
 
     /**
      * returns the rdata portion of the DNS packet
-     * 
-     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet use for compressed names
-     * @return  mixed                       either returns a binary packed string or null on failure
-     * @access  protected
-     * 
+     *
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     *                                 compressed names
+     *
+     * @return mixed                   either returns a binary packed
+     *                                 string or null on failure
+     * @access protected
+     *
      */
-	protected function _get(Net_DNS2_Packet &$packet)
-	{
-		if (strlen($this->digest) > 0) {
+    protected function rrGet(Net_DNS2_Packet &$packet)
+    {
+        if (strlen($this->digest) > 0) {
 
-			return pack('nCCH*', $this->keytag, $this->algorithm, $this->digesttype, $this->digest);
-		}
-		
-		return null;
-	}
+            return pack('nCCH*', $this->keytag, $this->algorithm, $this->digesttype, $this->digest);
+        }
+        
+        return null;
+    }
 }
 
 /*
