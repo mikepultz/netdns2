@@ -129,7 +129,7 @@ abstract class Net_DNS2_RR
      * @access protected
      *
      */
-    abstract protected function _toString();
+    abstract protected function rrToString();
 
     /**
      * abstract definition - parses a RR from a standard DNS config line
@@ -140,7 +140,7 @@ abstract class Net_DNS2_RR
      * @access protected
      *
      */
-    abstract protected function _fromString(array $rdata);
+    abstract protected function rrFromString(array $rdata);
 
     /**
      * abstract definition - sets a Net_DNS2_RR from a Net_DNS2_Packet object
@@ -151,7 +151,7 @@ abstract class Net_DNS2_RR
      * @access protected
      *
      */
-    abstract protected function _set(Net_DNS2_Packet &$packet);
+    abstract protected function rrSet(Net_DNS2_Packet &$packet);
 
     /**
      * abstract definition - returns a binary packet DNS RR object
@@ -164,7 +164,7 @@ abstract class Net_DNS2_RR
      * @access protected
      *
      */
-    abstract protected function _get(Net_DNS2_Packet &$packet);
+    abstract protected function rrGet(Net_DNS2_Packet &$packet);
 
     /**
      * Constructor - builds a new Net_DNS2_RR object
@@ -206,7 +206,7 @@ abstract class Net_DNS2_RR
     public function __toString()
     {
         return $this->name . '. ' . $this->ttl . ' ' . $this->class . 
-            ' ' . $this->type . ' ' . $this->_toString();
+            ' ' . $this->type . ' ' . $this->rrToString();
     }
 
     /**
@@ -312,7 +312,7 @@ abstract class Net_DNS2_RR
         $this->rdlength = $rr['rdlength'];
         $this->rdata    = substr($packet->rdata, $packet->offset, $rr['rdlength']);
 
-        return $this->_set($packet);
+        return $this->rrSet($packet);
     }
 
     /**
@@ -344,7 +344,7 @@ abstract class Net_DNS2_RR
             $this->rdata     = '';
         } else {
 
-            $this->rdata     = $this->_get($packet);
+            $this->rdata     = $this->rrGet($packet);
             $this->rdlength = strlen($this->rdata);
         }
 
@@ -533,7 +533,7 @@ abstract class Net_DNS2_RR
                 //
                 // parse the rdata
                 //
-                if ($o->_fromString($values) === false) {
+                if ($o->rrFromString($values) === false) {
                     throw new Net_DNS2_Exception(
                         'failed to parse rdata for config: ' . $line);
                 }

@@ -38,18 +38,18 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category    Networking
- * @package     Net_DNS2
- * @author      Mike Pultz <mike@mikepultz.com>
- * @copyright   2010 Mike Pultz <mike@mikepultz.com>
- * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version     SVN: $Id$
- * @link        http://pear.php.net/package/Net_DNS2
- * @since       File available since Release 1.0.0
+ * @category  Networking
+ * @package   Net_DNS2
+ * @author    Mike Pultz <mike@mikepultz.com>
+ * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version   SVN: $Id$
+ * @link      http://pear.php.net/package/Net_DNS2
+ * @since     File available since Release 1.0.0
  *
  */
 
-/*
+/**
  * SRV Resource Record - RFC2782
  *
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
@@ -62,32 +62,35 @@
  *    /                    TARGET                     /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
- * @package     Net_DNS2
- * @author      Mike Pultz <mike@mikepultz.com>
- * @see         Net_DNS2_RR
+ * @category Networking
+ * @package  Net_DNS2
+ * @author   Mike Pultz <mike@mikepultz.com>
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link     http://pear.php.net/package/Net_DNS2
+ * @see      Net_DNS2_RR
  *
  */
 class Net_DNS2_RR_SRV extends Net_DNS2_RR
 {
-	/*
-	 * The priority of this target host.
-	 */
-	public $priority;
+    /*
+     * The priority of this target host.
+     */
+    public $priority;
 
-	/*
-	 * a relative weight for entries with the same priority
-	 */
-	public $weight;
+    /*
+     * a relative weight for entries with the same priority
+     */
+    public $weight;
 
-	/*
- 	 * The port on this target host of this service.
-	 */
-	public $port;
+    /*
+      * The port on this target host of this service.
+     */
+    public $port;
 
-	/*
- 	 * The domain name of the target host
-	 */
-	public $target;
+    /*
+      * The domain name of the target host
+     */
+    public $target;
 
     /**
      * method to return the rdata portion of the packet as a string
@@ -96,79 +99,85 @@ class Net_DNS2_RR_SRV extends Net_DNS2_RR
      * @access  protected
      *
      */
-	protected function _toString()
-	{
-		return $this->priority . ' ' . $this->weight . ' ' . $this->port . ' ' . $this->target . '.';
-	}
+    protected function rrToString()
+    {
+        return $this->priority . ' ' . $this->weight . ' ' . 
+            $this->port . ' ' . $this->target . '.';
+    }
 
     /**
      * parses the rdata portion from a standard DNS config line
      *
-     * @param   array       $rdata  a string split line of values for the rdata
-     * @return  boolean
-     * @access  protected
+     * @param array $rdata a string split line of values for the rdata
+     *
+     * @return boolean
+     * @access protected
      *
      */
-	protected function _fromString(array $rdata)
-	{
-		$this->priority	= $rdata[0];
-		$this->weight	= $rdata[1];
-		$this->port		= $rdata[2];
+    protected function rrFromString(array $rdata)
+    {
+        $this->priority = $rdata[0];
+        $this->weight   = $rdata[1];
+        $this->port     = $rdata[2];
 
-		$this->target	= strtolower(trim($rdata[3], '.'));
-		
-		return true;
-	}
+        $this->target   = strtolower(trim($rdata[3], '.'));
+        
+        return true;
+    }
 
     /**
      * parses the rdata of the Net_DNS2_Packet object
      *
-     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet to parse the RR from
-     * @return  boolean
-     * @access  protected
-     * 
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     *
+     * @return boolean
+     * @access protected
+     *
      */
-	protected function _set(Net_DNS2_Packet &$packet)
-	{
-		if ($this->rdlength > 0) {
-			
-			//
-			// unpack the priority, weight and port
-			//
-			$x = unpack('npriority/nweight/nport', $this->rdata);
+    protected function rrSet(Net_DNS2_Packet &$packet)
+    {
+        if ($this->rdlength > 0) {
+            
+            //
+            // unpack the priority, weight and port
+            //
+            $x = unpack('npriority/nweight/nport', $this->rdata);
 
-			$this->priority = $x['priority'];
-			$this->weight	= $x['weight'];
-			$this->port 	= $x['port'];
+            $this->priority = $x['priority'];
+            $this->weight   = $x['weight'];
+            $this->port     = $x['port'];
 
-			$offset 		= $packet->offset + 6;
-			$this->target	= Net_DNS2_Packet::expand($packet, $offset);
-		}
-		
-		return true;
-	}
+            $offset         = $packet->offset + 6;
+            $this->target   = Net_DNS2_Packet::expand($packet, $offset);
+        }
+        
+        return true;
+    }
 
     /**
      * returns the rdata portion of the DNS packet
-     * 
-     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet use for compressed names
-     * @return  mixed                       either returns a binary packed string or null on failure
-     * @access  protected
-     * 
+     *
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     *                                 compressed names
+     *
+     * @return mixed                   either returns a binary packed
+     *                                 string or null on failure
+     * @access protected
+     *
      */
-	protected function _get(Net_DNS2_Packet &$packet)
-	{
-		if (strlen($this->target) > 0) {
+    protected function rrGet(Net_DNS2_Packet &$packet)
+    {
+        if (strlen($this->target) > 0) {
 
-			$data = pack('nnn', $this->priority, $this->weight, $this->port);
-			$packet->offset += 6;
+            $data = pack('nnn', $this->priority, $this->weight, $this->port);
+            $packet->offset += 6;
 
-			$data .= $packet->compress($this->target, $packet->offset);
-			return $data;
-		}
+            $data .= $packet->compress($this->target, $packet->offset);
+            return $data;
+        }
 
-		return null;
-	}
+        return null;
+    }
 }
 
 ?>

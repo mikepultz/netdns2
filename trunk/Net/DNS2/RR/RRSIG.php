@@ -38,14 +38,14 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category	Networking
- * @package		Net_DNS2
- * @author		Mike Pultz <mike@mikepultz.com>
- * @copyright	2010 Mike Pultz <mike@mikepultz.com>
- * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version		SVN: $Id$
- * @link		http://pear.php.net/package/Net_DNS2
- * @since		File available since Release 1.0.0
+ * @category  Networking
+ * @package   Net_DNS2
+ * @author    Mike Pultz <mike@mikepultz.com>
+ * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version   SVN: $Id$
+ * @link      http://pear.php.net/package/Net_DNS2
+ * @since     File available since Release 1.0.0
  *
  * This file contains code based off the Net::DNS::SEC Perl module by
  * Olaf M. Kolkman
@@ -75,7 +75,7 @@
  *
  */
 
-/*
+/**
  * RRSIG Resource Record - RFC4034 sction 3.1
  *
  *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -97,22 +97,25 @@
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- * @package     Net_DNS2
- * @author      Mike Pultz <mike@mikepultz.com>
- * @see         Net_DNS2_RR
+ * @category Networking
+ * @package  Net_DNS2
+ * @author   Mike Pultz <mike@mikepultz.com>
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link     http://pear.php.net/package/Net_DNS2
+ * @see      Net_DNS2_RR
  *
  */
 class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
 {
-	public $typecovered;
-	public $algorithm;
-	public $labels;
-	public $origttl;
-	public $sigexp;
-	public $sigincep;
-	public $keytag;
-	public $signname;
-	public $signature;
+    public $typecovered;
+    public $algorithm;
+    public $labels;
+    public $origttl;
+    public $sigexp;
+    public $sigincep;
+    public $keytag;
+    public $signname;
+    public $signature;
 
     /**
      * method to return the rdata portion of the packet as a string
@@ -121,139 +124,148 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
      * @access  protected
      *
      */
-	protected function _toString()
-	{
-		return $this->typecovered . ' ' . $this->algorithm . ' ' . $this->labels . ' ' . $this->origttl . ' ' .
-			$this->sigexp . ' ' . $this->sigincep . ' ' . $this->keytag . ' ' . $this->signname . '. ' . $this->signature;
-	}
+    protected function rrToString()
+    {
+        return $this->typecovered . ' ' . $this->algorithm . ' ' . 
+            $this->labels . ' ' . $this->origttl . ' ' .
+            $this->sigexp . ' ' . $this->sigincep . ' ' . 
+            $this->keytag . ' ' . $this->signname . '. ' . $this->signature;
+    }
 
     /**
      * parses the rdata portion from a standard DNS config line
      *
-     * @param   array       $rdata  a string split line of values for the rdata
-     * @return  boolean
-     * @access  protected
+     * @param array $rdata a string split line of values for the rdata
+     *
+     * @return boolean
+     * @access protected
      *
      */
-	protected function _fromString(array $rdata)
-	{
-		$this->typecovered		= strtoupper(array_shift($rdata));
-		$this->algorithm		= array_shift($rdata);
-		$this->labels			= array_shift($rdata);
-		$this->origttl			= array_shift($rdata);
-		$this->sigexp			= array_shift($rdata);
-		$this->sigincep			= array_shift($rdata);
-		$this->keytag			= array_shift($rdata);
-		$this->signname			= strtolower(trim(array_shift($rdata), '.'));
+    protected function rrFromString(array $rdata)
+    {
+        $this->typecovered  = strtoupper(array_shift($rdata));
+        $this->algorithm    = array_shift($rdata);
+        $this->labels       = array_shift($rdata);
+        $this->origttl      = array_shift($rdata);
+        $this->sigexp       = array_shift($rdata);
+        $this->sigincep     = array_shift($rdata);
+        $this->keytag       = array_shift($rdata);
+        $this->signname     = strtolower(trim(array_shift($rdata), '.'));
 
-		foreach($rdata as $line) {
+        foreach ($rdata as $line) {
 
-			$this->signature .= $line . ' ';
-		}
-		$this->signature = trim($this->signature);
+            $this->signature .= $line . ' ';
+        }
+        $this->signature = trim($this->signature);
 
-		return true;
-	}
+        return true;
+    }
 
     /**
      * parses the rdata of the Net_DNS2_Packet object
      *
-     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet to parse the RR from
-     * @return  boolean
-     * @access  protected
-     * 
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     *
+     * @return boolean
+     * @access protected
+     *
      */
-	protected function _set(Net_DNS2_Packet &$packet)
-	{
-		if ($this->rdlength > 0) {
-
-			//
-			// unpack 
-			//
-			$x = unpack("ntypecovered/Calgorithm/Clabels/Norigttl/Nsigexp/Nsigincep/nkeytag", $this->rdata);
-
-			$this->typecovered 	= Net_DNS2_Lookups::$rr_types_by_id[$x['typecovered']];
-			$this->algorithm	= $x['algorithm'];
-			$this->labels		= $x['labels'];
-			$this->origttl		= $x['origttl'];
+    protected function rrSet(Net_DNS2_Packet &$packet)
+    {
+        if ($this->rdlength > 0) {
 
             //
-            // TODO:    I dont' think these are right; I think we need to change localtime() to
-            //          gmdate() with a simple format and parse the output
+            // unpack 
+            //
+            $x = unpack("ntypecovered/Calgorithm/Clabels/Norigttl/Nsigexp/Nsigincep/nkeytag", $this->rdata);
+
+            $this->typecovered  = Net_DNS2_Lookups::$rr_types_by_id[$x['typecovered']];
+            $this->algorithm    = $x['algorithm'];
+            $this->labels       = $x['labels'];
+            $this->origttl      = $x['origttl'];
+
+            //
+            // TODO: I dont' think these are right; I think we need to change
+            // localtime() to gmdate() with a simple format and parse the output
             //
 
-			$e 					= localtime($x['sigexp']);
-			$this->sigexp 		= sprintf("%d%02d%02d%02d%02d%02d", $e[5]+1900, $e[4]+1, $e[3], $e[2], $e[1], $e[0]);
+            $e                  = localtime($x['sigexp']);
+            $this->sigexp       = sprintf("%d%02d%02d%02d%02d%02d", $e[5]+1900, $e[4]+1, $e[3], $e[2], $e[1], $e[0]);
 
-			$i 					= localtime($x['sigincep']);
-			$this->sigincep 	= sprintf("%d%02d%02d%02d%02d%02d", $i[5]+1900, $i[4]+1, $i[3], $i[2], $i[1], $i[0]);
+            $i                  = localtime($x['sigincep']);
+            $this->sigincep     = sprintf("%d%02d%02d%02d%02d%02d", $i[5]+1900, $i[4]+1, $i[3], $i[2], $i[1], $i[0]);
 
-            $this->keytag 		= $x['keytag'];
+            $this->keytag       = $x['keytag'];
 
-			//
-			// get teh signers name and signature
-			//
-			$offset				= $packet->offset + 18;
-			$sigoffset 			= $offset;
+            //
+            // get teh signers name and signature
+            //
+            $offset             = $packet->offset + 18;
+            $sigoffset          = $offset;
 
-			$this->signname		= strtolower(Net_DNS2_Packet::expand($packet, $sigoffset));
-			$this->signature	= base64_encode(substr($this->rdata, 18 + ($sigoffset - $offset)));
-		}
+            $this->signname     = strtolower(Net_DNS2_Packet::expand($packet, $sigoffset));
+            $this->signature    = base64_encode(substr($this->rdata, 18 + ($sigoffset - $offset)));
+        }
 
-		return true;
-	}
+        return true;
+    }
 
     /**
      * returns the rdata portion of the DNS packet
-     * 
-     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet use for compressed names
-     * @return  mixed                       either returns a binary packed string or null on failure
-     * @access  protected
-     * 
+     *
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     *                                 compressed names
+     *
+     * @return mixed                   either returns a binary packed
+     *                                 string or null on failure
+     * @access protected
+     *
      */
-	protected function _get(Net_DNS2_Packet &$packet)
-	{
-		if (strlen($this->signature) > 0) {
+    protected function rrGet(Net_DNS2_Packet &$packet)
+    {
+        if (strlen($this->signature) > 0) {
 
-			//
-			// parse the values out of the dates
-			//
-			preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigexp, $e);
-			preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigincep, $i);
+            //
+            // parse the values out of the dates
+            //
+            preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigexp, $e);
+            preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigincep, $i);
 
-			//
-			// pack the value
-			//
-			$data = pack('nCCNNNn', 
-				Net_DNS2_Lookups::$rr_types_by_name[$this->typecovered],
-				$this->algorithm,
-				$this->labels,
-				$this->origttl,
-				gmmktime($e[4], $e[5], $e[6], $e[2] - 1, $e[3], $e[1] - 1900),
-				gmmktime($i[4], $i[5], $i[6], $i[2] - 1, $i[3], $i[1] - 1900),
-				$this->keytag);
+            //
+            // pack the value
+            //
+            $data = pack(
+                'nCCNNNn', 
+                Net_DNS2_Lookups::$rr_types_by_name[$this->typecovered],
+                $this->algorithm,
+                $this->labels,
+                $this->origttl,
+                gmmktime($e[4], $e[5], $e[6], $e[2] - 1, $e[3], $e[1] - 1900),
+                gmmktime($i[4], $i[5], $i[6], $i[2] - 1, $i[3], $i[1] - 1900),
+                $this->keytag
+            );
 
-			//
-			// the signer name is special; it's not allowed to be compressed (see section 3.1.7)
-			//
-			$names = explode('.', strtolower($this->signname));
-			foreach($names as $name) {
-	
-				$data .= chr(strlen($name));
-				$data .= $name;
-			}
-			$data .= "\0";
+            //
+            // the signer name is special; it's not allowed to be compressed (see section 3.1.7)
+            //
+            $names = explode('.', strtolower($this->signname));
+            foreach ($names as $name) {
+    
+                $data .= chr(strlen($name));
+                $data .= $name;
+            }
+            $data .= "\0";
 
-			//
-			// add the signature
-			//
-			$data .= base64_decode($this->signature);
+            //
+            // add the signature
+            //
+            $data .= base64_decode($this->signature);
 
-			return $data;
-		}
-		
-		return null;
-	}
+            return $data;
+        }
+        
+        return null;
+    }
 }
 
 /*

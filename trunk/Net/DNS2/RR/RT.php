@@ -38,43 +38,46 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @category	Networking
- * @package		Net_DNS2
- * @author		Mike Pultz <mike@mikepultz.com>
- * @copyright	2010 Mike Pultz <mike@mikepultz.com>
- * @license		http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version		SVN: $Id$
- * @link		http://pear.php.net/package/Net_DNS2
- * @since		File available since Release 1.0.0
+ * @category  Networking
+ * @package   Net_DNS2
+ * @author    Mike Pultz <mike@mikepultz.com>
+ * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @version   SVN: $Id$
+ * @link      http://pear.php.net/package/Net_DNS2
+ * @since     File available since Release 1.0.0
  *
  */
 
-/*
+/**
  * RT Resource Record - RFC1183 section 3.3
  *
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *    |                preference                     |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *    /             intermediate-host                 /
- *    /            	                                  /
+ *    /                                               /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
- * @package     Net_DNS2
- * @author      Mike Pultz <mike@mikepultz.com>
- * @see         Net_DNS2_RR
+ * @category Networking
+ * @package  Net_DNS2
+ * @author   Mike Pultz <mike@mikepultz.com>
+ * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link     http://pear.php.net/package/Net_DNS2
+ * @see      Net_DNS2_RR
  *
  */
 class Net_DNS2_RR_RT extends Net_DNS2_RR
 {
-	/*
-	 * the preference of this route
-	 */
-	public $preference;
+    /*
+     * the preference of this route
+     */
+    public $preference;
 
-	/*
- 	 * host which will servce as an intermediate in reaching the owner host
-	 */
-	public $intermediatehost;
+    /*
+      * host which will servce as an intermediate in reaching the owner host
+     */
+    public $intermediatehost;
 
     /**
      * method to return the rdata portion of the packet as a string
@@ -83,73 +86,78 @@ class Net_DNS2_RR_RT extends Net_DNS2_RR
      * @access  protected
      *
      */
-	protected function _toString()
-	{
-		return $this->preference . ' ' . $this->intermediatehost . '.';
-	}
+    protected function rrToString()
+    {
+        return $this->preference . ' ' . $this->intermediatehost . '.';
+    }
 
     /**
      * parses the rdata portion from a standard DNS config line
      *
-     * @param   array       $rdata  a string split line of values for the rdata
-     * @return  boolean
-     * @access  protected
+     * @param array $rdata a string split line of values for the rdata
+     *
+     * @return boolean
+     * @access protected
      *
      */
-	protected function _fromString(array $rdata)
-	{
-		$this->preference 		= $rdata[0];
-		$this->intermediatehost	= strtolower(trim($rdata[1], '.'));
+    protected function rrFromString(array $rdata)
+    {
+        $this->preference       = $rdata[0];
+        $this->intermediatehost = strtolower(trim($rdata[1], '.'));
 
-		return true;
-	}
+        return true;
+    }
 
     /**
      * parses the rdata of the Net_DNS2_Packet object
      *
-     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet to parse the RR from
-     * @return  boolean
-     * @access  protected
-     * 
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     *
+     * @return boolean
+     * @access protected
+     *
      */
-	protected function _set(Net_DNS2_Packet &$packet)
-	{
-		if ($this->rdlength > 0) {
+    protected function rrSet(Net_DNS2_Packet &$packet)
+    {
+        if ($this->rdlength > 0) {
 
-			//
-			// unpack the preference
-			//
-			$x = unpack('npreference', $this->rdata);
+            //
+            // unpack the preference
+            //
+            $x = unpack('npreference', $this->rdata);
 
-			$this->preference 			= $x['preference'];
-			$offset 					= $packet->offset + 2;
+            $this->preference       = $x['preference'];
+            $offset                 = $packet->offset + 2;
 
-			$this->intermediatehost		=  Net_DNS2_Packet::expand($packet, $offset);
-		}
+            $this->intermediatehost =  Net_DNS2_Packet::expand($packet, $offset);
+        }
 
-		return true;
-	}
+        return true;
+    }
 
     /**
      * returns the rdata portion of the DNS packet
-     * 
-     * @param   Net_DNS2_Packet $packet     a Net_DNS2_Packet packet use for compressed names
-     * @return  mixed                       either returns a binary packed string or null on failure
-     * @access  protected
-     * 
+     *
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     *                                 compressed names
+     *
+     * @return mixed                   either returns a binary packed
+     *                                 string or null on failure
+     * @access protected
+     *
      */
-	protected function _get(Net_DNS2_Packet &$packet)
-	{
-		if (strlen($this->intermediatehost) > 0) {
+    protected function rrGet(Net_DNS2_Packet &$packet)
+    {
+        if (strlen($this->intermediatehost) > 0) {
 
-			$data = pack('n', $this->preference);
-			$data .= $packet->compress($this->intermediatehost, $packet->offset);
+            $data = pack('n', $this->preference);
+            $data .= $packet->compress($this->intermediatehost, $packet->offset);
 
-			return $data;
-		}
+            return $data;
+        }
 
-		return null;
-	}
+        return null;
+    }
 }
 
 /*
