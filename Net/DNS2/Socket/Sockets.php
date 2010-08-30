@@ -78,7 +78,9 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         //
         // create the socket
         //
-        $this->_sock = @socket_create(AF_INET, $this->type, ($this->type == SOCK_STREAM) ? SOL_TCP : SOL_UDP);
+        $this->_sock = @socket_create(
+            AF_INET, $this->type, ($this->type == SOCK_STREAM) ? SOL_TCP : SOL_UDP
+        );
         if ($this->_sock === false) {
 
             $this->last_error = socket_strerror(socket_last_error());

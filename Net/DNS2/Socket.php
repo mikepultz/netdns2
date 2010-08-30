@@ -75,6 +75,17 @@ abstract class Net_DNS2_Socket
 
     public $last_error;
 
+    /**   
+     * constructor - set the port details
+     *
+     * @param integer $type    the socket type
+     * @param string  $host    the IP address of the DNS server to connect to
+     * @param integer $port    the port of the DNS server to connect to
+     * @param integer $timeout the timeout value to use for socket functions
+     *
+     * @access public
+     *       
+     */
     public function __construct($type, $host, $port, $timeout)
     {
         $this->type     = $type;
@@ -82,19 +93,74 @@ abstract class Net_DNS2_Socket
         $this->port     = $port;
         $this->timeout  = $timeout;
     }
+
+    /**
+     * destructor
+     *
+     * @access public
+     */
     public function __destruct()
     {
         $this->close();
     }
+
+    /**   
+     * sets the local address/port for the socket to bind to
+     *
+     * @param string $address the local IP address to bind to
+     * @param mixed  $port    the local port to bind to, or 0 to let the socket
+     *                        function select a port
+     *
+     * @return boolean
+     * @access public
+     *       
+     */
     public function bindAddress($address, $port = 0)
     {
         $this->local_host = $address;
         $this->local_port = $port;
+
+        return true;
     }
 
+    /**
+     * opens a socket connection to the DNS server
+     *     
+     * @return boolean
+     * @access public
+     *
+     */
     abstract public function open();
+
+    /**
+     * closes a socket connection to the DNS server  
+     *
+     * @return boolean
+     * @access public
+     *     
+     */
     abstract public function close();
+
+    /**
+     * writes the given string to the DNS server socket
+     *
+     * @param string $data a binary packed DNS packet
+     *   
+     * @return boolean
+     * @access public
+     *
+     */
     abstract public function write($data);
+
+    /**   
+     * reads a response from a DNS server
+     *
+     * @param integer &$size the size of the DNS packet read is passed back
+     *
+     * @return mixed         returns the data on success and false on error
+     * @access public
+     *       
+     */
     abstract public function read(&$size);
 }
 
