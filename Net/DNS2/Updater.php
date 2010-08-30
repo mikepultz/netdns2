@@ -76,6 +76,8 @@ class Net_DNS2_Updater extends Net_DNS2
      */
     private $_packet;
 
+    private $_tsig;
+
     /**
      * Constructor - builds a new Net_DNS2_Updater objected used for doing 
      * dynamic DNS updates
@@ -94,7 +96,7 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // create the packet
         //
-        $this->_packet = new Net_DNS2_Packet_Request($zone, 'SOA', 'IN');
+        $this->_packet = new Net_DNS2_Packet_Request(strtolower(trim($zone, ' \n\r\t.')), 'SOA', 'IN');
 
         //
         // make sure the opcode on the packet is set to UPDATE
@@ -117,7 +119,7 @@ class Net_DNS2_Updater extends Net_DNS2
         if (!preg_match('/' . $this->_packet->question[0]->qname . '$/', $name)) {
             
             throw new InvalidArgumentException(
-                'name provided (' . $name . ') does not match zone name (' 
+                'name provided (' . $name . ') does not match zone name (' .
                 $this->_packet->question[0]->qname . ')');
         }
     
@@ -130,9 +132,15 @@ class Net_DNS2_Updater extends Net_DNS2
      * @return boolean
      * @access public
      */
-    public function signature()
+    public function signature($keyname, $signature)
     {
-        // TODO: figure out TSIG
+        //
+        // create the TSIG RR, but don't add it just yet; TSIG needs to be added
+        // as the last additional entry- so we'll add it just before we send.
+        //
+        $this->_tsig = Net_DNS2_RR::fromString(strtolower(trim($keyname)) .
+            ' TSIG '. $signature);
+
         return true;
     }
 
@@ -512,6 +520,14 @@ class Net_DNS2_Updater extends Net_DNS2
         // make sure we have some name servers set
         //
         $this->checkServers();
+
+        //
+        // if we have a TSIG stored, then add it
+        //
+        if ($this->_tsig instanceof Net_DNS2_RR_TSIG) {
+
+            $this->_packet->additional[] = $this->_tsig;
+        }
 
         //
         // update the counts

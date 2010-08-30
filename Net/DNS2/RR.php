@@ -338,14 +338,13 @@ abstract class Net_DNS2_RR
         //
         // get the RR specific details
         //
-        if ($this->rdlength == -1) {
+        $rdata = '';
+        $rdlength = 0;
 
-            $this->rdlength = 0;
-            $this->rdata     = '';
-        } else {
+        if ($this->rdlength != -1) {
 
-            $this->rdata     = $this->rrGet($packet);
-            $this->rdlength = strlen($this->rdata);
+            $rdata      = $this->rrGet($packet);
+            $rdlength   = strlen($rdata);
         }
 
         //
@@ -356,13 +355,13 @@ abstract class Net_DNS2_RR
             Net_DNS2_Lookups::$rr_types_by_name[$this->type], 
             Net_DNS2_Lookups::$classes_by_name[$this->class], 
             $this->ttl, 
-            $this->rdlength
+            $rdlength
         );
         
         //
         // add the RR
         //
-        $data .= $this->rdata;
+        $data .= $rdata;
 
         return $data;
     }
