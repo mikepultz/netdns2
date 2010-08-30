@@ -82,16 +82,56 @@
  */
 class Net_DNS2_RR_TSIG extends Net_DNS2_RR
 {
+    /*
+     * algorithm used; only supports HMAC-MD5
+     */
     public $algorithm;
+
+    /*
+     * The time it was signed
+     */
     public $time_signed;
+
+    /*
+     * fudge- allowed offset from the time signed
+     */
     public $fudge;
+
+    /*
+     * size of the digest
+     */
     public $mac_size;
+
+    /*
+     * the digest data
+     */
     public $mac;
+
+    /*
+     * the original id of the request
+     */
     public $original_id;
+
+    /*
+     * additional error code
+     */
     public $error;
+
+    /*
+     * length of the "other" data, should only ever be 0 when there is
+     * no error, or 6 when there is the error RCODE_BADTIME
+     */
     public $other_length;
+
+    /*
+     * the other data; should only ever be a timestamp when there is the
+     * error RCODE_BADTIME
+     */
     public $other_data;
 
+    /*
+     * the key to use for signing - passed in, not included in the rdata
+     */
     public $key;
 
     /**
