@@ -132,6 +132,9 @@ class Net_DNS2_Updater extends Net_DNS2
     /**
      * add a signature to the request for authentication 
      *
+     * @param string $keyname   the key name to use for the TSIG RR
+     * @param string $signature the key to sign the request.
+     *
      * @return boolean
      * @access public
      */
@@ -141,8 +144,10 @@ class Net_DNS2_Updater extends Net_DNS2
         // create the TSIG RR, but don't add it just yet; TSIG needs to be added
         // as the last additional entry- so we'll add it just before we send.
         //
-        $this->_tsig = Net_DNS2_RR::fromString(strtolower(trim($keyname)) .
-            ' TSIG '. $signature);
+        $this->_tsig = Net_DNS2_RR::fromString(
+            strtolower(trim($keyname)) .
+            ' TSIG '. $signature
+        );
 
         return true;
     }

@@ -237,7 +237,7 @@ class Net_DNS2_Packet
      * This logic was based on the Net::DNS::Packet::dn_comp() function 
      * by Michanel Fuhr
      *
-     * @param string  $name   the name to be compressed
+     * @param string $name the name to be compressed
      *
      * @return string
      * @access public

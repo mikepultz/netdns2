@@ -197,13 +197,12 @@ class Net_DNS2
         //
         // if it's an array, then use it directly
         //
+        // otherwise, see if it's a path to a resolv.conf file and if so, load it
+        //
         if (is_array($nameservers)) {
 
             $this->nameservers = $nameservers;
 
-        //
-        // otherwise, see if it's a path to a resolv.conf file and if so, load it
-        //
         } else {
 
             //
