@@ -5,14 +5,13 @@ Net_DNS2 TODO List
 	- these responses can be split between multiple messages, so the socket handling code
 	  will need to be modified to support it.
 
-- update requests
-	- need TSIG RR
-	- flag to upadate all or any name servers specified
+DONE- update requests
+	DONE - need TSIG RR
 
 - finish missing RR's
 
 	- main
-		APL, HIP, LOC, OPT, TKEY, TSIG, 
+		APL, HIP, LOC, OPT, TKEY
 	
 	- dnssec
 		DNSKEY, DS, NSEC, NSEC3, NSEC3PARAM, RRSIG, SIG

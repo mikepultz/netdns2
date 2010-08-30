@@ -76,7 +76,10 @@ class Net_DNS2_Updater extends Net_DNS2
      */
     private $_packet;
 
-    private $_tsig;
+    /*
+     * TSIG RR to use for authentication
+     */
+    private $_tsig = null;
 
     /**
      * Constructor - builds a new Net_DNS2_Updater objected used for doing 
