@@ -102,8 +102,8 @@ class Net_DNS2_RR_AFSDB extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $this->subtype         = array_shift($rdata);
-        $this->hostname     = array_shift($rdata);
+        $this->subtype  = array_shift($rdata);
+        $this->hostname = array_shift($rdata);
 
         return true;
     }
@@ -126,10 +126,10 @@ class Net_DNS2_RR_AFSDB extends Net_DNS2_RR
             //
             $x = unpack('nsubtype', $this->rdata);
 
-            $this->subtype     = $x['subtype'];
+            $this->subtype  = $x['subtype'];
             $offset         = $packet->offset + 2;
 
-            $this->hostname    = Net_DNS2_Packet::expand($packet, $offset);
+            $this->hostname = Net_DNS2_Packet::expand($packet, $offset);
         }
 
         return true;

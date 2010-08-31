@@ -74,32 +74,32 @@ class Net_DNS2_RR_CERT extends Net_DNS2_RR
     /*
      * format's allowed for certificates
      */
-    const CERT_FORMAT_RES        = 0;
-    const CERT_FORMAT_PKIX        = 1;
-    const CERT_FORMAT_SPKI        = 2;
-    const CERT_FORMAT_PGP        = 3;
-    const CERT_FORMAT_IPKIX        = 4;
-    const CERT_FORMAT_ISPKI        = 5;
-    const CERT_FORMAT_IPGP        = 6;
+    const CERT_FORMAT_RES       = 0;
+    const CERT_FORMAT_PKIX      = 1;
+    const CERT_FORMAT_SPKI      = 2;
+    const CERT_FORMAT_PGP       = 3;
+    const CERT_FORMAT_IPKIX     = 4;
+    const CERT_FORMAT_ISPKI     = 5;
+    const CERT_FORMAT_IPGP      = 6;
     const CERT_FORMAT_ACPKIX    = 7;
-    const CERT_FORMAT_IACPKIX    = 8;
-    const CERT_FORMAT_URI        = 253;
-    const CERT_FORMAT_OID        = 254;
+    const CERT_FORMAT_IACPKIX   = 8;
+    const CERT_FORMAT_URI       = 253;
+    const CERT_FORMAT_OID       = 254;
 
     public $cert_format_name_to_id = array();
     public $cert_format_id_to_name = array(
 
-        self::CERT_FORMAT_RES        => 'Reserved',
-        self::CERT_FORMAT_PKIX        => 'PKIX',
-        self::CERT_FORMAT_SPKI        => 'SPKI',
-        self::CERT_FORMAT_PGP        => 'PGP',
-        self::CERT_FORMAT_IPKIX        => 'IPKIX',
-        self::CERT_FORMAT_ISPKI        => 'ISPKI',
-        self::CERT_FORMAT_IPGP        => 'IPGP',
+        self::CERT_FORMAT_RES       => 'Reserved',
+        self::CERT_FORMAT_PKIX      => 'PKIX',
+        self::CERT_FORMAT_SPKI      => 'SPKI',
+        self::CERT_FORMAT_PGP       => 'PGP',
+        self::CERT_FORMAT_IPKIX     => 'IPKIX',
+        self::CERT_FORMAT_ISPKI     => 'ISPKI',
+        self::CERT_FORMAT_IPGP      => 'IPGP',
         self::CERT_FORMAT_ACPKIX    => 'ACPKIX',
-        self::CERT_FORMAT_IACPKIX    => 'IACPKIX',
-        self::CERT_FORMAT_URI        => 'URI',
-        self::CERT_FORMAT_OID        => 'OID'
+        self::CERT_FORMAT_IACPKIX   => 'IACPKIX',
+        self::CERT_FORMAT_URI       => 'URI',
+        self::CERT_FORMAT_OID       => 'OID'
     );
 
     /*
@@ -239,14 +239,14 @@ class Net_DNS2_RR_CERT extends Net_DNS2_RR
             //
             $x = unpack('nformat/nkeytag/Calgorithm', $this->rdata);
 
-            $this->format         = $x['format'];
-            $this->keytag        = $x['keytag'];
+            $this->format       = $x['format'];
+            $this->keytag       = $x['keytag'];
             $this->algorithm    = $x['algorithm'];
 
             //
             // copy the certificate
             //
-            $this->certificate    = substr($this->rdata, 5, $this->rdlength - 5);
+            $this->certificate  = substr($this->rdata, 5, $this->rdlength - 5);
 
             return true;
         }
