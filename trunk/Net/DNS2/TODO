@@ -11,7 +11,7 @@ DONE- update requests
 - finish missing RR's
 
 	- main
-		APL, HIP, LOC, OPT, TKEY
+		APL, HIP, LOC, OPT
 	
 	- dnssec
 		DNSKEY, DS, NSEC, NSEC3, NSEC3PARAM, RRSIG, SIG

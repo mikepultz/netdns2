@@ -76,6 +76,7 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
 		    'DNSKEY'	=> 'example.com. 300 IN DNSKEY 256 3 7 AwEAAYCXh/ZABi8kiJIDXYmyUlHzC0CHeBzqcpyZAIjC7dK1wkRYVcUvIlpTOpnOVVfcC3Py9Ui/x45qKb0LytvK7WYAe3WyOOwk5klwIqRC/0p4luafbd2yhRMF7quOBVqYrLoHwv8i9LrV+r8dhB7rXv/lkTSI6mEZsg5rDfee8Yy1',
 			'DHCID'		=> 'example.com. 300 IN DHCID AAIBY2/AuCccgoJbsaxcQc9TUapptP69lOjxfNuVAA2kjEA=',
 			'SPF'		=> 'example.com. 300 IN SPF "v=spf1 ip4:192.168.0.1/24 mx ?all"',
+            'TKEY'      => 'example.com. 300 IN TKEY gss.microsoft.com. 3 123456.',
 // BROKEN			'DLV'		=> 'example.com. 300 IN DS 21366 7 2 96EEB2FFD9B00CD4694E78278B5EFDAB0A80446567B69F634DA078F0 D90F01BA',
 		);
 

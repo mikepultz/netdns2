@@ -82,8 +82,41 @@
  * @see      Net_DNS2_RR
  *
  */
-class Net_DNS2_RR_TSIG extends Net_DNS2_RR
+class Net_DNS2_RR_TKEY extends Net_DNS2_RR
 {
+    public $algorithm;
+    public $inception;
+    public $expiration;
+    public $mode;
+    public $error;
+    public $key_size;
+    public $key_data;
+    public $other_size;
+    public $other_data;
+
+    /*
+     * TSIG Modes
+     */
+    const TSIG_MODE_RES           = 0;
+    const TSIG_MODE_SERV_ASSIGN   = 1;
+    const TSIG_MODE_DH            = 2;
+    const TSIG_MODE_GSS_API       = 3;
+    const TSIG_MODE_RESV_ASSIGN   = 4;
+    const TSIG_MODE_KEY_DELE      = 5;
+
+    /*
+     * map the mod id's to names so we can validate
+     */
+    public $tsgi_mode_id_to_name = array(
+
+        TSIG_MODE_RES           => 'Reserved',
+        TSIG_MODE_SERV_ASSIGN   => 'Server Assignment',
+        TSIG_MODE_DH            => 'Diffie-Hellman',
+        TSIG_MODE_GSS_API       => 'GSS-API',
+        TSIG_MODE_RESV_ASSIGN   => 'Resolver Assignment',
+        TSIG_MODE_KEY_DELE      => 'Key Deletion'
+    );
+
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -93,6 +126,16 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      */
     protected function rrToString()
     {
+        $out = $this->algorithm . '. ' . $this->mode;
+        if ($this->key_size > 0) {
+
+            $out .= ' ' . $this->key_data . '.';
+        } else {
+
+            $out .= ' .';
+        }
+
+        return $out;
     }
 
     /**
@@ -106,6 +149,24 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
+        //
+        // data passed in is assumed: <algorithm> <mode> <key>
+        //
+        $this->algorithm    = strtolower(trim(array_shift($rdata), '.'));
+        $this->mode         = array_shift($rdata);
+        $this->key_data     = trim(array_shift($rdata),'.');
+
+        //
+        // the rest of the data is set manually
+        //
+        $this->inception    = time();
+        $this->expiration   = time() + 24 * 60 * 60; // 1 day
+        $this->error        = 0;
+        $this->key_size     = strlen($this->key);
+        $this->other_size   = 0;
+        $this->other_data   = '';
+
+        return true;
     }
 
     /**
@@ -119,6 +180,56 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      */
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
+        if ($this->rdlength > 0) {
+        
+            //
+            // expand the algorithm
+            //
+            $offset = $packet->offset;
+            $this->algorithm = Net_DNS2_Packet::expand($packet, $offset);
+            
+            //
+            // unpack inception, expiration, mode, error and key size
+            //
+            $x = unpack('@' . $offset . '/Ninception/Nexpiration/nmode/nerror/nkey_size', $packet->rdata);
+
+            $this->inception    = $x['inception'];
+            $this->expiration   = $x['expiration'];
+            $this->mode         = $x['mode'];
+            $this->error        = $x['error'];
+            $this->key_size     = $x['key_size'];
+
+            $offset += 14;
+
+            //
+            // if key_size > 0, then copy out the key
+            //
+            if ($this->key_size > 0) {
+
+                $this->key_data = substr($packet->rdata, $offset, $this->key_size);
+                $offset += $this->key_size;
+            }
+
+            //
+            // unpack the other length
+            //
+            $x = unpack('@' . $offset . '/nother_size', $packet->rdata);
+            
+            $this->other_size = $x['other_size'];
+            $offset += 2;
+
+            //
+            // if other_size > 0, then copy out the data
+            //
+            if ($this->other_size > 0) {
+
+                $this->other_data = substr($packet->rdata, $offset, $this->other_size);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -134,6 +245,45 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
+        if (strlen($this->algorithm) > 0) {
+
+            //
+            // make sure the size values are correct
+            //
+            $this->key_size     = strlen($this->key_data);
+            $this->other_size   = strlen($this->other_data);
+
+            //
+            // add the algorithm without compression
+            //
+            $data = Net_DNS2_Packet::pack($this->algorithm);
+
+            //
+            // pack in the inception, expiration, mode, error and key size
+            //
+            $data .= pack('NNnnn', $this->inception, $this->expiration, $this->mode, 0, $this->key_size);
+
+            //
+            // if the key_size > 0, then add the key
+            //
+            if ($this->key_size > 0) {
+            
+                $data .= $this->key_data;
+            }
+
+            //
+            // pack in the other size
+            //
+            $data .= pack('n', $this->other_size);
+            if ($this->other_size > 0) {
+
+                $data .= $this->other_data;
+            }
+
+            return $data;
+        }
+
+        return null;
     }
 }
 
