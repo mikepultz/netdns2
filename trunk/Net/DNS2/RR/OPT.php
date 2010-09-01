@@ -52,6 +52,16 @@
 /**
  * OPT Resource Record - RFC2929 section 3.1
  *
+ *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *    |                          OPTION-CODE                          |
+ *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *    |                         OPTION-LENGTH                         |
+ *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *    |                                                               |
+ *    /                          OPTION-DATA                          /
+ *    /                                                               /
+ *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *
  * @category Networking
  * @package  Net_DNS2
  * @author   Mike Pultz <mike@mikepultz.com>
@@ -97,6 +107,14 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      */
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
+        if ($this->rdlength > 0) {
+
+            $x = unpack('noptioncode/noptionlength/
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
