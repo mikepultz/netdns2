@@ -69,6 +69,12 @@
  */
 class Net_DNS2_RR_NSEC3PARAM extends Net_DNS2_RR
 {
+    public $algorithm;
+    public $flags;
+    public $iterations;
+    public $salt_length;
+    public $salt;
+
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -78,6 +84,21 @@ class Net_DNS2_RR_NSEC3PARAM extends Net_DNS2_RR
      */
     protected function rrToString()
     {
+        $out = $this->algorithm . ' ' . $this->flags . ' ' . $this->iterations . ' ';
+
+        //
+        // per RFC5155, the salt_length value isn't displayed, and if the salt 
+        // is empty, the salt is displayed as "-"
+        //        
+        if ($this->salt_length > 0) {
+
+            $out .= $this->salt;
+        } else {
+            
+            $out .= '-';
+        }
+    
+        return $out;
     }
 
     /**
@@ -91,6 +112,22 @@ class Net_DNS2_RR_NSEC3PARAM extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
+        $this->algorithm    = array_shift($rdata);
+        $this->flags        = array_shift($rdata);
+        $this->iterations   = array_shift($rdata);
+
+        $salt = array_shift($rdata);
+        if ($salt == '-') {
+
+            $this->salt_length = 0;
+            $this->salt = '';
+        } else {
+
+            $this->salt_length = strlen(pack('H*', $salt));
+            $this->salt = strtoupper($salt);
+        }
+        
+        return true;
     }
 
     /**
@@ -104,6 +141,25 @@ class Net_DNS2_RR_NSEC3PARAM extends Net_DNS2_RR
      */
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
+        if ($this->rdlength > 0) {
+
+            $x = unpack('Calgorithm/Cflags/niterations/Csalt_length', $this->rdata);
+
+            $this->algorithm    = $x['algorithm'];
+            $this->flags        = $x['flags'];
+            $this->iterations   = $x['iterations'];
+            $this->salt_length  = $x['salt_length'];
+
+            if ($this->salt_length > 0) {
+
+                $x = unpack('H*', substr($this->rdata, 5, $this->salt_length));
+                $this->salt = strtoupper($x[1]);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -119,6 +175,15 @@ class Net_DNS2_RR_NSEC3PARAM extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
+        $salt = pack('H*', $this->salt);
+        $this->salt_length = strlen($salt);
+
+        return pack(
+            'CCnC', 
+            $this->algorithm, $this->flags, $this->iterations, $this->salt_length
+        ) . $salt;
+
+        return $data;
     }
 }
 

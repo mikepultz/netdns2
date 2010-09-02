@@ -14,7 +14,7 @@ DONE- update requests
 		APL, HIP, OPT
 	
 	- dnssec
-		NSEC, NSEC3, NSEC3PARAM
+		NSEC, NSEC3
 
 
 DONE - parse BIND style input and set all the appropriate values of the RR object
