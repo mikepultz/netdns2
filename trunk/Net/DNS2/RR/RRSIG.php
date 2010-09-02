@@ -154,7 +154,7 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
 
         foreach ($rdata as $line) {
 
-            $this->signature .= $line . ' ';
+            $this->signature .= $line;
         }
         $this->signature = trim($this->signature);
 
@@ -185,16 +185,14 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
             $this->origttl      = $x['origttl'];
 
             //
-            // TODO: I dont' think these are right; I think we need to change
-            // localtime() to gmdate() with a simple format and parse the output
+            // the dates are in GM time
             //
+            $this->sigexp       = gmdate('YmdHis', $x['sigexp']);
+            $this->sigincep     = gmdate('YmdHis', $x['sigincep']);
 
-            $e                  = localtime($x['sigexp']);
-            $this->sigexp       = sprintf("%d%02d%02d%02d%02d%02d", $e[5]+1900, $e[4]+1, $e[3], $e[2], $e[1], $e[0]);
-
-            $i                  = localtime($x['sigincep']);
-            $this->sigincep     = sprintf("%d%02d%02d%02d%02d%02d", $i[5]+1900, $i[4]+1, $i[3], $i[2], $i[1], $i[0]);
-
+            //
+            // get the keytag
+            //
             $this->keytag       = $x['keytag'];
 
             //
@@ -240,8 +238,8 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
                 $this->algorithm,
                 $this->labels,
                 $this->origttl,
-                gmmktime($e[4], $e[5], $e[6], $e[2] - 1, $e[3], $e[1] - 1900),
-                gmmktime($i[4], $i[5], $i[6], $i[2] - 1, $i[3], $i[1] - 1900),
+                gmmktime($e[4], $e[5], $e[6], $e[2], $e[3], $e[1]),
+                gmmktime($i[4], $i[5], $i[6], $i[2], $i[3], $i[1]),
                 $this->keytag
             );
 

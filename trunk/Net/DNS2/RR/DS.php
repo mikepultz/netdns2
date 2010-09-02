@@ -118,7 +118,7 @@ class Net_DNS2_RR_DS extends Net_DNS2_RR
         $this->keytag       = array_shift($rdata);
         $this->algorithm    = array_shift($rdata);
         $this->digesttype   = array_shift($rdata);
-        $this->digest       = implode(' ', $rdata);
+        $this->digest       = implode('', $rdata);
 
         return true;
     }
@@ -160,10 +160,13 @@ class Net_DNS2_RR_DS extends Net_DNS2_RR
             //
             // copy the digest
             //
-            $this->digest = unpack('H*', substr($this->rdata, 4, $digest_size));
+            $x = unpack('H*', substr($this->rdata, 4, $digest_size));
+            $this->digest = $x[1];
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
