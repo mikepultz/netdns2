@@ -77,9 +77,10 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
 			'IPSECKEY'	=> 'example.com. 300 IN IPSECKEY 10 2 2 2001:db8:0:8002:0:0:2000:1 AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ==',
 		    'DNSKEY'	=> 'example.com. 300 IN DNSKEY 256 3 7 AwEAAYCXh/ZABi8kiJIDXYmyUlHzC0CHeBzqcpyZAIjC7dK1wkRYVcUvIlpTOpnOVVfcC3Py9Ui/x45qKb0LytvK7WYAe3WyOOwk5klwIqRC/0p4luafbd2yhRMF7quOBVqYrLoHwv8i9LrV+r8dhB7rXv/lkTSI6mEZsg5rDfee8Yy1',
 			'DHCID'		=> 'example.com. 300 IN DHCID AAIBY2/AuCccgoJbsaxcQc9TUapptP69lOjxfNuVAA2kjEA=',
+            'NSEC3PARAM'=> 'example.com. 300 IN NSEC3PARAM 1 0 1 D399EAAB',
 			'SPF'		=> 'example.com. 300 IN SPF "v=spf1 ip4:192.168.0.1/24 mx ?all"',
             'TKEY'      => 'example.com. 300 IN TKEY gss.microsoft.com. 3 123456.',
-            //'DLV'		=> 'example.com. 300 IN DS 21366 7 2 96EEB2FFD9B00CD4694E78278B5EFDAB0A80446567B69F634DA078F0 D90F01BA',
+            'DLV'		=> 'example.com. 300 IN DLV 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
 		);
 
 		foreach($rrs as $rr => $line) {
