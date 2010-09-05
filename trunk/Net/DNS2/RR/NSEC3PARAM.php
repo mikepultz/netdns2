@@ -69,10 +69,31 @@
  */
 class Net_DNS2_RR_NSEC3PARAM extends Net_DNS2_RR
 {
+    /*
+     * Algorithm to use
+     *
+     * TODO: same as the NSEC3
+     */
     public $algorithm;
+
+    /*
+     * flags
+     */
     public $flags;
+
+    /*
+     *  defines the number of additional times the hash is performed.
+     */
     public $iterations;
+
+    /*
+     * the length of the salt- not displayed
+     */
     public $salt_length;
+
+    /*
+     * the salt
+     */
     public $salt;
 
     /**

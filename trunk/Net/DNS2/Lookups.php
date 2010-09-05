@@ -216,6 +216,27 @@ class Net_DNS2_Lookups
     );
 
     /*
+     * Qtypes and Metatypes - defined in RFC2929 section 3.1
+     */
+    public static $rr_qtypes_by_id = array();
+    public static $rr_qtypes_by_name = array(
+
+        'IXFR'          => 251,     // RFC 1995 - only a full transfer (AXFR) is supported
+        'AXFR'          => 252,     // RFC 1035
+        'MAILB'         => 253,     // RFC 883, Not implemented
+        'MAILA'         => 254,     // RFC 973, Not implemented
+        'ANY'           => 255      // RFC 1035 - we support both 'ANY' and '*'
+    );
+    
+    public static $rr_metatypes_by_id = array();
+    public static $rr_metatypes_by_name = array(
+
+        'OPT'           => 41,      // RFC 2671
+        'TKEY'          => 249,     // RFC 2930
+        'TSIG'          => 250      // RFC 2845
+    );
+
+    /*
      * used to map resource record id's to RR class names
      */
     public static $rr_types_class_to_id = array();
@@ -347,6 +368,8 @@ class Net_DNS2_Lookups
         self::$classes_by_id                = array_flip(self::$classes_by_name);
         self::$rr_types_class_to_id         = array_flip(self::$rr_types_id_to_class);
         self::$dnssec_algorithm_name_to_id  = array_flip(self::$dnssec_algorithm_id_to_name);
+        self::$rr_qtypes_by_id              = array_flip(self::$rr_qtypes_by_name);
+        self::$rr_metatypes_by_id           = array_flip(self::$rr_metatypes_by_name);
     }
 }
 
