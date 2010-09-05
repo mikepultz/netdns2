@@ -77,6 +77,11 @@ $GLOBALS['_Net_DNS2_Lookups'] = new Net_DNS2_Lookups();
 class Net_DNS2
 {
     /*
+     * the current version of this library
+     */
+    const VERSION = "1.0.0";
+
+    /*
      * use TCP only (true/false)
      */
     public $use_tcp = false;
