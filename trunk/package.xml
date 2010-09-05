@@ -8,30 +8,30 @@
  <summary>PHP5 Resolver library used to communicate with a DNS server.</summary>
  <description>Provides (roughly) the same functionality as Net_DNS, but using PHP5 objects, exceptions for error handling, better sockets support.
 
-This release is (in most cases) 2x - 10x faster than Net_DNS, as well as includes more RR&apos;s, and improved sockets and streams support.</description>
+This release is (in most cases) 2x - 10x faster than Net_DNS, as well as includes more RR&apos;s (including DNSSEC RR&apos;s), and improved sockets and streams support.</description>
  <lead>
   <name>Mike Pultz</name>
   <user>mikepultz</user>
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2010-09-04</date>
- <time>23:38:16</time>
+ <date>2010-09-05</date>
+ <time>01:22:16</time>
  <version>
-  <release>1.0.0</release>
-  <api>1.0.0</api>
+  <release>0.0.5</release>
+  <api>0.0.5</api>
  </version>
  <stability>
-  <release>stable</release>
-  <api>stable</api>
+  <release>beta</release>
+  <api>beta</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
  <notes>
-Initial release of Net_DNS2
+Initial Beta release of Net_DNS2
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
-   <file baseinstalldir="/" md5sum="54e4bead866c968dac5c1ef4b037ee29" name="Net/DNS2.php" role="php" />
+   <file baseinstalldir="/" md5sum="2988d15ebb138b86a182288df3ff4319" name="Net/DNS2.php" role="php" />
    <file baseinstalldir="/" md5sum="2a34552a114e6db5c344dbac885b7826" name="Net/DNS2/BitMap.php" role="php" />
    <file baseinstalldir="/" md5sum="3921e75337e534a112bd0764edd2c85b" name="Net/DNS2/Exception.php" role="php" />
    <file baseinstalldir="/" md5sum="3fd5d8979760891f80aea569eb26c97d" name="Net/DNS2/Header.php" role="php" />
@@ -116,6 +116,21 @@ Initial release of Net_DNS2
    <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
    <notes>
 Initial release of Net_DNS2
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>0.0.5</release>
+    <api>0.0.5</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2010-09-05</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+Initial Beta release of Net_DNS2
    </notes>
   </release>
  </changelog>
