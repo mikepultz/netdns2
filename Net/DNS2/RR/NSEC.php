@@ -69,6 +69,16 @@
  */
 class Net_DNS2_RR_NSEC extends Net_DNS2_RR
 {
+    /*
+     * The next owner name
+     */
+    public $next_domain_name;
+
+    /*
+     * identifies the RRset types that exist at the NSEC RR's owner name.
+     */
+    public $type_bit_maps = array();
+
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -78,6 +88,13 @@ class Net_DNS2_RR_NSEC extends Net_DNS2_RR
      */
     protected function rrToString()
     {
+        $data = $this->next_domain_name . '.';
+        foreach ($this->type_bit_maps as $rr) {
+
+            $data .= ' ' . $rr;
+        }
+
+        return $data;
     }
 
     /**
@@ -91,6 +108,10 @@ class Net_DNS2_RR_NSEC extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
+        $this->next_domain_name = strtolower(trim(array_shift($rdata), '.'));
+        $this->type_bit_maps = $rdata;
+        
+        return true;
     }
 
     /**
@@ -104,6 +125,25 @@ class Net_DNS2_RR_NSEC extends Net_DNS2_RR
      */
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
+        if ($this->rdlength > 0) {
+
+            //
+            // expand the next domain name
+            //
+            $offset = $packet->offset;
+            $this->next_domain_name = Net_DNS2_Packet::expand($packet, $offset);
+
+            //
+            // parse out the RR's from the bitmap
+            //
+            $this->type_bit_maps = Net_DNS2_BitMap::bitMapToArray(
+                substr($this->rdata, $offset - $packet->offset)
+            );
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -119,6 +159,15 @@ class Net_DNS2_RR_NSEC extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
+        if (strlen($this->next_domain_name) > 0) {
+
+            $data = $packet->compress($this->next_domain_name, $packet->offset);
+            $data .= Net_DNS2_BitMap::arrayToBitMap($this->type_bit_maps);
+    
+            return $data;
+        }
+
+        return null;
     }
 }
 

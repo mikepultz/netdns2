@@ -10,12 +10,7 @@ DONE- update requests
 
 - finish missing RR's
 
-	- main
 		APL, HIP, OPT
-	
-	- dnssec
-		NSEC, NSEC3
-
 
 DONE - parse BIND style input and set all the appropriate values of the RR object
 
