@@ -180,7 +180,10 @@ class Net_DNS2_RR_SOA extends Net_DNS2_RR
             //
             // get the SOA values
             //
-            $x = unpack('@' . $offset . '/Nserial/Nrefresh/Nretry/Nexpire/Nminimum/', $packet->rdata);
+            $x = unpack(
+                '@' . $offset . '/Nserial/Nrefresh/Nretry/Nexpire/Nminimum/', 
+                $packet->rdata
+            );
 
             $this->serial   = $x['serial'];
             $this->refresh  = $x['refresh'];
@@ -210,7 +213,10 @@ class Net_DNS2_RR_SOA extends Net_DNS2_RR
             $data = $packet->compress($this->mname, $packet->offset);
             $data .= $packet->compress($this->rname, $packet->offset);
 
-            $data .= pack('N5', $this->serial, $this->refresh, $this->retry, $this->expire, $this->minimum);
+            $data .= pack(
+                'N5', $this->serial, $this->refresh, $this->retry, 
+                $this->expire, $this->minimum
+            );
 
             return $data;
         }

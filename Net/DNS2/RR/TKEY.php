@@ -154,7 +154,7 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
         //
         $this->algorithm    = strtolower(trim(array_shift($rdata), '.'));
         $this->mode         = array_shift($rdata);
-        $this->key_data     = trim(array_shift($rdata),'.');
+        $this->key_data     = trim(array_shift($rdata), '.');
 
         //
         // the rest of the data is set manually
@@ -191,7 +191,10 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
             //
             // unpack inception, expiration, mode, error and key size
             //
-            $x = unpack('@' . $offset . '/Ninception/Nexpiration/nmode/nerror/nkey_size', $packet->rdata);
+            $x = unpack(
+                '@' . $offset . '/Ninception/Nexpiration/nmode/nerror/nkey_size', 
+                $packet->rdata
+            );
 
             $this->inception    = $x['inception'];
             $this->expiration   = $x['expiration'];
@@ -223,7 +226,9 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
             //
             if ($this->other_size > 0) {
 
-                $this->other_data = substr($packet->rdata, $offset, $this->other_size);
+                $this->other_data = substr(
+                    $packet->rdata, $offset, $this->other_size
+                );
             }
 
             return true;
@@ -261,7 +266,10 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
             //
             // pack in the inception, expiration, mode, error and key size
             //
-            $data .= pack('NNnnn', $this->inception, $this->expiration, $this->mode, 0, $this->key_size);
+            $data .= pack(
+                'NNnnn', $this->inception, $this->expiration, 
+                $this->mode, 0, $this->key_size
+            );
 
             //
             // if the key_size > 0, then add the key

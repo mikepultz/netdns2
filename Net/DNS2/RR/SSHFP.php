@@ -124,7 +124,9 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
     protected function rrFromString(array $rdata)
     {
         //
-        // "The use of mnemonics instead of numbers is not allowed." - RFC4255 section 3.2
+        // "The use of mnemonics instead of numbers is not allowed."
+        // 
+        // RFC4255 section 3.2
         //
         $algorithm      = array_shift($rdata);
         $fp_type        = array_shift($rdata);
@@ -219,7 +221,9 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
     {
         if (strlen($this->fingerprint) > 0) {
 
-            return pack('CCH*', $this->algorithm, $this->fp_type, $this->fingerprint);
+            return pack(
+                'CCH*', $this->algorithm, $this->fp_type, $this->fingerprint
+            );
         }
 
         return null;

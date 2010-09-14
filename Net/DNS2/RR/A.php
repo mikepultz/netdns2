@@ -96,7 +96,7 @@ class Net_DNS2_RR_A extends Net_DNS2_RR
     {
         $value = array_shift($rdata);
 
-        if (preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $value, $matches)) {
+        if (preg_match(Net_DNS2_Lookups::IPV4_REGEX, $value, $matches)) {
 
             foreach ($matches as $x) {
 

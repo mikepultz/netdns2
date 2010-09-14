@@ -75,8 +75,6 @@ class Net_DNS2_RR_NSEC3 extends Net_DNS2_RR
 {
     /*
      * Algorithm to use
-     *
-     * TODO: same as the NSEC3
      */
     public $algorithm;
  
@@ -100,8 +98,19 @@ class Net_DNS2_RR_NSEC3 extends Net_DNS2_RR
      */
     public $salt;
 
+    /*
+     * the length of the hash value
+     */
     public $hash_length;
+
+    /*
+     * the hashed value of the owner name
+     */
     public $hashed_owner_name;
+
+    /*
+     * array of RR type names
+     */
     public $type_bit_maps = array();
 
     /**

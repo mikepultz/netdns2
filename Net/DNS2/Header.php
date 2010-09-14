@@ -82,19 +82,19 @@
  */
 class Net_DNS2_Header
 {
-    public $id;            // 16 bit     - identifier
-    public $qr;            //  1 bit     - 0 = query, 1 = response
-    public $opcode;        //  4 bit    - op code
-    public $aa;            //  1 bit    - Authoritative Answer
-    public $tc;            //     1 bit    - TrunCation
-    public $rd;            //    1 bit    - Recursion Desired
-    public $ra;            //    1 bit    - Recursion Available
-    public $z;            //    3 bit    - Reserved
-    public $rcode;        //    4 bit    - Response code
-    public $qdcount;    // 16 bit    - entries in the question section
-    public $ancount;    // 16 bit    - resource records in the answer section
-    public $nscount;    // 16 bit    - name server resource records in the authority records section
-    public $arcount;    // 16 bit    - resource records in the additional records section
+    public $id;         // 16 bit - identifier
+    public $qr;         //  1 bit - 0 = query, 1 = response
+    public $opcode;     //  4 bit - op code
+    public $aa;         //  1 bit - Authoritative Answer
+    public $tc;         //  1 bit - TrunCation
+    public $rd;         //  1 bit - Recursion Desired
+    public $ra;         //  1 bit - Recursion Available
+    public $z;          //  3 bit - Reserved
+    public $rcode;      //  4 bit - Response code
+    public $qdcount;    // 16 bit - entries in the question section
+    public $ancount;    // 16 bit - resource records in the answer section
+    public $nscount;    // 16 bit - name server rr in the authority records section
+    public $arcount;    // 16 bit - rr's in the additional records section
 
     /**
      * Constructor - builds a new Net_DNS2_Header object
@@ -112,19 +112,19 @@ class Net_DNS2_Header
             $this->set($packet);
         } else {
 
-            $this->id        = $this->_nextPacketId();
-            $this->qr        = Net_DNS2_Lookups::QR_QUERY;
-            $this->opcode    = Net_DNS2_Lookups::OPCODE_QUERY;
-            $this->aa        = 0;
-            $this->tc        = 0;
-            $this->rd        = 1;
-            $this->ra        = 0;
+            $this->id       = $this->_nextPacketId();
+            $this->qr       = Net_DNS2_Lookups::QR_QUERY;
+            $this->opcode   = Net_DNS2_Lookups::OPCODE_QUERY;
+            $this->aa       = 0;
+            $this->tc       = 0;
+            $this->rd       = 1;
+            $this->ra       = 0;
             $this->z        = 0;
             $this->rcode    = Net_DNS2_Lookups::RCODE_NOERROR;
-            $this->qdcount    = 1;
-            $this->ancount    = 0;
-            $this->nscount    = 0;
-            $this->arcount    = 0;
+            $this->qdcount  = 1;
+            $this->ancount  = 0;
+            $this->nscount  = 0;
+            $this->arcount  = 0;
         }
     }
 
@@ -156,15 +156,15 @@ class Net_DNS2_Header
     {
         $output = ";;\n;; Header:\n";
 
-        $output .= ";;\t id            = " . $this->id . "\n";
-        $output .= ";;\t qr            = " . $this->qr . "\n";
-        $output .= ";;\t opcode        = " . $this->opcode . "\n";
-        $output .= ";;\t aa            = " . $this->aa . "\n";
-        $output .= ";;\t tc            = " . $this->tc . "\n";
-        $output .= ";;\t rd            = " . $this->rd . "\n";
-        $output .= ";;\t ra            = " . $this->ra . "\n";
-        $output .= ";;\t z            = " . $this->z . "\n";
-        $output .= ";;\t rcode        = " . $this->rcode . "\n";
+        $output .= ";;\t id         = " . $this->id . "\n";
+        $output .= ";;\t qr         = " . $this->qr . "\n";
+        $output .= ";;\t opcode     = " . $this->opcode . "\n";
+        $output .= ";;\t aa         = " . $this->aa . "\n";
+        $output .= ";;\t tc         = " . $this->tc . "\n";
+        $output .= ";;\t rd         = " . $this->rd . "\n";
+        $output .= ";;\t ra         = " . $this->ra . "\n";
+        $output .= ";;\t z          = " . $this->z . "\n";
+        $output .= ";;\t rcode      = " . $this->rcode . "\n";
         $output .= ";;\t qdcount    = " . $this->qdcount . "\n";
         $output .= ";;\t ancount    = " . $this->ancount . "\n";
         $output .= ";;\t nscount    = " . $this->nscount . "\n";
@@ -189,7 +189,9 @@ class Net_DNS2_Header
         // the header must be at least 12 bytes long.
         //
         if ($packet->rdlength < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
-            throw new InvalidArgumentException('invalid header data provided; to small');
+            throw new InvalidArgumentException(
+                'invalid header data provided; to small'
+            );
         }
 
         $offset = 0;
@@ -197,24 +199,29 @@ class Net_DNS2_Header
         //
         // parse the values
         //
-        $this->id        = ord($packet->rdata[$offset]) << 8 | ord($packet->rdata[++$offset]);
+        $this->id       = ord($packet->rdata[$offset]) << 8 | 
+            ord($packet->rdata[++$offset]);
 
         ++$offset;
-        $this->qr        = (ord($packet->rdata[$offset]) >> 7) & 0x1;
-        $this->opcode    = (ord($packet->rdata[$offset]) >> 3) & 0xf;
-        $this->aa        = (ord($packet->rdata[$offset]) >> 2) & 0x1;
-        $this->tc        = (ord($packet->rdata[$offset]) >> 1) & 0x1;
-        $this->rd        = ord($packet->rdata[$offset]) & 0x1;
+        $this->qr       = (ord($packet->rdata[$offset]) >> 7) & 0x1;
+        $this->opcode   = (ord($packet->rdata[$offset]) >> 3) & 0xf;
+        $this->aa       = (ord($packet->rdata[$offset]) >> 2) & 0x1;
+        $this->tc       = (ord($packet->rdata[$offset]) >> 1) & 0x1;
+        $this->rd       = ord($packet->rdata[$offset]) & 0x1;
 
         ++$offset;
-        $this->ra        = (ord($packet->rdata[$offset]) >> 7) & 0x1;
+        $this->ra       = (ord($packet->rdata[$offset]) >> 7) & 0x1;
         $this->z        = 0;
         $this->rcode    = ord($packet->rdata[$offset]) & 0xf;
             
-        $this->qdcount    = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
-        $this->ancount    = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
-        $this->nscount    = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
-        $this->arcount    = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
+        $this->qdcount  = ord($packet->rdata[++$offset]) << 8 | 
+            ord($packet->rdata[++$offset]);
+        $this->ancount  = ord($packet->rdata[++$offset]) << 8 | 
+            ord($packet->rdata[++$offset]);
+        $this->nscount  = ord($packet->rdata[++$offset]) << 8 | 
+            ord($packet->rdata[++$offset]);
+        $this->arcount  = ord($packet->rdata[++$offset]) << 8 | 
+            ord($packet->rdata[++$offset]);
 
         return true;
     }
@@ -229,7 +236,10 @@ class Net_DNS2_Header
     public function get()
     {
         return pack('n', $this->id) . 
-            chr(($this->qr << 7) | ($this->opcode << 3) | ($this->aa << 2) | ($this->tc << 1) | ($this->rd)) .
+            chr(
+                ($this->qr << 7) | ($this->opcode << 3) | 
+                ($this->aa << 2) | ($this->tc << 1) | ($this->rd)
+            ) .
             chr(($this->ra << 7) | $this->rcode) .
             chr($this->qdcount << 8) . chr($this->qdcount) .
             chr($this->ancount << 8) . chr($this->ancount) . 

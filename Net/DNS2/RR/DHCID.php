@@ -160,7 +160,9 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
             //
             // copy out the digest
             //
-            $this->digest = base64_encode(substr($this->rdata, 3, $this->rdlength - 3));
+            $this->digest = base64_encode(
+                substr($this->rdata, 3, $this->rdlength - 3)
+            );
 
             return true;
         }

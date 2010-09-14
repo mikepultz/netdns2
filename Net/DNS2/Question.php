@@ -163,8 +163,10 @@ class Net_DNS2_Question
         //
         // unpack the type and class
         //
-        $type   = ord($packet->rdata[$packet->offset++]) << 8 | ord($packet->rdata[$packet->offset++]);
-        $class  = ord($packet->rdata[$packet->offset++]) << 8 | ord($packet->rdata[$packet->offset++]);
+        $type   = ord($packet->rdata[$packet->offset++]) << 8 | 
+            ord($packet->rdata[$packet->offset++]);
+        $class  = ord($packet->rdata[$packet->offset++]) << 8 | 
+            ord($packet->rdata[$packet->offset++]);
 
         //
         // validate it
