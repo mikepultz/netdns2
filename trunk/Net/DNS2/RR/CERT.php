@@ -196,16 +196,17 @@ class Net_DNS2_RR_CERT extends Net_DNS2_RR
         if (!is_numeric($this->algorithm)) {
 
             $mnemonic = strtoupper(trim($this->algorithm));
-            if (!isset(Net_DNS2_Lookups::$dnssec_algorithm_name_to_id[$mnemonic])) {
+            if (!isset(Net_DNS2_Lookups::$algorithm_name_to_id[$mnemonic])) {
 
                 return false;
             }
 
-            $this->algorithm = Net_DNS2_Lookups::$dnssec_algorithm_name_to_id[$mnemonic];
+            $this->algorithm = Net_DNS2_Lookups::$algorithm_name_to_id[
+                $mnemonic
+            ];
         } else {
 
-            if (!isset(Net_DNS2_Lookups::$dnssec_algorithm_id_to_name[$this->algorithm])) {
-
+            if (!isset(Net_DNS2_Lookups::$algorithm_id_to_name[$this->algorithm])) {
                 return false;
             }
         }

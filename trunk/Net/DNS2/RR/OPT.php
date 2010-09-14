@@ -107,14 +107,6 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      */
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
-            $x = unpack('noptioncode/noptionlength/
-
-            return true;
-        }
-
-        return false;
     }
 
     /**

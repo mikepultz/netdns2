@@ -181,7 +181,7 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
             break;
 
         case self::GATEWAY_TYPE_IPV4:
-            if (!preg_match('/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $gateway)) {
+            if (!preg_match(Net_DNS2_Lookups::IPV4_REGEX, $gateway)) {
                 return false;
             }
             break;
@@ -326,7 +326,9 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
         //
         // pack the precedence, gateway type and algorithm
         //
-        $data = pack('CCC', $this->precedence, $this->gateway_type, $this->algorithm);
+        $data = pack(
+            'CCC', $this->precedence, $this->gateway_type, $this->algorithm
+        );
 
         //
         // add the gateway based on the type

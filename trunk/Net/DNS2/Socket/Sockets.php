@@ -94,7 +94,11 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         //
         if (strlen($this->local_host) > 0) {
 
-            if (@socket_bind($this->_sock, $this->local_host, ($this->local_port > 0) ? $this->local_port : null) === false) {
+            $result = @socket_bind(
+                $this->_sock, $this->local_host, 
+                ($this->local_port > 0) ? $this->local_port : null
+            );
+            if ($result === false) {
 
                 $this->last_error = socket_strerror(socket_last_error());
                 return false;

@@ -219,7 +219,10 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
             //
             // unpack time, fudge and mac_size
             //
-            $x = unpack('@' . $offset. '/ntime_high/Ntime_low/nfudge/nmac_size', $this->rdata);
+            $x = unpack(
+                '@' . $offset . '/ntime_high/Ntime_low/nfudge/nmac_size', 
+                $this->rdata
+            );
 
             $this->time_signed  = $x['time_low'];
             $this->fudge        = $x['fudge'];
@@ -239,7 +242,10 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
             //
             // unpack the original id, error, and other_length values
             //
-            $x = unpack('@' . $offset . '/noriginal_id/nerror/nother_length', $this->rdata);
+            $x = unpack(
+                '@' . $offset . '/noriginal_id/nerror/nother_length', 
+                $this->rdata
+            );
         
             $this->original_id  = $x['original_id'];
             $this->error        = $x['error'];
@@ -262,7 +268,10 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
                 //
                 // other data is a 48bit timestamp
                 //
-                $x = unpack('nhigh/nlow', substr($this->rdata, $offset + 6, $this->other_length));
+                $x = unpack(
+                    'nhigh/nlow', 
+                    substr($this->rdata, $offset + 6, $this->other_length)
+                );
                 $this->other_data = $x['low'];
             }
 
@@ -314,7 +323,9 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
             //
             // add the class and TTL
             //
-            $sig_data .= pack('nN', Net_DNS2_Lookups::$classes_by_name[$this->class], $this->ttl);
+            $sig_data .= pack(
+                'nN', Net_DNS2_Lookups::$classes_by_name[$this->class], $this->ttl
+            );
 
             //
             // add the algorithm name without compression
@@ -324,7 +335,10 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
             //
             // add the rest of the values
             //
-            $sig_data .= pack('nNnnn', 0, $this->time_signed, $this->fudge, $this->error, $this->other_length);
+            $sig_data .= pack(
+                'nNnnn', 0, $this->time_signed, $this->fudge, 
+                $this->error, $this->other_length
+            );
             if ($this->other_length > 0) {
 
                 $sig_data .= pack('nN', 0, $this->other_data);
@@ -344,7 +358,9 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
             //
             // pack the time, fudge and mac size
             //
-            $data .= pack('nNnn', 0, $this->time_signed, $this->fudge, $this->mac_size);
+            $data .= pack(
+                'nNnn', 0, $this->time_signed, $this->fudge, $this->mac_size
+            );
             $data .= $this->mac;
 
             //
@@ -366,7 +382,9 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
             //
             // pack the id, error and other_length
             //
-            $data .= pack('nnn', $packet->header->id, $this->error, $this->other_length);
+            $data .= pack(
+                'nnn', $packet->header->id, $this->error, $this->other_length
+            );
             if ($this->other_length > 0) {
 
                 $data .= pack('nN', 0, $this->other_data);

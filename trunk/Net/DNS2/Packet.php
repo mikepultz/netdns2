@@ -299,7 +299,8 @@ class Net_DNS2_Packet
                     return null;
                 }
 
-                $ptr = ord($packet->rdata[$offset]) << 8 | ord($packet->rdata[$offset+1]);
+                $ptr = ord($packet->rdata[$offset]) << 8 | 
+                    ord($packet->rdata[$offset+1]);
                 $ptr = $ptr & 0x3fff;
 
                 $name2 = Net_DNS2_Packet::expand($packet, $ptr);
@@ -378,7 +379,9 @@ class Net_DNS2_Packet
     {
         if (strpos($address, '::') !== false) {
         
-            $address = str_replace('::', str_repeat(':0', 8 - substr_count($address, ':')).':', $address);
+            $address = str_replace(
+                '::', str_repeat(':0', 8 - substr_count($address, ':')).':', $address
+            );
         }
         if (strpos($address, ':') === 0) {
             

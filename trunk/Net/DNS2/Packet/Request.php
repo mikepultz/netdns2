@@ -142,7 +142,7 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
         // TODO: move to a function
         //
         if ( ($type == 'PTR') 
-            && (preg_match('/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/', $name, $a)) 
+            && (preg_match(Net_DNS2_Lookups::IPV4_REGEX, $name, $a)) 
         ) {
             $name = $a[4] . '.' . $a[3] . '.' . $a[2] . '.' . 
                 $a[1] . '.in-addr.arpa';

@@ -62,6 +62,11 @@
 class Net_DNS2_Lookups
 {
     /*
+     * TODO: move this to a function
+     */
+    const IPV4_REGEX = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
+
+    /*
      * size (in bytes) of a header in a standard DNS packet
      */
     const DNS_HEADER_SIZE       = 12;
@@ -123,15 +128,26 @@ class Net_DNS2_Lookups
     /*
      * DNSSEC Algorithms
      */
-    const DNSSEC_ALGORITHM_RES          = 0;
-    const DNSSEC_ALGORITHM_RSAMD5       = 1;
-    const DNSSEC_ALGORITHM_DH           = 2;
-    const DNSSEC_ALGORITHM_DSA          = 3;
-    const DNSSEC_ALGORITHM_ECC          = 4;
-    const DNSSEC_ALGORITHM_RSASHA1      = 5;
-    const DNSSEC_ALGORITHM_INDIRECT     = 252;
-    const DNSSEC_ALGORITHM_PRIVATEDNS   = 253;
-    const DNSSEC_ALGORITHM_PRIVATEOID   = 254;
+    const DNSSEC_ALGORITHM_RES                  = 0;
+    const DNSSEC_ALGORITHM_RSAMD5               = 1;
+    const DNSSEC_ALGORITHM_DH                   = 2;
+    const DNSSEC_ALGORITHM_DSA                  = 3;
+    const DNSSEC_ALGORITHM_ECC                  = 4;
+    const DNSSEC_ALGORITHM_RSASHA1              = 5;
+    const DNSSEC_ALGORITHM_DSANSEC3SHA1         = 6;
+    const DSNSEC_ALGORITHM_RSASHA1NSEC3SHA1     = 7;
+    const DNSSEC_ALGORITHM_RSASHA256	        = 8;
+    const DNSSEC_ALGORITHM_RSASHA512            = 10;
+    const DNSSEC_ALGORITHM_ECCGOST              = 12;
+    const DNSSEC_ALGORITHM_INDIRECT             = 252;
+    const DNSSEC_ALGORITHM_PRIVATEDNS           = 253;
+    const DNSSEC_ALGORITHM_PRIVATEOID           = 254;
+
+    /*
+     * DNSSEC Digest Types
+     */
+    const DNSSEC_DIGEST_RES                     = 0;
+    const DNSSEC_DIGEST_SHA1                    = 1;
 
     /*
      * The packet id used when sending requests
@@ -150,11 +166,11 @@ class Net_DNS2_Lookups
         'MF'            => 4,       // RFC 1035 - obsolete, Not implemented
         'CNAME'         => 5,       // RFC 1035
         'SOA'           => 6,       // RFC 1035
-        'MB'            => 7,       // RFC 1035    - obsolete, Not implemented
-        'MG'            => 8,       // RFC 1035    - obsolete, Not implemented
+        'MB'            => 7,       // RFC 1035 - obsolete, Not implemented
+        'MG'            => 8,       // RFC 1035 - obsolete, Not implemented
         'MR'            => 9,       // RFC 1035 - obsolete, Not implemented
-        'NULL'          => 10,      // RFC 1035    - obsolete, Not implemented
-        'WKS'           => 11,      // RFC 1035    - "not to be relied upon", Not implemented
+        'NULL'          => 10,      // RFC 1035 - obsolete, Not implemented
+        'WKS'           => 11,      // RFC 1035 - Not implemented
         'PTR'           => 12,      // RFC 1035
         'HINFO'         => 13,      // RFC 1035
         'MINFO'         => 14,      // RFC 1035 - obsolete, Not implemented
@@ -170,10 +186,10 @@ class Net_DNS2_Lookups
         'SIG'           => 24,      // RFC 2535
         'KEY'           => 25,      // RFC 2535, RFC 2930
         'PX'            => 26,      // RFC 2163
-        'GPOS'          => 27,      // RFC 1712 earlier version of the LOC RR, Not implemented
+        'GPOS'          => 27,      // RFC 1712 - Not implemented
         'AAAA'          => 28,      // RFC 3596
         'LOC'           => 29,      // RFC 1876
-        'NXT'           => 30,      // RFC 2065, obsoleted by by RFC 3755, Not implemented
+        'NXT'           => 30,      // RFC 2065, obsoleted by by RFC 3755
         'EID'           => 31,      //
         'NIMLOC'        => 32,      //
         'SRV'           => 33,      // RFC 2782
@@ -181,9 +197,9 @@ class Net_DNS2_Lookups
         'NAPTR'         => 35,      // RFC 2915
         'KX'            => 36,      // RFC 2230
         'CERT'          => 37,      // RFC 4398
-        'A6'            => 38,      // downgraded to experimental by RFC 3363, Not implemented
+        'A6'            => 38,      // downgraded to experimental by RFC 3363
         'DNAME'         => 39,      //
-        'SINK'          => 40,      // Defined by the "kitchen sink" draft, but no RFC - Not implemented
+        'SINK'          => 40,      // Not implemented
         'OPT'           => 41,      // RFC 2671
         'APL'           => 42,      // RFC 3123
         'DS'            => 43,      // RFC 4034
@@ -205,7 +221,7 @@ class Net_DNS2_Lookups
         'UNSPEC'        => 103,     // no RFC, Not implemented
         'TKEY'          => 249,     // RFC 2930
         'TSIG'          => 250,     // RFC 2845
-        'IXFR'          => 251,     // RFC 1995 - only a full transfer (AXFR) is supported
+        'IXFR'          => 251,     // RFC 1995 - only a full (AXFR) is supported
         'AXFR'          => 252,     // RFC 1035
         'MAILB'         => 253,     // RFC 883, Not implemented
         'MAILA'         => 254,     // RFC 973, Not implemented
@@ -221,7 +237,7 @@ class Net_DNS2_Lookups
     public static $rr_qtypes_by_id = array();
     public static $rr_qtypes_by_name = array(
 
-        'IXFR'          => 251,     // RFC 1995 - only a full transfer (AXFR) is supported
+        'IXFR'          => 251,     // RFC 1995 - only a full (AXFR) is supported
         'AXFR'          => 252,     // RFC 1035
         'MAILB'         => 253,     // RFC 883, Not implemented
         'MAILA'         => 254,     // RFC 973, Not implemented
@@ -333,18 +349,33 @@ class Net_DNS2_Lookups
     /*
      * maps DNS SEC alrorithms to their mnemonics
      */
-    public static $dnssec_algorithm_name_to_id = array();
-    public static $dnssec_algorithm_id_to_name = array(
+    public static $algorithm_name_to_id = array();
+    public static $algorithm_id_to_name = array(
     
-        self::DNSSEC_ALGORITHM_RES          => 'RES',
-        self::DNSSEC_ALGORITHM_RSAMD5       => 'RSAMD5',
-        self::DNSSEC_ALGORITHM_DH           => 'DH',
-        self::DNSSEC_ALGORITHM_DSA          => 'DSA',
-        self::DNSSEC_ALGORITHM_ECC          => 'ECC',
-        self::DNSSEC_ALGORITHM_RSASHA1      => 'RSASHA1',
-        self::DNSSEC_ALGORITHM_INDIRECT     => 'INDIRECT',
-        self::DNSSEC_ALGORITHM_PRIVATEDNS   => 'PRIVATEDNS',
-        self::DNSSEC_ALGORITHM_PRIVATEOID   => 'PRIVATEOID'
+        self::DNSSEC_ALGORITHM_RES                  => 'RES',
+        self::DNSSEC_ALGORITHM_RSAMD5               => 'RSAMD5',
+        self::DNSSEC_ALGORITHM_DH                   => 'DH',
+        self::DNSSEC_ALGORITHM_DSA                  => 'DSA',
+        self::DNSSEC_ALGORITHM_ECC                  => 'ECC',
+        self::DNSSEC_ALGORITHM_RSASHA1              => 'RSASHA1',
+        self::DNSSEC_ALGORITHM_DSANSEC3SHA1         => 'DSA-NSEC3-SHA1',
+        self::DSNSEC_ALGORITHM_RSASHA1NSEC3SHA1     => 'RSASHA1-NSEC3-SHA1',
+        self::DNSSEC_ALGORITHM_RSASHA256            => 'RSASHA256',
+        self::DNSSEC_ALGORITHM_RSASHA512            => 'RSASHA512',
+        self::DNSSEC_ALGORITHM_ECCGOST              => 'ECC-GOST',
+        self::DNSSEC_ALGORITHM_INDIRECT             => 'INDIRECT',
+        self::DNSSEC_ALGORITHM_PRIVATEDNS           => 'PRIVATEDNS',
+        self::DNSSEC_ALGORITHM_PRIVATEOID           => 'PRIVATEOID'
+    );
+
+    /*
+     * maps DNSSEC digest types to their mnemonics
+     */
+    public static $digest_name_to_id = array();
+    public static $digest_id_to_name = array(
+
+        self::DNSSEC_DIGEST_RES         => 'RES',
+        self::DNSSEC_DIGEST_SHA1        => 'SHA-1'
     );
 
     /**
@@ -364,12 +395,13 @@ class Net_DNS2_Lookups
         // build the reverse lookup tables; this is just so we don't have to
         // have duplicate static content laying around.
         //
-        self::$rr_types_by_id               = array_flip(self::$rr_types_by_name);
-        self::$classes_by_id                = array_flip(self::$classes_by_name);
-        self::$rr_types_class_to_id         = array_flip(self::$rr_types_id_to_class);
-        self::$dnssec_algorithm_name_to_id  = array_flip(self::$dnssec_algorithm_id_to_name);
-        self::$rr_qtypes_by_id              = array_flip(self::$rr_qtypes_by_name);
-        self::$rr_metatypes_by_id           = array_flip(self::$rr_metatypes_by_name);
+        self::$rr_types_by_id       = array_flip(self::$rr_types_by_name);
+        self::$classes_by_id        = array_flip(self::$classes_by_name);
+        self::$rr_types_class_to_id = array_flip(self::$rr_types_id_to_class);
+        self::$algorithm_name_to_id = array_flip(self::$algorithm_id_to_name);
+        self::$digest_name_to_id    = array_flip(self::$digest_id_to_name);
+        self::$rr_qtypes_by_id      = array_flip(self::$rr_qtypes_by_name);
+        self::$rr_metatypes_by_id   = array_flip(self::$rr_metatypes_by_name);
     }
 }
 

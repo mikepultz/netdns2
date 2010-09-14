@@ -476,7 +476,8 @@ abstract class Net_DNS2_RR
         if (count($values) < 3) {
 
             throw new InvalidArgumentException(
-                'failed to parse config line: minimum of name, type and rdata required.');
+                'failed to parse config: minimum of name, type and rdata required.'
+            );
         }
 
         //
@@ -515,7 +516,9 @@ abstract class Net_DNS2_RR
         // lookup the class to use
         //
         $o          = null;
-        $class_name = Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]];
+        $class_name = Net_DNS2_Lookups::$rr_types_id_to_class[
+            Net_DNS2_Lookups::$rr_types_by_name[$type]
+        ];
 
         if (isset($class_name)) {
 

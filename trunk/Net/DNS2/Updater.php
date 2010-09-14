@@ -99,7 +99,9 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // create the packet
         //
-        $this->_packet = new Net_DNS2_Packet_Request(strtolower(trim($zone, ' \n\r\t.')), 'SOA', 'IN');
+        $this->_packet = new Net_DNS2_Packet_Request(
+            strtolower(trim($zone, ' \n\r\t.')), 'SOA', 'IN'
+        );
 
         //
         // make sure the opcode on the packet is set to UPDATE
@@ -231,7 +233,9 @@ class Net_DNS2_Updater extends Net_DNS2
     {
         $this->_checkName($name);
 
-        $class = Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]];
+        $class = Net_DNS2_Lookups::$rr_types_id_to_class[
+            Net_DNS2_Lookups::$rr_types_by_name[$type]
+        ];
         if (!isset($class)) {
 
             throw new InvalidArgumentException(
@@ -319,7 +323,9 @@ class Net_DNS2_Updater extends Net_DNS2
     {
         $this->_checkName($name);
         
-        $class = Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]];
+        $class = Net_DNS2_Lookups::$rr_types_id_to_class[
+            Net_DNS2_Lookups::$rr_types_by_name[$type]
+        ];
         if (!isset($class)) {
 
             throw new InvalidArgumentException(
@@ -402,7 +408,9 @@ class Net_DNS2_Updater extends Net_DNS2
     {
         $this->_checkName($name);
 
-        $class = Net_DNS2_Lookups::$rr_types_id_to_class[Net_DNS2_Lookups::$rr_types_by_name[$type]];
+        $class = Net_DNS2_Lookups::$rr_types_id_to_class[
+            Net_DNS2_Lookups::$rr_types_by_name[$type]
+        ];
         if (!isset($class)) {
 
             throw new InvalidArgumentException(

@@ -107,14 +107,49 @@
  */
 class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
 {
+    /*
+     * the RR type covered by this signature
+     */
     public $typecovered;
+
+    /*
+     * the algorithm used for the signature
+     */
     public $algorithm;
+    
+    /*
+     * the number of labels in the name
+     */
     public $labels;
+
+    /*
+     * the original TTL
+     */
     public $origttl;
+
+    /*
+     * the signature expiration
+     */
     public $sigexp;
+
+    /*
+     * the inception of the signature
+    */
     public $sigincep;
+
+    /*
+     * the keytag used
+     */
     public $keytag;
+
+    /*
+     * the signer's name
+     */
     public $signname;
+
+    /*
+     * the signature
+     */
     public $signature;
 
     /**
@@ -177,9 +212,12 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
             //
             // unpack 
             //
-            $x = unpack("ntypecovered/Calgorithm/Clabels/Norigttl/Nsigexp/Nsigincep/nkeytag", $this->rdata);
+            $x = unpack(
+                'ntc/Calgorithm/Clabels/Norigttl/Nsigexp/Nsigincep/nkeytag', 
+                $this->rdata
+            );
 
-            $this->typecovered  = Net_DNS2_Lookups::$rr_types_by_id[$x['typecovered']];
+            $this->typecovered  = Net_DNS2_Lookups::$rr_types_by_id[$x['tc']];
             $this->algorithm    = $x['algorithm'];
             $this->labels       = $x['labels'];
             $this->origttl      = $x['origttl'];
@@ -201,8 +239,12 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
             $offset             = $packet->offset + 18;
             $sigoffset          = $offset;
 
-            $this->signname     = strtolower(Net_DNS2_Packet::expand($packet, $sigoffset));
-            $this->signature    = base64_encode(substr($this->rdata, 18 + ($sigoffset - $offset)));
+            $this->signname     = strtolower(
+                Net_DNS2_Packet::expand($packet, $sigoffset)
+            );
+            $this->signature    = base64_encode(
+                substr($this->rdata, 18 + ($sigoffset - $offset))
+            );
         }
 
         return true;
@@ -226,8 +268,12 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
             //
             // parse the values out of the dates
             //
-            preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigexp, $e);
-            preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigincep, $i);
+            preg_match(
+                '/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigexp, $e
+            );
+            preg_match(
+                '/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigincep, $i
+            );
 
             //
             // pack the value
@@ -244,7 +290,8 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
             );
 
             //
-            // the signer name is special; it's not allowed to be compressed (see section 3.1.7)
+            // the signer name is special; it's not allowed to be compressed 
+            // (see section 3.1.7)
             //
             $names = explode('.', strtolower($this->signname));
             foreach ($names as $name) {

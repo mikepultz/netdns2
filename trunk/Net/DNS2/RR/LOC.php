@@ -227,12 +227,15 @@ class Net_DNS2_RR_LOC extends Net_DNS2_RR
             //
             // unpack all the values
             //
-            $x = unpack('Cversion/Csize/Choriz_pre/Cvert_pre/Nlatitude/Nlongitude/Naltitude', $this->rdata);
+            $x = unpack(
+                'Cver/Csize/Choriz_pre/Cvert_pre/Nlatitude/Nlongitude/Naltitude', 
+                $this->rdata
+            );
 
             //
             // version must be 0 per RFC 1876 section 2
             //
-            $this->version = $x['version'];
+            $this->version = $x['ver'];
             if ($this->version == 0) {
 
                 $this->size         = $this->_precsizeNtoA($x['size']);
