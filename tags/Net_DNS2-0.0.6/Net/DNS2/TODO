@@ -1,0 +1,62 @@
+Net_DNS2 TODO List
+------------------
+
+- zone transfers (AXFR)
+	- these responses can be split between multiple messages, so the socket handling code
+	  will need to be modified to support it.
+
+DONE- update requests
+	DONE - need TSIG RR
+
+- finish missing RR's
+
+		APL, HIP, OPT
+
+DONE - parse BIND style input and set all the appropriate values of the RR object
+
+DONE - parse and read a resolv.conf file
+
+DONE - fix up all teh exception handling
+
+DONE - add proper function comments at the head of each method
+
+DONE - change the defines() to class constants
+
+DONE - add proper licensing at the top of each file
+	DONE - change to BSD licensing
+
+- test classes
+
+DONE - inverse_query
+
+
+                         +-----------------------------------------+
+           Header        |          OPCODE=IQUERY, ID=997          |
+                         +-----------------------------------------+
+          Question       |                 <empty>                 |
+                         +-----------------------------------------+
+           Answer        |        <anyname> A IN 10.1.0.52         |
+                         +-----------------------------------------+
+          Authority      |                 <empty>                 |
+                         +-----------------------------------------+
+         Additional      |                 <empty>                 |
+                         +-----------------------------------------+
+
+This query asks for a question whose answer is the Internet style
+address 10.1.0.52.  Since the owner name is not known, any domain name
+can be used as a placeholder (and is ignored).  A single octet of zero,
+signifying the root, is usually used because it minimizes the length of
+the message.  The TTL of the RR is not significant.  The response to
+this query might be:
+
+                         +-----------------------------------------+
+           Header        |         OPCODE=RESPONSE, ID=997         |
+                         +-----------------------------------------+
+          Question       |QTYPE=A, QCLASS=IN, QNAME=VENERA.ISI.EDU |
+                         +-----------------------------------------+
+           Answer        |  VENERA.ISI.EDU  A IN 10.1.0.52         |
+                         +-----------------------------------------+
+          Authority      |                 <empty>                 |
+                         +-----------------------------------------+
+         Additional      |                 <empty>                 |
+                         +-----------------------------------------+
