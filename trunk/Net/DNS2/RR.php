@@ -464,9 +464,9 @@ abstract class Net_DNS2_RR
             throw new InvalidArgumentException('empty config line provided.');
         }
 
-        $name     = '';
-        $type     = '';
-        $class    = 'IN';
+        $name   = '';
+        $type   = '';
+        $class  = 'IN';
         $ttl    = 86400;
 
         //
@@ -493,6 +493,13 @@ abstract class Net_DNS2_RR
             switch($value) {
             case is_numeric($value):
 
+                $ttl = array_shift($values);
+                break;
+
+            //
+            // PHP SUCKS!
+            //
+            case ($value === 0):
                 $ttl = array_shift($values);
                 break;
 
@@ -531,7 +538,7 @@ abstract class Net_DNS2_RR
                 $o->name    = $name;
                 $o->class   = $class;
                 $o->ttl     = $ttl;
-            
+
                 //
                 // parse the rdata
                 //
