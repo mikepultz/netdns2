@@ -61,7 +61,6 @@ spl_autoload_register('Net_DNS2::autoload');
  */
 $GLOBALS['_Net_DNS2_Lookups'] = new Net_DNS2_Lookups();
 
-
 /**
  * This is the base class for the Net_DNS2_Resolver and Net_DNS2_Updater
  * classes.
@@ -79,7 +78,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = "0.6.0";
+    const VERSION = "1.0.0";
 
     /*
      * use TCP only (true/false)
