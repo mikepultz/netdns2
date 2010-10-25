@@ -72,8 +72,40 @@
  */
 class Net_DNS2_RR_OPT extends Net_DNS2_RR
 {
+    /*
+     * option code - assigned by IANA
+     */
+    public $option_code;
+
+    /*
+     * the length of the option data
+     */
+    public $option_length;
+
+    /*
+     * the option data
+     */
+    public $option_data;
+
+    /*
+     * the extended response code stored in the TTL
+     */
+    public $extended_rcode;
+
+    /*
+     * the implementation level
+     */
+    public $version;
+
+    /*
+     * the extended flags
+     */
+    public $z;
+
     /**
-     * method to return the rdata portion of the packet as a string
+     * method to return the rdata portion of the packet as a string. There is no
+     * defintion for returning an OPT RR by string- this is just here to validate
+     * the binary parsing / building routines.
      *
      * @return  string
      * @access  protected
@@ -81,10 +113,13 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      */
     protected function rrToString()
     {
+        return $this->option_code . ' ' . $this->option_data;
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
+     * parses the rdata portion from a standard DNS config line. There is no 
+     * definition for parsing a OPT RR by string- this is just here to validate
+     * the binary parsing / building routines.
      *
      * @param array $rdata a string split line of values for the rdata
      *
@@ -94,6 +129,17 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
+        $this->option_code      = array_shift($rdata);
+        $this->option_data      = array_shift($rdata);
+        $this->option_length    = strlen($this->option_data);
+
+        $x = unpack('Cextended/Cversion/nz', pack('N', $this->ttl));
+
+        $this->extended_rcode   = $x['extended'];
+        $this->version          = $x['version'];
+        $this->z                = $x['z'];
+
+        return $true;
     }
 
     /**
@@ -107,6 +153,34 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      */
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
+        if ($this->rdlength > 0) {
+
+            //
+            // unpack the code and length
+            //
+            $x = unpack('noption_code/noption_length', $this->rdata);
+
+            $this->option_code      = $x['option_code'];
+            $this->option_length    = $x['option_length'];
+
+            //
+            // copy out the data based on the length
+            //
+            $this->option_data      = substr($this->rdata, 4);
+
+            //
+            // parse out the TTL value
+            //
+            $ttl = pack('N', $this->ttl);
+
+            $x = unpack('Cextended/Cversion/nz', $ttl);
+
+            $this->extended_rcode   = $x['extended'];
+            $this->version          = $x['version'];
+            $this->z                = $x['z'];
+        }
+
+        return true;
     }
 
     /**
@@ -122,6 +196,19 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
+        if ($this->option_code) {
+
+            $ttl = unpack(
+                'N', pack('CCn', $this->extended_rcode, $this->version, $this->z)
+            );
+        
+            $this->ttl = $ttl[1];
+
+            return pack('nn', $this->option_code, $this->option_length) . 
+                $this->option_data;
+        }
+
+        return null;
     }
 }
 
