@@ -100,7 +100,7 @@ class Net_DNS2_Updater extends Net_DNS2
         // create the packet
         //
         $this->_packet = new Net_DNS2_Packet_Request(
-            strtolower(trim($zone, ' \n\r\t.')), 'SOA', 'IN'
+            strtolower(trim($zone, " \n\r\t.")), 'SOA', 'IN'
         );
 
         //

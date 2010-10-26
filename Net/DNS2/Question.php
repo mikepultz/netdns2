@@ -134,7 +134,7 @@ class Net_DNS2_Question
      */
     public function __toString()
     {
-        return ';;\n;; Question:\n;;\t ' . $this->qname . '. ' . 
+        return ";;\n;; Question:\n;;\t " . $this->qname . '. ' . 
             $this->qtype . ' ' . $this->qclass . "\n";
     }
 
