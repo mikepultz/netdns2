@@ -8,9 +8,7 @@ Net_DNS2 TODO List
 DONE- update requests
 	DONE - need TSIG RR
 
-- finish missing RR's
-
-		APL
+DONE- finish missing RR's
 
 DONE - parse BIND style input and set all the appropriate values of the RR object
 
