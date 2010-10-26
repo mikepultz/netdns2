@@ -50,7 +50,7 @@
  */
 
 /**
- * APL Resource Record - http://tools.ietf.org/html/draft-ietf-dnsext-apl-rr-02
+ * APL Resource Record - RFC3123
  *
  *     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *     |                          ADDRESSFAMILY                        |
@@ -71,6 +71,11 @@
  */
 class Net_DNS2_RR_APL extends Net_DNS2_RR
 {
+    /*
+     * a list of all the address prefix list items
+     */
+    public $apl_items = array();
+
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -80,6 +85,20 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
      */
     protected function rrToString()
     {
+        $out = "";
+
+        foreach ($this->apl_items as $item) {
+
+            if ($item['n'] == 1) {
+
+                $out .= '!';
+            }
+
+            $out .= $item['address_family'] . ':' . 
+                $item['afd_part'] . '/' . $item['prefix'] . ' ';
+        }
+
+        return trim($out);
     }
 
     /**
@@ -93,6 +112,28 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
+        foreach ($rdata as $item) {
+
+            if (preg_match('/^(!?)([1|2])\:([^\/]*)\/([0-9]{1,3})$/', $item, $m)) {
+
+                    $i = array(
+
+                        'address_family'    => $m[2],
+                        'prefix'            => $m[4],
+                        'n'                 => ($m[1] == '!') ? 1 : 0,
+                        'afd_part'          => strtolower($m[3])
+                    );
+
+                    $address = $this->_trimZeros(
+                        $i['address_family'], $i['afd_part']
+                    );
+                    $i['afd_length'] = count(explode('.', $address));
+
+                    $this->apl_items[] = $i;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -106,6 +147,73 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
      */
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
+        if ($this->rdlength > 0) {
+
+            $offset = 0;
+
+            while ($offset < $this->rdlength) {
+
+                //
+                // unpack the family, prefix, negate and length values
+                //   
+                $x = unpack(
+                    'naddress_family/Cprefix/Cextra', substr($this->rdata, $offset)
+                );
+
+                $item = array(
+            
+                    'address_family'    => $x['address_family'],
+                    'prefix'            => $x['prefix'],
+                    'n'                 => ($x['extra'] >> 7) & 0x1,
+                    'afd_length'        => $x['extra'] & 0xf
+                );
+
+                switch($item['address_family']) {
+
+                case 1:
+                    $r = unpack(
+                        'C*', substr($this->rdata, $offset + 4, $item['afd_length'])
+                    );
+                    if (count($r) < 4) {
+
+                        for ($c=count($r)+1; $c<4+1; $c++) {
+
+                            $r[$c] = 0;
+                        }
+                    }
+
+                    $item['afd_part'] = implode('.', $r);
+
+                    break;
+                case 2:
+                    $r = unpack(
+                        'C*', substr($this->rdata, $offset + 4, $item['afd_length'])
+                    );
+                    if (count($r) < 8) {
+
+                        for ($c=count($r)+1; $c<8+1; $c++) {
+
+                            $r[$c] = 0;
+                        }
+                    }
+
+                    $item['afd_part'] = sprintf(
+                        "%x:%x:%x:%x:%x:%x:%x:%x", 
+                        $r[1], $r[2], $r[3], $r[4], $r[5], $r[6], $r[7], $r[8]
+                    );
+
+                    break;
+                default:
+                    return false;
+                }
+
+                $this->apl_items[] = $item;
+
+                $offset += 4 + $item['afd_length'];
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -121,6 +229,102 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
+        if (count($this->apl_items) > 0) {
+
+            $out = "";
+
+            foreach ($this->apl_items as $item) {
+
+                //
+                // pack the address_family and prefix values
+                //
+                $out .= pack(
+                    'nCC', 
+                    $item['address_family'], 
+                    $item['prefix'],
+                    ($item['n'] << 7) | $item['afd_length']
+                );
+
+                switch($item['address_family']) {
+                case 1:
+                    $address = explode(
+                        '.', 
+                        $this->_trimZeros($item['address_family'], $item['afd_part'])
+                    );
+
+                    foreach ($address as $b) {
+                        $out .= pack('C', $b);
+                    }
+                    break;
+                case 2:
+                    $address = explode(
+                        ':', 
+                        $this->_trimZeros($item['address_family'], $item['afd_part'])
+                    );
+
+                    foreach ($address as $b) {
+                        $out .= pack('H', $b);
+                    }
+                    break;
+                default:
+                    return null;
+                }
+            }
+
+            return $out;
+        }
+
+        return null;
+    }
+
+    /**
+     * returns an IP address with the right-hand zero's trimmed
+     *
+     * @param integer $family  the IP address family from the rdata
+     * @param string  $address the IP address
+     *
+     * @return string the trimmed IP addresss.
+     *
+     * @access private
+     *
+     */
+    private function _trimZeros($family, $address)
+    {
+        $a = array();
+
+        switch($family) {
+        case 1:
+            $a = array_reverse(explode(".", $address));
+            break;
+        case 2:
+            $a = array_reverse(explode(":", $address));
+            break;
+        default:
+            return "";
+        }
+
+        foreach ($a as $value) {
+
+            if ($value === '0') {
+
+                array_shift($a);
+            }
+        }
+
+        $out = "";
+
+        switch($family) {
+        case 1:
+            $out = implode('.', array_reverse($a));
+            break;
+        case 2:
+            $out = implode(':', array_reverse($a));
+            break;
+        default:
+            return "";
+        }
+
+        return $out;
     }
 }
 
