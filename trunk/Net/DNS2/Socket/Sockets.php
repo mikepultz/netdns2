@@ -187,7 +187,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         //
         if ($this->type == SOCK_STREAM) {
 
-            $s = chr($length << 8) . chr($length);
+            $s = chr($length >> 8) . chr($length);
 
             if (@socket_write($this->_sock, $s) === false) {
 
