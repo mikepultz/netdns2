@@ -8,7 +8,9 @@ Net_DNS2 TODO List
 DONE- update requests
 	DONE - need TSIG RR
 
-DONE- finish missing RR's
+- finish missing RR's
+	
+	WKS, look at ATMA
 
 DONE - parse BIND style input and set all the appropriate values of the RR object
 

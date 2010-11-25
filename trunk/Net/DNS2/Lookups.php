@@ -170,7 +170,7 @@ class Net_DNS2_Lookups
         'MG'            => 8,       // RFC 1035 - obsolete, Not implemented
         'MR'            => 9,       // RFC 1035 - obsolete, Not implemented
         'NULL'          => 10,      // RFC 1035 - obsolete, Not implemented
-        'WKS'           => 11,      // RFC 1035 - Not implemented
+        'WKS'           => 11,      // RFC 1035
         'PTR'           => 12,      // RFC 1035
         'HINFO'         => 13,      // RFC 1035
         'MINFO'         => 14,      // RFC 1035 - obsolete, Not implemented
@@ -262,6 +262,7 @@ class Net_DNS2_Lookups
         2           => 'Net_DNS2_RR_NS',
         5           => 'Net_DNS2_RR_CNAME',
         6           => 'Net_DNS2_RR_SOA',
+        11          => 'Net_DNS2_RR_WKS',
         12          => 'Net_DNS2_RR_PTR',
         13          => 'Net_DNS2_RR_HINFO',
         15          => 'Net_DNS2_RR_MX',
@@ -378,6 +379,65 @@ class Net_DNS2_Lookups
         self::DNSSEC_DIGEST_SHA1        => 'SHA-1'
     );
 
+    /*
+     * Protocols names - RFC 1010
+     */
+    public static $protocol_by_id = array();
+    public static $protocol_by_name = array(
+
+        'ICMP'          => 1,
+        'IGMP'          => 2,
+        'GGP'           => 3,
+        'ST'            => 5,
+        'TCP'           => 6,
+        'UCL'           => 7,
+        'EGP'           => 8,
+        'IGP'           => 9,
+        'BBN-RCC-MON'   => 10,
+        'NVP-II'        => 11,
+        'PUP'           => 12,
+        'ARGUS'         => 13,
+        'EMCON'         => 14,
+        'XNET'          => 15,
+        'CHAOS'         => 16,
+        'UDP'           => 17,
+        'MUX'           => 18,
+        'DCN-MEAS'      => 19,
+        'HMP'           => 20,
+        'PRM'           => 21,
+        'XNS-IDP'       => 22,
+        'TRUNK-1'       => 23,
+        'TRUNK-2'       => 24,
+        'LEAF-1'        => 25,
+        'LEAF-2'        => 26,
+        'RDP'           => 27,
+        'IRTP'          => 28,
+        'ISO-TP4'       => 29,
+        'NETBLT'        => 30,
+        'MFE-NSP'       => 31,
+        'MERIT-INP'     => 32,
+        'SEP'           => 33,
+        // 34 - 60      - Unassigned
+        // 61           - any host internal protocol
+        'CFTP'          => 62,
+        // 63           - any local network
+        'SAT-EXPAK'     => 64,
+        'MIT-SUBNET'    => 65,
+        'RVD'           => 66,
+        'IPPC'          => 67,
+        // 68           - any distributed file system
+        'SAT-MON'       => 69,
+        // 70           - Unassigned
+        'IPCV'          => 71,
+        // 72 - 75      - Unassigned
+        'BR-SAT-MON'    => 76,
+        // 77           - Unassigned
+        'WB-MON'        => 78,
+        'WB-EXPAK'      => 79
+        // 80 - 254     - Unassigned
+        // 255          - Reserved
+    );
+
     /**
      * Constructor - generates some static arrays 
      *
@@ -402,6 +462,7 @@ class Net_DNS2_Lookups
         self::$digest_name_to_id    = array_flip(self::$digest_id_to_name);
         self::$rr_qtypes_by_id      = array_flip(self::$rr_qtypes_by_name);
         self::$rr_metatypes_by_id   = array_flip(self::$rr_metatypes_by_name);
+        self::$protocol_by_id       = array_flip(self::$protocol_by_name);
     }
 }
 

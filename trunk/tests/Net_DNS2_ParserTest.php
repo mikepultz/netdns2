@@ -51,6 +51,7 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             'NS'            => 'example.com. 300 IN NS ns1.mrdns.com.',
             'CNAME'         => 'example.com. 300 IN CNAME www.example.com.',
             'SOA'           => 'example.com. 300 IN SOA ns1.mrdns.com. help.mrhost.ca. 1278700841 900 1800 86400 21400',
+            'WKS'           => 'example.com. 300 IN WKS 128.8.1.14 6 21 25',
             'PTR'           => '26.in-addr.arpa. 300 IN PTR example.com.',
             'HINFO'         => 'example.com. 300 IN HINFO PC-Intel-700mhz "Redhat \"Linux\" 7.1"',
             'MX'            => 'example.com. 300 IN MX 10 mx1.mrhost.ca.',
