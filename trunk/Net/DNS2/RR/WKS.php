@@ -98,7 +98,7 @@ class Net_DNS2_RR_WKS extends Net_DNS2_RR
     {
         $data = $this->address . ' ' . $this->protocol;
 
-        foreach($this->bitmap as $port) {
+        foreach ($this->bitmap as $port) {
             $data .= ' ' . $port;
         }
 
@@ -148,7 +148,7 @@ class Net_DNS2_RR_WKS extends Net_DNS2_RR
             // unpack the port list bitmap
             //
             $port = 0;
-            foreach  (unpack('@5/C*', $this->rdata) as $set) {
+            foreach (unpack('@5/C*', $this->rdata) as $set) {
 
                 $s = sprintf("%08b", $set);
 
@@ -201,7 +201,7 @@ class Net_DNS2_RR_WKS extends Net_DNS2_RR
             $string = "";
             $n = 0;
 
-            foreach($ports as $s) {
+            foreach ($ports as $s) {
 
                 $string .= $s;
                 $n++;
