@@ -15,35 +15,35 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2010-10-25</date>
- <time>23:22:07</time>
+ <date>2010-12-02</date>
+ <time>00:32:02</time>
  <version>
-  <release>1.0.0</release>
-  <api>1.0.0</api>
+  <release>1.0.1</release>
+  <api>1.0.1</api>
  </version>
  <stability>
   <release>stable</release>
-  <api>beta</api>
+  <api>stable</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
  <notes>
-- finished support for the OPT, APL, and the HIP RR
-- fixed a small bug in the Net_DNS2_RR::fromString method when parsing strings. apparently PHP doesn&apos;t think that 0 is numeric sometimes
-- updated the @since value for all the files; it was set with the incorrect version.
+- fixed a problem Sockets and Streams class; was using the wrong shift operators when calculating the size
+- added support for the WKS RR
+- fixed some phpcs issues
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
-   <file baseinstalldir="/" md5sum="db807905c6efff44aeef6c3b6e8f1cbb" name="Net/DNS2.php" role="php" />
+   <file baseinstalldir="/" md5sum="5fa97a3ee23d36704dca2f10390f43c2" name="Net/DNS2.php" role="php" />
    <file baseinstalldir="/" md5sum="a727d9616f91480082df263651214acc" name="Net/DNS2/BitMap.php" role="php" />
    <file baseinstalldir="/" md5sum="605b57298371bb1d2ed9c8fc1dab0a58" name="Net/DNS2/Exception.php" role="php" />
    <file baseinstalldir="/" md5sum="72f7bd741fcc364de7e7b674f0345896" name="Net/DNS2/Header.php" role="php" />
-   <file baseinstalldir="/" md5sum="9260413e2654d063e14dbfb732ae1c87" name="Net/DNS2/Lookups.php" role="php" />
+   <file baseinstalldir="/" md5sum="e6baacb0c9c6cd647e2f748b5d2fe1ab" name="Net/DNS2/Lookups.php" role="php" />
    <file baseinstalldir="/" md5sum="3ff289a6b320bbb76f3142c20e8b6298" name="Net/DNS2/Packet.php" role="php" />
-   <file baseinstalldir="/" md5sum="5ac073e442f7cb8d7403c80af7126c18" name="Net/DNS2/Question.php" role="php" />
+   <file baseinstalldir="/" md5sum="529b29ae96e8ceffc3b0931a04821218" name="Net/DNS2/Question.php" role="php" />
    <file baseinstalldir="/" md5sum="23f4a1539e0af483c7c3546649c217f4" name="Net/DNS2/Resolver.php" role="php" />
    <file baseinstalldir="/" md5sum="c5bdf125f9f696283ba134173afb83c6" name="Net/DNS2/RR.php" role="php" />
    <file baseinstalldir="/" md5sum="e28eb1bdc3a31b2cb3300522059655c3" name="Net/DNS2/Socket.php" role="php" />
-   <file baseinstalldir="/" md5sum="102b9c2d5b6b03c434a42f929f7ed350" name="Net/DNS2/Updater.php" role="php" />
+   <file baseinstalldir="/" md5sum="1450a1825e456694a69cc94458351980" name="Net/DNS2/Updater.php" role="php" />
    <file baseinstalldir="/" md5sum="726b405829e09faad89260f9ff161796" name="Net/DNS2/Packet/Request.php" role="php" />
    <file baseinstalldir="/" md5sum="8eeea7e7cdcee7713dfd751bdc8cd44c" name="Net/DNS2/Packet/Response.php" role="php" />
    <file baseinstalldir="/" md5sum="40417cf9c4a4e93fca47899bad9aa920" name="Net/DNS2/RR/A.php" role="php" />
@@ -88,9 +88,10 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="b5f2f2898495a7cb6700f427ae64b385" name="Net/DNS2/RR/TKEY.php" role="php" />
    <file baseinstalldir="/" md5sum="18613b847e0833522ecc36ce0b7b36b7" name="Net/DNS2/RR/TSIG.php" role="php" />
    <file baseinstalldir="/" md5sum="77fed784acbf0533a78aaf9492a2f9f9" name="Net/DNS2/RR/TXT.php" role="php" />
+   <file baseinstalldir="/" md5sum="f5c8455cd876b15790f5b40a72ea082e" name="Net/DNS2/RR/WKS.php" role="php" />
    <file baseinstalldir="/" md5sum="f68c3ef193bb286c990c88879b5678a0" name="Net/DNS2/RR/X25.php" role="php" />
-   <file baseinstalldir="/" md5sum="ee2f79a169e4152dfd2c02690955f38b" name="Net/DNS2/Socket/Sockets.php" role="php" />
-   <file baseinstalldir="/" md5sum="420bc692b8c7fe28b0a36f76c33c8e40" name="Net/DNS2/Socket/Streams.php" role="php" />
+   <file baseinstalldir="/" md5sum="5afd7cef5683e1e6de51faa8dc05c64c" name="Net/DNS2/Socket/Sockets.php" role="php" />
+   <file baseinstalldir="/" md5sum="131ce86d2259d1e0803890b8f583f761" name="Net/DNS2/Socket/Streams.php" role="php" />
   </dir>
  </contents>
  <dependencies>
@@ -135,6 +136,23 @@ Initial Beta release of Net_DNS2
 - finished support for the OPT, APL, and the HIP RR
 - fixed a small bug in the Net_DNS2_RR::fromString method when parsing strings. apparently PHP doesn&apos;t think that 0 is numeric sometimes
 - updated the @since value for all the files; it was set with the incorrect version.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.0.1</release>
+    <api>1.0.1</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2010-12-02</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- fixed a problem Sockets and Streams class; was using the wrong shift operators when calculating the size
+- added support for the WKS RR
+- fixed some phpcs issues
    </notes>
   </release>
  </changelog>
