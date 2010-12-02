@@ -78,7 +78,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = "1.0.1";
+    const VERSION = "1.0.2";
 
     /*
      * use TCP only (true/false)
