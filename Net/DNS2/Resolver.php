@@ -123,7 +123,7 @@ class Net_DNS2_Resolver extends Net_DNS2
         if (   ($this->_auth_signature instanceof Net_DNS2_RR_TSIG)
             || ($this->_auth_signature instanceof Net_DNS2_RR_SIG)
         ) {
-            packet->additional[] = $this->_auth_signature;
+            $packet->additional[] = $this->_auth_signature;
         }
 
         //
@@ -179,7 +179,7 @@ class Net_DNS2_Resolver extends Net_DNS2
         if (   ($this->_auth_signature instanceof Net_DNS2_RR_TSIG)
             || ($this->_auth_signature instanceof Net_DNS2_RR_SIG)
         ) {
-            packet->additional[] = $this->_auth_signature;
+            $packet->additional[] = $this->_auth_signature;
         }
 
         //

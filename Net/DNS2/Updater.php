@@ -140,7 +140,7 @@ class Net_DNS2_Updater extends Net_DNS2
      */
     public function signature($keyname, $signature)
     {
-        return this->signTSIG($keyname, $signature);
+        return $this->signTSIG($keyname, $signature);
     }
 
     /**

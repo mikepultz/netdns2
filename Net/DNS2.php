@@ -132,14 +132,14 @@ class Net_DNS2
     protected $sockets_enabled = false;
 
     /*
+     * the TSIG or SIG RR object for authentication
+     */
+    protected $_auth_signature = null;
+
+    /*
      * the last erro message returned by the sockets class
      */
     private $_last_socket_error = '';
-
-    /*
-     * the TSIG or SIG RR object for authentication
-     */
-    private $_auth_signature = null;
 
     /**
      * Constructor - base constructor for the Resolver and Updater
@@ -317,16 +317,28 @@ class Net_DNS2
      * @since  function available since release 1.0.2
      *
      */
-    public function signTSIG($keyname, $signature)
+    public function signTSIG($keyname, $signature = "")
     {
         //
-        // create the TSIG RR, but don't add it just yet; TSIG needs to be added
-        // as the last additional entry- so we'll add it just before we send.
+        // if the TSIG was pre-created and passed in, then we can just used 
+        // it as provided.
         //
-        $this->_auth_signature = Net_DNS2_RR::fromString(
-            strtolower(trim($keyname)) .
-            ' TSIG '. $signature
-        );
+        if ($keyname instanceof Net_DNS2_RR_TSIG) {
+
+            $this->_auth_signature = $keyname;
+
+        //
+        // otherwise create the TSIG RR, but don't add it just yet; TSIG needs 
+        // to be added as the last additional entry- so we'll add it just 
+        // before we send.
+        //
+        } else {
+
+            $this->_auth_signature = Net_DNS2_RR::fromString(
+                strtolower(trim($keyname)) .
+                ' TSIG '. $signature
+            );
+        }
           
         return true;
     }
@@ -338,11 +350,72 @@ class Net_DNS2
      * @param string $signature the key to sign the request.
      * 
      * @return boolean
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
-    public function signSIG0()
+    public function signSIG0($filename)
     {
+        //
+        // if the SIG was pre-created, then use it as-is
+        //
+        if ($filename instanceof Net_DNS2_RR_SIG) {
+
+            $this->_auth_signature = $filename;
+
+        //
+        // otherwise, it's filename which needs to be parsed and processed.
+        //
+        } else {
+        
+            //
+            // parse the signature file
+            //
+            $private = new Net_DNS2_PrivateKey($filename);
+
+            //
+            // create a new Net_DNS2_RR_SIG object
+            //
+            $this->_auth_signature = new Net_DNS2_RR_SIG();
+
+            //
+            // reset some values
+            //
+            $this->_auth_signature->name        = "";
+            $this->_auth_signature->ttl         = 0;
+            $this->_auth_signature->class       = "ANY";
+
+            //
+            // these values are pulled from the private key
+            //
+            $this->_auth_signature->algorithm   = $private->algorithm();
+            $this->_auth_signature->keytag      = $private->keytag();
+            $this->_auth_signature->signname    = $private->signname();
+
+            //
+            // these values are hard-coded for SIG0
+            //
+            $this->_auth_signature->typecovered = "SIG0";
+            $this->_auth_signature->labels      = 0;
+            $this->_auth_signature->origttl     = 0;
+
+            //
+            // generate the dates
+            //
+            $this->_auth_signature->sigexp      = 0;
+            $this->_auth_signature->sigincep    = 0;
+
+            //
+            // get the signature using the private key
+            //
+            $this->_auth_signature->signature   = 0;
+
+print_r($private);
+print_r($this->_auth_signature);
+
+        }
+
+        return true;
     }
 
     /**

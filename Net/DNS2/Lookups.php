@@ -160,6 +160,7 @@ class Net_DNS2_Lookups
     public static $rr_types_by_id = array();
     public static $rr_types_by_name = array(
 
+        'SIG0'          => 0,       // RFC 2931 pseudo type
         'A'             => 1,       // RFC 1035
         'NS'            => 2,       // RFC 1035
         'MD'            => 3,       // RFC 1035 - obsolete, Not implemented
