@@ -76,11 +76,6 @@ class Net_DNS2_Updater extends Net_DNS2
      */
     private $_packet;
 
-    /*
-     * TSIG RR to use for authentication
-     */
-    private $_tsig = null;
-
     /**
      * Constructor - builds a new Net_DNS2_Updater objected used for doing 
      * dynamic DNS updates
@@ -137,21 +132,15 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $keyname   the key name to use for the TSIG RR
      * @param string $signature the key to sign the request.
      *
-     * @return boolean
-     * @access public
+     * @return     boolean
+     * @access     public
+     * @see        Net_DNS2::signTSIG()
+     * @deprecated function deprecated in 1.0.2
+     *
      */
     public function signature($keyname, $signature)
     {
-        //
-        // create the TSIG RR, but don't add it just yet; TSIG needs to be added
-        // as the last additional entry- so we'll add it just before we send.
-        //
-        $this->_tsig = Net_DNS2_RR::fromString(
-            strtolower(trim($keyname)) .
-            ' TSIG '. $signature
-        );
-
-        return true;
+        return this->signTSIG($keyname, $signature);
     }
 
     /**
@@ -538,11 +527,12 @@ class Net_DNS2_Updater extends Net_DNS2
         $this->checkServers();
 
         //
-        // if we have a TSIG stored, then add it
+        // check for an authentication method; either TSIG or SIG
         //
-        if ($this->_tsig instanceof Net_DNS2_RR_TSIG) {
-
-            $this->_packet->additional[] = $this->_tsig;
+        if (   ($this->_auth_signature instanceof Net_DNS2_RR_TSIG) 
+            || ($this->_auth_signature instanceof Net_DNS2_RR_SIG)
+        ) {
+            $this->_packet->additional[] = $this->_auth_signature;
         }
 
         //

@@ -85,7 +85,7 @@ class Net_DNS2_Resolver extends Net_DNS2
      * @return Net_DNS_RR object
      * @throws InvalidArgumentException, Net_DNS2_Exception, 
      *         Net_DNS2_Socket_Exception
-     * @access  public
+     * @access public
      *
      */
     public function query($name, $type = 'A', $class = 'IN')
@@ -118,6 +118,15 @@ class Net_DNS2_Resolver extends Net_DNS2
         $packet = new Net_DNS2_Packet_Request($name, $type, $class);
 
         //
+        // check for an authentication method; either TSIG or SIG
+        //
+        if (   ($this->_auth_signature instanceof Net_DNS2_RR_TSIG)
+            || ($this->_auth_signature instanceof Net_DNS2_RR_SIG)
+        ) {
+            packet->additional[] = $this->_auth_signature;
+        }
+
+        //
         // send the packet and get back the response
         //
         return $this->sendPacket($packet, ($type == 'AXFR') ? true : $this->use_tcp);
@@ -143,6 +152,15 @@ class Net_DNS2_Resolver extends Net_DNS2
         $this->checkServers();
 
         //
+        // check for an authentication method; either TSIG or SIG            
+        //
+        if (   ($this->_auth_signature instanceof Net_DNS2_RR_TSIG)
+            || ($this->_auth_signature instanceof Net_DNS2_RR_SIG)
+        ) {
+            $this->_packet->additional[] = $this->_auth_signature;
+        }
+
+        //
         // create an empty packet
         //
         $packet = new Net_DNS2_Packet_Request($rr->name, 'A', 'IN');
@@ -163,6 +181,15 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         $packet->answer[] = $rr;
         $packet->header->ancount = 1;
+
+        //
+        // check for an authentication method; either TSIG or SIG
+        //
+        if (   ($this->_auth_signature instanceof Net_DNS2_RR_TSIG)
+            || ($this->_auth_signature instanceof Net_DNS2_RR_SIG)
+        ) {
+            packet->additional[] = $this->_auth_signature;
+        }
 
         //
         // send the packet and get back the response

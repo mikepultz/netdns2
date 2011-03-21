@@ -136,6 +136,10 @@ class Net_DNS2
      */
     private $_last_socket_error = '';
 
+    /*
+     * the TSIG or SIG RR object for authentication
+     */
+    private $_auth_signature = null;
 
     /**
      * Constructor - base constructor for the Resolver and Updater
@@ -300,6 +304,45 @@ class Net_DNS2
         }
     
         return true;
+    }
+
+    /**
+     * adds a TSIG RR object for authentication
+     *
+     * @param string $keyname   the key name to use for the TSIG RR
+     * @param string $signature the key to sign the request.
+     * 
+     * @return boolean
+     * @access public
+     * @since  function available since release 1.0.2
+     *
+     */
+    public function signTSIG($keyname, $signature)
+    {
+        //
+        // create the TSIG RR, but don't add it just yet; TSIG needs to be added
+        // as the last additional entry- so we'll add it just before we send.
+        //
+        $this->_auth_signature = Net_DNS2_RR::fromString(
+            strtolower(trim($keyname)) .
+            ' TSIG '. $signature
+        );
+          
+        return true;
+    }
+
+    /**
+     * adds a SIG RR object for authentication
+     *
+     * @param string $keyname   the key name to use for the TSIG RR
+     * @param string $signature the key to sign the request.
+     * 
+     * @return boolean
+     * @access public
+     *
+     */
+    public function signSIG0()
+    {
     }
 
     /**
