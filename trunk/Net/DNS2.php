@@ -408,7 +408,7 @@ class Net_DNS2
             //
             // get the signature using the private key
             //
-            $this->_auth_signature->signature   = 0;
+            $this->_auth_signature->signature   = $private->signature();
 
 print_r($private);
 print_r($this->_auth_signature);
