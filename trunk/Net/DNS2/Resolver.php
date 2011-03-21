@@ -152,15 +152,6 @@ class Net_DNS2_Resolver extends Net_DNS2
         $this->checkServers();
 
         //
-        // check for an authentication method; either TSIG or SIG            
-        //
-        if (   ($this->_auth_signature instanceof Net_DNS2_RR_TSIG)
-            || ($this->_auth_signature instanceof Net_DNS2_RR_SIG)
-        ) {
-            $this->_packet->additional[] = $this->_auth_signature;
-        }
-
-        //
         // create an empty packet
         //
         $packet = new Net_DNS2_Packet_Request($rr->name, 'A', 'IN');
