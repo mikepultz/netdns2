@@ -1,6 +1,13 @@
 Net_DNS2 TODO List
 ------------------
 
+- add auth support for SIG(0) (on top of TSIG); needs openssl
+
+- move auth support to the Net_DNS2 class so it can be used for both updates and queries
+  (so it could be used for zone transfers)
+
+- validate auth responses- have to look into how this works
+
 - zone transfers (AXFR)
 	- these responses can be split between multiple messages, so the socket handling code
 	  will need to be modified to support it.
@@ -10,7 +17,7 @@ DONE- update requests
 
 - finish missing RR's
 	
-	WKS, look at ATMA
+	look at ATMA
 
 DONE - parse BIND style input and set all the appropriate values of the RR object
 
