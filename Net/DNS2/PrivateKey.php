@@ -68,17 +68,31 @@ class Net_DNS2_PrivateKey
     /*
      *
      */
-    private $_algorithm;
-   
-    /*
-     *
-     */
     private $_keytag;
 
     /*
      *
      */
     private $_signname;
+
+    private $_key_format;
+
+    /*
+     *
+     */
+    private $_algorithm;
+   
+    private $_prime;
+    
+    private $_subprime;
+
+    private $_base;
+
+    private $_private_value;
+
+    private $_public_value;
+
+    private $_signature;
 
 
     /**
@@ -125,11 +139,11 @@ class Net_DNS2_PrivateKey
         //
         // parse the keyname
         //
-        if (preg_match("/K(.*)\.\+(\d{3})\+(\d*)\.private/", $keyname, $matches) == 3 ) {
+        if (preg_match("/K(.*)\.\+(\d{3})\+(\d*)\.private/", $keyname, $matches)) {
             
             $this->_signname    = $matches[1];
-            $this->_keytag      = $matches[2];
-            $this->_algorithm   = $matches[3];
+            $this->_algorithm   = intval($matches[2]);
+            $this->_keytag      = intval($matches[3]);
 
         } else {
 
@@ -138,6 +152,150 @@ class Net_DNS2_PrivateKey
             );
         }
 
+        //
+        // read all the data from the
+        //
+        $data = file($filename, FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
+        if (count($data) == 0) {
+            
+            throw new Net_DNS2_Exception(
+                'file ' . $keyname . ' is empty!'
+            );
+        }
+
+        foreach($data as $line) {
+
+            list($key, $value) = explode(':', $line);
+
+            $key    = trim($key);
+            $value  = trim($value);
+
+            switch(strtolower($key)) {
+
+            case 'private-key-format':
+                $this->_key_format = $value;
+                break;
+
+            case 'algorithm':
+                if ($this->_algorithm != $value) {
+                    throw new Net_DNS2_Exception(
+                        'Algorithm mis-match! filename is ' . $this->_algorithm . ', contents say ' . $value
+                    );
+                }
+                break;
+
+            //
+            // RSA
+            //
+            case 'modulus':
+                break;
+
+            case 'publicexponent':
+                break;
+
+            case 'privateexponent':
+                break;
+        
+            case 'prime1':
+                break;
+
+            case 'prime2':
+                break;
+
+            case 'exponent1':
+                break;
+
+            case 'exponent2':
+                break;
+
+            case 'coefficient':
+                break;
+
+            //
+            // DSA
+            //
+            case 'prime(p)':
+                $this->_prime = $value;
+                break;
+
+            case 'subprime(q)':
+                $this->_subprime = $value;
+                break;
+
+            case 'base(g)':
+                $this->_base = $value;
+                break;
+
+            case 'private_value(x)':
+                $this->_private_value = $value;
+                break;
+
+            case 'public_value(y)':
+                $this->_public_value = $value;
+                break;
+
+            default:
+                throw new Net_DNS2_Exception(
+                    'unknown private key data: ' . $key . ': ' . $value
+                );
+            }
+        }
+
+        //
+        // generate the private key
+        //
+        switch($this->_algorithm) {
+        
+        //
+        // RSA
+        //
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSAMD5:
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA1:
+        case Net_DNS2_Lookups::DSNSEC_ALGORITHM_RSASHA1NSEC3SHA1:
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:
+
+
+
+            break;
+
+        //
+        // DSA
+        //
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSANSEC3SHA1:
+
+            $args = array(
+
+                'dsa' => array(
+
+                    'private_key_type'  => OPENSSL_KEYTYPE_DSA,
+                    'p'                 => base64_decode($this->_prime),
+                    'q'                 => base64_decode($this->_subprime),
+                    'g'                 => base64_decode($this->_base),
+                    'priv_key'          => base64_decode($this->_private_value),
+                    'pub_key'           => base64_decode($this->_public_value)
+                )
+            );
+
+            //
+            // generate and store the key
+            //
+            $res = openssl_pkey_new($args);
+            if ($res === false) {
+                throw new Net_DNS2_Exception(openssl_error_string());
+            }
+            if (openssl_pkey_export($res, $this->_signature) == false) {
+                throw new Net_DNS2_Exception(openssl_error_string());
+            }
+
+            break;
+        
+        default:
+            throw new Net_DNS2_Exception(
+                'we only currently support RSA and DSA encryption.'
+            );
+        }
 
         //
         // store the filename incase we need it for something
@@ -165,7 +323,10 @@ class Net_DNS2_PrivateKey
         return $this->_signname;
     }
 
-    
+    public function signature()
+    {
+        return $this->_signature;
+    }    
 
 }
 
