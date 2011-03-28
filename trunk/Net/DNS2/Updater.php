@@ -532,6 +532,7 @@ class Net_DNS2_Updater extends Net_DNS2
         if (   ($this->_auth_signature instanceof Net_DNS2_RR_TSIG) 
             || ($this->_auth_signature instanceof Net_DNS2_RR_SIG)
         ) {
+            $this->_auth_signature->name = $this->_packet->question[0]->qname;
             $this->_packet->additional[] = $this->_auth_signature;
         }
 

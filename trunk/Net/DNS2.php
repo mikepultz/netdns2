@@ -402,17 +402,29 @@ class Net_DNS2
             //
             // generate the dates
             //
-            $this->_auth_signature->sigexp      = 0;
-            $this->_auth_signature->sigincep    = 0;
+            $t = time();
+
+            $this->_auth_signature->sigincep    = gmdate('YmdHis', $t);
+            $this->_auth_signature->sigexp      = gmdate('YmdHis', $t + 500);
 
             //
-            // get the signature using the private key
+            // store the private key in the SIG object for later.
             //
-            $this->_auth_signature->signature   = $private->signature();
+            $this->_auth_signature->private_key = $private;
+        }
 
-print_r($private);
-print_r($this->_auth_signature);
-
+        //
+        // only RSAMD5, RSASHA1 and DSA are supported for SIG(0)
+        //
+        switch($this->_auth_signature->algorithm) {
+            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSAMD5:
+            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA1:
+            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
+                break;
+            default:
+                throw new InvalidArgumentException(
+                    'only asymmetric algorithms work with SIG(0)!'
+                );
         }
 
         return true;
