@@ -167,7 +167,7 @@ class Net_DNS2_PrivateKey
      */
     public function __construct($file = null)
     {
-        if (isset($file) {
+        if (isset($file)) {
             $this->parseFile($file);
         }
     }
@@ -371,8 +371,8 @@ class Net_DNS2_PrivateKey
                     'p'                 => base64_decode($this->_prime),
                     'q'                 => base64_decode($this->_subprime),
                     'g'                 => base64_decode($this->_base),
-                    'pub_key'           => base64_decode($this->_public_value),
-                    'priv_key'          => base64_decode($this->_private_value)
+                    'priv_key'          => base64_decode($this->_private_value),
+                    'pub_key'           => base64_decode($this->_public_value)
                 )
             );
 
