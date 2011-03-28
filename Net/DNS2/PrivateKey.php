@@ -75,13 +75,33 @@ class Net_DNS2_PrivateKey
      */
     private $_signname;
 
+    private $_algorithm;
+
     private $_key_format;
 
     /*
      *
      */
-    private $_algorithm;
-   
+    private $_modulus;
+
+    private $_public_exponent;
+
+    private $_private_exponent;
+
+    private $_prime1;
+
+    private $_prime2;
+
+    private $_exponent1;
+
+    private $_exponent2;
+
+    private $_coefficient;
+
+
+    /*
+     *
+     */
     private $_prime;
     
     private $_subprime;
@@ -94,6 +114,7 @@ class Net_DNS2_PrivateKey
 
     private $_signature;
 
+    private $_instance;
 
     /**
      * Constructor - base constructor the private key container class
@@ -188,27 +209,35 @@ class Net_DNS2_PrivateKey
             // RSA
             //
             case 'modulus':
+                $this->_modulus = $value;
                 break;
 
             case 'publicexponent':
+                $this->_public_exponent = $value;
                 break;
 
             case 'privateexponent':
+                $this->_private_exponent = $value;
                 break;
         
             case 'prime1':
+                $this->_prime1 = $value;
                 break;
 
             case 'prime2':
+                $this->_prime2 = $value;
                 break;
 
             case 'exponent1':
+                $this->_exponent1 = $value;
                 break;
 
             case 'exponent2':
+                $this->_exponent2 = $value;
                 break;
 
             case 'coefficient':
+                $this->_coefficient = $value;
                 break;
 
             //
@@ -255,7 +284,28 @@ class Net_DNS2_PrivateKey
         case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
         case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:
 
+            $args = array(
 
+                'rsa' => array(
+
+                    'n'                 => base64_decode($this->_modulus),
+                    'e'                 => base64_decode($this->_public_exponent),
+                    'd'                 => base64_decode($this->_private_exponent),
+                    'p'                 => base64_decode($this->_prime1),
+                    'q'                 => base64_decode($this->_prime2),
+                    'dmp1'              => base64_decode($this->_exponent1),
+                    'dmq1'              => base64_decode($this->_exponent2),
+                    'iqmp'              => base64_decode($this->_coefficient)
+                )
+            );
+
+            //
+            // generate and store the key
+            //
+            $this->_instance = openssl_pkey_new($args);
+            if ($this->_instance === false) {
+                throw new Net_DNS2_Exception(openssl_error_string());
+            }
 
             break;
 
@@ -269,23 +319,19 @@ class Net_DNS2_PrivateKey
 
                 'dsa' => array(
 
-                    'private_key_type'  => OPENSSL_KEYTYPE_DSA,
                     'p'                 => base64_decode($this->_prime),
                     'q'                 => base64_decode($this->_subprime),
                     'g'                 => base64_decode($this->_base),
-                    'priv_key'          => base64_decode($this->_private_value),
-                    'pub_key'           => base64_decode($this->_public_value)
+                    'pub_key'           => base64_decode($this->_public_value),
+                    'priv_key'          => base64_decode($this->_private_value)
                 )
             );
 
             //
             // generate and store the key
             //
-            $res = openssl_pkey_new($args);
-            if ($res === false) {
-                throw new Net_DNS2_Exception(openssl_error_string());
-            }
-            if (openssl_pkey_export($res, $this->_signature) == false) {
+            $this->_instance = openssl_pkey_new($args);
+            if ($this->_instance === false) {
                 throw new Net_DNS2_Exception(openssl_error_string());
             }
 
@@ -327,6 +373,11 @@ class Net_DNS2_PrivateKey
     {
         return $this->_signature;
     }    
+
+    public function instance()
+    {
+        return $this->_instance;
+    }
 
 }
 

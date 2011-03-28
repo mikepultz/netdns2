@@ -137,19 +137,19 @@ class Net_DNS2_Packet
 
         foreach ($this->question as $x) {
 
-            $output .= $x->__toString();
+            $output .= $x->__toString() . "\n";
         }
         foreach ($this->answer as $x) {
 
-            $output .= $x->__toString();
+            $output .= $x->__toString() . "\n";
         }
         foreach ($this->authority as $x) {
 
-            $output .= $x->__toString();
+            $output .= $x->__toString() . "\n";
         }
         foreach ($this->additional as $x) {
 
-            $output .= $x->__toString();
+            $output .= $x->__toString() . "\n";
         }
 
         return $output;
