@@ -367,6 +367,27 @@ class Net_DNS2_Packet
     }
 
     /**
+     * copies the contents of the given packet, to the local packet object. this
+     * function intentionally ignores some of the packet data.
+     *
+     * @param Net_DNS2_Packet $packet the DNS packet to copy the data from
+     *
+     * @return boolean
+     * @access public
+     *
+     */
+    public function copy(Net_DNS2_Packet $packet)
+    {
+        $this->header       = $packet->header;
+        $this->question     = $packet->question;
+        $this->answer       = $packet->answer;
+        $this->authority    = $packet->authority;
+        $this->additional   = $packet->additional;
+
+        return true;
+    }
+
+    /**
      * formats an IPv6 IP address in the preferred format
      *
      * @param string $address The IPv6 IP address to format

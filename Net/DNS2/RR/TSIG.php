@@ -297,16 +297,18 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
         if (strlen($this->key) > 0) {
 
             //
-            // copy the packet so we can sign the content
+            // create a new packet for the signature-
             //
             $new_packet = new Net_DNS2_Packet_Request('example.com', 'SOA', 'IN');
 
-            $new_packet->header     = $packet->header;
-            $new_packet->question   = $packet->question;    
-            $new_packet->answer     = $packet->answer;
-            $new_packet->authority  = $packet->authority;
-            $new_packet->additional = $packet->additional;
+            //
+            // copy the packet data over
+            //
+            $new_packet->copy($packet);
 
+            //
+            // remove the TSIG object from the additional list
+            //
             array_pop($new_packet->additional);
             $new_packet->header->arcount = count($new_packet->additional);
 

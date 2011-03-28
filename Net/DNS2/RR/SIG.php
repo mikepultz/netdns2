@@ -306,23 +306,28 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
         $data .= pack('C', '0');
 
         //
-        // if the signature needs to be generated
+        // if the signature is empty, and $this->private_key is an instance of a 
+        // private key object, and we have access to openssl, then assume this
+        // is a SIG(0), and generate a new signature
         //
-        if (strlen($this->signature) == 0) {
-        
+        if ( (strlen($this->signature) == 0)
+            && ($this->private_key instanceof Net_DNS2_PrivateKey)
+            && (extension_loaded('openssl') === true)
+        ) {
+
             //
             // create a new packet for the signature-
             //
-            // TODO: make a packet copy?
-            //
             $new_packet = new Net_DNS2_Packet_Request('example.com', 'SOA', 'IN');
 
-            $new_packet->header     = $packet->header;
-            $new_packet->question   = $packet->question;
-            $new_packet->answer     = $packet->answer;
-            $new_packet->authority  = $packet->authority;
-            $new_packet->additional = $packet->additional;
+            //
+            // copy the packet data over
+            //
+            $new_packet->copy($packet);
 
+            //
+            // remove the SIG object from the additional list
+            //
             array_pop($new_packet->additional);
             $new_packet->header->arcount = count($new_packet->additional);
 
@@ -367,10 +372,14 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             //
             // sign the data
             //
-            if (openssl_sign($sigdata, $this->signature, $this->private_key->instance(), $algorithm) == false) {
+            if (openssl_sign($sigdata, $this->signature, $this->private_key->instance, $algorithm) == false) {
+
                 throw new Net_DNS2_Exception(openssl_error_string());
             }
 
+            //
+            // add it locally encoded
+            //
             $this->signature = base64_encode($this->signature);
         }
 
