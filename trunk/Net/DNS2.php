@@ -357,6 +357,16 @@ class Net_DNS2
     public function signSIG0($filename)
     {
         //
+        // check for OpenSSL
+        //
+        if (extension_loaded('openssl') === false) {
+            
+            throw new Net_DNS2_Exception(
+                'the OpenSSL extension is required to use SIG(0).'
+            );
+        }
+
+        //
         // if the SIG was pre-created, then use it as-is
         //
         if ($filename instanceof Net_DNS2_RR_SIG) {
@@ -381,21 +391,21 @@ class Net_DNS2
             //
             // reset some values
             //
-            $this->_auth_signature->name        = "";
+            $this->_auth_signature->name        = $private->signname;
             $this->_auth_signature->ttl         = 0;
-            $this->_auth_signature->class       = "ANY";
+            $this->_auth_signature->class       = 'ANY';
 
             //
             // these values are pulled from the private key
             //
-            $this->_auth_signature->algorithm   = $private->algorithm();
-            $this->_auth_signature->keytag      = $private->keytag();
-            $this->_auth_signature->signname    = $private->signname();
+            $this->_auth_signature->algorithm   = $private->algorithm;
+            $this->_auth_signature->keytag      = $private->keytag;
+            $this->_auth_signature->signname    = $private->signname;
 
             //
             // these values are hard-coded for SIG0
             //
-            $this->_auth_signature->typecovered = "SIG0";
+            $this->_auth_signature->typecovered = 'SIG0';
             $this->_auth_signature->labels      = 0;
             $this->_auth_signature->origttl     = 0;
 
@@ -422,7 +432,7 @@ class Net_DNS2
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
                 break;
             default:
-                throw new InvalidArgumentException(
+                throw new Net_DNS2_Exception(
                     'only asymmetric algorithms work with SIG(0)!'
                 );
         }
