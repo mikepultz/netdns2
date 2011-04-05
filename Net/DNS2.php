@@ -352,6 +352,7 @@ class Net_DNS2
      * @return boolean
      * @throws Net_DNS2_Exception
      * @access public
+     * @since  function available since release 1.0.2
      *
      */
     public function signSIG0($filename)
@@ -424,12 +425,12 @@ class Net_DNS2
         }
 
         //
-        // only RSAMD5, RSASHA1 and DSA are supported for SIG(0)
+        // only RSAMD5 and RSASHA1 are supported for SIG(0)
         //
         switch($this->_auth_signature->algorithm) {
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSAMD5:
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA1:
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
+            //case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
                 break;
             default:
                 throw new Net_DNS2_Exception(

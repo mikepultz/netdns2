@@ -355,11 +355,17 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             // SHA1
             //
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA1:
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
 
                 $algorithm = OPENSSL_ALGO_SHA1;
                 break;
         
+            //
+            // un-supported
+            //
+            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
+                //
+                // DSA won't work in PHP until the OpenSSL extension has better DSA support
+                //
             case Net_DNS2_Lookups::DSNSEC_ALGORITHM_RSASHA1NSEC3SHA1:
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:

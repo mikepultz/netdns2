@@ -45,7 +45,7 @@
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
- * @since     File available since Release 1.2.0
+ * @since     File available since Release 1.0.2
  *
  */
 
@@ -134,27 +134,27 @@ class Net_DNS2_PrivateKey
     /*
      * DSA: prime
      */
-    private $_prime;
+    //private $_prime;
     
     /*
      * DSA: subprime
      */
-    private $_subprime;
+    //private $_subprime;
 
     /*
      * DSA: base
      */
-    private $_base;
+    //private $_base;
 
     /*
      * DSA: private value
      */
-    private $_private_value;
+    //private $_private_value;
 
     /*
      * DSA: public value
      */
-    private $_public_value;
+    //private $_public_value;
 
     /**
      * Constructor - base constructor the private key container class
@@ -300,9 +300,9 @@ class Net_DNS2_PrivateKey
                 break;
 
             //
-            // DSA
+            // DSA - this won't work in PHP until the OpenSSL extension is better
             //
-            case 'prime(p)':
+            /*case 'prime(p)':
                 $this->_prime = $value;
                 break;
 
@@ -321,7 +321,7 @@ class Net_DNS2_PrivateKey
             case 'public_value(y)':
                 $this->_public_value = $value;
                 break;
-
+            */
             default:
                 throw new Net_DNS2_Exception(
                     'unknown private key data: ' . $key . ': ' . $value
@@ -360,9 +360,9 @@ class Net_DNS2_PrivateKey
             break;
 
         //
-        // DSA
+        // DSA - this won't work in PHP until the OpenSSL extension is better
         //
-        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
+        /*case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
 
             $args = array(
 
@@ -377,10 +377,10 @@ class Net_DNS2_PrivateKey
             );
 
             break;
-
+        */
         default:
             throw new Net_DNS2_Exception(
-                'we only currently support RSAMD5, RSASHA1 and DSA encryption.'
+                'we only currently support RSAMD5 and RSASHA1 encryption.'
             );
         }
 
