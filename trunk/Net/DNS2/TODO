@@ -1,9 +1,9 @@
 Net_DNS2 TODO List
 ------------------
 
-- add auth support for SIG(0) (on top of TSIG); needs openssl
+DONE - add auth support for SIG(0) (on top of TSIG); needs openssl
 
-- move auth support to the Net_DNS2 class so it can be used for both updates and queries
+DONE - move auth support to the Net_DNS2 class so it can be used for both updates and queries
   (so it could be used for zone transfers)
 
 - validate auth responses- have to look into how this works
