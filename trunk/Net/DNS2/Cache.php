@@ -109,7 +109,7 @@ class Net_DNS2_Cache
     {
         if (isset($this->cache_data[$key])) {
 
-            return $this->cache_data[$key]['object'];
+            return unserialize($this->cache_data[$key]['object']);
         } else {
 
             return false;
@@ -128,7 +128,43 @@ class Net_DNS2_Cache
      */
     public function put($key, $data)
     {
-        $this->cache_data[$key] = array('cache_date' => time(), 'object' => $data);
+        $ttl = 60 * 60 * 24 * 365;
+
+        //
+        // find the lowest TTL, and use that as the TTL for the whole cached 
+        // object. The downside to using one TTL for the whole object, is that
+        // we'll invalidate entries before they actuall expire, causing a
+        // real lookup to happen.
+        //
+        // The upside is that we don't need to require() each RR type in the
+        // cache, so we can look at their individual TTL's on each run- we only
+        // unserialize the actual RR object when it's get() from the cache.
+        //
+        foreach ($data->answer as $index => $rr) {
+                    
+            if ($rr->ttl < $ttl) {
+                $ttl = $rr->ttl;
+            }
+        }
+        foreach ($data->authority as $index => $rr) {
+                    
+            if ($rr->ttl < $ttl) {
+                $ttl = $rr->ttl;
+            }
+        }
+        foreach ($data->additional as $index => $rr) {
+                    
+            if ($rr->ttl < $ttl) {
+                $ttl = $rr->ttl;
+            }
+        }
+
+        $this->cache_data[$key] = array(
+
+            'cache_date'    => time(),
+            'ttl'           => $ttl,
+            'object'        => serialize($data)
+        );
     }
 
     /**
@@ -151,41 +187,14 @@ class Net_DNS2_Cache
             foreach ($this->cache_data as $key => $data) {
 
                 $diff = $now - $data['cache_date'];
-            
-                $this->cache_data[$key]['cache_date'] = $now;
 
-                foreach ($data['object']->answer as $index => $rr) {
-                    
-                    if ($rr->ttl <= $diff) {
+                if ($data['ttl'] <= $diff) {
 
-                        unset($this->cache_data[$key]);
-                        break 2;
-                    } else {
+                    unset($this->cache_data[$key]);
+                } else {
 
-                        $this->cache_data[$key]['object']->answer[$index]->ttl -= $diff;
-                    }
-                }
-                foreach ($data['object']->authority as $index => $rr) {
-                    
-                    if ($rr->ttl <= $diff) {
-
-                        unset($this->cache_data[$key]);
-                        break 2;
-                    } else {
-
-                        $this->cache_data[$key]['object']->authority[$index]->ttl -= $diff;
-                    }
-                }
-                foreach ($data['object']->additional as $index => $rr) {
-                    
-                    if ($rr->ttl <= $diff) {
-
-                        unset($this->cache_data[$key]);
-                        break 2;
-                    } else {
-
-                        $this->cache_data[$key]['object']->additional[$index]->ttl -= $diff;
-                    }
+                    $this->cache_data[$key]['ttl'] -= $diff;
+                    $this->cache_data[$key]['cache_date'] = $now;
                 }
             }
 
