@@ -28,7 +28,7 @@ $pkg->setAPIStability('stable');
 $pkg->setNotes("- fixed a problem Sockets and Streams class; was using the wrong shift operators when calculating the size\n- added support for the WKS RR\n- fixed some phpcs issues");
 $pkg->setPackageType('php');
 $pkg->addRelease();
-$pkg->setPhpDep('5.1.0');
+$pkg->setPhpDep('5.1.2');
 $pkg->setPearinstallerDep('1.4.0a12');
 $pkg->addMaintainer('lead', 'mikepultz', 'Mike Pultz', 'mike@mikepultz.com');
 $pkg->setLicense('BSD License', 'http://www.opensource.org/licenses/bsd-license.php');
