@@ -109,12 +109,12 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
      */
     public $tsgi_mode_id_to_name = array(
 
-        TSIG_MODE_RES           => 'Reserved',
-        TSIG_MODE_SERV_ASSIGN   => 'Server Assignment',
-        TSIG_MODE_DH            => 'Diffie-Hellman',
-        TSIG_MODE_GSS_API       => 'GSS-API',
-        TSIG_MODE_RESV_ASSIGN   => 'Resolver Assignment',
-        TSIG_MODE_KEY_DELE      => 'Key Deletion'
+        self::TSIG_MODE_RES           => 'Reserved',
+        self::TSIG_MODE_SERV_ASSIGN   => 'Server Assignment',
+        self::TSIG_MODE_DH            => 'Diffie-Hellman',
+        self::TSIG_MODE_GSS_API       => 'GSS-API',
+        self::TSIG_MODE_RESV_ASSIGN   => 'Resolver Assignment',
+        self::TSIG_MODE_KEY_DELE      => 'Key Deletion'
     );
 
     /**
@@ -162,7 +162,7 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
         $this->inception    = time();
         $this->expiration   = time() + 24 * 60 * 60; // 1 day
         $this->error        = 0;
-        $this->key_size     = strlen($this->key);
+        $this->key_size     = strlen($this->key_data);
         $this->other_size   = 0;
         $this->other_data   = '';
 

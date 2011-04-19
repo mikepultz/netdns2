@@ -522,7 +522,7 @@ abstract class Net_DNS2_RR
         //
         // lookup the class to use
         //
-        $o          = null;
+        $o = null;
         $class_name = Net_DNS2_Lookups::$rr_types_id_to_class[
             Net_DNS2_Lookups::$rr_types_by_name[$type]
         ];

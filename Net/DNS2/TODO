@@ -1,23 +1,32 @@
 Net_DNS2 TODO List
 ------------------
 
+- add support for the ATMA RR - supported by windows DNS servers only
+
+- support some simple caching
+    - cache on disk or in shared memory so it can be used between multiple requests
+    - enable/disable by config option
+    - cache by request, and use TTL on response to invalidate the cache
+    - use a simple format like md5(serialized request object) => serialized response object.
+
+- add more detailed documentation with lots of examples.
+
+- go through all the code and figure out what the lowest possible PHP version we can
+  support is
+    - check for usage of any functions that aren't supported between OS's or are deprecated
+
+- make a patch to net_dnsbl o use net_dns2 and see if it's any faster
+
+DONE - change it so by default it uses the /etc/resolv.conf file if not options are specified
+
 DONE - add auth support for SIG(0) (on top of TSIG); needs openssl
 
 DONE - move auth support to the Net_DNS2 class so it can be used for both updates and queries
   (so it could be used for zone transfers)
 
-- validate auth responses- have to look into how this works
-
-- zone transfers (AXFR)
-	- these responses can be split between multiple messages, so the socket handling code
-	  will need to be modified to support it.
-
 DONE- update requests
 	DONE - need TSIG RR
 
-- finish missing RR's
-	
-	look at ATMA
 
 DONE - parse BIND style input and set all the appropriate values of the RR object
 
@@ -32,7 +41,7 @@ DONE - change the defines() to class constants
 DONE - add proper licensing at the top of each file
 	DONE - change to BSD licensing
 
-- test classes
+DONE - test classes
 
 DONE - inverse_query
 
