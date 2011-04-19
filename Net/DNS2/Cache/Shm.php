@@ -102,7 +102,7 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
                 //
                 // read the data from teh shared memory segment
                 //
-                $data = @shmop_read($this->cache_id, 0, $size);
+                $data = shmop_read($this->cache_id, 0, $size);
                 if ( ($data !== false) && (strlen($data) > 0) ) {
 
                     //

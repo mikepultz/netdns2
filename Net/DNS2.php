@@ -124,7 +124,7 @@ class Net_DNS2
     /*
      * use the local shared memory cache (true/false)
      */
-    public $use_cache = false;
+    public $use_cache = true;
 
     /*
      * file name to use for shared memory segment or file cache

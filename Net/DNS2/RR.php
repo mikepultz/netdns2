@@ -432,6 +432,7 @@ abstract class Net_DNS2_RR
                 $packet->offset += $object['rdlength'];
             }
         } else {
+
             throw new Net_DNS2_Exception('un-implemented resource record type: ' . 
                 $object['type']);
         }
@@ -543,16 +544,19 @@ abstract class Net_DNS2_RR
                 // parse the rdata
                 //
                 if ($o->rrFromString($values) === false) {
+
                     throw new Net_DNS2_Exception(
                         'failed to parse rdata for config: ' . $line);
                 }
 
             } else {
+
                 throw new Net_DNS2_Exception(
                     'failed to create new RR record for type: ' . $type);
             }
 
         } else {
+
             throw new Net_DNS2_Exception(
                 'un-implemented resource record type: '. $type);
         }
