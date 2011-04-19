@@ -145,18 +145,12 @@ class Net_DNS2_RR_ATMA extends Net_DNS2_RR
 
             $this->format = $x['format'];
 
-            //
-            // NSAP format
-            //
             if ($this->format == 0) {
 
                 $a = unpack('@1/H*address', $this->rdata);
 
                 $this->address = $a['address'];
 
-            //
-            // E.164 format
-            //
             } else if ($this->format == 1) {
 
                 $this->address = substr($this->rdata, 1, $this->rdlength - 1);
@@ -185,16 +179,10 @@ class Net_DNS2_RR_ATMA extends Net_DNS2_RR
     {
         $data = pack('C', $this->format);
 
-        //
-        // NSAP format
-        //
         if ($this->format == 0) {
 
             $data .= pack('H*', $this->address);
 
-        //
-        // E.164 format
-        //
         } else if ($this->format == 1) {
 
             $data .= $this->address;
