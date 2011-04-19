@@ -524,7 +524,7 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // make sure we have some name servers set
         //
-        $this->checkServers();
+        $this->checkServers(Net_DNS2::RESOLV_CONF);
 
         //
         // check for an authentication method; either TSIG or SIG

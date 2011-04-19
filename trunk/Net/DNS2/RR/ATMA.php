@@ -45,22 +45,20 @@
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
- * @since     File available since Release 1.0.0
+ * @since     File available since Release 1.0.2
  *
  */
 
 /**
- * OPT Resource Record - RFC2929 section 3.1
+ * ATMA Resource Record
  *
- *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- *    |                          OPTION-CODE                          |
- *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- *    |                         OPTION-LENGTH                         |
- *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
- *    |                                                               |
- *    /                          OPTION-DATA                          /
- *    /                                                               /
- *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+ * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ * |          FORMAT       |                       |
+ * |                       +--+--+--+--+--+--+--+--+
+ * /                    ADDRESS                    /
+ * |                                               |
+ * +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  * @category Networking
  * @package  Net_DNS2
@@ -70,42 +68,22 @@
  * @see      Net_DNS2_RR
  *
  */
-class Net_DNS2_RR_OPT extends Net_DNS2_RR
+class Net_DNS2_RR_ATMA extends Net_DNS2_RR
 {
     /*
-     * option code - assigned by IANA
+     * One octet that indicates the format of ADDRESS. The two possible values 
+     * for FORMAT are value 0 indicating ATM End System Address (AESA) format
+     * and value 1 indicating E.164 format
      */
-    public $option_code;
+    public $format;
 
     /*
-     * the length of the option data
+     * The IPv4 address in quad-dotted notation
      */
-    public $option_length;
-
-    /*
-     * the option data
-     */
-    public $option_data;
-
-    /*
-     * the extended response code stored in the TTL
-     */
-    public $extended_rcode;
-
-    /*
-     * the implementation level
-     */
-    public $version;
-
-    /*
-     * the extended flags
-     */
-    public $z;
+    public $address;
 
     /**
-     * method to return the rdata portion of the packet as a string. There is no
-     * defintion for returning an OPT RR by string- this is just here to validate
-     * the binary parsing / building routines.
+     * method to return the rdata portion of the packet as a string
      *
      * @return  string
      * @access  protected
@@ -113,13 +91,11 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->option_code . ' ' . $this->option_data;
+        return $this->address;
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line. There is no 
-     * definition for parsing a OPT RR by string- this is just here to validate
-     * the binary parsing / building routines.
+     * parses the rdata portion from a standard DNS config line
      *
      * @param array $rdata a string split line of values for the rdata
      *
@@ -129,15 +105,22 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $this->option_code      = array_shift($rdata);
-        $this->option_data      = array_shift($rdata);
-        $this->option_length    = strlen($this->option_data);
+        $address = array_shift($rdata);
 
-        $x = unpack('Cextended/Cversion/nz', pack('N', $this->ttl));
+        if (ctype_xdigit($address) == true) {
+            
+            $this->format = 0;
+            $this->address = $address;
 
-        $this->extended_rcode   = $x['extended'];
-        $this->version          = $x['version'];
-        $this->z                = $x['z'];
+        } else if (is_numeric($address) == true) {
+
+            $this->format = 1;
+            $this->address = $address;
+
+        } else {
+
+            return false;
+        }
 
         return true;
     }
@@ -149,35 +132,39 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      *
      * @return boolean
      * @access protected
-     *
+     * 
      */
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
         if ($this->rdlength > 0) {
 
             //
-            // unpack the code and length
+            // unpack the format
             //
-            $x = unpack('noption_code/noption_length', $this->rdata);
+            $x = unpack('Cformat/N*address', $this->rdata);
 
-            $this->option_code      = $x['option_code'];
-            $this->option_length    = $x['option_length'];
-
-            //
-            // copy out the data based on the length
-            //
-            $this->option_data      = substr($this->rdata, 4);
+            $this->format = $x['format'];
 
             //
-            // parse out the TTL value
+            // NSAP format
             //
-            $ttl = pack('N', $this->ttl);
+            if ($this->format == 0) {
 
-            $x = unpack('Cextended/Cversion/nz', $ttl);
+                $a = unpack('@1/H*address', $this->rdata);
 
-            $this->extended_rcode   = $x['extended'];
-            $this->version          = $x['version'];
-            $this->z                = $x['z'];
+                $this->address = $a['address'];
+
+            //
+            // E.164 format
+            //
+            } else if ($this->format == 1) {
+
+                $this->address = substr($this->rdata, 1, $this->rdlength - 1);
+
+            } else {
+
+                return false;
+            }
         }
 
         return true;
@@ -185,30 +172,39 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
 
     /**
      * returns the rdata portion of the DNS packet
-     *
+     * 
      * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
      *                                 compressed names
      *
-     * @return mixed                   either returns a binary packed
+     * @return mixed                   either returns a binary packed 
      *                                 string or null on failure
      * @access protected
-     *
+     * 
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
-        if ($this->option_code) {
+        $data = pack('C', $this->format);
 
-            $ttl = unpack(
-                'N', pack('CCn', $this->extended_rcode, $this->version, $this->z)
-            );
-        
-            $this->ttl = $ttl[1];
+        //
+        // NSAP format
+        //
+        if ($this->format == 0) {
 
-            return pack('nn', $this->option_code, $this->option_length) . 
-                $this->option_data;
+            $data .= pack('H*', $this->address);
+
+        //
+        // E.164 format
+        //
+        } else if ($this->format == 1) {
+
+            $data .= $this->address;
+
+        } else {
+
+            return null;
         }
-
-        return null;
+        
+        return $data;
     }
 }
 

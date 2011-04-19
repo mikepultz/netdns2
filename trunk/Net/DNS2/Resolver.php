@@ -93,7 +93,7 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         // make sure we have some name servers set
         //
-        $this->checkServers();
+        $this->checkServers(Net_DNS2::RESOLV_CONF);
 
         //
         // we dont' support incrmental zone tranfers; so if it's requested, a full
@@ -128,9 +128,29 @@ class Net_DNS2_Resolver extends Net_DNS2
         }
 
         //
+        //
+        //
+        $packet_hash = "";
+
+        if ($this->use_cache == true) {
+
+            $packet_hash = md5(print_r($packet->question, 1));
+            if ($this->_cache->has($packet_hash)) {
+
+                return $this->_cache->get($packet_hash);
+            }
+        }
+
+        //
         // send the packet and get back the response
         //
-        return $this->sendPacket($packet, ($type == 'AXFR') ? true : $this->use_tcp);
+        $response = $this->sendPacket($packet, ($type == 'AXFR') ? true : $this->use_tcp);
+        if ($this->use_cache == true) {
+
+            $this->_cache->put($packet_hash, $response);
+        }
+
+        return $response;
     }
 
     /**
@@ -150,7 +170,7 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         // make sure we have some name servers set
         //
-        $this->checkServers();
+        $this->checkServers(Net_DNS2::RESOLV_CONF);
 
         //
         // create an empty packet

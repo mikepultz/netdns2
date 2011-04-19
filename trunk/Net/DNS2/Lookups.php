@@ -194,7 +194,7 @@ class Net_DNS2_Lookups
         'EID'           => 31,      //
         'NIMLOC'        => 32,      //
         'SRV'           => 33,      // RFC 2782
-        'ATMA'          => 34,      // Not implemented
+        'ATMA'          => 34,      // Windows only
         'NAPTR'         => 35,      // RFC 2915
         'KX'            => 36,      // RFC 2230
         'CERT'          => 37,      // RFC 4398
@@ -282,6 +282,7 @@ class Net_DNS2_Lookups
         31          => 'Net_DNS2_RR_EID',
         32          => 'Net_DNS2_RR_NIMLOC',
         33          => 'Net_DNS2_RR_SRV',
+        34          => 'Net_DNS2_RR_ATMA',
         35          => 'Net_DNS2_RR_NAPTR',
         36          => 'Net_DNS2_RR_KX',
         37          => 'Net_DNS2_RR_CERT',

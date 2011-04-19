@@ -78,7 +78,12 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = "1.0.2";
+    const VERSION = '1.0.2';
+
+    /*
+     * the default path to a resolv.conf file
+     */
+    const RESOLV_CONF = '/etc/resolv.conf';
 
     /*
      * use TCP only (true/false)
@@ -117,6 +122,16 @@ class Net_DNS2
     public $search_list = array();
 
     /*
+     * use the local shared memory cache (true/false)
+     */
+    public $use_cache = false;
+
+    /*
+     * file name to use for shared memory segment or file cache
+     */
+    public $cache_file = '/tmp/net_dns2.cache';
+
+    /*
      * local sockets
      */
     protected $sock = array('udp' => array(), 'tcp' => array());
@@ -135,6 +150,11 @@ class Net_DNS2
      * the TSIG or SIG RR object for authentication
      */
     protected $_auth_signature = null;
+
+    /*
+     * the shared memory segment id for the local cache
+     */
+    protected $_cache = null;
 
     /*
      * the last erro message returned by the sockets class
@@ -170,6 +190,21 @@ class Net_DNS2
 
                     $this->$key = $value;
                 }
+            }
+        }
+
+        //
+        // if we're set to use the local shared memory cache, then
+        // make sure it's been initialized
+        //
+        if ($this->use_cache == true) {
+
+            if (extension_loaded("shmop")) {
+
+                $this->_cache = new Net_DNS2_Cache_Shm($this->cache_file, 10000);
+            } else {
+
+                $this->_cache = new Net_DNS2_Cache_File($this->cache_file);
             }
         }
     }
@@ -294,13 +329,20 @@ class Net_DNS2
      * @access protected
      *
      */
-    protected function checkServers()
+    protected function checkServers($default = null)
     {
         if (empty($this->nameservers)) {
-            throw new Net_DNS2_Exception(
-                'empty name servers list; you must provide a list of name servers,'.
-                ' or the path to a resolv.conf file.'
-            );
+
+            if (isset($default)) {
+
+                $this->setServers($default);
+            } else {
+
+                throw new Net_DNS2_Exception(
+                    'empty name servers list; you must provide a list of name '.
+                    'servers, or the path to a resolv.conf file.'
+                );
+            }
         }
     
         return true;

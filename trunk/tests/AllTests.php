@@ -1,5 +1,8 @@
 <?php
 
+error_reporting(E_ALL | E_STRICT);
+ini_set("include_path", ".:/u/devel/www/Net_DNS2/:/usr/local/php/lib/php/");
+
 if (!defined('PHPUnit_MAIN_METHOD')) {
     define('PHPUnit_MAIN_METHOD', 'Net_DNS2_AllTests::main');
 }
