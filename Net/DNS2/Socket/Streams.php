@@ -85,11 +85,8 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         //
         // bind to a local IP/port if it's set
         //
-        // bindto was only added in v5.1.0
-        //
-        if ( (strlen($this->local_host) > 0) 
-            && (version_compare(PHP_VERSION, '5.1.0', '>=') === true) 
-        ) {
+        if (strlen($this->local_host) > 0) {
+
             $opts['socket']['bindto'] = $this->local_host;
             if ($this->local_port > 0) {
 

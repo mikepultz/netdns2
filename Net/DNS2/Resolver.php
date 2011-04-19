@@ -128,7 +128,8 @@ class Net_DNS2_Resolver extends Net_DNS2
         }
 
         //
-        //
+        // if caching is turned on, then check then hash the question, and
+        // do a cache lookup.
         //
         $packet_hash = "";
 

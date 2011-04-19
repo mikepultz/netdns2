@@ -1,7 +1,10 @@
 Net_DNS2 TODO List
 ------------------
 
-- add support for the ATMA RR - supported by windows DNS servers only
+- move the IP (v4 and v6) matching to functions- 
+    - just use inet_ntop/pton()
+
+- handle IPv6 in PTR records
 
 - support some simple caching
     - cache on disk or in shared memory so it can be used between multiple requests
@@ -11,11 +14,15 @@ Net_DNS2 TODO List
 
 - add more detailed documentation with lots of examples.
 
-- go through all the code and figure out what the lowest possible PHP version we can
+- make a patch to net_dnsbl to use net_dns2 and see if it's any faster
+
+DONE - go through all the code and figure out what the lowest possible PHP version we can
   support is
     - check for usage of any functions that aren't supported between OS's or are deprecated
 
-- make a patch to net_dnsbl o use net_dns2 and see if it's any faster
+     *** we need at least 5.1.2 for spl_autoload_register()
+
+DONE - add support for the ATMA RR - supported by windows DNS servers only
 
 DONE - change it so by default it uses the /etc/resolv.conf file if not options are specified
 
