@@ -63,24 +63,19 @@
 class Net_DNS2_Cache
 {
     /*
-     *
+     * the filename of the cache file
      */
-    protected $cache_id      = false;
+    protected $cache_file = "";
 
     /*
-     *
+     * the local data store for the cache
      */
-    protected $cache_file    = "";
+    protected $cache_data = array();
 
     /*
-     *
+     * the size of the cache to use
      */
-    protected $cache_data    = array();
-
-    /*
-     *
-     */
-    protected $cache_size    = 10000;
+    protected $cache_size = 0;
 
     /**
      * returns true/false if the provided key is defined in the cache
@@ -183,7 +178,7 @@ class Net_DNS2_Cache
             // have expired
             //
             $now = time();
-                
+
             foreach ($this->cache_data as $key => $data) {
 
                 $diff = $now - $data['cache_date'];
@@ -197,12 +192,69 @@ class Net_DNS2_Cache
                     $this->cache_data[$key]['cache_date'] = $now;
                 }
             }
+        }
+    }
+
+    /**
+     * runs a clean up process on the cache data
+     *
+     * @return mixed
+     * @access protected
+     *
+     */
+    protected function resize()
+    {
+        if (count($this->cache_data) > 0) {
+        
+            //
+            // serialize the cache data
+            //
+            $cache = serialize($this->cache_data);
 
             //
-            // how also check to see if we have too many entries, and remove the
-            // oldest entries first
+            // only do this part if the size allocated to the cache storage
+            // is smaller than the actual cache data
             //
+            if (strlen($cache) > $this->cache_size) {
+
+                while(strlen($cache) > $this->cache_size) {
+
+                    //
+                    // go through the data, and remove the entries closed to
+                    // their expiration date.
+                    //
+                    $smallest_ttl = time();
+                    $smallest_key = null;
+
+                    foreach ($this->cache_data as $key => $data) {
+
+                        if ($data['ttl'] < $smallest_ttl) {
+
+                            $smallest_ttl = $data['ttl'];
+                            $smallest_key = $key;
+                        }
+                    }
+
+                    //
+                    // unset the key with the smallest TTL
+                    //
+                    unset($this->cache_data[$smallest_key]);
+
+                    //
+                    // re-serialize
+                    //
+                    $cache = serialize($this->cache_data);
+                }
+            }
+
+            if ($cache == "a:0:{}") {
+                return null;
+            } else {
+                return $cache;
+            }
         }
+
+        return null;
     }
 };
 

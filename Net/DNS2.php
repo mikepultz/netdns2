@@ -132,6 +132,11 @@ class Net_DNS2
     public $cache_file = '/tmp/net_dns2.cache';
 
     /*
+     * the max size of the cache file (in bytes)
+     */
+    public $cache_size = 10000;
+
+    /*
      * local sockets
      */
     protected $sock = array('udp' => array(), 'tcp' => array());
@@ -149,12 +154,12 @@ class Net_DNS2
     /*
      * the TSIG or SIG RR object for authentication
      */
-    protected $_auth_signature = null;
+    protected $auth_signature = null;
 
     /*
      * the shared memory segment id for the local cache
      */
-    protected $_cache = null;
+    protected $cache = null;
 
     /*
      * the last erro message returned by the sockets class
@@ -166,6 +171,7 @@ class Net_DNS2
      *
      * @param mixed $options array of options or null for none
      *
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -201,10 +207,10 @@ class Net_DNS2
 
             if (extension_loaded("shmop")) {
 
-                $this->_cache = new Net_DNS2_Cache_Shm($this->cache_file, 10000);
+                $this->cache = new Net_DNS2_Cache_Shm;
             } else {
 
-                $this->_cache = new Net_DNS2_Cache_File($this->cache_file);
+                $this->cache = new Net_DNS2_Cache_File;
             }
         }
     }
@@ -367,7 +373,7 @@ class Net_DNS2
         //
         if ($keyname instanceof Net_DNS2_RR_TSIG) {
 
-            $this->_auth_signature = $keyname;
+            $this->auth_signature = $keyname;
 
         //
         // otherwise create the TSIG RR, but don't add it just yet; TSIG needs 
@@ -376,7 +382,7 @@ class Net_DNS2
         //
         } else {
 
-            $this->_auth_signature = Net_DNS2_RR::fromString(
+            $this->auth_signature = Net_DNS2_RR::fromString(
                 strtolower(trim($keyname)) .
                 ' TSIG '. $signature
             );
@@ -414,7 +420,7 @@ class Net_DNS2
         //
         if ($filename instanceof Net_DNS2_RR_SIG) {
 
-            $this->_auth_signature = $filename;
+            $this->auth_signature = $filename;
 
         //
         // otherwise, it's filename which needs to be parsed and processed.
@@ -429,47 +435,47 @@ class Net_DNS2
             //
             // create a new Net_DNS2_RR_SIG object
             //
-            $this->_auth_signature = new Net_DNS2_RR_SIG();
+            $this->auth_signature = new Net_DNS2_RR_SIG();
 
             //
             // reset some values
             //
-            $this->_auth_signature->name        = $private->signname;
-            $this->_auth_signature->ttl         = 0;
-            $this->_auth_signature->class       = 'ANY';
+            $this->auth_signature->name         = $private->signname;
+            $this->auth_signature->ttl          = 0;
+            $this->auth_signature->class        = 'ANY';
 
             //
             // these values are pulled from the private key
             //
-            $this->_auth_signature->algorithm   = $private->algorithm;
-            $this->_auth_signature->keytag      = $private->keytag;
-            $this->_auth_signature->signname    = $private->signname;
+            $this->auth_signature->algorithm    = $private->algorithm;
+            $this->auth_signature->keytag       = $private->keytag;
+            $this->auth_signature->signname     = $private->signname;
 
             //
             // these values are hard-coded for SIG0
             //
-            $this->_auth_signature->typecovered = 'SIG0';
-            $this->_auth_signature->labels      = 0;
-            $this->_auth_signature->origttl     = 0;
+            $this->auth_signature->typecovered  = 'SIG0';
+            $this->auth_signature->labels       = 0;
+            $this->auth_signature->origttl      = 0;
 
             //
             // generate the dates
             //
             $t = time();
 
-            $this->_auth_signature->sigincep    = gmdate('YmdHis', $t);
-            $this->_auth_signature->sigexp      = gmdate('YmdHis', $t + 500);
+            $this->auth_signature->sigincep     = gmdate('YmdHis', $t);
+            $this->auth_signature->sigexp       = gmdate('YmdHis', $t + 500);
 
             //
             // store the private key in the SIG object for later.
             //
-            $this->_auth_signature->private_key = $private;
+            $this->auth_signature->private_key  = $private;
         }
 
         //
         // only RSAMD5 and RSASHA1 are supported for SIG(0)
         //
-        switch($this->_auth_signature->algorithm) {
+        switch($this->auth_signature->algorithm) {
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSAMD5:
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA1:
             //case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
