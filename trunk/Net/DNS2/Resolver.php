@@ -120,10 +120,10 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->_auth_signature instanceof Net_DNS2_RR_TSIG)
-            || ($this->_auth_signature instanceof Net_DNS2_RR_SIG)
+        if (   ($this->auth_signature instanceof Net_DNS2_RR_TSIG)
+            || ($this->auth_signature instanceof Net_DNS2_RR_SIG)
         ) {
-            $packet->additional[]       = $this->_auth_signature;
+            $packet->additional[]       = $this->auth_signature;
             $packet->header->arcount    = count($packet->additional);
         }
 
@@ -134,11 +134,19 @@ class Net_DNS2_Resolver extends Net_DNS2
         $packet_hash = "";
 
         if ($this->use_cache == true) {
+    
+            //
+            // open the cache
+            //
+            $this->cache->open($this->cache_file, $this->cache_size);
 
+            //
+            // build the key and check for it in the cache.
+            //
             $packet_hash = md5(print_r($packet->question, 1));
-            if ($this->_cache->has($packet_hash)) {
+            if ($this->cache->has($packet_hash)) {
 
-                return $this->_cache->get($packet_hash);
+                return $this->cache->get($packet_hash);
             }
         }
 
@@ -148,7 +156,7 @@ class Net_DNS2_Resolver extends Net_DNS2
         $response = $this->sendPacket($packet, ($type == 'AXFR') ? true : $this->use_tcp);
         if ($this->use_cache == true) {
 
-            $this->_cache->put($packet_hash, $response);
+            $this->cache->put($packet_hash, $response);
         }
 
         return $response;
@@ -198,10 +206,10 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->_auth_signature instanceof Net_DNS2_RR_TSIG)
-            || ($this->_auth_signature instanceof Net_DNS2_RR_SIG)
+        if (   ($this->auth_signature instanceof Net_DNS2_RR_TSIG)
+            || ($this->auth_signature instanceof Net_DNS2_RR_SIG)
         ) {
-            $packet->additional[]       = $this->_auth_signature;
+            $packet->additional[]       = $this->auth_signature;
             $packet->header->arcount    = count($packet->additional);
         }
 

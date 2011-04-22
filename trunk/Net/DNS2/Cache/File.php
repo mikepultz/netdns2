@@ -71,15 +71,17 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
      * @access public
      *
      */
-    public function __construct($cache_file)
+    public function __construct($cache_file, $size)
     {
+        $this->cache_size = $size;
+
         $this->cache_file = $cache_file;
         if (file_exists($this->cache_file) == true) {
 
             //
             // open the file for reading
             //
-            $fp = fopen($this->cache_file, "r");
+            $fp = @fopen($this->cache_file, "r");
             if ($fp !== false) {
                 
                 //
@@ -105,7 +107,10 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
                 fclose($fp);
 
             } else {
-                // throw an exception
+            
+                throw new Net_DNS2_Exception(
+                    'failed to fopen() file: ' . $cache_file
+                );
             }
 
             $this->clean();
@@ -120,7 +125,8 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
      */
     public function __destruct()
     {
-        if (count($this->cache_data) > 0) {
+        $data = $this->resize();
+        if ($data != NULL) {
 
             //
             // open the file for writing
@@ -136,7 +142,7 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
                 //
                 // write the file contents
                 //
-                fwrite($fp, serialize($this->cache_data));
+                fwrite($fp, $data);
 
                 //
                 // unlock
@@ -147,10 +153,13 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
                 // close the file
                 //
                 fclose($fp);
-
-            } else {
-                // throw an exception
             }
+        } else {
+        
+            //
+            // clear out the file
+            //
+            file_put_contents($this->cache_file, "");
         }
     }
 };

@@ -529,10 +529,10 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->_auth_signature instanceof Net_DNS2_RR_TSIG) 
-            || ($this->_auth_signature instanceof Net_DNS2_RR_SIG)
+        if (   ($this->auth_signature instanceof Net_DNS2_RR_TSIG) 
+            || ($this->auth_signature instanceof Net_DNS2_RR_SIG)
         ) {
-            $this->_packet->additional[] = $this->_auth_signature;
+            $this->_packet->additional[] = $this->auth_signature;
         }
 
         //

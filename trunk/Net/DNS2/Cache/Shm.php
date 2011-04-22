@@ -62,6 +62,11 @@
  */
 class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
 {
+    /*
+     * resource id of the shared memory cache
+     */
+    private $_cache_id = false;
+
     /**
      * Constructor
      *
@@ -72,43 +77,100 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
      * @access public
      *
      */
-    public function __construct($cache_file, $size)
+    public function open($cache_file, $size)
     {
+        $this->cache_size = $size;
+
         //
         // make sure the file exists first
         //
         if (!file_exists($cache_file)) {
-            touch($cache_file);
+
+            if (file_put_contents($cache_file, "") === false) {
+        
+                throw new Net_DNS2_Exception(
+                    'failed to create empty SHM file: ' . $cache_file
+                );
+            }
         }
 
         //
         // convert the filename to a IPC key
         //
         $this->cache_file = ftok($cache_file, 't');
+        if ($this->cache_file == -1) {
+
+            throw new Net_DNS2_Exception(
+                'failed on ftok() file: ' . $cache_file
+            );
+        }
 
         //
-        // open the shared memory segment
+        // try to open an existing cache
         //
-        $this->cache_id = shmop_open($this->cache_file, 'c', 0644, $size);
-        if ($this->cache_id !== false) {
+        $this->_cache_id = @shmop_open($this->cache_file, 'w', 0, 0);
+        if ($this->_cache_id === false) {
+
+            //
+            // if it fails, then try to create a new segment.
+            //
+            $this->_cache_id = @shmop_open($this->cache_file, 'c', 0644, $this->cache_size);
+
+        } else {
+
+            //
+            // if it opened, but the size of the cache isn't the size we have specified, then the
+            // user has adjusted the size- and we need to handle it.
+            //
+            $allocated = shmop_size($this->_cache_id);
+
+            if ( ($allocated != $this->cache_size) && ($allocated > 0) ) {
+
+                //
+                // read the contents from the cache
+                //
+                $data = trim(shmop_read($this->_cache_id, 0, $allocated));
+                    
+                //
+                // delete the segment
+                //
+                shmop_delete($this->_cache_id);
+
+                //
+                // create segment with the new size
+                //
+                $this->_cache_id = @shmop_open($this->cache_file, 'c', 0644, $this->cache_size);
+                if ($this->_cache_id !== false) {
+
+                    //
+                    // re-store the cached data, but only if it fits.
+                    //
+                    if (strlen($data) <= $this->cache_size) {
+
+                        shmop_write($this->_cache_id, $data, 0);
+                    }
+                }
+            }
+        }
+        if ($this->_cache_id !== false) {
 
             //
             // this returns the size allocated, and not the size used, but it's
             // still a good check to make sure there's space allocated.
             //
-            $size = shmop_size($this->cache_id);
-            if ($size > 0) {
+            $allocated = shmop_size($this->_cache_id);
+            if ($allocated > 0) {
             
                 //
                 // read the data from teh shared memory segment
                 //
-                $data = shmop_read($this->cache_id, 0, $size);
+                $data = trim(shmop_read($this->_cache_id, 0, 0));
                 if ( ($data !== false) && (strlen($data) > 0) ) {
 
                     //
                     // unserialize and store the data
                     //
-                    $this->cache_data = unserialize($data);
+                    $this->cache_data = @unserialize($data);
 
                     //
                     // call clean to clean up old entries
@@ -118,7 +180,9 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
             }
         } else {
 
-            // throw an exception
+            throw new Net_DNS2_Exception(
+                'failed to shmop_open() file: ' . $cache_file
+            );
         }
     }
 
@@ -130,12 +194,16 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
      */
     public function __destruct()
     {
-        if (count($this->cache_data) > 0) {
-            
-            shmop_write($this->cache_id, serialize($this->cache_data), 0);
+        $data = $this->resize();
+        if (!is_null($data)) {
+
+            $o = shmop_write($this->_cache_id, $data, 0);
+        } else {
+
+            $o = shmop_write($this->_cache_id, "", 0);
         }
 
-        shmop_close($this->cache_id);
+        shmop_close($this->_cache_id);
     }
 };
 
