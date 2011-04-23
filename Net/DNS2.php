@@ -78,7 +78,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = '1.0.2';
+    const VERSION = '1.1.0';
 
     /*
      * the default path to a resolv.conf file
@@ -362,7 +362,7 @@ class Net_DNS2
      * 
      * @return boolean
      * @access public
-     * @since  function available since release 1.0.2
+     * @since  function available since release 1.1.0
      *
      */
     public function signTSIG($keyname, $signature = "")
@@ -400,7 +400,7 @@ class Net_DNS2
      * @return boolean
      * @throws Net_DNS2_Exception
      * @access public
-     * @since  function available since release 1.0.2
+     * @since  function available since release 1.1.0
      *
      */
     public function signSIG0($filename)
