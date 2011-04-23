@@ -259,7 +259,7 @@ class Net_DNS2_PrivateKey
                 if ($this->algorithm != $value) {
                     throw new Net_DNS2_Exception(
                         'Algorithm mis-match! filename is ' . $this->algorithm . 
-                            ', contents say ' . $value
+                        ', contents say ' . $value
                     );
                 }
                 break;

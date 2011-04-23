@@ -124,7 +124,7 @@ class Net_DNS2
     /*
      * enable cache; either "shared", "file" or "none"
      */
-    public $cache_type = "shared";
+    public $cache_type = 'none';
 
     /*
      * file name to use for shared memory segment or file cache
@@ -162,14 +162,14 @@ class Net_DNS2
     protected $cache = null;
 
     /*
+     * internal setting for enabling cache
+     */
+    protected $use_cache = false;
+
+    /*
      * the last erro message returned by the sockets class
      */
     private $_last_socket_error = '';
-
-    /*
-     * internal setting for enabling cache
-     */
-    public $_use_cache = false;
 
     /**
      * Constructor - base constructor for the Resolver and Updater
@@ -209,33 +209,32 @@ class Net_DNS2
         // make sure it's been initialized
         //
         switch($this->cache_type) {
-            case 'shared':
-                if (extension_loaded("shmop")) {
+        case 'shared':
+            if (extension_loaded("shmop")) {
 
-                    $this->cache = new Net_DNS2_Cache_Shm;
-                    $this->_use_cache = true;
-                } else {
-
-                    throw new Net_DNS2_Exception(
-                        'shmop library is not available for cache'
-                    );
-                }
-                break;
-            case 'file':
-
-                $this->cache = new Net_DNS2_Cache_File;
-                $this->_use_cache = true;
-
-                break;  
-            case 'none':
-                $this->_use_cache = false;
-                break;
-            default:
+                $this->cache = new Net_DNS2_Cache_Shm;
+                $this->use_cache = true;
+            } else {
 
                 throw new Net_DNS2_Exception(
-                    'un-supported cache type: ' . $this->cache_type
+                    'shmop library is not available for cache'
                 );
-                break;
+            }
+            break;
+        case 'file':
+
+            $this->cache = new Net_DNS2_Cache_File;
+            $this->use_cache = true;
+
+            break;  
+        case 'none':
+            $this->use_cache = false;
+            break;
+        default:
+
+            throw new Net_DNS2_Exception(
+                'un-supported cache type: ' . $this->cache_type
+            );
         }
     }
 
@@ -354,6 +353,8 @@ class Net_DNS2
     /**
      * checks the list of name servers to make sure they're set
      *
+     * @param mixed $default a path to a resolv.conf file or an array of servers.
+     *
      * @return boolean
      * @throws Net_DNS2_Exception
      * @access protected
@@ -399,13 +400,13 @@ class Net_DNS2
 
             $this->auth_signature = $keyname;
 
-        //
-        // otherwise create the TSIG RR, but don't add it just yet; TSIG needs 
-        // to be added as the last additional entry- so we'll add it just 
-        // before we send.
-        //
         } else {
 
+            //
+            // otherwise create the TSIG RR, but don't add it just yet; TSIG needs 
+            // to be added as the last additional entry- so we'll add it just 
+            // before we send.
+            //
             $this->auth_signature = Net_DNS2_RR::fromString(
                 strtolower(trim($keyname)) .
                 ' TSIG '. $signature
@@ -418,8 +419,7 @@ class Net_DNS2
     /**
      * adds a SIG RR object for authentication
      *
-     * @param string $keyname   the key name to use for the TSIG RR
-     * @param string $signature the key to sign the request.
+     * @param string $filename the name of a file to load the signature from.
      * 
      * @return boolean
      * @throws Net_DNS2_Exception
@@ -446,13 +446,10 @@ class Net_DNS2
 
             $this->auth_signature = $filename;
 
-        //
-        // otherwise, it's filename which needs to be parsed and processed.
-        //
         } else {
         
             //
-            // parse the signature file
+            // otherwise, it's filename which needs to be parsed and processed.
             //
             $private = new Net_DNS2_PrivateKey($filename);
 
@@ -500,14 +497,13 @@ class Net_DNS2
         // only RSAMD5 and RSASHA1 are supported for SIG(0)
         //
         switch($this->auth_signature->algorithm) {
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSAMD5:
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA1:
-            //case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
-                break;
-            default:
-                throw new Net_DNS2_Exception(
-                    'only asymmetric algorithms work with SIG(0)!'
-                );
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSAMD5:
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA1:
+            break;
+        default:
+            throw new Net_DNS2_Exception(
+                'only asymmetric algorithms work with SIG(0)!'
+            );
         }
 
         return true;

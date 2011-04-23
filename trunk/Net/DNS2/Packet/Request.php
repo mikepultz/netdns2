@@ -130,8 +130,9 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
         if (   (!isset(Net_DNS2_Lookups::$rr_types_by_name[$type])) 
             || (!isset(Net_DNS2_Lookups::$classes_by_name[$class])) 
         ) {
-            throw new InvalidArgumentException('invalid type (' . $type . 
-                ') or class (' . $class . ') specified.');
+            throw new InvalidArgumentException(
+                'invalid type (' . $type . ') or class (' . $class . ') specified.'
+            );
         }
 
         //

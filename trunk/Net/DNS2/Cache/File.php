@@ -65,11 +65,12 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
     /**
      * open a cache object
      *
-     * @param string $cache_file path to a file to use for cache storage
+     * @param string  $cache_file path to a file to use for cache storage
      * @param integer $size       the size of the shared memory segment to create
      *
      * @throws Net_DNS2_Exception
      * @access public
+     * @return void
      *
      */
     public function open($cache_file, $size)
@@ -81,7 +82,8 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
         // check that the file exists first
         //
         if ( (file_exists($this->cache_file) == true) 
-            && (filesize($this->cache_file) > 0) ) {
+            && (filesize($this->cache_file) > 0)
+        ) {
 
             //
             // open the file for reading
