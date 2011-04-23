@@ -135,7 +135,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @return     boolean
      * @access     public
      * @see        Net_DNS2::signTSIG()
-     * @deprecated function deprecated in 1.0.2
+     * @deprecated function deprecated in 1.1.0
      *
      */
     public function signature($keyname, $signature)

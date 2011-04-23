@@ -45,7 +45,7 @@
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
- * @since     File available since Release 1.0.2
+ * @since     File available since Release 1.1.0
  *
  */
 
