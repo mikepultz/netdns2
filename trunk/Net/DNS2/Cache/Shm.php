@@ -67,8 +67,13 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
      */
     private $_cache_id = false;
 
+    /*
+     * the IPC key
+     */
+    private $_cache_file_tok = -1;
+
     /**
-     * Constructor
+     * open a cache object
      *
      * @param string  $cache_file path to a file to use for cache storage
      * @param integer $size       the size of the shared memory segment to create
@@ -80,6 +85,7 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
     public function open($cache_file, $size)
     {
         $this->cache_size = $size;
+        $this->cache_file = $cache_file;
 
         //
         // make sure the file exists first
@@ -97,61 +103,19 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
         //
         // convert the filename to a IPC key
         //
-        $this->cache_file = ftok($cache_file, 't');
-        if ($this->cache_file == -1) {
+        $this->_cache_file_tok = ftok($cache_file, 't');
+        if ($this->_cache_file_tok == -1) {
 
             throw new Net_DNS2_Exception(
-                'failed on ftok() file: ' . $cache_file
+                'failed on ftok() file: ' . $this->_cache_file_tok
             );
         }
 
         //
-        // try to open an existing cache
+        // try to open an existing cache; if it doesn't exist, then there's no
+        // cache, and nothing to do.
         //
-        $this->_cache_id = @shmop_open($this->cache_file, 'w', 0, 0);
-        if ($this->_cache_id === false) {
-
-            //
-            // if it fails, then try to create a new segment.
-            //
-            $this->_cache_id = @shmop_open($this->cache_file, 'c', 0644, $this->cache_size);
-
-        } else {
-
-            //
-            // if it opened, but the size of the cache isn't the size we have specified, then the
-            // user has adjusted the size- and we need to handle it.
-            //
-            $allocated = shmop_size($this->_cache_id);
-
-            if ( ($allocated != $this->cache_size) && ($allocated > 0) ) {
-
-                //
-                // read the contents from the cache
-                //
-                $data = trim(shmop_read($this->_cache_id, 0, $allocated));
-                    
-                //
-                // delete the segment
-                //
-                shmop_delete($this->_cache_id);
-
-                //
-                // create segment with the new size
-                //
-                $this->_cache_id = @shmop_open($this->cache_file, 'c', 0644, $this->cache_size);
-                if ($this->_cache_id !== false) {
-
-                    //
-                    // re-store the cached data, but only if it fits.
-                    //
-                    if (strlen($data) <= $this->cache_size) {
-
-                        shmop_write($this->_cache_id, $data, 0);
-                    }
-                }
-            }
-        }
+        $this->_cache_id = @shmop_open($this->_cache_file_tok, 'w', 0, 0);
         if ($this->_cache_id !== false) {
 
             //
@@ -162,9 +126,9 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
             if ($allocated > 0) {
             
                 //
-                // read the data from teh shared memory segment
+                // read the data from the shared memory segment
                 //
-                $data = trim(shmop_read($this->_cache_id, 0, 0));
+                $data = trim(shmop_read($this->_cache_id, 0, $allocated));
                 if ( ($data !== false) && (strlen($data) > 0) ) {
 
                     //
@@ -178,11 +142,6 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
                     $this->clean();
                 }
             }
-        } else {
-
-            throw new Net_DNS2_Exception(
-                'failed to shmop_open() file: ' . $cache_file
-            );
         }
     }
 
@@ -194,16 +153,114 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
      */
     public function __destruct()
     {
-        $data = $this->resize();
-        if (!is_null($data)) {
+        $fp = fopen($this->cache_file, "r");
+        if ($fp !== false) {
 
-            $o = shmop_write($this->_cache_id, $data, 0);
-        } else {
+            //
+            // lock the file
+            //
+            flock($fp, LOCK_EX);
 
-            $o = shmop_write($this->_cache_id, "", 0);
+            //
+            // check to see if we have an open shm segment
+            //
+            if ($this->_cache_id === false) {
+
+                //
+                // try opening it again, incase it was created by another
+                // process in the mean time
+                //
+                $this->_cache_id = @shmop_open(
+                    $this->_cache_file_tok, 'w', 0, 0
+                );
+                if ($this->_cache_id === false) {
+
+                    //
+                    // otherwise, create it.
+                    //
+                    $this->_cache_id = @shmop_open(
+                        $this->_cache_file_tok, 'c', 0, $this->cache_size
+                    );
+                }
+            }
+
+            //
+            // get the size allocated to the segment
+            //
+            $allocated = shmop_size($this->_cache_id);
+
+            //
+            // read the contents
+            //
+            $data = trim(shmop_read($this->_cache_id, 0, $allocated));
+
+            //
+            // if there was some data
+            //    
+            if ( ($data !== false) && (strlen($data) > 0) ) {
+
+                //
+                // unserialize and store the data
+                //
+                $this->cache_data = array_merge(
+                    $this->cache_data, @unserialize($data)
+                );
+            }
+
+            //
+            // if the size allocated to the segment, is different than 
+            // our cache_size setting, then the size changed, and we need to 
+            // re-crate it before writing the content.
+            //
+            if ( ($allocated != $this->cache_size) && ($allocated > 0) ) {
+
+                //
+                // delete the segment
+                //
+                shmop_delete($this->_cache_id);
+
+                //
+                // create segment with the new size
+                //
+                $this->_cache_id = @shmop_open(
+                    $this->_cache_file_tok, 'c', 0644, $this->cache_size
+                );
+                if ($this->_cache_id === false)
+                {
+                    //
+                    // not much to do here
+                    //
+                    return;
+                }
+            }
+
+            //
+            // clean up and write the data
+            //
+            $data = $this->resize();
+            if (!is_null($data)) {
+
+                $o = shmop_write($this->_cache_id, $data, 0);
+            } else {
+
+                $o = shmop_write($this->_cache_id, "", 0);
+            }
+
+            //
+            // close the segment
+            //
+            shmop_close($this->_cache_id);
+
+            //
+            // unlock
+            //
+            flock($fp, LOCK_UN);
+
+            //
+            // close the file
+            //
+            fclose($fp);
         }
-
-        shmop_close($this->_cache_id);
     }
 };
 

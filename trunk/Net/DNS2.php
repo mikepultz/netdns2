@@ -122,9 +122,9 @@ class Net_DNS2
     public $search_list = array();
 
     /*
-     * use the local shared memory cache (true/false)
+     * enable cache; either "shared", "file" or "none"
      */
-    public $use_cache = true;
+    public $cache_type = "shared";
 
     /*
      * file name to use for shared memory segment or file cache
@@ -166,6 +166,11 @@ class Net_DNS2
      */
     private $_last_socket_error = '';
 
+    /*
+     * internal setting for enabling cache
+     */
+    public $_use_cache = false;
+
     /**
      * Constructor - base constructor for the Resolver and Updater
      *
@@ -203,15 +208,34 @@ class Net_DNS2
         // if we're set to use the local shared memory cache, then
         // make sure it's been initialized
         //
-        if ($this->use_cache == true) {
+        switch($this->cache_type) {
+            case 'shared':
+                if (extension_loaded("shmop")) {
 
-            if (extension_loaded("shmop")) {
+                    $this->cache = new Net_DNS2_Cache_Shm;
+                    $this->_use_cache = true;
+                } else {
 
-                $this->cache = new Net_DNS2_Cache_Shm;
-            } else {
+                    throw new Net_DNS2_Exception(
+                        'shmop library is not available for cache'
+                    );
+                }
+                break;
+            case 'file':
 
                 $this->cache = new Net_DNS2_Cache_File;
-            }
+                $this->_use_cache = true;
+
+                break;  
+            case 'none':
+                $this->_use_cache = false;
+                break;
+            default:
+
+                throw new Net_DNS2_Exception(
+                    'un-supported cache type: ' . $this->cache_type
+                );
+                break;
         }
     }
 

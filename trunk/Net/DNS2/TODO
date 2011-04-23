@@ -6,15 +6,15 @@ Net_DNS2 TODO List
 
 - handle IPv6 in PTR records
 
-- support some simple caching
-    - cache on disk or in shared memory so it can be used between multiple requests
-    - enable/disable by config option
-    - cache by request, and use TTL on response to invalidate the cache
-    - use a simple format like md5(serialized request object) => serialized response object.
-
 - add more detailed documentation with lots of examples.
 
 - make a patch to net_dnsbl to use net_dns2 and see if it's any faster
+
+DONE - support some simple caching
+    DONE - cache on disk or in shared memory so it can be used between multiple requests
+    DONE - enable/disable by config option
+    DONE - cache by request, and use TTL on response to invalidate the cache
+    DONE - use a simple format like md5(serialized request object) => serialized response object.
 
 DONE - go through all the code and figure out what the lowest possible PHP version we can
   support is
