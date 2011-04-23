@@ -364,7 +364,8 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             //
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
                 //
-                // DSA won't work in PHP until the OpenSSL extension has better DSA support
+                // DSA won't work in PHP until the OpenSSL extension has 
+                // better DSA support
                 //
             case Net_DNS2_Lookups::DSNSEC_ALGORITHM_RSASHA1NSEC3SHA1:
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
@@ -378,7 +379,9 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             //
             // sign the data
             //
-            if (openssl_sign($sigdata, $this->signature, $this->private_key->instance, $algorithm) == false) {
+            if (openssl_sign(
+                $sigdata, $this->signature, $this->private_key->instance, $algorithm
+            ) == false) {
 
                 throw new Net_DNS2_Exception(openssl_error_string());
             }

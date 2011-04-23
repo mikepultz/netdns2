@@ -131,9 +131,9 @@ class Net_DNS2_Resolver extends Net_DNS2
         // if caching is turned on, then check then hash the question, and
         // do a cache lookup.
         //
-        $packet_hash = "";
+        $packet_hash = '';
 
-        if ($this->_use_cache == true) {
+        if ($this->use_cache == true) {
     
             //
             // open the cache
@@ -143,7 +143,9 @@ class Net_DNS2_Resolver extends Net_DNS2
             //
             // build the key and check for it in the cache.
             //
-            $packet_hash = md5($packet->question[0]->qname . '|' . $packet->question[0]->qtype);
+            $packet_hash = md5(
+                $packet->question[0]->qname . '|' . $packet->question[0]->qtype
+            );
 
             if ($this->cache->has($packet_hash)) {
 
@@ -154,8 +156,10 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         // send the packet and get back the response
         //
-        $response = $this->sendPacket($packet, ($type == 'AXFR') ? true : $this->use_tcp);
-        if ($this->_use_cache == true) {
+        $response = $this->sendPacket(
+            $packet, ($type == 'AXFR') ? true : $this->use_tcp
+        );
+        if ($this->use_cache == true) {
 
             $this->cache->put($packet_hash, $response);
         }

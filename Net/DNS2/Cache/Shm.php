@@ -80,6 +80,7 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
      *
      * @throws Net_DNS2_Exception
      * @access public
+     * @return void
      *
      */
     public function open($cache_file, $size)
@@ -225,8 +226,8 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
                 $this->_cache_id = @shmop_open(
                     $this->_cache_file_tok, 'c', 0644, $this->cache_size
                 );
-                if ($this->_cache_id === false)
-                {
+                if ($this->_cache_id === false) {
+
                     //
                     // not much to do here
                     //

@@ -120,7 +120,8 @@ class Net_DNS2_Updater extends Net_DNS2
             
             throw new InvalidArgumentException(
                 'name provided (' . $name . ') does not match zone name (' .
-                $this->_packet->question[0]->qname . ')');
+                $this->_packet->question[0]->qname . ')'
+            );
         }
     
         return true;
@@ -228,7 +229,8 @@ class Net_DNS2_Updater extends Net_DNS2
         if (!isset($class)) {
 
             throw new InvalidArgumentException(
-                'unknown or un-supported resource record type: ' . $type);
+                'unknown or un-supported resource record type: ' . $type
+            );
         }
     
         $rr = new $class;
@@ -318,7 +320,8 @@ class Net_DNS2_Updater extends Net_DNS2
         if (!isset($class)) {
 
             throw new InvalidArgumentException(
-                'unknown or un-supported resource record type: ' . $type);
+                'unknown or un-supported resource record type: ' . $type
+            );
         }
     
         $rr = new $class;
@@ -403,7 +406,8 @@ class Net_DNS2_Updater extends Net_DNS2
         if (!isset($class)) {
 
             throw new InvalidArgumentException(
-                'unknown or un-supported resource record type: ' . $type);
+                'unknown or un-supported resource record type: ' . $type
+            );
         }
     
         $rr = new $class;

@@ -157,7 +157,8 @@ class Net_DNS2_Question
         if ($packet->rdlength < ($packet->offset + 4)) {
 
             throw new InvalidArgumentException(
-                'invalid question question section: to small');
+                'invalid question question section: to small'
+            );
         }
 
         //
@@ -177,7 +178,8 @@ class Net_DNS2_Question
         if ( (!isset($type_name)) || (!isset($class_name)) ) {
             throw new InvalidArgumentException(
                 'invalid question section: invalid type (' . $type . 
-                ') or class (' . $class . ') specified.');
+                ') or class (' . $class . ') specified.'
+            );
         }
 
         //
@@ -215,7 +217,8 @@ class Net_DNS2_Question
         if ( (!isset($type)) || (!isset($class)) ) {
             throw new InvalidArgumentException(
                 'invalid question section: invalid type (' . $this->qtype . 
-                ') or class (' . $this->qclass . ') specified.');
+                ') or class (' . $this->qclass . ') specified.'
+            );
         }
 
         return $packet->compress($this->qname, $offset) . chr($type << 8) . 
