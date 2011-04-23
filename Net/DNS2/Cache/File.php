@@ -63,20 +63,25 @@
 class Net_DNS2_Cache_File extends Net_DNS2_Cache
 {
     /**
-     * Constructor
+     * open a cache object
      *
      * @param string $cache_file path to a file to use for cache storage
+     * @param integer $size       the size of the shared memory segment to create
      *
      * @throws Net_DNS2_Exception
      * @access public
      *
      */
-    public function __construct($cache_file, $size)
+    public function open($cache_file, $size)
     {
         $this->cache_size = $size;
-
         $this->cache_file = $cache_file;
-        if (file_exists($this->cache_file) == true) {
+
+        //
+        // check that the file exists first
+        //
+        if ( (file_exists($this->cache_file) == true) 
+            && (filesize($this->cache_file) > 0) ) {
 
             //
             // open the file for reading
@@ -106,14 +111,11 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
                 //
                 fclose($fp);
 
-            } else {
-            
-                throw new Net_DNS2_Exception(
-                    'failed to fopen() file: ' . $cache_file
-                );
+                //
+                // clean up the data
+                //
+                $this->clean();
             }
-
-            $this->clean();
         }
     }
 
@@ -125,41 +127,62 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
      */
     public function __destruct()
     {
-        $data = $this->resize();
-        if ($data != NULL) {
+        //
+        // open the file for reading/writing
+        //
+        $fp = fopen($this->cache_file, "a+");
+        if ($fp !== false) {
+                
+            //
+            // lock the file just in case
+            //
+            flock($fp, LOCK_EX);
+        
+            //
+            // seek to the start of the file to read
+            //
+            fseek($fp, 0, SEEK_SET);
 
             //
-            // open the file for writing
+            // read the file contents
             //
-            $fp = fopen($this->cache_file, "w");
-            if ($fp !== false) {
-                
+            $data = @fread($fp, filesize($this->cache_file));
+            if ( ($data !== false) && (strlen($data) > 0) ) {
+
                 //
-                // lock the file just in case
+                // unserialize and store the data
                 //
-                flock($fp, LOCK_EX);
+                $this->cache_data = array_merge(
+                    $this->cache_data, @unserialize($data)
+                );
+            }
+
+            //
+            // trucate the file
+            //
+            ftruncate($fp, 0);
+
+            //
+            // resize the data
+            //
+            $data = $this->resize();
+            if (!is_null($data)) {
 
                 //
                 // write the file contents
                 //
                 fwrite($fp, $data);
-
-                //
-                // unlock
-                //
-                flock($fp, LOCK_UN);
-
-                //
-                // close the file
-                //
-                fclose($fp);
             }
-        } else {
-        
+
             //
-            // clear out the file
+            // unlock
             //
-            file_put_contents($this->cache_file, "");
+            flock($fp, LOCK_UN);
+
+            //
+            // close the file
+            //
+            fclose($fp);
         }
     }
 };

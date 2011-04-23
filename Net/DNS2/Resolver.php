@@ -133,7 +133,7 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         $packet_hash = "";
 
-        if ($this->use_cache == true) {
+        if ($this->_use_cache == true) {
     
             //
             // open the cache
@@ -143,7 +143,8 @@ class Net_DNS2_Resolver extends Net_DNS2
             //
             // build the key and check for it in the cache.
             //
-            $packet_hash = md5(print_r($packet->question, 1));
+            $packet_hash = md5($packet->question[0]->qname . '|' . $packet->question[0]->qtype);
+
             if ($this->cache->has($packet_hash)) {
 
                 return $this->cache->get($packet_hash);
@@ -154,7 +155,7 @@ class Net_DNS2_Resolver extends Net_DNS2
         // send the packet and get back the response
         //
         $response = $this->sendPacket($packet, ($type == 'AXFR') ? true : $this->use_tcp);
-        if ($this->use_cache == true) {
+        if ($this->_use_cache == true) {
 
             $this->cache->put($packet_hash, $response);
         }
