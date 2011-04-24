@@ -1,3 +1,5 @@
+= Resource Records Supported =
+
 === Net_DNS2 Supports the following RR's ===
 
  * A
