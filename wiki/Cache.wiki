@@ -1,12 +1,12 @@
 = Local Cache =
 
-Net_DNS2 includes a built-in local cache to improve query performance. The cache is disabled by default, and can use shared memory, using the shmop PHP extension, or a flat file.
+Net_DNS2 includes a built-in local cache to improve query performance. The cache is disabled by default, and can use shared memory, using the PHP [http://ca2.php.net/manual/en/book.shmop.php Shmop Extension], or a flat file.
 
 The local cache is only used for lookup queries, and is disabled for Updates.
 
 == Shared Memory ==
 
-Net_DNS2 uses the Shmop extension. If you do not have the extension installed, and you specify to use the shared memory cache, Net_DNS2 will throw an exception.
+Net_DNS2 uses the [http://ca2.php.net/manual/en/book.shmop.php Shmop Extension]. If you do not have the extension installed, and you specify to use the shared memory cache, Net_DNS2 will throw an exception.
 
 === Example ===
 
@@ -23,7 +23,7 @@ $r = new Net_DNS2_Resolver(array(
 
 == Flat File ==
 
-Net_DNS2 can use a flat file to store the cache information. The cache_file must be in a location PHP can write to, and has enough space to hold a file *cache_size* bytes big.
+Net_DNS2 can use a flat file to store the cache information. The *cache_file* must be in a location PHP can write to, and has enough space to hold a file *cache_size* bytes big.
 
 === Example ===
 
