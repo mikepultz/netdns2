@@ -51,7 +51,11 @@ $u->update();
 
 == SIG(0) ==
 
-Signing using SIG(0) is more complicated. It requires a private/public key to be generated. Both can be generated using the dnssec-keygen tool. This tool produces both the public key, which will be advertised via the domain zone, and a private key which is based to the signSIG0() function.
+Signing using SIG(0) is more complicated. It requires a private/public key to be generated. Both can be generated using the dnssec-keygen tool. This tool produces both the public key, which will be advertised via the domain zone, and a private key which is passed to the signSIG0() function.
+
+Net_DNS2 uses the PHP [http://ca2.php.net/manual/en/book.openssl.php OpenSSL Extension] to support SIG(0). Net_DNS2 will throw an exception if you try to sign requests using SIG(0) and you do not have openssl installed.
+
+Unfortunately, the openssl extension is somewhat imcomplete in PHP, and therefore Net_DNS2 only supports RSA keys, and cannot support DSA keys.
 
 {{{
 
