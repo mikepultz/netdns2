@@ -1,0 +1,64 @@
+= Net_DNS2 Options =
+
+*nameservers* - _ array, defaults to unset _
+
+An array of IP addresses to use as name servers. If this is unset, Net_DNS2 will default to using the /etc/resolv.conf file.
+
+*use_tcp* - _ boolean, defaults to false._
+
+Tells Net_DNS2 to use TCP instead of UDP for queries. UDP is faster, but is limited in size. Net_DNS2 will automatically use TCP for zone transfers (AFXR) and when a response was truncated.
+
+In the event of a truncated response, Net_DNS2 will switch to TCP, and resend the request.
+
+*dns_port* - _ int, defaults to 53. _
+
+The UDP/TCP port to use when making DNS requests.
+
+*local_host* - _ string, defaults to unset. _
+
+The local IP address to bind to when making outbound requests.
+
+*local_port* - _ int, defaults to unset. _
+
+The local port number to bind to when making outbound requests. *local_host* can be set without this setting, and the system will auto-allocate the port from the ephemeral ports.
+
+*timeout* - _ int, defaults to 5 seconds _
+
+Timeout value to use for socket connections (in seconds)
+
+*ns_random* - _ boolean, defaults to false _
+
+Tells Net_DNS2 to randomize the name servers list each time it's used.
+
+*domain* - _ string, defaults to unset _
+
+The default domain to use for unqualified host names.
+
+*cache_type* - _ string, defaults to 'none' _
+
+Defines the type of cache to use; either 'none' to disable the cache, 'shared' to use the shmop extension, or 'file' to use a flat file.
+
+*cache_file* - _ string, defaults to '/tmp/net_dns2.cache' _
+
+The file to use for the cache. This is used for both the shared memory and file based cached. Net_DNS2 will need to write to this file, so it must have proper permissions.
+
+*cache_size* - _ int, defaults to 10000
+
+The number of bytes Net_DNS2 is allowed to use as a cache- the bigger the better.
+
+== Example Usage ==
+
+{{{
+
+//
+// pass the options directly to the constructor
+//
+$r = new Net_DNS2_Resolver(array(
+
+	'nameservers'	=> array('192.168.0.1', '192.168.0.2'),
+	'use_tcp'	=> true,
+	'cache_type'	=> 'shared',
+	'cache_size'	=> 100000
+));
+
+}}}
