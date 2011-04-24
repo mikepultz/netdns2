@@ -61,7 +61,7 @@ Signing using SIG(0) is more complicated. It requires a private/public key to be
 $u = new Net_DNS2_Updater('example.com', array('nameservers' => array('192.168.0.1')));
 
 //
-// add a TSIG to authenticate the request
+// add a SIG(0) to authenticate the request
 //
 $u->signSIG0('/etc/namedb/Kexample.com.+001+15765.private');
 
@@ -84,7 +84,7 @@ The sign signTSIG() and signSIG0() functions can be use to authenticate zone tra
 $r = new Net_DNS2_Resolver(array('nameservers' => array('192.168.0.1')));
 
 //
-// add a TSIG to authenticate the request
+// add a SIG(0) to authenticate the request
 //
 $r->signSIG0('/etc/namedb/Kexample.com.+001+15765.private');
 
@@ -94,4 +94,3 @@ $r->signSIG0('/etc/namedb/Kexample.com.+001+15765.private');
 $data = $r->query('example.com', 'AXFR');
 
 }}}
-
