@@ -20,9 +20,9 @@ $mx = Net_DNS2_RR::fromString('test.example.com MX 10 mail.google.com');
 $u->add($mx);
 
 //
-// add a TKEY to authentication the request
+// add a TSIG to authenticate the request
 //
-$u->signature('my-key', '9dnf93asdf39fs');
+$u->signTSIG('my-key', '9dnf93asdf39fs');
 
 //
 // execute the request
