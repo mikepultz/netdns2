@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package packagerversion="1.9.0" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
+    http://pear.php.net/dtd/tasks-1.0.xsd
+    http://pear.php.net/dtd/package-2.0
+    http://pear.php.net/dtd/package-2.0.xsd">
+ <name>Net_DNS2</name>
+ <channel>pear.php.net</channel>
+ <summary>PHP5 Resolver library used to communicate with a DNS server.</summary>
+ <description>Provides (roughly) the same functionality as Net_DNS, but using PHP5 objects, exceptions for error handling, better sockets support.
+
+This release is (in most cases) 2x - 10x faster than Net_DNS, as well as includes more RR&apos;s (including DNSSEC RR&apos;s), and improved sockets and streams support.</description>
+ <lead>
+  <name>Mike Pultz</name>
+  <user>mikepultz</user>
+  <email>mike@mikepultz.com</email>
+  <active>yes</active>
+ </lead>
+ <date>2010-12-02</date>
+ <time>00:32:02</time>
+ <version>
+  <release>1.0.1</release>
+  <api>1.0.1</api>
+ </version>
+ <stability>
+  <release>stable</release>
+  <api>stable</api>
+ </stability>
+ <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+ <notes>
+- fixed a problem Sockets and Streams class; was using the wrong shift operators when calculating the size
+- added support for the WKS RR
+- fixed some phpcs issues
+ </notes>
+ <contents>
+  <dir baseinstalldir="/" name="/">
+   <file baseinstalldir="/" md5sum="5fa97a3ee23d36704dca2f10390f43c2" name="Net/DNS2.php" role="php" />
+   <file baseinstalldir="/" md5sum="a727d9616f91480082df263651214acc" name="Net/DNS2/BitMap.php" role="php" />
+   <file baseinstalldir="/" md5sum="605b57298371bb1d2ed9c8fc1dab0a58" name="Net/DNS2/Exception.php" role="php" />
+   <file baseinstalldir="/" md5sum="72f7bd741fcc364de7e7b674f0345896" name="Net/DNS2/Header.php" role="php" />
+   <file baseinstalldir="/" md5sum="e6baacb0c9c6cd647e2f748b5d2fe1ab" name="Net/DNS2/Lookups.php" role="php" />
+   <file baseinstalldir="/" md5sum="3ff289a6b320bbb76f3142c20e8b6298" name="Net/DNS2/Packet.php" role="php" />
+   <file baseinstalldir="/" md5sum="529b29ae96e8ceffc3b0931a04821218" name="Net/DNS2/Question.php" role="php" />
+   <file baseinstalldir="/" md5sum="23f4a1539e0af483c7c3546649c217f4" name="Net/DNS2/Resolver.php" role="php" />
+   <file baseinstalldir="/" md5sum="c5bdf125f9f696283ba134173afb83c6" name="Net/DNS2/RR.php" role="php" />
+   <file baseinstalldir="/" md5sum="e28eb1bdc3a31b2cb3300522059655c3" name="Net/DNS2/Socket.php" role="php" />
+   <file baseinstalldir="/" md5sum="1450a1825e456694a69cc94458351980" name="Net/DNS2/Updater.php" role="php" />
+   <file baseinstalldir="/" md5sum="726b405829e09faad89260f9ff161796" name="Net/DNS2/Packet/Request.php" role="php" />
+   <file baseinstalldir="/" md5sum="8eeea7e7cdcee7713dfd751bdc8cd44c" name="Net/DNS2/Packet/Response.php" role="php" />
+   <file baseinstalldir="/" md5sum="40417cf9c4a4e93fca47899bad9aa920" name="Net/DNS2/RR/A.php" role="php" />
+   <file baseinstalldir="/" md5sum="f23bb925716f99d5823a9fd4f64eb1aa" name="Net/DNS2/RR/AAAA.php" role="php" />
+   <file baseinstalldir="/" md5sum="220b2a6c06474f630377aa35805140e2" name="Net/DNS2/RR/AFSDB.php" role="php" />
+   <file baseinstalldir="/" md5sum="de71e50719f2b236f5cccf2a520b0382" name="Net/DNS2/RR/ANY.php" role="php" />
+   <file baseinstalldir="/" md5sum="74455496a05442d204158fdf20f3655f" name="Net/DNS2/RR/APL.php" role="php" />
+   <file baseinstalldir="/" md5sum="a275a0e6d23f6e13677884ba550c4ffa" name="Net/DNS2/RR/CERT.php" role="php" />
+   <file baseinstalldir="/" md5sum="10974d241c4af5dbd015eafada5155be" name="Net/DNS2/RR/CNAME.php" role="php" />
+   <file baseinstalldir="/" md5sum="f42700434078717e13e21c3e807fc278" name="Net/DNS2/RR/DHCID.php" role="php" />
+   <file baseinstalldir="/" md5sum="45c9999a0810b302727fcae682d7d67a" name="Net/DNS2/RR/DLV.php" role="php" />
+   <file baseinstalldir="/" md5sum="ffa08c06819d54fcc0e71fdaceafc03a" name="Net/DNS2/RR/DNAME.php" role="php" />
+   <file baseinstalldir="/" md5sum="999de34d1c8ee20f325fa715aa21db6b" name="Net/DNS2/RR/DNSKEY.php" role="php" />
+   <file baseinstalldir="/" md5sum="8e8e9caf02d7c5b89579a4bf5b438737" name="Net/DNS2/RR/DS.php" role="php" />
+   <file baseinstalldir="/" md5sum="3c575b22600cbeec57b18f9d4e22da62" name="Net/DNS2/RR/EID.php" role="php" />
+   <file baseinstalldir="/" md5sum="1a3476495eab846028b7fb7d633406a0" name="Net/DNS2/RR/HINFO.php" role="php" />
+   <file baseinstalldir="/" md5sum="2be7a7652ded8d23eb4394f9aa3f829c" name="Net/DNS2/RR/HIP.php" role="php" />
+   <file baseinstalldir="/" md5sum="a03e77c1c860eb2541d1d36ec47908b6" name="Net/DNS2/RR/IPSECKEY.php" role="php" />
+   <file baseinstalldir="/" md5sum="fcc8a5f98c577a89298d88d0601eef56" name="Net/DNS2/RR/ISDN.php" role="php" />
+   <file baseinstalldir="/" md5sum="2a5ac4b379ed680cb0e055732952149e" name="Net/DNS2/RR/KEY.php" role="php" />
+   <file baseinstalldir="/" md5sum="6e478783b0f851d0ca00d42e4b602939" name="Net/DNS2/RR/KX.php" role="php" />
+   <file baseinstalldir="/" md5sum="0113556a6a7993d63129e77634e51999" name="Net/DNS2/RR/LOC.php" role="php" />
+   <file baseinstalldir="/" md5sum="6a74038e46e2b4a8b659b1005975bb65" name="Net/DNS2/RR/MX.php" role="php" />
+   <file baseinstalldir="/" md5sum="2f43ac1c78709b0d280a3e767635009a" name="Net/DNS2/RR/NAPTR.php" role="php" />
+   <file baseinstalldir="/" md5sum="54cb28b4a03250df3b015f093fd16455" name="Net/DNS2/RR/NIMLOC.php" role="php" />
+   <file baseinstalldir="/" md5sum="b6a07bbbc409a348b63d8653ef689d18" name="Net/DNS2/RR/NS.php" role="php" />
+   <file baseinstalldir="/" md5sum="a3032a1e21add130f135b7d7b49de444" name="Net/DNS2/RR/NSAP.php" role="php" />
+   <file baseinstalldir="/" md5sum="97cf3814287002f7a3ed2146805cc72c" name="Net/DNS2/RR/NSEC.php" role="php" />
+   <file baseinstalldir="/" md5sum="da91dacb31079f2ef005d882c5ef8af4" name="Net/DNS2/RR/NSEC3.php" role="php" />
+   <file baseinstalldir="/" md5sum="67e00109d5219bc46c64a1c34c02b38f" name="Net/DNS2/RR/NSEC3PARAM.php" role="php" />
+   <file baseinstalldir="/" md5sum="94078087b7096b051278eafe4e85e02a" name="Net/DNS2/RR/OPT.php" role="php" />
+   <file baseinstalldir="/" md5sum="324c43df28d1c0a0d25a20544fe43a9a" name="Net/DNS2/RR/PTR.php" role="php" />
+   <file baseinstalldir="/" md5sum="6a4827394339baed59bf64cda4908f49" name="Net/DNS2/RR/PX.php" role="php" />
+   <file baseinstalldir="/" md5sum="c248c1328faf32be090af5cd242fe3af" name="Net/DNS2/RR/RP.php" role="php" />
+   <file baseinstalldir="/" md5sum="f76b921ff84446fade427d840388419b" name="Net/DNS2/RR/RRSIG.php" role="php" />
+   <file baseinstalldir="/" md5sum="a4ed002effaf041eb8975dc7a440acb6" name="Net/DNS2/RR/RT.php" role="php" />
+   <file baseinstalldir="/" md5sum="799788dd70916f5251b204946c3d50ff" name="Net/DNS2/RR/SIG.php" role="php" />
+   <file baseinstalldir="/" md5sum="f076c76368f77bb17526485ede7517c8" name="Net/DNS2/RR/SOA.php" role="php" />
+   <file baseinstalldir="/" md5sum="44166e6e876735f30d292ce8ecd5d5a7" name="Net/DNS2/RR/SPF.php" role="php" />
+   <file baseinstalldir="/" md5sum="4f7cbed6e5353b96c4f2ff12229ab0bd" name="Net/DNS2/RR/SRV.php" role="php" />
+   <file baseinstalldir="/" md5sum="520753faaf4473013ff440045e2691c3" name="Net/DNS2/RR/SSHFP.php" role="php" />
+   <file baseinstalldir="/" md5sum="b5f2f2898495a7cb6700f427ae64b385" name="Net/DNS2/RR/TKEY.php" role="php" />
+   <file baseinstalldir="/" md5sum="18613b847e0833522ecc36ce0b7b36b7" name="Net/DNS2/RR/TSIG.php" role="php" />
+   <file baseinstalldir="/" md5sum="77fed784acbf0533a78aaf9492a2f9f9" name="Net/DNS2/RR/TXT.php" role="php" />
+   <file baseinstalldir="/" md5sum="f5c8455cd876b15790f5b40a72ea082e" name="Net/DNS2/RR/WKS.php" role="php" />
+   <file baseinstalldir="/" md5sum="f68c3ef193bb286c990c88879b5678a0" name="Net/DNS2/RR/X25.php" role="php" />
+   <file baseinstalldir="/" md5sum="5afd7cef5683e1e6de51faa8dc05c64c" name="Net/DNS2/Socket/Sockets.php" role="php" />
+   <file baseinstalldir="/" md5sum="131ce86d2259d1e0803890b8f583f761" name="Net/DNS2/Socket/Streams.php" role="php" />
+  </dir>
+ </contents>
+ <dependencies>
+  <required>
+   <php>
+    <min>5.1.0</min>
+   </php>
+   <pearinstaller>
+    <min>1.4.0a12</min>
+   </pearinstaller>
+  </required>
+ </dependencies>
+ <phprelease />
+ <changelog>
+  <release>
+   <version>
+    <release>0.6.0</release>
+    <api>0.6.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2010-09-26</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+Initial Beta release of Net_DNS2
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.0.0</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>beta</api>
+   </stability>
+   <date>2010-10-25</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- finished support for the OPT, APL, and the HIP RR
+- fixed a small bug in the Net_DNS2_RR::fromString method when parsing strings. apparently PHP doesn&apos;t think that 0 is numeric sometimes
+- updated the @since value for all the files; it was set with the incorrect version.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.0.1</release>
+    <api>1.0.1</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2010-12-02</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- fixed a problem Sockets and Streams class; was using the wrong shift operators when calculating the size
+- added support for the WKS RR
+- fixed some phpcs issues
+   </notes>
+  </release>
+ </changelog>
+</package>
