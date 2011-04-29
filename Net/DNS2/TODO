@@ -8,8 +8,6 @@ Net_DNS2 TODO List
 
 - add more detailed documentation with lots of examples.
 
-- make a patch to net_dnsbl to use net_dns2 and see if it's any faster
-
 DONE - support some simple caching
     DONE - cache on disk or in shared memory so it can be used between multiple requests
     DONE - enable/disable by config option

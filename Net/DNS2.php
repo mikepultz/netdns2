@@ -78,7 +78,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = '1.1.0';
+    const VERSION = '1.1.1';
 
     /*
      * the default path to a resolv.conf file
@@ -249,7 +249,14 @@ class Net_DNS2
      */
     static public function autoload($name)
     {
-        include str_replace('_', '/', $name) . '.php';
+        //
+        // only auto-load "our" classes
+        //
+        if (strncmp($name, "Net_DNS2", 8) == 0)
+        {
+            include str_replace('_', '/', $name) . '.php';
+        }
+
         return;
     }
 
