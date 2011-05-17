@@ -122,7 +122,7 @@ class Net_DNS2_Packet
     /*
      * array of compressed labeles
      */
-    private $_compressed = array();
+    public $compressed = array();
 
     /**
      * magic __toString() method to return the Net_DNS2_Packet as a string
@@ -209,13 +209,13 @@ class Net_DNS2_Packet
 
             $dname = join('.', $names);
 
-            if (isset($this->_compressed[$dname])) {
+            if (isset($this->compressed[$dname])) {
 
-                $compname .= pack('n', 0xc000 | $this->_compressed[$dname]);
+                $compname .= pack('n', 0xc000 | $this->compressed[$dname]);
                 break;
             }
 
-            $this->_compressed[$dname] = $offset;
+            $this->compressed[$dname] = $offset;
 
             $first = array_shift($names);
             $length = strlen($first);
