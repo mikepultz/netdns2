@@ -112,7 +112,7 @@ class Net_DNS2_Header
             $this->set($packet);
         } else {
 
-            $this->id       = $this->_nextPacketId();
+            $this->id       = $this->nextPacketId();
             $this->qr       = Net_DNS2_Lookups::QR_QUERY;
             $this->opcode   = Net_DNS2_Lookups::OPCODE_QUERY;
             $this->aa       = 0;
@@ -132,10 +132,10 @@ class Net_DNS2_Header
      * returns the next available packet id
      *
      * @return    integer
-     * @access    private
+     * @access    public
      *
      */
-    private function _nextPacketId()
+    public function nextPacketId()
     {
         if (++Net_DNS2_Lookups::$next_packet_id > 65535) {
 
