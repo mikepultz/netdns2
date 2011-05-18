@@ -15,11 +15,11 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2011-05-07</date>
- <time>12:29:35</time>
+ <date>2011-05-18</date>
+ <time>16:19:25</time>
  <version>
-  <release>1.1.1</release>
-  <api>1.1.1</api>
+  <release>1.1.2</release>
+  <api>1.1.2</api>
  </version>
  <stability>
   <release>stable</release>
@@ -27,23 +27,23 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
  <notes>
-- fixed a bug in the autoload function; if you had another autoload function defined, and tried to load a class with an _ in the name, it would fail.
+- fixed a bug in the Net_DNS2_Updater class; I wasn&apos;t resetting the internal packet request values, so in some cases making more than one request on the same instance would fail.
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
-   <file baseinstalldir="/" md5sum="d572bc70089297b8299de7c8cb2dc712" name="Net/DNS2.php" role="php" />
+   <file baseinstalldir="/" md5sum="f7b297f48f2979a24b0a629f8f849d72" name="Net/DNS2.php" role="php" />
    <file baseinstalldir="/" md5sum="7f51e5dfe68dcd753c6b1cba5733331d" name="Net/DNS2/BitMap.php" role="php" />
    <file baseinstalldir="/" md5sum="7bddef407168a8d983ef360a863d4e41" name="Net/DNS2/Cache.php" role="php" />
    <file baseinstalldir="/" md5sum="605b57298371bb1d2ed9c8fc1dab0a58" name="Net/DNS2/Exception.php" role="php" />
-   <file baseinstalldir="/" md5sum="72f7bd741fcc364de7e7b674f0345896" name="Net/DNS2/Header.php" role="php" />
+   <file baseinstalldir="/" md5sum="4b544768ca47978597611aebd61b06b9" name="Net/DNS2/Header.php" role="php" />
    <file baseinstalldir="/" md5sum="2f69f7786dd46d7b36a87725d3dd1c3f" name="Net/DNS2/Lookups.php" role="php" />
-   <file baseinstalldir="/" md5sum="9018235c0d18fa5c15485f6c9a142d1e" name="Net/DNS2/Packet.php" role="php" />
+   <file baseinstalldir="/" md5sum="810e54395058f25c48544889ace46add" name="Net/DNS2/Packet.php" role="php" />
    <file baseinstalldir="/" md5sum="b4c490b581209eefe31d721ed57e2dbf" name="Net/DNS2/PrivateKey.php" role="php" />
    <file baseinstalldir="/" md5sum="367474a5bfdfc399361b7631e83bb7cf" name="Net/DNS2/Question.php" role="php" />
    <file baseinstalldir="/" md5sum="a952838e4ddb417e4837b10dfce7d9f0" name="Net/DNS2/Resolver.php" role="php" />
    <file baseinstalldir="/" md5sum="d0ad1a6d9bc5afb7405813e62f52c757" name="Net/DNS2/RR.php" role="php" />
    <file baseinstalldir="/" md5sum="e28eb1bdc3a31b2cb3300522059655c3" name="Net/DNS2/Socket.php" role="php" />
-   <file baseinstalldir="/" md5sum="93fc748ea5fefc072949acf62e57da4d" name="Net/DNS2/Updater.php" role="php" />
+   <file baseinstalldir="/" md5sum="0eb901fba499451abd5de26322f8a367" name="Net/DNS2/Updater.php" role="php" />
    <file baseinstalldir="/" md5sum="692472c4efcef2903f92060cc0ba738e" name="Net/DNS2/Cache/File.php" role="php" />
    <file baseinstalldir="/" md5sum="2e1632e4a5e1780a3e764aa6b4c07e35" name="Net/DNS2/Cache/Shm.php" role="php" />
    <file baseinstalldir="/" md5sum="37778c8ee6a0636c270b2965fc9a2082" name="Net/DNS2/Packet/Request.php" role="php" />
@@ -189,6 +189,21 @@ Initial Beta release of Net_DNS2
    <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
    <notes>
 - fixed a bug in the autoload function; if you had another autoload function defined, and tried to load a class with an _ in the name, it would fail.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.1.2</release>
+    <api>1.1.2</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2011-05-18</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- fixed a bug in the Net_DNS2_Updater class; I wasn&apos;t resetting the internal packet request values, so in some cases making more than one request on the same instance would fail.
    </notes>
   </release>
  </changelog>
