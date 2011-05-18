@@ -122,7 +122,7 @@ class Net_DNS2_Packet
     /*
      * array of compressed labeles
      */
-    public $compressed = array();
+    private $_compressed = array();
 
     /**
      * magic __toString() method to return the Net_DNS2_Packet as a string
@@ -209,13 +209,13 @@ class Net_DNS2_Packet
 
             $dname = join('.', $names);
 
-            if (isset($this->compressed[$dname])) {
+            if (isset($this->_compressed[$dname])) {
 
-                $compname .= pack('n', 0xc000 | $this->compressed[$dname]);
+                $compname .= pack('n', 0xc000 | $this->_compressed[$dname]);
                 break;
             }
 
-            $this->compressed[$dname] = $offset;
+            $this->_compressed[$dname] = $offset;
 
             $first = array_shift($names);
             $length = strlen($first);
@@ -387,6 +387,27 @@ class Net_DNS2_Packet
         return true;
     }
 
+    /**
+     * resets the values in the current packet object
+     *
+     * @return boolean
+     * @access public
+     *
+     */
+    public function reset()
+    {
+        $this->header->id   = $this->header->nextPacketId();
+        $this->rdata        = '';
+        $this->rdlength     = 0;
+        $this->offset       = 0;
+        $this->answer       = array();
+        $this->authority    = array();
+        $this->additional   = array();
+        $this->_compressed  = array();
+    
+        return true;
+    }
+    
     /**
      * formats an IPv6 IP address in the preferred format
      *

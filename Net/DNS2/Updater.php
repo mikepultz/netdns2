@@ -565,14 +565,7 @@ class Net_DNS2_Updater extends Net_DNS2
         // clear the internal packet so if we make another request, we don't have
         // old data being sent.
         //
-        $this->_packet->header->id  = $this->_packet->header->nextPacketId();
-        $this->_packet->rdata       = '';
-        $this->_packet->rdlength    = 0;
-        $this->_packet->offset      = 0;
-        $this->_packet->answer      = array();
-        $this->_packet->authority   = array();
-        $this->_packet->additional  = array();
-        $this->_packet->compressed  = array();
+        $this->_packet->reset();
 
         //
         // for updates, we just need to know it worked- we don't actualy need to
