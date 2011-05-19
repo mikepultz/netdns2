@@ -302,14 +302,20 @@ class Net_DNS2
                     
                     $line = trim($line);
 
-                    if (strlen($line) == 0) {
+                    //
+                    // ignore empty lines, and lines that are commented out
+                    //
+                    if ( (strlen($line) == 0) 
+                        || ($line[0] == '#') 
+                        || ($line[0] == ';')
+                    ) {
                         continue;
                     }
 
                     list($key, $value) = preg_split('/\s+/', $line, 2);
 
-                    $key     = trim(strtolower($key));
-                    $value    = trim(strtolower($value));
+                    $key    = trim(strtolower($key));
+                    $value  = trim(strtolower($value));
 
                     switch($key) {
                     case 'nameserver':
