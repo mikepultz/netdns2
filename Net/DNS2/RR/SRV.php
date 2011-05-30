@@ -102,7 +102,7 @@ class Net_DNS2_RR_SRV extends Net_DNS2_RR
     protected function rrToString()
     {
         return $this->priority . ' ' . $this->weight . ' ' . 
-            $this->port . ' ' . $this->target . '.';
+            $this->port . ' ' . $this->cleanString($this->target) . '.';
     }
 
     /**
@@ -120,7 +120,7 @@ class Net_DNS2_RR_SRV extends Net_DNS2_RR
         $this->weight   = $rdata[1];
         $this->port     = $rdata[2];
 
-        $this->target   = strtolower(trim($rdata[3], '.'));
+        $this->target   = $this->cleanString($rdata[3]);
         
         return true;
     }

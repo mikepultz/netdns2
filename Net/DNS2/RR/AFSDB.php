@@ -88,7 +88,7 @@ class Net_DNS2_RR_AFSDB extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->subtype . ' ' . $this->hostname . '.';
+        return $this->subtype . ' ' . $this->cleanString($this->hostname) . '.';
     }
 
     /**
@@ -103,7 +103,7 @@ class Net_DNS2_RR_AFSDB extends Net_DNS2_RR
     protected function rrFromString(array $rdata)
     {
         $this->subtype  = array_shift($rdata);
-        $this->hostname = array_shift($rdata);
+        $this->hostname = $this->cleanString(array_shift($rdata));
 
         return true;
     }

@@ -123,7 +123,7 @@ class Net_DNS2_RR_NAPTR extends Net_DNS2_RR
             $this->formatString($this->flags) . ' ' . 
             $this->formatString($this->services) . ' ' . 
             $this->formatString($this->regexp) . ' ' . 
-            $this->replacement . '.';
+            $this->cleanString($this->replacement) . '.';
     }
 
     /**
@@ -146,7 +146,7 @@ class Net_DNS2_RR_NAPTR extends Net_DNS2_RR
             $this->flags        = $data[0];
             $this->services     = $data[1];
             $this->regexp       = $data[2];
-            $this->replacement  = $data[3];
+            $this->replacement  = $this->cleanString($data[3]);
         
             return true;
         }

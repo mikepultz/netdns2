@@ -91,9 +91,15 @@ class Net_DNS2_RR_NSAP extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->afi . '.' . $this->idi . '.' . $this->dfi . '.' . $this->aa . 
-            '.' . $this->rsvd . '.' . $this->rd . '.' . $this->area . '.' . 
-            $this->id . '.' . $this->sel;
+        return $this->cleanString($this->afi) . '.' . 
+            $this->cleanString($this->idi) . '.' . 
+            $this->cleanString($this->dfi) . '.' . 
+            $this->cleanString($this->aa) . '.' . 
+            $this->cleanString($this->rsvd) . '.' . 
+            $this->cleanString($this->rd) . '.' . 
+            $this->cleanString($this->area) . '.' . 
+            $this->cleanString($this->id) . '.' . 
+            $this->sel;
     }
 
     /**

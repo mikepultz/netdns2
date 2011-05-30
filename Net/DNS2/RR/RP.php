@@ -89,7 +89,8 @@ class Net_DNS2_RR_RP extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->mboxdname . '. ' . $this->txtdname . '.';
+        return $this->cleanString($this->mboxdname) . '. ' . 
+            $this->cleanString($this->txtdname) . '.';
     }
 
     /**
@@ -103,8 +104,8 @@ class Net_DNS2_RR_RP extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $this->mboxdname    = strtolower(trim($rdata[0], '.'));
-        $this->txtdname     = strtolower(trim($rdata[1], '.'));
+        $this->mboxdname    = $this->cleanString($rdata[0]);
+        $this->txtdname     = $this->cleanString($rdata[1]);
 
         return true;
     }
