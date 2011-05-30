@@ -126,10 +126,10 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        $out = $this->algorithm . '. ' . $this->mode;
+        $out = $this->cleanString($this->algorithm) . '. ' . $this->mode;
         if ($this->key_size > 0) {
 
-            $out .= ' ' . $this->key_data . '.';
+            $out .= ' ' . trim($this->key_data, '.') . '.';
         } else {
 
             $out .= ' .';
@@ -152,7 +152,7 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
         //
         // data passed in is assumed: <algorithm> <mode> <key>
         //
-        $this->algorithm    = strtolower(trim(array_shift($rdata), '.'));
+        $this->algorithm    = $this->cleanString(array_shift($rdata));
         $this->mode         = array_shift($rdata);
         $this->key_data     = trim(array_shift($rdata), '.');
 

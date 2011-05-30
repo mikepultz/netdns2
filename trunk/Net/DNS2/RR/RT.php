@@ -88,7 +88,8 @@ class Net_DNS2_RR_RT extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->preference . ' ' . $this->intermediatehost . '.';
+        return $this->preference . ' ' . 
+            $this->cleanString($this->intermediatehost) . '.';
     }
 
     /**
@@ -103,7 +104,7 @@ class Net_DNS2_RR_RT extends Net_DNS2_RR
     protected function rrFromString(array $rdata)
     {
         $this->preference       = $rdata[0];
-        $this->intermediatehost = strtolower(trim($rdata[1], '.'));
+        $this->intermediatehost = $this->cleanString($rdata[1]);
 
         return true;
     }

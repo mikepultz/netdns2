@@ -81,7 +81,7 @@ class Net_DNS2_RR_NS extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->nsdname . '.';
+        return $this->cleanString($this->nsdname) . '.';
     }
 
     /**
@@ -95,7 +95,7 @@ class Net_DNS2_RR_NS extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $this->nsdname = array_shift($rdata);
+        $this->nsdname = $this->cleanString(array_shift($rdata));
         return true;
     }
 

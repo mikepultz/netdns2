@@ -128,9 +128,10 @@ class Net_DNS2_RR_SOA extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->mname . '. ' . $this->rname . '. ' . $this->serial . ' ' . 
-            $this->refresh . ' ' . $this->retry . ' ' . $this->expire . ' ' . 
-            $this->minimum;
+        return $this->cleanString($this->mname) . '. ' . 
+            $this->cleanString($this->rname) . '. ' . 
+            $this->serial . ' ' . $this->refresh . ' ' . $this->retry . ' ' . 
+            $this->expire . ' ' . $this->minimum;
     }
 
     /**
@@ -144,8 +145,8 @@ class Net_DNS2_RR_SOA extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $this->mname    = strtolower(trim($rdata[0], '.'));
-        $this->rname    = strtolower(trim($rdata[1], '.'));
+        $this->mname    = $this->cleanString($rdata[0]);
+        $this->rname    = $this->cleanString($rdata[1]);
 
         $this->serial   = $rdata[2];
         $this->refresh  = $rdata[3];

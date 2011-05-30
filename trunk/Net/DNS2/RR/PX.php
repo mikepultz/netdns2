@@ -96,7 +96,8 @@ class Net_DNS2_RR_PX extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->preference . ' ' . $this->map822 . '. ' . $this->mapx400 . '.';
+        return $this->preference . ' ' . $this->cleanString($this->map822) . '. ' . 
+            $this->cleanString($this->mapx400) . '.';
     }
 
     /**
@@ -111,8 +112,8 @@ class Net_DNS2_RR_PX extends Net_DNS2_RR
     protected function rrFromString(array $rdata)
     {
         $this->preference   = $rdata[0];
-        $this->map822       = strtolower(trim($rdata[1], '.'));
-        $this->mapx400      = strtolower(trim($rdata[2], '.'));
+        $this->map822       = $this->cleanString($rdata[1]);
+        $this->mapx400      = $this->cleanString($rdata[2]);
 
         return true;
     }

@@ -169,7 +169,8 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
         return $this->typecovered . ' ' . $this->algorithm . ' ' . 
             $this->labels . ' ' . $this->origttl . ' ' .
             $this->sigexp . ' ' . $this->sigincep . ' ' . 
-            $this->keytag . ' ' . $this->signname . '. ' . $this->signature;
+            $this->keytag . ' ' . $this->cleanString($this->signname) . '. ' . 
+            $this->signature;
     }
 
     /**
@@ -190,7 +191,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
         $this->sigexp       = array_shift($rdata);
         $this->sigincep     = array_shift($rdata);
         $this->keytag       = array_shift($rdata);
-        $this->signname     = strtolower(trim(array_shift($rdata), '.'));
+        $this->signname     = $this->cleanString(array_shift($rdata));
 
         foreach ($rdata as $line) {
 

@@ -444,6 +444,21 @@ abstract class Net_DNS2_RR
     }
 
     /**
+     * cleans up some RR data
+     * 
+     * @param string $data the text string to clean
+     *
+     * @return string returns the cleaned string
+     *
+     * @access public
+     *
+     */
+    public function cleanString($data)
+    {
+        return strtolower(rtrim($data, '.'));
+    }
+
+    /**
      * parses a standard RR format lines, as defined by rfc1035 (kinda)
      *
      * In our implementation, the domain *must* be specified- format must be

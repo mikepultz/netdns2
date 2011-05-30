@@ -166,7 +166,10 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // add the RR to the "update" section
         //
-        $this->_packet->authority[] = $rr;
+        if (!in_array($rr, $this->_packet->authority)) {
+            $this->_packet->authority[] = $rr;
+        }
+
         return true;
     }
 
@@ -197,7 +200,10 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // add the RR to the "update" section
         //
-        $this->_packet->authority[] = $rr;
+        if (!in_array($rr, $this->_packet->authority)) {
+            $this->_packet->authority[] = $rr;
+        }
+
         return true;
     }
 
@@ -244,7 +250,10 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // add the RR to the "update" section
         //
-        $this->_packet->authority[] = $rr;
+        if (!in_array($rr, $this->_packet->authority)) {
+            $this->_packet->authority[] = $rr;
+        }
+
         return true;
     }
 
@@ -285,7 +294,10 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // add the RR to the "update" section
         //
-        $this->_packet->authority[] = $rr;
+        if (!in_array($rr, $this->_packet->authority)) {
+            $this->_packet->authority[] = $rr;
+        }
+
         return true;
     }
 
@@ -335,7 +347,10 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // add the RR to the "prerequisite" section
         //
-        $this->_packet->answer[] = $rr;
+        if (!in_array($rr, $this->_packet->answer)) {
+            $this->_packet->answer[] = $rr;
+        }
+
         return true;
     }
 
@@ -370,7 +385,10 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // add the RR to the "prerequisite" section
         //
-        $this->_packet->answer[] = $rr;
+        if (!in_array($rr, $this->_packet->answer)) {
+            $this->_packet->answer[] = $rr;
+        }
+
         return true;
     }
 
@@ -421,7 +439,10 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // add the RR to the "prerequisite" section
         //
-        $this->_packet->answer[] = $rr;
+        if (!in_array($rr, $this->_packet->answer)) {
+            $this->_packet->answer[] = $rr;
+        }
+
         return true;
     }
 
@@ -467,7 +488,10 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // add the RR to the "prerequisite" section
         //
-        $this->_packet->answer[] = $rr;
+        if (!in_array($rr, $this->_packet->answer)) {
+            $this->_packet->answer[] = $rr;
+        }
+
         return true;
     }
 
@@ -510,7 +534,10 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // add the RR to the "prerequisite" section
         //
-        $this->_packet->answer[] = $rr;
+        if (!in_array($rr, $this->_packet->answer)) {
+            $this->_packet->answer[] = $rr;
+        }
+
         return true;
     }
 

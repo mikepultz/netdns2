@@ -81,7 +81,7 @@ class Net_DNS2_RR_DNAME extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->dname . '.';
+        return $this->cleanString($this->dname) . '.';
     }
 
     /**
@@ -95,7 +95,7 @@ class Net_DNS2_RR_DNAME extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $this->dname = strtolower(trim(array_shift($rdata), '.'));
+        $this->dname = $this->cleanString(array_shift($rdata));
         return true;
     }
 

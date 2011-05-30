@@ -88,7 +88,8 @@ class Net_DNS2_RR_NSEC extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        $data = $this->next_domain_name . '.';
+        $data = $this->cleanString($this->next_domain_name) . '.';
+
         foreach ($this->type_bit_maps as $rr) {
 
             $data .= ' ' . $rr;
@@ -108,7 +109,7 @@ class Net_DNS2_RR_NSEC extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $this->next_domain_name = strtolower(trim(array_shift($rdata), '.'));
+        $this->next_domain_name = $this->cleanString(array_shift($rdata));
         $this->type_bit_maps = $rdata;
         
         return true;

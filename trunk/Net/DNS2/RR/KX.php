@@ -91,7 +91,7 @@ class Net_DNS2_RR_KX extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->preference . ' ' . $this->exchange . '.';
+        return $this->preference . ' ' . $this->cleanString($this->exchange) . '.';
     }
 
     /**
@@ -105,8 +105,8 @@ class Net_DNS2_RR_KX extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $this->preference   = $rdata[0];
-        $this->exchange     = strtolower(trim($rdata[1], '.'));
+        $this->preference   = array_shift($rdata);
+        $this->exchange     = $this->cleanString(array_shift($rdata));
  
         return true;        
     }
