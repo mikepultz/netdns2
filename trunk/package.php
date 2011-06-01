@@ -25,7 +25,8 @@ $pkg->setAPIVersion('1.1.2');
 $pkg->setReleaseVersion('1.1.2');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
-$pkg->setNotes("- fixed a bug in the Net_DNS2_Updater class; I wasn't resetting the internal packet request values, so in some cases making more than one request on the same instance would fail.\n- Fixed a bug in Net_DNS2; I wasn't handling comments properly when parsing the resolv.conf file.");
+$pkg->setNotes("- fixed a bug in the Net_DNS2_Updater class; I wasn't resetting the internal packet request values, so in some cases making more than one request on the same instance would fail.\n- Fixed a bug in Net_DNS2; I wasn't handling comments properly when parsing the resolv.conf file.\n- check for duplicate entries when adding/deleting entries in the Updater() class; BIND will throw and error if you try to delete the same RR twice in the same request, not sure if this is expected behaviour\n- modified several RR's to clean up the trailing period when it's displayed on hosts.
+");
 $pkg->setPackageType('php');
 $pkg->addRelease();
 $pkg->setPhpDep('5.1.2');
