@@ -107,7 +107,11 @@ class Net_DNS2_RR_AAAA extends Net_DNS2_RR
         //
         // expand out compressed formats
         //
-        $this->address = Net_DNS2_Packet::formatIPv6(array_shift($rdata));
+        $address = array_shift($rdata);
+        if (Net_DNS2::isIPv6($address) == true) {
+
+            $this->address = $address;
+        }
             
         return true;
     }

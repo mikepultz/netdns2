@@ -319,9 +319,20 @@ class Net_DNS2
 
                     switch($key) {
                     case 'nameserver':
-                        if (preg_match('/^[0-9\.]{7,15}$/', $value)) {
+
+                        //
+                        // nameserver can be a IPv4 or IPv6 address
+                        //
+                        if ( (self::isIPv4($value) == true) 
+                            || (self::isIPv6($value) == true)
+                        ) {
 
                             $this->nameservers[] = $value;
+                        } else {
+
+                            throw new Net_DNS2_Exception(
+                                'invalid nameserver entry: ' . $value
+                            );
                         }
                         break;
 
@@ -523,6 +534,91 @@ class Net_DNS2
     }
 
     /**
+     * returns true/false if the given address is a valid IPv4 address
+     *
+     * @param string $_address the IPv4 address to check
+     *
+     * @return boolean returns true/false if the address is IPv4 address
+     * @access public
+     *
+     */
+    public static function isIPv4($_address)
+    {
+        if (filter_var($_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == false) {
+            return false;
+        }
+
+        return true;
+    }
+    
+    /**
+     * returns true/false if the given address is a valid IPv6 address
+     *
+     * @param string $_address the IPv6 address to check
+     *
+     * @return boolean returns true/false if the address is IPv6 address
+     * @access public
+     *
+     */
+    public static function isIPv6($_address)
+    {
+        if (filter_var($_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == false) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * formats the given IPv6 address as a fully expanded IPv6 address
+     *
+     * @param string $_address the IPv6 address to expand
+     *
+     * @return string the fully expanded IPv6 address
+     * @access public
+     *
+     */
+    public static function expandIPv6($_address)
+    {
+        if (strpos($_address, '::') !== false) {
+        
+            $part = explode('::', $_address);
+            $part[0] = explode(':', $part[0]);
+            $part[1] = explode(':', $part[1]);
+        
+            $missing = array();
+        
+            for ($i = 0; $i < (8 - (count($part[0]) + count($part[1]))); $i++) {
+            
+                array_push($missing, '0000');
+            }
+
+            $missing = array_merge($part[0], $missing);
+            $part = array_merge($missing, $part[1]);
+
+        } else {
+        
+            $part = explode(":", $_address);
+        }
+
+        foreach ($part as &$p) {
+            while (strlen($p) < 4) {
+                $p = '0' . $p;
+            }
+        }
+
+        unset($p);
+    
+        $result = implode(':', $part);
+
+        if (strlen($result) == 39) {
+            return $result;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * sends a standard Net_DNS2_Packet_Request packet
      *
      * @param Net_DNS2_Packet $request a Net_DNS2_Packet_Request object
@@ -611,7 +707,7 @@ class Net_DNS2
                             SOCK_STREAM, $ns, $this->dns_port, $this->timeout
                         );
                     }
-                }            
+                }
 
                 //
                 // if a local IP address / port is set, then add it

@@ -78,9 +78,26 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         //
         // create the socket
         //
-        $this->_sock = @socket_create(
-            AF_INET, $this->type, ($this->type == SOCK_STREAM) ? SOL_TCP : SOL_UDP
-        );
+        if (Net_DNS2::isIPv4($this->host) == true) {
+
+            $this->_sock = @socket_create(
+                AF_INET, $this->type, 
+                ($this->type == SOCK_STREAM) ? SOL_TCP : SOL_UDP
+            );
+
+        } else if (Net_DNS2::isIPv6($this->host) == true) {
+        
+            $this->_sock = @socket_create(
+                AF_INET6, $this->type, 
+                ($this->type == SOCK_STREAM) ? SOL_TCP : SOL_UDP
+            );
+
+        } else {
+
+            $this->last_error = 'invalid address type: ' . $this->host;
+            return false;
+        }
+
         if ($this->_sock === false) {
 
             $this->last_error = socket_strerror(socket_last_error());

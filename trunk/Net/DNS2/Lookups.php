@@ -62,11 +62,6 @@
 class Net_DNS2_Lookups
 {
     /*
-     * TODO: move this to a function
-     */
-    const IPV4_REGEX = '/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$/';
-
-    /*
      * size (in bytes) of a header in a standard DNS packet
      */
     const DNS_HEADER_SIZE       = 12;

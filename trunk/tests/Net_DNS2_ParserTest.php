@@ -52,7 +52,7 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             'CNAME'         => 'example.com. 300 IN CNAME www.example.com.',
             'SOA'           => 'example.com. 300 IN SOA ns1.mrdns.com. help.mrhost.ca. 1278700841 900 1800 86400 21400',
             'WKS'           => 'example.com. 300 IN WKS 128.8.1.14 6 21 25',
-            'PTR'           => '26.in-addr.arpa. 300 IN PTR example.com.',
+            'PTR'           => '1.0.0.127.in-addr.arpa. 300 IN PTR localhost.',
             'HINFO'         => 'example.com. 300 IN HINFO PC-Intel-700mhz "Redhat \"Linux\" 7.1"',
             'MX'            => 'example.com. 300 IN MX 10 mx1.mrhost.ca.',
             'TXT'           => 'example.com. 300 IN TXT "first record" "another records" "a third"',
@@ -97,7 +97,11 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             //
             // create a new packet
             //
-            $request = new Net_DNS2_Packet_Request('example.com', $rr, 'IN');
+            if ($rr == 'PTR') {
+                $request = new Net_DNS2_Packet_Request('1.0.0.127.in-addr.arpa', $rr, 'IN');
+            } else {
+                $request = new Net_DNS2_Packet_Request('example.com', $rr, 'IN');
+            }
 
             //
             // parse the line

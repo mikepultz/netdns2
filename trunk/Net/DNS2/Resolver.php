@@ -107,7 +107,7 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         // if the name *looks* too short, then append the domain from the config
         //
-        if (strpos($name, '.') === false) {
+        if ( (strpos($name, '.') === false) && ($type != 'PTR') ) {
 
             $name .= '.' . strtolower($this->domain);
         }

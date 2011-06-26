@@ -415,22 +415,12 @@ class Net_DNS2_Packet
      *
      * @return string The IPv6 IP address formatted in the new format
      * @access public
+     * @deprecated function deprecated in 1.1.3
      *
      */
     public static function formatIPv6($address)
     {
-        if (strpos($address, '::') !== false) {
-        
-            $address = str_replace(
-                '::', str_repeat(':0', 8 - substr_count($address, ':')).':', $address
-            );
-        }
-        if (strpos($address, ':') === 0) {
-            
-            $address = '0' . $address;
-        }
-
-        return $address;
+        return Net_DNS2::expandIPv6($address);
     }
 }
 
