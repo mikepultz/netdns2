@@ -104,7 +104,7 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
         //
         $q = new Net_DNS2_Question();
 
-        $name   = trim($name, " \t\n\r\0\x0B.");
+        $name   = trim(strtolower($name), " \t\n\r\0\x0B.");
         $type   = strtoupper(trim($type));
         $class  = strtoupper(trim($class));
 
@@ -139,14 +139,48 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
         // if it's a PTR request for an IP address, then make sure we tack on 
         // the arpa domain
         //
-        // TODO: handle IPv6
-        // TODO: move to a function
-        //
-        if ( ($type == 'PTR') 
-            && (preg_match(Net_DNS2_Lookups::IPV4_REGEX, $name, $a)) 
-        ) {
-            $name = $a[4] . '.' . $a[3] . '.' . $a[2] . '.' . 
-                $a[1] . '.in-addr.arpa';
+        if ($type == 'PTR') {
+
+            if (Net_DNS2::isIPv4($name) == true) {
+
+                //
+                // IPv4
+                //
+                $name = implode('.', array_reverse(explode('.', $name)));
+                $name .= '.in-addr.arpa';
+
+            } else if (Net_DNS2::isIPv6($name) == true) {
+
+                //
+                // IPv6
+                //
+                $e = Net_DNS2::expandIPv6($name);
+                if ($e !== false) {
+
+                    $name = implode(
+                        '.', array_reverse(str_split(str_replace(':', '', $e)))
+                    );
+
+                    $name .= '.ip6.arpa';
+
+                } else {
+                    throw new InvalidArgumentException(
+                        'unsupported PTR value: ' . $name
+                    );
+                }
+
+            } else if (preg_match('/arpa$/', $name) == true) {
+
+                //
+                // an already formatted IPv4 or IPv6 address in the arpa domain
+                //
+
+            } else {
+
+                throw new InvalidArgumentException(
+                    'unsupported PTR value: ' . $name
+                );
+            }
         }
 
         //

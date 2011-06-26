@@ -181,13 +181,15 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
             break;
 
         case self::GATEWAY_TYPE_IPV4:
-            if (!preg_match(Net_DNS2_Lookups::IPV4_REGEX, $gateway)) {
+            if (Net_DNS2::isIPv4($gateway) == false) {
                 return false;
             }
             break;
 
         case self::GATEWAY_TYPE_IPV6:
-            $gateway = Net_DNS2_Packet::formatIPv6($gateway);
+            if (Net_DNS2::isIPv6($gateway) == false) {
+                return false;
+            }
             break;
 
         case self::GATEWAY_TYPE_DOMAIN:

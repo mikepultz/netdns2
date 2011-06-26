@@ -107,19 +107,51 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 
         switch($this->type) {
         case SOCK_STREAM:
-            $this->_sock = @stream_socket_client(
-                'tcp://' . $this->host . ':' . $this->port, 
-                $errno, $errstr, $this->timeout, 
-                STREAM_CLIENT_CONNECT, $this->_context
-            );
+
+            if (Net_DNS2::isIPv4($this->host) == true) {
+
+                $this->_sock = @stream_socket_client(
+                    'tcp://' . $this->host . ':' . $this->port, 
+                    $errno, $errstr, $this->timeout, 
+                    STREAM_CLIENT_CONNECT, $this->_context
+                );
+            } else if (Net_DNS2::isIPv6($this->host) == true) {
+
+                $this->_sock = @stream_socket_client(
+                    'tcp://[' . $this->host . ']:' . $this->port, 
+                    $errno, $errstr, $this->timeout, 
+                    STREAM_CLIENT_CONNECT, $this->_context
+                );
+            } else {
+
+                $this->last_error = 'invalid address type: ' . $this->host;
+                return false;
+            }
+
             break;
         
         case SOCK_DGRAM:
-            $this->_sock = @stream_socket_client(
-                'udp://' . $this->host . ':' . $this->port, 
-                $errno, $errstr, $this->timeout, 
-                STREAM_CLIENT_CONNECT, $this->_context
-            );
+
+            if (Net_DNS2::isIPv4($this->host) == true) {
+
+                $this->_sock = @stream_socket_client(
+                    'udp://' . $this->host . ':' . $this->port, 
+                    $errno, $errstr, $this->timeout, 
+                    STREAM_CLIENT_CONNECT, $this->_context
+                );
+            } else if (Net_DNS2::isIPv6($this->host) == true) {
+
+                $this->_sock = @stream_socket_client(
+                    'udp://[' . $this->host . ']:' . $this->port, 
+                    $errno, $errstr, $this->timeout, 
+                    STREAM_CLIENT_CONNECT, $this->_context
+                );
+            } else {
+
+                $this->last_error = 'invalid address type: ' . $this->host;
+                return false;
+            }
+
             break;
             
         default:

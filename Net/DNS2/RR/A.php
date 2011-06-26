@@ -96,14 +96,7 @@ class Net_DNS2_RR_A extends Net_DNS2_RR
     {
         $value = array_shift($rdata);
 
-        if (preg_match(Net_DNS2_Lookups::IPV4_REGEX, $value, $matches)) {
-
-            foreach ($matches as $x) {
-
-                if ( ($x < 0) || ($x > 255) ) {
-                    return false;
-                }
-            }
+        if (Net_DNS2::isIPv4($value) == true) {
             
             $this->address = $value;
             return true;

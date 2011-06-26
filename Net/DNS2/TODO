@@ -1,10 +1,9 @@
 Net_DNS2 TODO List
 ------------------
 
-- move the IP (v4 and v6) matching to functions- 
-    - just use inet_ntop/pton()
+DONE - move the IP (v4 and v6) matching to functions- 
 
-- handle IPv6 in PTR records
+DONE - handle IPv6 in PTR records
 
 - add more detailed documentation with lots of examples.
 
