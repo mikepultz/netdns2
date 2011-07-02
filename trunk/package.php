@@ -21,12 +21,11 @@ $pkg->setPackage('Net_DNS2');
 $pkg->setSummary('PHP5 Resolver library used to communicate with a DNS server.');
 $pkg->setDescription("Provides (roughly) the same functionality as Net_DNS, but using PHP5 objects, exceptions for error handling, better sockets support.\n\nThis release is (in most cases) 2x - 10x faster than Net_DNS, as well as includes more RR's (including DNSSEC RR's), and improved sockets and streams support.");
 $pkg->setChannel('pear.php.net');
-$pkg->setAPIVersion('1.1.2');
-$pkg->setReleaseVersion('1.1.2');
+$pkg->setAPIVersion('1.1.3');
+$pkg->setReleaseVersion('1.1.3');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
-$pkg->setNotes("- fixed a bug in the Net_DNS2_Updater class; I wasn't resetting the internal packet request values, so in some cases making more than one request on the same instance would fail.\n- Fixed a bug in Net_DNS2; I wasn't handling comments properly when parsing the resolv.conf file.\n- check for duplicate entries when adding/deleting entries in the Updater() class; BIND will throw and error if you try to delete the same RR twice in the same request, not sure if this is expected behaviour\n- modified several RR's to clean up the trailing period when it's displayed on hosts.
-");
+$pkg->setNotes("- added support for IPv6 DNS servers; from resolv.conf files, and from name server arrays\n- added new IPv4 and IPv6 validation functions, and a IPv6 expand function\n- changed the A, AAAA and IPSECKEY RR's to use the new validation methods\n- added support for IPv6 PTR records\n- dropped the old IPv4 regex from the lookups class\n");
 $pkg->setPackageType('php');
 $pkg->addRelease();
 $pkg->setPhpDep('5.1.2');
