@@ -15,11 +15,11 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2011-07-01</date>
- <time>23:51:23</time>
+ <date>2011-07-25</date>
+ <time>16:40:54</time>
  <version>
-  <release>1.1.3</release>
-  <api>1.1.3</api>
+  <release>1.1.4</release>
+  <api>1.1.4</api>
  </version>
  <stability>
   <release>stable</release>
@@ -27,32 +27,29 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
  <notes>
-- added support for IPv6 DNS servers; from resolv.conf files, and from name server arrays
-- added new IPv4 and IPv6 validation functions, and a IPv6 expand function
-- changed the A, AAAA and IPSECKEY RR&apos;s to use the new validation methods
-- added support for IPv6 PTR records
-- dropped the old IPv4 regex from the lookups class
+- fixed a math issue with the name compress logic; this would somtimes screw up Updates with multiple RR&apos;s
+- added a new test in the test suite, that validates that the domain name compression and expansion works properly
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
-   <file baseinstalldir="/" md5sum="c05db45552374778849e619a56c09eb9" name="Net/DNS2.php" role="php" />
+   <file baseinstalldir="/" md5sum="4fa8db3dc3da396736d0e23bf8198002" name="Net/DNS2.php" role="php" />
    <file baseinstalldir="/" md5sum="7f51e5dfe68dcd753c6b1cba5733331d" name="Net/DNS2/BitMap.php" role="php" />
    <file baseinstalldir="/" md5sum="7bddef407168a8d983ef360a863d4e41" name="Net/DNS2/Cache.php" role="php" />
    <file baseinstalldir="/" md5sum="605b57298371bb1d2ed9c8fc1dab0a58" name="Net/DNS2/Exception.php" role="php" />
-   <file baseinstalldir="/" md5sum="4b544768ca47978597611aebd61b06b9" name="Net/DNS2/Header.php" role="php" />
+   <file baseinstalldir="/" md5sum="173cd63fe13a132e0cd8cf2bdd9a4bde" name="Net/DNS2/Header.php" role="php" />
    <file baseinstalldir="/" md5sum="f042d4c0a179cabcacc2e56f753bbd99" name="Net/DNS2/Lookups.php" role="php" />
-   <file baseinstalldir="/" md5sum="412e42fe02f31bc8a7a77cfa3c53d4bc" name="Net/DNS2/Packet.php" role="php" />
+   <file baseinstalldir="/" md5sum="20eb8023c01f917aa1e676adf6feba56" name="Net/DNS2/Packet.php" role="php" />
    <file baseinstalldir="/" md5sum="b4c490b581209eefe31d721ed57e2dbf" name="Net/DNS2/PrivateKey.php" role="php" />
-   <file baseinstalldir="/" md5sum="367474a5bfdfc399361b7631e83bb7cf" name="Net/DNS2/Question.php" role="php" />
+   <file baseinstalldir="/" md5sum="071e7f8fb7f4dd15e92ae0adc6baf7d6" name="Net/DNS2/Question.php" role="php" />
    <file baseinstalldir="/" md5sum="0183397d6fe5040290b277f3fde8811c" name="Net/DNS2/Resolver.php" role="php" />
-   <file baseinstalldir="/" md5sum="db2de942543ada861792ea9691f9c9b7" name="Net/DNS2/RR.php" role="php" />
+   <file baseinstalldir="/" md5sum="9a55c6ff6fba606f73a4e5c902466397" name="Net/DNS2/RR.php" role="php" />
    <file baseinstalldir="/" md5sum="e28eb1bdc3a31b2cb3300522059655c3" name="Net/DNS2/Socket.php" role="php" />
-   <file baseinstalldir="/" md5sum="ec7d12d133cda2875d55f82180394246" name="Net/DNS2/Updater.php" role="php" />
+   <file baseinstalldir="/" md5sum="85eee56b5cc9dd19db1efadce7e92af5" name="Net/DNS2/Updater.php" role="php" />
    <file baseinstalldir="/" md5sum="692472c4efcef2903f92060cc0ba738e" name="Net/DNS2/Cache/File.php" role="php" />
    <file baseinstalldir="/" md5sum="2e1632e4a5e1780a3e764aa6b4c07e35" name="Net/DNS2/Cache/Shm.php" role="php" />
    <file baseinstalldir="/" md5sum="ebf08894c8006d2291fc8f2ba4f3fe11" name="Net/DNS2/Packet/Request.php" role="php" />
-   <file baseinstalldir="/" md5sum="8eeea7e7cdcee7713dfd751bdc8cd44c" name="Net/DNS2/Packet/Response.php" role="php" />
-   <file baseinstalldir="/" md5sum="7b2e36e53a66c8fe0f397b0bf9414309" name="Net/DNS2/RR/A.php" role="php" />
+   <file baseinstalldir="/" md5sum="2a03bdf505b2f5f05d44714e61caf2a0" name="Net/DNS2/Packet/Response.php" role="php" />
+   <file baseinstalldir="/" md5sum="85293b9b208dc60be2372951e40fc33f" name="Net/DNS2/RR/A.php" role="php" />
    <file baseinstalldir="/" md5sum="864811be71e6488e5ab942d78a35a79a" name="Net/DNS2/RR/AAAA.php" role="php" />
    <file baseinstalldir="/" md5sum="1772b9fa365aa2e9d2a5786b05961856" name="Net/DNS2/RR/AFSDB.php" role="php" />
    <file baseinstalldir="/" md5sum="de71e50719f2b236f5cccf2a520b0382" name="Net/DNS2/RR/ANY.php" role="php" />
@@ -67,14 +64,14 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="8e8e9caf02d7c5b89579a4bf5b438737" name="Net/DNS2/RR/DS.php" role="php" />
    <file baseinstalldir="/" md5sum="3c575b22600cbeec57b18f9d4e22da62" name="Net/DNS2/RR/EID.php" role="php" />
    <file baseinstalldir="/" md5sum="1a3476495eab846028b7fb7d633406a0" name="Net/DNS2/RR/HINFO.php" role="php" />
-   <file baseinstalldir="/" md5sum="2be7a7652ded8d23eb4394f9aa3f829c" name="Net/DNS2/RR/HIP.php" role="php" />
+   <file baseinstalldir="/" md5sum="ebddf820cba140a6cc4860e0ca5892c0" name="Net/DNS2/RR/HIP.php" role="php" />
    <file baseinstalldir="/" md5sum="1425a82c3d7202b755f61559e61ee1b8" name="Net/DNS2/RR/IPSECKEY.php" role="php" />
    <file baseinstalldir="/" md5sum="fcc8a5f98c577a89298d88d0601eef56" name="Net/DNS2/RR/ISDN.php" role="php" />
    <file baseinstalldir="/" md5sum="2a5ac4b379ed680cb0e055732952149e" name="Net/DNS2/RR/KEY.php" role="php" />
    <file baseinstalldir="/" md5sum="3fe456c038d2f8beec0d070cbdf8fef6" name="Net/DNS2/RR/KX.php" role="php" />
    <file baseinstalldir="/" md5sum="0113556a6a7993d63129e77634e51999" name="Net/DNS2/RR/LOC.php" role="php" />
-   <file baseinstalldir="/" md5sum="552017292a23a7d9e305eecbe2c471ac" name="Net/DNS2/RR/MX.php" role="php" />
-   <file baseinstalldir="/" md5sum="dcccc407f0cfddaf8f1daf138d09e460" name="Net/DNS2/RR/NAPTR.php" role="php" />
+   <file baseinstalldir="/" md5sum="26a1f4bccf63d7c5eb711b13cb531a39" name="Net/DNS2/RR/MX.php" role="php" />
+   <file baseinstalldir="/" md5sum="c85be5c2701ae09d0c8f6edf40638f0f" name="Net/DNS2/RR/NAPTR.php" role="php" />
    <file baseinstalldir="/" md5sum="54cb28b4a03250df3b015f093fd16455" name="Net/DNS2/RR/NIMLOC.php" role="php" />
    <file baseinstalldir="/" md5sum="a4e25271ddc9b4fabcc82da473c8405d" name="Net/DNS2/RR/NS.php" role="php" />
    <file baseinstalldir="/" md5sum="d740bd33b2abca28a9f0f4c55ff5b768" name="Net/DNS2/RR/NSAP.php" role="php" />
@@ -86,9 +83,9 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="fd9984a5c288b77b058ab060df5bee1d" name="Net/DNS2/RR/PX.php" role="php" />
    <file baseinstalldir="/" md5sum="2210b98e982097497dacf1c10b476fa7" name="Net/DNS2/RR/RP.php" role="php" />
    <file baseinstalldir="/" md5sum="505416d4bbfb966fb475b446dd4e525c" name="Net/DNS2/RR/RRSIG.php" role="php" />
-   <file baseinstalldir="/" md5sum="b10d863ccb088c15d5e3afb2d608c54a" name="Net/DNS2/RR/RT.php" role="php" />
+   <file baseinstalldir="/" md5sum="ec37ade0ca961d2d5a6f7fe574d44b83" name="Net/DNS2/RR/RT.php" role="php" />
    <file baseinstalldir="/" md5sum="a0a9ba504d41976acc8476337cc2ef8f" name="Net/DNS2/RR/SIG.php" role="php" />
-   <file baseinstalldir="/" md5sum="4b3febea3e13228f7af68a6ac3c7c92a" name="Net/DNS2/RR/SOA.php" role="php" />
+   <file baseinstalldir="/" md5sum="77420770dc120d5f5dd594757f19e08b" name="Net/DNS2/RR/SOA.php" role="php" />
    <file baseinstalldir="/" md5sum="44166e6e876735f30d292ce8ecd5d5a7" name="Net/DNS2/RR/SPF.php" role="php" />
    <file baseinstalldir="/" md5sum="ba225356799452513fff325659733d5d" name="Net/DNS2/RR/SRV.php" role="php" />
    <file baseinstalldir="/" md5sum="520753faaf4473013ff440045e2691c3" name="Net/DNS2/RR/SSHFP.php" role="php" />
@@ -230,6 +227,22 @@ Initial Beta release of Net_DNS2
 - changed the A, AAAA and IPSECKEY RR&apos;s to use the new validation methods
 - added support for IPv6 PTR records
 - dropped the old IPv4 regex from the lookups class
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.1.4</release>
+    <api>1.1.4</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2011-07-25</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- fixed a math issue with the name compress logic; this would somtimes screw up Updates with multiple RR&apos;s
+- added a new test in the test suite, that validates that the domain name compression and expansion works properly
    </notes>
   </release>
  </changelog>
