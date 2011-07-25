@@ -219,6 +219,8 @@ class Net_DNS2_RR_SOA extends Net_DNS2_RR
                 $this->expire, $this->minimum
             );
 
+            $packet->offset += 20;
+
             return $data;
         }
 

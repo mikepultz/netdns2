@@ -152,6 +152,8 @@ class Net_DNS2_RR_RT extends Net_DNS2_RR
         if (strlen($this->intermediatehost) > 0) {
 
             $data = pack('n', $this->preference);
+            $packet->offset += 2;
+
             $data .= $packet->compress($this->intermediatehost, $packet->offset);
 
             return $data;

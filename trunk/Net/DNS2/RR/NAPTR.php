@@ -208,9 +208,9 @@ class Net_DNS2_RR_NAPTR extends Net_DNS2_RR
             $data .= pack('C', strlen($this->services)) . $this->services;
             $data .= pack('C', strlen($this->regexp)) . $this->regexp;
 
-            $data .= $packet->compress(
-                $this->replacement, $packet->offset + strlen($data)
-            );
+            $packet->offset += strlen($data);
+
+            $data .= $packet->compress($this->replacement, $packet->offset);
 
             return $data;
         }

@@ -83,7 +83,7 @@ class Net_DNS2_Packet
     /*
      * the offset pointer used when building/parsing packets
      */
-    public $offset;
+    public $offset = 0;
 
     /*
      * Net_DNS2_Header object with the DNS packet header
@@ -165,23 +165,23 @@ class Net_DNS2_Packet
      */
     public function get()
     {
-        $data = $this->header->get();
+        $data = $this->header->get($this);
 
         foreach ($this->question as $x) {
 
-            $data .= $x->get($this, strlen($data));
+            $data .= $x->get($this);
         }
         foreach ($this->answer as $x) {
 
-            $data .= $x->get($this, strlen($data));
+            $data .= $x->get($this);
         }
         foreach ($this->authority as $x) {
 
-            $data .= $x->get($this, strlen($data));
+            $data .= $x->get($this);
         }
         foreach ($this->additional as $x) {
 
-            $data .= $x->get($this, strlen($data));
+            $data .= $x->get($this);
         }
 
         return $data;
@@ -193,16 +193,16 @@ class Net_DNS2_Packet
      * This logic was based on the Net::DNS::Packet::dn_comp() function 
      * by Michanel Fuhr
      *
-     * @param string  $name   the name to be compressed
-     * @param integer $offset the offset into the given packet object
+     * @param string  $name    the name to be compressed
+     * @param integer &$offset the offset into the given packet object
      *
      * @return string
      * @access public
      *
      */
-    public function compress($name, $offset)
+    public function compress($name, &$offset)
     {
-        $names = explode('.', $name);
+        $names    = explode('.', $name);
         $compname = '';
 
         while (!empty($names)) {
@@ -212,20 +212,36 @@ class Net_DNS2_Packet
             if (isset($this->_compressed[$dname])) {
 
                 $compname .= pack('n', 0xc000 | $this->_compressed[$dname]);
+                $offset += 2;
+
                 break;
             }
 
             $this->_compressed[$dname] = $offset;
-
             $first = array_shift($names);
+
             $length = strlen($first);
+            if ($length <= 0) {
+                continue;
+            }
+        
+            //
+            // truncate see RFC1035 2.3.1
+            //
+            if ($length > 63) {
+
+                $length = 63;
+                $first = substr($first, 0, $length);
+            }
 
             $compname .= pack('Ca*', $length, $first);
             $offset += $length + 1;
         }
 
         if (empty($names)) {
-            $compname .= "\0";
+
+            $compname .= pack('C', 0);
+            $offset++;
         }
 
         return $compname;

@@ -119,9 +119,9 @@ class Net_DNS2_Question
             $this->set($packet);
         } else {
 
-            $this->qname     = '';
-            $this->qtype     = 'A';
-            $this->qclass     = 'IN';
+            $this->qname    = '';
+            $this->qtype    = 'A';
+            $this->qclass   = 'IN';
         }
     }
 
@@ -176,6 +176,7 @@ class Net_DNS2_Question
         $class_name = Net_DNS2_Lookups::$classes_by_id[$class];        
 
         if ( (!isset($type_name)) || (!isset($class_name)) ) {
+
             throw new InvalidArgumentException(
                 'invalid question section: invalid type (' . $type . 
                 ') or class (' . $class . ') specified.'
@@ -199,30 +200,34 @@ class Net_DNS2_Question
      *                                 the compressed qname value can be packed in
      *                                 with the names of the other parts of the 
      *                                 packet.
-     * @param integer         $offset  the offset into the packet.
      *
      * @return string
      * @throws InvalidArgumentException
      * @access public
      *
      */
-    public function get(Net_DNS2_Packet &$packet, $offset)
+    public function get(Net_DNS2_Packet &$packet)
     {
         //
         // validate the type and class
         //
-        $type     = Net_DNS2_Lookups::$rr_types_by_name[$this->qtype];
-        $class    = Net_DNS2_Lookups::$classes_by_name[$this->qclass];
+        $type  = Net_DNS2_Lookups::$rr_types_by_name[$this->qtype];
+        $class = Net_DNS2_Lookups::$classes_by_name[$this->qclass];
 
         if ( (!isset($type)) || (!isset($class)) ) {
+
             throw new InvalidArgumentException(
                 'invalid question section: invalid type (' . $this->qtype . 
                 ') or class (' . $this->qclass . ') specified.'
             );
         }
 
-        return $packet->compress($this->qname, $offset) . chr($type << 8) . 
-            chr($type) . chr($class << 8) . chr($class);
+        $data = $packet->compress($this->qname, $packet->offset);
+
+        $data .= chr($type << 8) . chr($type) . chr($class << 8) . chr($class);
+        $packet->offset += 4;
+
+        return $data;
     }
 }
 
