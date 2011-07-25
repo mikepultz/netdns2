@@ -141,6 +141,7 @@ class Net_DNS2_RR_A extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
+        $packet->offset += 4;
         return inet_pton($this->address);
     }
 }

@@ -189,6 +189,7 @@ class Net_DNS2_Header
         // the header must be at least 12 bytes long.
         //
         if ($packet->rdlength < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
+
             throw new InvalidArgumentException(
                 'invalid header data provided; to small'
             );
@@ -223,19 +224,26 @@ class Net_DNS2_Header
         $this->arcount  = ord($packet->rdata[++$offset]) << 8 | 
             ord($packet->rdata[++$offset]);
 
+        //
+        // increment the internal offset
+        //
+        $packet->offset += Net_DNS2_Lookups::DNS_HEADER_SIZE;
+
         return true;
     }
 
     /**
      * returns a binary packed DNS Header
      *
+     * @param Net_DNS2_Packet &$packet Object
+     *
      * @return    string
      * @access    public
      *
      */
-    public function get()
+    public function get(Net_DNS2_Packet &$packet)
     {
-        return pack('n', $this->id) . 
+        $data = pack('n', $this->id) . 
             chr(
                 ($this->qr << 7) | ($this->opcode << 3) | 
                 ($this->aa << 2) | ($this->tc << 1) | ($this->rd)
@@ -245,6 +253,10 @@ class Net_DNS2_Header
             chr($this->ancount << 8) . chr($this->ancount) . 
             chr($this->nscount << 8) . chr($this->nscount) .
             chr($this->arcount << 8) . chr($this->arcount);
+
+        $packet->offset += Net_DNS2_Lookups::DNS_HEADER_SIZE;
+
+        return $data;
     }
 }
 

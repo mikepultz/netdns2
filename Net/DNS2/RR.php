@@ -328,7 +328,8 @@ abstract class Net_DNS2_RR
      */
     public function get(Net_DNS2_Packet &$packet)
     {
-        $data = '';
+        $data  = '';
+        $rdata = '';
 
         //
         // pack the name
@@ -336,32 +337,32 @@ abstract class Net_DNS2_RR
         $data = $packet->compress($this->name, $packet->offset);
 
         //
+        // pack the main values
+        //
+        $data .= pack(
+            'nnN', 
+            Net_DNS2_Lookups::$rr_types_by_name[$this->type],
+            Net_DNS2_Lookups::$classes_by_name[$this->class],
+            $this->ttl
+        );
+
+        //
+        // increase the offset, and allow for the rdlength
+        //
+        $packet->offset += 10;
+
+        //
         // get the RR specific details
         //
-        $rdata = '';
-        $rdlength = 0;
-
         if ($this->rdlength != -1) {
 
-            $rdata      = $this->rrGet($packet);
-            $rdlength   = strlen($rdata);
+            $rdata = $this->rrGet($packet);
         }
 
         //
-        // pack the rest of the values
-        //
-        $data .= pack(
-            'nnNn', 
-            Net_DNS2_Lookups::$rr_types_by_name[$this->type], 
-            Net_DNS2_Lookups::$classes_by_name[$this->class], 
-            $this->ttl, 
-            $rdlength
-        );
-        
-        //
         // add the RR
         //
-        $data .= $rdata;
+        $data .= pack('n', strlen($rdata)) . $rdata;
 
         return $data;
     }

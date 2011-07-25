@@ -547,26 +547,29 @@ class Net_DNS2
         //
         // use filter_var() if it's available; it's faster than preg
         //
-        if (extension_loaded('filter') == true)
-        {
-            if (filter_var($_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == false) {
+        if (extension_loaded('filter') == true) {
+
+            if (filter_var(
+                $_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4
+            ) == false) {
                 return false;
             }
-        } else 
-        {
+        } else {
+
             //
             // do the main check here;
             //
-            if (inet_pton($_address) === false)
-            {
+            if (inet_pton($_address) === false) {
                 return false;
             }
 
             //
             // then make sure we're not a IPv6 address
             //
-            if (preg_match('/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $_address) == 0)
-            {
+            if (preg_match(
+                '/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', 
+                $_address
+            ) == 0) {
                 return false;
             }
         }
@@ -588,26 +591,27 @@ class Net_DNS2
         //
         // use filter_var() if it's available; it's faster than preg
         //
-        if (extension_loaded('filter') == true)
-        {
-            if (filter_var($_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == false) {
+        if (extension_loaded('filter') == true) {
+            if (filter_var(
+                $_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6
+            ) == false) {
                 return false;
             }
-        } else
-        {
+        } else {
+
             //
             // do the main check here
             //
-            if (inet_pton($_address) === false)
-            {
+            if (inet_pton($_address) === false) {
                 return false;
             }
 
             //
             // then make sure it doesn't match a IPv4 address
             //
-            if (preg_match('/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $_address) == 1)
-            {
+            if (preg_match(
+                '/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $_address
+            ) == 1) {
                 return false;
             }
         }

@@ -151,14 +151,11 @@ class Net_DNS2_RR_MX extends Net_DNS2_RR
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
         if (strlen($this->exchange) > 0) {
-            
-            // TODO: get rid of pack()
-            //
+
             $data = pack('n', $this->preference);
             $packet->offset += 2;
 
             $data .= $packet->compress($this->exchange, $packet->offset);
-
             return $data;
         }
 

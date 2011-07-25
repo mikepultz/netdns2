@@ -256,11 +256,16 @@ class Net_DNS2_RR_HIP extends Net_DNS2_RR
             $data .= base64_decode($this->public_key);
 
             //
+            // add the offset
+            //
+            $packet->offset += strlen($data);
+
+            //
             // add each rendezvous server
             //
             foreach ($this->rendezvous_servers as $index => $server) {
 
-                $data .= $packet->compress($server, $packet->offset + strlen($data));
+                $data .= $packet->compress($server, $packet->offset);
             }
 
             return $data;
