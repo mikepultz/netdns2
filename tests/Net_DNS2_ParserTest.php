@@ -135,6 +135,97 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             $this->assertSame($line, $response->answer[0]->__toString());
         }
     }
+    public function testCompression()
+    {
+        //
+        // this list of RR's uses name compression
+        //
+        $rrs = array(
+
+            'NS'            => 'example.com. 300 IN NS ns1.mrdns.com.',
+            'CNAME'         => 'example.com. 300 IN CNAME www.example.com.',
+            'SOA'           => 'example.com. 300 IN SOA ns1.mrdns.com. help.mrhost.ca. 1278700841 900 1800 86400 21400',
+            'MX'            => 'example.com. 300 IN MX 10 mx1.mrhost.ca.',
+            'RP'            => 'example.com. 300 IN RP louie.trantor.umd.edu. lam1.people.test.com.',
+            'AFSDB'         => 'example.com. 300 IN AFSDB 3 afsdb.example.com.',
+            'RT'            => 'example.com. 300 IN RT 2 relay.prime.com.',
+            'PX'            => 'example.com. 300 IN PX 10 ab.net2.it. o-ab.prmd-net2.admdb.c-it.',
+            'SRV'           => 'example.com. 300 IN SRV 20 0 5269 xmpp-server2.l.google.com.',
+            'NAPTR'         => 'example.com. 300 IN NAPTR 100 10 S SIP+D2U !^.*$!sip:customer-service@example.com! _sip._udp.example.com.',
+            'DNAME'         => 'example.com. 300 IN DNAME frobozz-division.acme.example.',
+            'HIP'           => 'example.com. 300 IN HIP 2 200100107B1A74DF365639CC39F1D578 AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQb1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D rvs.example.com. another.example.com. test.domain.org.'
+        );
+
+        //
+        // create a new updater object
+        //
+        $u = new Net_DNS2_Updater("example.com", array('nameservers' => array('10.10.0.1')));
+
+        //
+        // add each RR to the same object, so we can build a build compressed name list
+        //
+        foreach($rrs as $rr => $line) {
+
+            $class_name = 'Net_DNS2_RR_' . $rr;
+
+            //
+            // parse the line
+            //
+            $a = Net_DNS2_RR::fromString($line);
+
+            //
+            // check that the object is right 
+            //
+            $this->assertTrue($a instanceof $class_name);
+                        
+            //
+            // set it on the packet
+            //
+            $u->add($a);
+        }
+
+        //
+        // get the request packet
+        //
+        $request = $u->packet();
+
+        //
+        // get the authority section of the request
+        //
+        $request_authority = $request->authority;
+
+        //
+        // parse the binary
+        //
+        $data = $request->get();
+        $response = new Net_DNS2_Packet_Response($data, strlen($data));
+
+        //
+        // get the authority section of the response, and clean up the
+        // rdata so everything will match.
+        //
+        // the request packet doesn't have the rdlength and rdata fields
+        // built yet, so it will throw off the hash
+        //
+        $response_authority = $response->authority;
+
+        foreach($response_authority as $id => $object)
+        {
+            $response_authority[$id]->rdlength = '';
+            $response_authority[$id]->rdata = '';
+        }
+
+        //
+        // build the hashes
+        //
+        $a = md5(print_r($request_authority, 1));
+        $b = md5(print_r($response_authority, 1));
+
+        //
+        // the new hashes should match.
+        //
+        $this->assertSame($a, $b);
+    }
 }
 
 

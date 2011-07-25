@@ -542,6 +542,40 @@ class Net_DNS2_Updater extends Net_DNS2
     }
 
     /**
+     * returns the current internal packet object.
+     *
+     * @return Net_DNS2_Packet_Request
+     * @access public
+     #
+     */
+    public function packet()
+    {
+        //
+        // take a copy
+        //
+        $p = $this->_packet;
+
+        //
+        // check for an authentication method; either TSIG or SIG
+        //
+        if (   ($this->auth_signature instanceof Net_DNS2_RR_TSIG) 
+            || ($this->auth_signature instanceof Net_DNS2_RR_SIG)
+        ) {
+            $p->additional[] = $this->auth_signature;
+        }
+
+        //
+        // update the counts
+        //
+        $p->header->qdcount = count($p->question);
+        $p->header->ancount = count($p->answer);
+        $p->header->nscount = count($p->authority);
+        $p->header->arcount = count($p->additional);
+
+        return $p;
+    }
+
+    /**
      * executes the update request with the object informaton
      *
      * @return boolean
