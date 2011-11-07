@@ -25,7 +25,7 @@ $pkg->setAPIVersion('1.1.5');
 $pkg->setReleaseVersion('1.1.5');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
-$pkg->setNotes("- fixed a math issue with the name compress logic; this would somtimes screw up Updates with multiple RR's\n- added a new test in the test suite, that validates that the domain name compression and expansion works properly");
+$pkg->setNotes("- fixed a docblock issue in the Net_DNS2 class\n- added error codes to the Lookups class, and had each method that throws an exception throw a numeric error code along with the message");
 $pkg->setPackageType('php');
 $pkg->addRelease();
 $pkg->setPhpDep('5.1.2');
