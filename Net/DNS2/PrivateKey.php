@@ -190,7 +190,8 @@ class Net_DNS2_PrivateKey
         if (extension_loaded('openssl') === false) {
 
             throw new Net_DNS2_Exception(
-                'the OpenSSL extension is required to use parse private key.'
+                'the OpenSSL extension is required to use parse private key.',
+                Net_DNS2_Lookups::E_OPENSSL_UNAVAIL
             );
         }
 
@@ -200,7 +201,8 @@ class Net_DNS2_PrivateKey
         if (is_readable($file) == false) {
 
             throw new Net_DNS2_Exception(
-                'invalid private key file: ' . $file
+                'invalid private key file: ' . $file,
+                Net_DNS2_Lookups::E_OPENSSL_INV_PKEY
             );
         }
 
@@ -211,7 +213,8 @@ class Net_DNS2_PrivateKey
         if (strlen($keyname) == 0) {
 
             throw new Net_DNS2_Exception(
-                'failed to get basename() for: ' . $file
+                'failed to get basename() for: ' . $file,
+                Net_DNS2_Lookups::E_OPENSSL_INV_PKEY
             );
         }
 
@@ -227,7 +230,8 @@ class Net_DNS2_PrivateKey
         } else {
 
             throw new Net_DNS2_Exception(
-                'file ' . $keyname . ' does not look like a private key file!'
+                'file ' . $keyname . ' does not look like a private key file!',
+                Net_DNS2_Lookups::E_OPENSSL_INV_PKEY
             );
         }
 
@@ -238,7 +242,8 @@ class Net_DNS2_PrivateKey
         if (count($data) == 0) {
             
             throw new Net_DNS2_Exception(
-                'file ' . $keyname . ' is empty!'
+                'file ' . $keyname . ' is empty!',
+                Net_DNS2_Lookups::E_OPENSSL_INV_PKEY
             );
         }
 
@@ -259,7 +264,8 @@ class Net_DNS2_PrivateKey
                 if ($this->algorithm != $value) {
                     throw new Net_DNS2_Exception(
                         'Algorithm mis-match! filename is ' . $this->algorithm . 
-                        ', contents say ' . $value
+                        ', contents say ' . $value,
+                        Net_DNS2_Lookups::E_ALGO_INVALID
                     );
                 }
                 break;
@@ -324,7 +330,8 @@ class Net_DNS2_PrivateKey
             */
             default:
                 throw new Net_DNS2_Exception(
-                    'unknown private key data: ' . $key . ': ' . $value
+                    'unknown private key data: ' . $key . ': ' . $value,
+                    Net_DNS2_Lookups::E_OPENSSL_INV_PKEY
                 );
             }
         }
@@ -380,7 +387,8 @@ class Net_DNS2_PrivateKey
         */
         default:
             throw new Net_DNS2_Exception(
-                'we only currently support RSAMD5 and RSASHA1 encryption.'
+                'we only currently support RSAMD5 and RSASHA1 encryption.',
+                Net_DNS2_Lookups::E_OPENSSL_INV_PKEY
             );
         }
 
@@ -389,7 +397,10 @@ class Net_DNS2_PrivateKey
         //
         $this->instance = openssl_pkey_new($args);
         if ($this->instance === false) {
-            throw new Net_DNS2_Exception(openssl_error_string());
+            throw new Net_DNS2_Exception(
+                openssl_error_string(),
+                Net_DNS2_Lookups::E_OPENSSL_ERROR
+            );
         }
 
         //

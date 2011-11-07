@@ -217,7 +217,8 @@ class Net_DNS2
             } else {
 
                 throw new Net_DNS2_Exception(
-                    'shmop library is not available for cache'
+                    'shmop library is not available for cache',
+                    Net_DNS2_Lookups::E_CACHE_SHMOP_UNAVAIL
                 );
             }
             break;
@@ -233,7 +234,8 @@ class Net_DNS2
         default:
 
             throw new Net_DNS2_Exception(
-                'un-supported cache type: ' . $this->cache_type
+                'un-supported cache type: ' . $this->cache_type,
+                Net_DNS2_Lookups::E_CACHE_UNSUPORTED
             );
         }
     }
@@ -292,7 +294,8 @@ class Net_DNS2
                 $data = file_get_contents($nameservers);
                 if ($data === false) {
                     throw new Net_DNS2_Exception(
-                        'failed to read contents of file: ' . $nameservers
+                        'failed to read contents of file: ' . $nameservers,
+                        Net_DNS2_Lookups::E_NS_INVALID_FILE
                     );
                 }
 
@@ -331,7 +334,8 @@ class Net_DNS2
                         } else {
 
                             throw new Net_DNS2_Exception(
-                                'invalid nameserver entry: ' . $value
+                                'invalid nameserver entry: ' . $value,
+                                Net_DNS2_Lookups::E_NS_INVALID_ENTRY
                             );
                         }
                         break;
@@ -361,7 +365,8 @@ class Net_DNS2
 
             } else {
                 throw new Net_DNS2_Exception(
-                    'resolver file file provided is not readable: ' . $nameservers
+                    'resolver file file provided is not readable: ' . $nameservers,
+                    Net_DNS2_Lookups::E_NS_INVALID_FILE
                 );
             }
         }
@@ -395,7 +400,8 @@ class Net_DNS2
 
                 throw new Net_DNS2_Exception(
                     'empty name servers list; you must provide a list of name '.
-                    'servers, or the path to a resolv.conf file.'
+                    'servers, or the path to a resolv.conf file.',
+                    Net_DNS2_Lookups::E_NS_INVALID_ENTRY
                 );
             }
         }
@@ -459,7 +465,8 @@ class Net_DNS2
         if (extension_loaded('openssl') === false) {
             
             throw new Net_DNS2_Exception(
-                'the OpenSSL extension is required to use SIG(0).'
+                'the OpenSSL extension is required to use SIG(0).',
+                Net_DNS2_Lookups::E_OPENSSL_UNAVAIL
             );
         }
 
@@ -526,7 +533,8 @@ class Net_DNS2
             break;
         default:
             throw new Net_DNS2_Exception(
-                'only asymmetric algorithms work with SIG(0)!'
+                'only asymmetric algorithms work with SIG(0)!',
+                Net_DNS2_Lookups::E_ALGO_INVALID
             );
         }
 
@@ -676,8 +684,7 @@ class Net_DNS2
      *                                 use TCP for the request
      *
      * @return mixed returns a Net_DNS2_Packet_Response object, or false on error
-     * @throws InvalidArgumentException, Net_DNS2_Exception, 
-     *         Net_DNS2_Socket_Exception
+     * @throws InvalidArgumentException, Net_DNS2_Exception
      * @access protected
      *
      */
@@ -690,7 +697,8 @@ class Net_DNS2
         if (strlen($data) < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
 
             throw new InvalidArgumentException(
-                'invalid or empty packet for sending!'
+                'invalid or empty packet for sending!',
+                Net_DNS2_Lookups::E_PACKET_INVALID
             );
         }
 
@@ -723,7 +731,8 @@ class Net_DNS2
 
                     throw new Net_DNS2_Exception(
                         'every name server provided has failed: ' . 
-                        $this->_last_socket_error
+                        $this->_last_socket_error,
+                        Net_DNS2_Lookups::E_NS_FAILED
                     );
                 }
 
@@ -899,7 +908,8 @@ class Net_DNS2
         if ($request->header->id != $response->header->id) {
 
             throw new Net_DNS2_Exception(
-                'invalid header: the request and response id do not match.'
+                'invalid header: the request and response id do not match.',
+                Net_DNS2_Lookups::E_HEADER_INVALID
             );
         }
 
@@ -911,7 +921,8 @@ class Net_DNS2
         if ($response->header->qr != Net_DNS2_Lookups::QR_RESPONSE) {
 
             throw new Net_DNS2_Exception(
-                'invalid header: the response provided is not a response packet.'
+                'invalid header: the response provided is not a response packet.',
+                Net_DNS2_Lookups::E_HEADER_INVALID
             );
         }
 
@@ -922,7 +933,8 @@ class Net_DNS2
 
             throw new Net_DNS2_Exception(
                 'DNS request failed: ' . 
-                Net_DNS2_Lookups::$result_code_messages[$response->header->rcode]
+                Net_DNS2_Lookups::$result_code_messages[$response->header->rcode],
+                $response->header->rcode
             );
         }
 
