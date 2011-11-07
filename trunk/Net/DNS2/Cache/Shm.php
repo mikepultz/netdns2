@@ -96,7 +96,8 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
             if (file_put_contents($cache_file, "") === false) {
         
                 throw new Net_DNS2_Exception(
-                    'failed to create empty SHM file: ' . $cache_file
+                    'failed to create empty SHM file: ' . $cache_file,
+                    Net_DNS2_Lookups::E_CACHE_SHM_FILE
                 );
             }
         }
@@ -108,7 +109,8 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
         if ($this->_cache_file_tok == -1) {
 
             throw new Net_DNS2_Exception(
-                'failed on ftok() file: ' . $this->_cache_file_tok
+                'failed on ftok() file: ' . $this->_cache_file_tok,
+                Net_DNS2_Lookups::E_CACHE_SHM_FILE
             );
         }
 

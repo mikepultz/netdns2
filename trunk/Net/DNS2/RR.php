@@ -391,13 +391,15 @@ abstract class Net_DNS2_RR
         if (is_null($object['name'])) {
 
             throw new Net_DNS2_Exception(
-                'failed to parse resource record: failed to expand name.'
+                'failed to parse resource record: failed to expand name.',
+                Net_DNS2_Lookups::E_PARSE_ERROR
             );
         }
         if ($packet->rdlength < ($packet->offset + 10)) {
 
             throw new Net_DNS2_Exception(
-                'failed to parse resource record: packet too small.'
+                'failed to parse resource record: packet too small.',
+                Net_DNS2_Lookups::E_PARSE_ERROR
             );
         }
 
@@ -437,7 +439,8 @@ abstract class Net_DNS2_RR
         } else {
 
             throw new Net_DNS2_Exception(
-                'un-implemented resource record type: ' . $object['type']
+                'un-implemented resource record type: ' . $object['type'],
+                Net_DNS2_Lookups::E_RR_INVALID
             );
         }
 
@@ -566,21 +569,24 @@ abstract class Net_DNS2_RR
                 if ($o->rrFromString($values) === false) {
 
                     throw new Net_DNS2_Exception(
-                        'failed to parse rdata for config: ' . $line
+                        'failed to parse rdata for config: ' . $line,
+                        Net_DNS2_Lookups::E_PARSE_ERROR
                     );
                 }
 
             } else {
 
                 throw new Net_DNS2_Exception(
-                    'failed to create new RR record for type: ' . $type
+                    'failed to create new RR record for type: ' . $type,
+                    Net_DNS2_Lookups::E_RR_INVALID
                 );
             }
 
         } else {
 
             throw new Net_DNS2_Exception(
-                'un-implemented resource record type: '. $type
+                'un-implemented resource record type: '. $type,
+                Net_DNS2_Lookups::E_RR_INVALID
             );
         }
 

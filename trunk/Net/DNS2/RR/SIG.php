@@ -373,7 +373,10 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSANSEC3SHA1:            
             default:
-                throw new Net_DNS2_Exception('invalid or unsupported algorithm');
+                throw new Net_DNS2_Exception(
+                    'invalid or unsupported algorithm',
+                    Net_DNS2_Lookups::E_ALGO_INVALID
+                );
                 break;
             }
 
@@ -384,7 +387,10 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
                 $sigdata, $this->signature, $this->private_key->instance, $algorithm
             ) == false) {
 
-                throw new Net_DNS2_Exception(openssl_error_string());
+                throw new Net_DNS2_Exception(
+                    openssl_error_string(), 
+                    Net_DNS2_Lookups::E_OPENSSL_ERROR
+                );
             }
 
             //

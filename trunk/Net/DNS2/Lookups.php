@@ -119,7 +119,52 @@ class Net_DNS2_Lookups
     const RCODE_BADNAME         = 20;       // RFC 2930
     const RCODE_BADALG          = 21;       // RFC 2930
     const RCODE_BADTRUNC        = 22;       // RFC 4635
-    
+
+    /*
+     * internal errors codes returned by the exceptions class
+     */
+    const E_NONE                = 0;
+    const E_DNS_FORMERR         = self::RCODE_FORMERR;
+    const E_DNS_SERVFAIL        = self::RCODE_SERVFAIL;
+    const E_DNS_NXDOMAIN        = self::RCODE_NXDOMAIN;
+    const E_DNS_NOTIMP          = self::RCODE_NOTIMP;
+    const E_DNS_REFUSED         = self::RCODE_REFUSED;
+    const E_DNS_YXDOMAIN        = self::RCODE_YXDOMAIN;
+    const E_DNS_YXRRSET         = self::RCODE_YXRRSET;
+    const E_DNS_NXRRSET         = self::RCODE_NXRRSET;
+    const E_DNS_NOTAUTH         = self::RCODE_NOTAUTH;
+    const E_DNS_NOTZONE         = self::RCODE_NOTZONE;
+
+    // 11-15 reserved
+
+    const E_DNS_BADSIG          = self::RCODE_BADSIG;
+    const E_DNS_BADKEY          = self::RCODE_BADKEY;
+    const E_DNS_BADTIME         = self::RCODE_BADTIME;
+    const E_DNS_BADMODE         = self::RCODE_BADMODE;
+    const E_DNS_BADNAME         = self::RCODE_BADNAME;
+    const E_DNS_BADALG          = self::RCODE_BADALG;
+    const E_DNS_BADTRUNC        = self::RCODE_BADTRUNC;    
+
+    // other error conditions
+
+    const E_NS_INVALID_FILE     = 200;
+    const E_NS_INVALID_ENTRY    = 201;
+    const E_NS_FAILED           = 202;
+
+    const E_PACKET_INVALID      = 300;
+    const E_HEADER_INVALID      = 301;
+    const E_PARSE_ERROR         = 302;
+    const E_RR_INVALID          = 303;
+
+    const E_OPENSSL_ERROR       = 400;
+    const E_OPENSSL_UNAVAIL     = 401;
+    const E_OPENSSL_INV_PKEY    = 402;
+    const E_ALGO_INVALID        = 403;
+
+    const E_CACHE_UNSUPORTED    = 500;
+    const E_CACHE_SHM_FILE      = 501;
+    const E_CACHE_SHMOP_UNAVAIL = 502;
+
     /*
      * DNSSEC Algorithms
      */

@@ -579,8 +579,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * executes the update request with the object informaton
      *
      * @return boolean
-     * @throws InvalidArgumentException, Net_DNS2_Exception, 
-     *         Net_DNS2_Socket_Exception
+     * @throws InvalidArgumentException, Net_DNS2_Exception
      * @access public
      *
      */
