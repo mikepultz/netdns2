@@ -1,6 +1,6 @@
 = IPv6 Support =
 
-Net_DNS2 now includes full support for IPv6. This includes support for accessing IPv6 DNS servers, forward DNS lookups (the AAAA record), and reverse DNS (PTR) support, using long or short form IPv6 IP addresses.
+Net_DNS2 includes full support for IPv6. This includes support for accessing IPv6 DNS servers, forward DNS lookups (the AAAA record), and reverse DNS (PTR) support, using long or short form IPv6 IP addresses.
 
 === IPv6 DNS Servers ===
 
