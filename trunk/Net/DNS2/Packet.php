@@ -159,7 +159,7 @@ class Net_DNS2_Packet
      * returns a full binary DNS packet
      *
      * @return string
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */

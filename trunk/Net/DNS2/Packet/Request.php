@@ -71,7 +71,7 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
      * @param string $type  the DNS RR type for the packet
      * @param string $class the DNS class for the packet
      *
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -88,7 +88,7 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
      * @param string $class the DNS class for the packet
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -113,7 +113,10 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
         //
         if (empty($name)) {
 
-            throw new InvalidArgumentException('empty query string provided');
+            throw new Net_DNS2_Exception(
+                'empty query string provided',
+                Net_DNS2_Lookups::E_PACKET_INVALID
+            );
         }
 
         //
@@ -130,8 +133,9 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
         if (   (!isset(Net_DNS2_Lookups::$rr_types_by_name[$type])) 
             || (!isset(Net_DNS2_Lookups::$classes_by_name[$class])) 
         ) {
-            throw new InvalidArgumentException(
-                'invalid type (' . $type . ') or class (' . $class . ') specified.'
+            throw new Net_DNS2_Exception(
+                'invalid type (' . $type . ') or class (' . $class . ') specified.',
+                Net_DNS2_Lookups::E_PACKET_INVALID
             );
         }
 
@@ -164,8 +168,10 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
                     $name .= '.ip6.arpa';
 
                 } else {
-                    throw new InvalidArgumentException(
-                        'unsupported PTR value: ' . $name
+
+                    throw new Net_DNS2_Exception(
+                        'unsupported PTR value: ' . $name,
+                        Net_DNS2_Lookup::E_PACKET_INVALID
                     );
                 }
 
@@ -177,8 +183,9 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
 
             } else {
 
-                throw new InvalidArgumentException(
-                    'unsupported PTR value: ' . $name
+                throw new Net_DNS2_Exception(
+                    'unsupported PTR value: ' . $name,
+                    Net_DNS2_Lookup::E_PACKET_INVALID
                 );
             }
         }

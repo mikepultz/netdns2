@@ -108,7 +108,7 @@ class Net_DNS2_Question
      * @param mixed &$packet either a Net_DNS2_Packet object, or null to 
      *                       build an empty object
      *
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -144,7 +144,7 @@ class Net_DNS2_Question
      * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet object
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -156,8 +156,9 @@ class Net_DNS2_Question
         $this->qname = $packet->expand($packet, $packet->offset);
         if ($packet->rdlength < ($packet->offset + 4)) {
 
-            throw new InvalidArgumentException(
-                'invalid question question section: to small'
+            throw new Net_DNS2_Exception(
+                'invalid question section: to small',
+                Net_DNS2_Lookups::E_QUESTION_INVALID
             );
         }
 
@@ -177,9 +178,10 @@ class Net_DNS2_Question
 
         if ( (!isset($type_name)) || (!isset($class_name)) ) {
 
-            throw new InvalidArgumentException(
+            throw new Net_DNS2_Exception(
                 'invalid question section: invalid type (' . $type . 
-                ') or class (' . $class . ') specified.'
+                ') or class (' . $class . ') specified.',
+                Net_DNS2_Lookups::E_QUESTION_INVALID
             );
         }
 
@@ -202,7 +204,7 @@ class Net_DNS2_Question
      *                                 packet.
      *
      * @return string
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -216,9 +218,10 @@ class Net_DNS2_Question
 
         if ( (!isset($type)) || (!isset($class)) ) {
 
-            throw new InvalidArgumentException(
+            throw new Net_DNS2_Exception(
                 'invalid question section: invalid type (' . $this->qtype . 
-                ') or class (' . $this->qclass . ') specified.'
+                ') or class (' . $this->qclass . ') specified.',
+                Net_DNS2_Lookups::E_QUESTION_INVALID
             );
         }
 

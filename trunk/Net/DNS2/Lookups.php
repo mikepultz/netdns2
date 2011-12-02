@@ -152,9 +152,10 @@ class Net_DNS2_Lookups
     const E_NS_FAILED           = 202;
 
     const E_PACKET_INVALID      = 300;
-    const E_HEADER_INVALID      = 301;
-    const E_PARSE_ERROR         = 302;
-    const E_RR_INVALID          = 303;
+    const E_PARSE_ERROR         = 301;
+    const E_HEADER_INVALID      = 302;
+    const E_QUESTION_INVALID    = 303
+    const E_RR_INVALID          = 304;
 
     const E_OPENSSL_ERROR       = 400;
     const E_OPENSSL_UNAVAIL     = 401;

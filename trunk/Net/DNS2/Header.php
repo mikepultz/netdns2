@@ -101,7 +101,7 @@ class Net_DNS2_Header
      *
      * @param mixed &$packet either a Net_DNS2_Packet object or null
      *
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -179,7 +179,7 @@ class Net_DNS2_Header
      * @param Net_DNS2_Packet &$packet Object
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -190,8 +190,9 @@ class Net_DNS2_Header
         //
         if ($packet->rdlength < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
 
-            throw new InvalidArgumentException(
-                'invalid header data provided; to small'
+            throw new Net_DNS2_Exception(
+                'invalid header data provided; to small',
+                Net_DNS2_Lookups::E_HEADER_INVALID
             );
         }
 

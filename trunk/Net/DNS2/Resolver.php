@@ -83,7 +83,7 @@ class Net_DNS2_Resolver extends Net_DNS2
      * @param string $class the name of the RR class to lookup
      *
      * @return Net_DNS_RR object
-     * @throws InvalidArgumentException, Net_DNS2_Exception
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -173,7 +173,7 @@ class Net_DNS2_Resolver extends Net_DNS2
      * @param Net_DNS2_RR $rr the RR object to lookup
      * 
      * @return Net_DNS_RR object
-     * @throws InvalidArgumentException, Net_DNS2_Exception
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
