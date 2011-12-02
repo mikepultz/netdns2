@@ -78,7 +78,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = '1.1.5';
+    const VERSION = '1.2.0';
 
     /*
      * the default path to a resolv.conf file
@@ -684,7 +684,7 @@ class Net_DNS2
      *                                 use TCP for the request
      *
      * @return mixed returns a Net_DNS2_Packet_Response object, or false on error
-     * @throws InvalidArgumentException, Net_DNS2_Exception
+     * @throws Net_DNS2_Exception
      * @access protected
      *
      */
@@ -696,7 +696,7 @@ class Net_DNS2
         $data = $request->get();
         if (strlen($data) < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
 
-            throw new InvalidArgumentException(
+            throw new Net_DNS2_Exception(
                 'invalid or empty packet for sending!',
                 Net_DNS2_Lookups::E_PACKET_INVALID
             );

@@ -70,7 +70,7 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
      * @param string  $data binary DNS packet
      * @param integer $size the length of the DNS packet
      *
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -86,7 +86,7 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
      * @param integer $size the length of the DNS packet
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */

@@ -174,7 +174,7 @@ abstract class Net_DNS2_RR
      * @param array           $rr      an array with RR parse values or null to 
      *                                 create an empty object
      *
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -299,7 +299,7 @@ abstract class Net_DNS2_RR
      *                                 create an empty object
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -322,7 +322,7 @@ abstract class Net_DNS2_RR
      *                                 compressing names
      *
      * @return string
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -477,14 +477,17 @@ abstract class Net_DNS2_RR
      * @param string $line a standard DNS config line 
      *
      * @return mixed       returns a new Net_DNS2_RR_* object for the given RR
-     * @throws InvalidArgumentException, Net_DNS2_Exception
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
     public static function fromString($line)
     {
         if (strlen($line) == 0) {
-            throw new InvalidArgumentException('empty config line provided.');
+            throw new Net_DNS2_Exception(
+                'empty config line provided.',
+                Net_DNS2_Lookups::E_PARSE_ERROR
+            );
         }
 
         $name   = '';
@@ -498,8 +501,9 @@ abstract class Net_DNS2_RR
         $values = preg_split('/[\s]+/', $line);
         if (count($values) < 3) {
 
-            throw new InvalidArgumentException(
-                'failed to parse config: minimum of name, type and rdata required.'
+            throw new Net_DNS2_Exception(
+                'failed to parse config: minimum of name, type and rdata required.',
+                Net_DNS2_Lookups::E_PARSE_ERROR
             );
         }
 
@@ -537,8 +541,10 @@ abstract class Net_DNS2_RR
                 break 2;
                 break;   
             default:
-                throw new InvalidArgumentException(
-                    'invalid config line provided: unknown file: ' . $value
+
+                throw new Net_DNS2_Exception(
+                    'invalid config line provided: unknown file: ' . $value,
+                    Net_DNS2_Lookups::E_PARSE_ERROR
                 );
             }
         }

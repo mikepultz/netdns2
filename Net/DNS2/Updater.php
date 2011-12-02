@@ -83,7 +83,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $zone    the domain name to use for DNS updates
      * @param mixed  $options an array of config options or null
      *
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -110,7 +110,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $name The name to be checked.
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access private
      *
      */
@@ -118,9 +118,10 @@ class Net_DNS2_Updater extends Net_DNS2
     {
         if (!preg_match('/' . $this->_packet->question[0]->qname . '$/', $name)) {
             
-            throw new InvalidArgumentException(
+            throw new Net_DNS2_Exception(
                 'name provided (' . $name . ') does not match zone name (' .
-                $this->_packet->question[0]->qname . ')'
+                $this->_packet->question[0]->qname . ')',
+                Net_DNS2_Lookups::E_PACKET_INVALID
             );
         }
     
@@ -155,7 +156,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param Net_DNS2_RR $rr the Net_DNS2_RR object to be added to the zone
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -186,7 +187,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param Net_DNS2_RR $rr the Net_DNS2_RR object to be deleted from the zone
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -221,7 +222,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $type the RR type to be removed from the zone
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -234,8 +235,9 @@ class Net_DNS2_Updater extends Net_DNS2
         ];
         if (!isset($class)) {
 
-            throw new InvalidArgumentException(
-                'unknown or un-supported resource record type: ' . $type
+            throw new Net_DNS2_Exception(
+                'unknown or un-supported resource record type: ' . $type,
+                Net_DNS2_Lookups::E_RR_INVALID
             );
         }
     
@@ -270,7 +272,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $name the RR name to be removed from the zone
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -318,7 +320,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $type the RR type for the prerequisite
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -331,8 +333,9 @@ class Net_DNS2_Updater extends Net_DNS2
         ];
         if (!isset($class)) {
 
-            throw new InvalidArgumentException(
-                'unknown or un-supported resource record type: ' . $type
+            throw new Net_DNS2_Exception(
+                'unknown or un-supported resource record type: ' . $type,
+                Net_DNS2_Lookups::E_RR_INVALID
             );
         }
     
@@ -372,7 +375,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param Net_DNS2_RR $rr the RR object to be used as a prerequisite
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -410,7 +413,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $type the RR type for the prerequisite
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -423,8 +426,9 @@ class Net_DNS2_Updater extends Net_DNS2
         ];
         if (!isset($class)) {
 
-            throw new InvalidArgumentException(
-                'unknown or un-supported resource record type: ' . $type
+            throw new Net_DNS2_Exception(
+                'unknown or un-supported resource record type: ' . $type,
+                Net_DNS2_Lookups::E_RR_INVALID
             );
         }
     
@@ -464,7 +468,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $name the RR name for the prerequisite
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -510,7 +514,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $name the RR name for the prerequisite
      *
      * @return boolean
-     * @throws InvalidArgumentException
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -579,7 +583,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * executes the update request with the object informaton
      *
      * @return boolean
-     * @throws InvalidArgumentException, Net_DNS2_Exception
+     * @throws Net_DNS2_Exception
      * @access public
      *
      */
@@ -613,7 +617,10 @@ class Net_DNS2_Updater extends Net_DNS2
         if (   ($this->_packet->header->qdcount == 0) 
             || ($this->_packet->header->nscount == 0) 
         ) {
-            throw new InvalidArgumentException('empty headers- nothing to send!');
+            throw new Net_DNS2_Exception(
+                'empty headers- nothing to send!',
+                Net_DNS2_Lookup::E_PACKET_INVALID
+            );
         }
 
         //
