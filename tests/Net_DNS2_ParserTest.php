@@ -87,8 +87,8 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             'HIP'           => 'example.com. 300 IN HIP 2 200100107B1A74DF365639CC39F1D578 AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQb1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D rvs.example.com. another.example.com. test.domain.org.',
             'SPF'           => 'example.com. 300 IN SPF "v=spf1 ip4:192.168.0.1/24 mx ?all"',
             'TKEY'          => 'example.com. 300 IN TKEY gss.microsoft.com. 3 123456.',
-            'URI'           => 'example.com. 300 IN URI 10 1 "http://mrdns.com".',
-            'CAA'           => 'example.com. 300 IN CAA 0 issue "ca.example.net; policy=ev".',
+            'URI'           => 'example.com. 300 IN URI 10 1 "http://mrdns.com"',
+            'CAA'           => 'example.com. 300 IN CAA 0 issue "ca.example.net; policy=ev"',
             'DLV'           => 'example.com. 300 IN DLV 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
         );
 
