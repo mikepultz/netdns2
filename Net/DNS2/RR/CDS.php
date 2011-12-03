@@ -50,8 +50,10 @@
  */
 
 /**
- * The TA RR is implemented exactly like the DS record, so
+ * The CDS RR is implemented exactly like the DS record, so
  * for now we just extend the DS RR and use it.
+ *
+ * http://tools.ietf.org/html/draft-barwood-dnsop-ds-publish-02
  *
  * @category Networking
  * @package  Net_DNS2
@@ -61,7 +63,7 @@
  * @see      Net_DNS2_RR
  *
  */
-class Net_DNS2_RR_TA extends Net_DNS2_RR_DS
+class Net_DNS2_RR_CDS extends Net_DNS2_RR_DS
 {
 }
 
