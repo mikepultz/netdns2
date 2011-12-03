@@ -265,7 +265,7 @@ class Net_DNS2_PrivateKey
                     throw new Net_DNS2_Exception(
                         'Algorithm mis-match! filename is ' . $this->algorithm . 
                         ', contents say ' . $value,
-                        Net_DNS2_Lookups::E_ALGO_INVALID
+                        Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
                     );
                 }
                 break;

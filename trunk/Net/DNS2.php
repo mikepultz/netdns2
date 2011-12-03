@@ -218,7 +218,7 @@ class Net_DNS2
 
                 throw new Net_DNS2_Exception(
                     'shmop library is not available for cache',
-                    Net_DNS2_Lookups::E_CACHE_SHMOP_UNAVAIL
+                    Net_DNS2_Lookups::E_CACHE_SHM_UNAVAIL
                 );
             }
             break;
@@ -235,7 +235,7 @@ class Net_DNS2
 
             throw new Net_DNS2_Exception(
                 'un-supported cache type: ' . $this->cache_type,
-                Net_DNS2_Lookups::E_CACHE_UNSUPORTED
+                Net_DNS2_Lookups::E_CACHE_UNSUPPORTED
             );
         }
     }
@@ -534,7 +534,7 @@ class Net_DNS2
         default:
             throw new Net_DNS2_Exception(
                 'only asymmetric algorithms work with SIG(0)!',
-                Net_DNS2_Lookups::E_ALGO_INVALID
+                Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
             );
         }
 

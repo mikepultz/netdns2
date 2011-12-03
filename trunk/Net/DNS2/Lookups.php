@@ -160,11 +160,11 @@ class Net_DNS2_Lookups
     const E_OPENSSL_ERROR       = 400;
     const E_OPENSSL_UNAVAIL     = 401;
     const E_OPENSSL_INV_PKEY    = 402;
-    const E_ALGO_INVALID        = 403;
+    const E_OPENSSL_INV_ALGO    = 403;
 
-    const E_CACHE_UNSUPORTED    = 500;
+    const E_CACHE_UNSUPPORTED   = 500;
     const E_CACHE_SHM_FILE      = 501;
-    const E_CACHE_SHMOP_UNAVAIL = 502;
+    const E_CACHE_SHM_UNAVAIL   = 502;
 
     /*
      * DNSSEC Algorithms

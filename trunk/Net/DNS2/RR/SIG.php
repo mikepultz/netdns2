@@ -378,7 +378,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             default:
                 throw new Net_DNS2_Exception(
                     'invalid or unsupported algorithm',
-                    Net_DNS2_Lookups::E_ALGO_INVALID
+                    Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
                 );
                 break;
             }
