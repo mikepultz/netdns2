@@ -130,9 +130,11 @@ class Net_DNS2_RR_TXT extends Net_DNS2_RR
 
                 $this->text[] = Net_DNS2_Packet::label($packet, $offset);
             }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

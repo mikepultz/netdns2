@@ -253,19 +253,25 @@ class Net_DNS2_Lookups
         'DHCID'         => 49,      // RFC 4701
         'NSEC3'         => 50,      // RFC 5155
         'NSEC3PARAM'    => 51,      // RFC 5155
+
                                     // 52 - 54 unassigned
+
         'HIP'           => 55,      // RFC 5205
         'NINFO'         => 56,      // Not implemented
         'RKEY'          => 57,      // Not implemented
         'TALINK'        => 58,      // Not implemented
         'CDS'           => 59,      // Not implemented
+
                                     // 60 - 98 unassigned
+
         'SPF'           => 99,      // RFC 4408
         'UINFO'         => 100,     // no RFC, Not implemented
         'UID'           => 101,     // no RFC, Not implemented
         'GID'           => 102,     // no RFC, Not implemented
         'UNSPEC'        => 103,     // no RFC, Not implemented
+
                                     // 104 - 248 unassigned
+
         'TKEY'          => 249,     // RFC 2930
         'TSIG'          => 250,     // RFC 2845
         'IXFR'          => 251,     // RFC 1995 - only a full (AXFR) is supported
@@ -273,9 +279,11 @@ class Net_DNS2_Lookups
         'MAILB'         => 253,     // RFC 883, Not implemented
         'MAILA'         => 254,     // RFC 973, Not implemented
         'ANY'           => 255,     // RFC 1035 - we support both 'ANY' and '*'
-        'URI'           => 256,     // Faltstrom
-        'CAA'           => 257,     // Hallam-Baker
+        'URI'           => 256,     // tools.ietf.org/html/draft-faltstrom-uri-06
+        'CAA'           => 257,     // tools.ietf.org/html/draft-ietf-pkix-caa-03
+
                                     // 258 - 32767 unassigned
+
         'TA'            => 32768,   // same as DS
         'DLV'           => 32769    // RFC 4431
     );
@@ -355,6 +363,8 @@ class Net_DNS2_Lookups
     //    252            - AXFR - handled as a function call
     //    255            - ANY - used only for queries
 
+        256         => 'Net_DNS2_RR_URI',
+        257         => 'Net_DNS2_RR_CAA',
         32768       => 'Net_DNS2_RR_TA',
         32769       => 'Net_DNS2_RR_DLV'
     );

@@ -158,9 +158,11 @@ class Net_DNS2_RR_WKS extends Net_DNS2_RR
                     }
                 }
             }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

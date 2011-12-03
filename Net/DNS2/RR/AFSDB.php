@@ -130,9 +130,11 @@ class Net_DNS2_RR_AFSDB extends Net_DNS2_RR
             $offset         = $packet->offset + 2;
 
             $this->hostname = Net_DNS2_Packet::expand($packet, $offset);
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -154,6 +156,7 @@ class Net_DNS2_RR_AFSDB extends Net_DNS2_RR
             $packet->offset += 2;
             
             $data .= $packet->compress($this->hostname, $packet->offset);
+
             return $data;
         }
         

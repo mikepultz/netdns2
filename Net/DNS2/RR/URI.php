@@ -2,11 +2,11 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
  * PHP Version 5
  *
- * Copyright (c) 2010, Mike Pultz <mike@mikepultz.com>.
+ * Copyright (c) 2011, Mike Pultz <mike@mikepultz.com>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -21,8 +21,8 @@
  *     the documentation and/or other materials provided with the
  *     distribution.
  *
- *   * Neither the name of Mike Pultz nor the names of his contributors 
- *     may be used to endorse or promote products derived from this 
+ *   * Neither the name of Mike Pultz nor the names of his contributors
+ *     may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -41,27 +41,25 @@
  * @category  Networking
  * @package   Net_DNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @copyright 2011 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
- * @since     File available since Release 0.6.0
+ * @since     File available since Release 1.2.0
  *
  */
 
 /**
- * DHCID Resource Record - RFC4701 section 3.1
+ * URI Resource Record - http://tools.ietf.org/html/draft-faltstrom-uri-06
  *
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *    |                  ID Type Code                 |       
+ *    |                   PRIORITY                    |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *    |       Digest Type     |                       /       
- *    +--+--+--+--+--+--+--+--+                       /
- *    /                                               /       
- *    /                    Digest                     /       
- *    /                                               /       
+ *    |                    WEIGHT                     |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- * 
+ *    /                    TARGET                     /
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *
  * @category Networking
  * @package  Net_DNS2
  * @author   Mike Pultz <mike@mikepultz.com>
@@ -70,24 +68,23 @@
  * @see      Net_DNS2_RR
  *
  */
-class Net_DNS2_RR_DHCID extends Net_DNS2_RR
+class Net_DNS2_RR_URI extends Net_DNS2_RR
 {
     /*
-     * Identifier type
+     * The priority of this target host.
      */
-    public $id_type;
+    public $priority;
 
     /*
-     * Digest Type
+     * a relative weight for entries with the same priority
      */
-    public $digest_type;
+    public $weight;
 
     /*
-     * The digest
+      * The domain name of the target host
      */
-    public $digest;
+    public $target;
 
-    
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -97,10 +94,11 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        $out = pack('nC', $this->id_type, $this->digest_type);
-        $out .= base64_decode($this->digest);
-
-        return base64_encode($out);
+        //
+        // presentation format has double quotes (") around the target.
+        //
+        return $this->priority . ' ' . $this->weight . ' "' . 
+            $this->cleanString($this->target) . '".';
     }
 
     /**
@@ -114,26 +112,15 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $data = base64_decode(array_shift($rdata));
-        if (strlen($data) > 0) {
+        $this->priority = $rdata[0];
+        $this->weight   = $rdata[1];
 
-            //
-            // unpack the id type and digest type
-            //
-            $x = unpack('nid_type/Cdigest_type', $data);
-
-            $this->id_type      = $x['id_type'];
-            $this->digest_type  = $x['digest_type'];
-
-            //
-            // copy out the digest
-            //
-            $this->digest = base64_encode(substr($data, 3, strlen($data) - 3));
-
-            return true;
-        }
-
-        return false;
+        //
+        // make sure to trim the lead/trailing double quote if it's there.
+        //
+        $this->target   = trim($this->cleanString($rdata[2]), '"');
+        
+        return true;
     }
 
     /**
@@ -148,25 +135,21 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
         if ($this->rdlength > 0) {
+            
+            //
+            // unpack the priority and weight
+            //
+            $x = unpack('npriority/nweight', $this->rdata);
 
-            //
-            // unpack the id type and digest type
-            //
-            $x = unpack('nid_type/Cdigest_type', $this->rdata);
+            $this->priority = $x['priority'];
+            $this->weight   = $x['weight'];
 
-            $this->id_type      = $x['id_type'];
-            $this->digest_type  = $x['digest_type'];
-
-            //
-            // copy out the digest
-            //
-            $this->digest = base64_encode(
-                substr($this->rdata, 3, $this->rdlength - 3)
-            );
+            $offset         = $packet->offset + 4;
+            $this->target   = Net_DNS2_Packet::expand($packet, $offset);
 
             return true;
         }
-
+        
         return false;
     }
 
@@ -183,21 +166,18 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
-        if (strlen($this->digest) > 0) {
+        if (strlen($this->target) > 0) {
 
-            return pack('nC', $this->id_type, $this->digest_type) . 
-                base64_decode($this->digest);
+            $data = pack('nn', $this->priority, $this->weight);
+            $packet->offset += 4;
+
+            $data .= $packet->compress(trim($this->target,'"'), $packet->offset);
+
+            return $data;
         }
-    
+
         return null;
     }
 }
 
-/*
- * Local variables:
- * tab-width: 4
- * c-basic-offset: 4
- * c-hanging-comment-ender-p: nil
- * End:
- */
 ?>

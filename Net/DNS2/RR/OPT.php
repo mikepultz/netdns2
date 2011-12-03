@@ -178,9 +178,11 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
             $this->extended_rcode   = $x['extended'];
             $this->version          = $x['version'];
             $this->z                = $x['z'];
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

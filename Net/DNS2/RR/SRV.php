@@ -149,9 +149,11 @@ class Net_DNS2_RR_SRV extends Net_DNS2_RR
 
             $offset         = $packet->offset + 6;
             $this->target   = Net_DNS2_Packet::expand($packet, $offset);
+
+            return true;
         }
         
-        return true;
+        return false;
     }
 
     /**
@@ -173,6 +175,7 @@ class Net_DNS2_RR_SRV extends Net_DNS2_RR
             $packet->offset += 6;
 
             $data .= $packet->compress($this->target, $packet->offset);
+
             return $data;
         }
 

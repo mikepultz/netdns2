@@ -209,6 +209,7 @@ class Net_DNS2_RR_LOC extends Net_DNS2_RR
             return true;
         }
 
+        return false;
     }
 
     /**

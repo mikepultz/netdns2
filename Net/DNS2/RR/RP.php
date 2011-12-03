@@ -127,9 +127,11 @@ class Net_DNS2_RR_RP extends Net_DNS2_RR
 
             $this->mboxdname    = Net_DNS2_Packet::expand($packet, $offset);
             $this->txtdname     = Net_DNS2_Packet::expand($packet, $offset);
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

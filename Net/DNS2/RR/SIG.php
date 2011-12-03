@@ -197,6 +197,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
 
             $this->signature .= $line;
         }
+
         $this->signature = trim($this->signature);
 
         return true;
@@ -251,9 +252,11 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             $this->signature    = base64_encode(
                 substr($this->rdata, 18 + ($sigoffset - $offset))
             );
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

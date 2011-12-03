@@ -113,9 +113,11 @@ class Net_DNS2_RR_PTR extends Net_DNS2_RR
 
             $offset = $packet->offset;
             $this->ptrdname = Net_DNS2_Packet::expand($packet, $offset);
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

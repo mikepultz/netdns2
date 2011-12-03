@@ -182,9 +182,11 @@ class Net_DNS2_RR_NAPTR extends Net_DNS2_RR
             $this->regexp       = Net_DNS2_Packet::label($packet, $offset);
 
             $this->replacement  = Net_DNS2_Packet::expand($packet, $offset);
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

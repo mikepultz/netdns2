@@ -135,9 +135,11 @@ class Net_DNS2_RR_KX extends Net_DNS2_RR
             //
             $offset = $packet->offset + 2;
             $this->exchange = Net_DNS2_Packet::label($packet, $offset);
+
+            return true;
         }
       
-        return true;
+        return false;
     }
 
     /**

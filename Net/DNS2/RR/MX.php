@@ -132,9 +132,11 @@ class Net_DNS2_RR_MX extends Net_DNS2_RR
             //
             $offset = $packet->offset + 2;
             $this->exchange = Net_DNS2_Packet::expand($packet, $offset);
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
