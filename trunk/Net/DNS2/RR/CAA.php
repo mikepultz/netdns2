@@ -95,7 +95,7 @@ class Net_DNS2_RR_CAA extends Net_DNS2_RR
     protected function rrToString()
     {
         return $this->flags . ' ' . $this->tag . ' "' . 
-            trim($this->cleanString($this->value),'"') . '"';
+            trim($this->cleanString($this->value), '"') . '"';
     }
 
     /**
