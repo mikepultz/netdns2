@@ -140,7 +140,7 @@ class Net_DNS2_RR_AAAA extends Net_DNS2_RR
             $x = unpack('n8', $this->rdata);
             if (count($x) == 8) {
 
-                $this->address = vsprintf("%x:%x:%x:%x:%x:%x:%x:%x", $x);
+                $this->address = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', $x);
                 return true;
             }
         }

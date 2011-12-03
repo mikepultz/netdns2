@@ -135,16 +135,16 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
         
         switch($this->gateway_type) {
         case self::GATEWAY_TYPE_NONE:
-            $out .= ". ";
+            $out .= '. ';
             break;
 
         case self::GATEWAY_TYPE_IPV4:
         case self::GATEWAY_TYPE_IPV6:
-            $out .= $this->gateway . " ";
+            $out .= $this->gateway . ' ';
             break;
 
         case self::GATEWAY_TYPE_DOMAIN:
-            $out .= $this->gateway . ". ";
+            $out .= $this->gateway . '. ';
             break;
         }
 
@@ -177,7 +177,7 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
         //
         switch($gateway_type) {
         case self::GATEWAY_TYPE_NONE:
-            $gateway = "";
+            $gateway = '';
             break;
 
         case self::GATEWAY_TYPE_IPV4:
@@ -205,7 +205,7 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
         //
         switch($algorithm) {
         case self::ALGORITHM_NONE:
-            $key = "";
+            $key = '';
             break;
 
         case self::ALGORITHM_DSA:
@@ -270,7 +270,7 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
                 $ip = unpack('n8', substr($this->rdata, $offset, 16));
                 if (count($ip) == 8) {
 
-                    $this->gateway = vsprintf("%x:%x:%x:%x:%x:%x:%x:%x", $ip);
+                    $this->gateway = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', $ip);
                     $offset += 16;
                 } else {
 
@@ -294,7 +294,7 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
             //
             switch($this->algorithm) {
             case self::ALGORITHM_NONE:
-                $this->key = "";
+                $this->key = '';
                 break;
                 
             case self::ALGORITHM_DSA:
@@ -346,7 +346,7 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
             break;
             
         case self::GATEWAY_TYPE_DOMAIN:
-            $data .= pack('C', strlen($this->gateway))  . $this->gateway;
+            $data .= chr(strlen($this->gateway))  . $this->gateway;
             break;
             
         default:

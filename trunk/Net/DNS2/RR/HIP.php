@@ -184,7 +184,7 @@ class Net_DNS2_RR_HIP extends Net_DNS2_RR
             //
             // unpack the algorithm and length values
             //
-            $x = unpack("Chit_length/Cpk_algorithm/npk_length", $this->rdata);
+            $x = unpack('Chit_length/Cpk_algorithm/npk_length', $this->rdata);
 
             $this->hit_length   = $x['hit_length'];
             $this->pk_algorithm = $x['pk_algorithm'];

@@ -119,7 +119,7 @@ class Net_DNS2_BitMap
                         $output[] = Net_DNS2_Lookups::$rr_types_by_id[$type];
                     } else {
 
-                        $output[] = "TYPE" . $type;
+                        $output[] = 'TYPE' . $type;
                     }
                 }
             }

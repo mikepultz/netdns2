@@ -150,7 +150,7 @@ class Net_DNS2_RR_WKS extends Net_DNS2_RR
             $port = 0;
             foreach (unpack('@5/C*', $this->rdata) as $set) {
 
-                $s = sprintf("%08b", $set);
+                $s = sprintf('%08b', $set);
 
                 for ($i=0; $i<8; $i++, $port++) {
                     if ($s[$i] == '1') {
@@ -198,7 +198,7 @@ class Net_DNS2_RR_WKS extends Net_DNS2_RR
 
             ksort($ports);
 
-            $string = "";
+            $string = '';
             $n = 0;
 
             foreach ($ports as $s) {
@@ -208,8 +208,8 @@ class Net_DNS2_RR_WKS extends Net_DNS2_RR
 
                 if ($n == 8) {
 
-                    $data .= pack('C', bindec($string));
-                    $string = "";
+                    $data .= chr(bindec($string));
+                    $string = '';
                     $n = 0;
                 }
             }

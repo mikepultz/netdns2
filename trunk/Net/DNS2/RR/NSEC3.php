@@ -126,7 +126,7 @@ class Net_DNS2_RR_NSEC3 extends Net_DNS2_RR
  
         //
         // per RFC5155, the salt_length value isn't displayed, and if the salt
-        // is empty, the salt is displayed as "-"
+        // is empty, the salt is displayed as '-'
         //
         if ($this->salt_length > 0) {
   
@@ -168,7 +168,7 @@ class Net_DNS2_RR_NSEC3 extends Net_DNS2_RR
         $this->iterations   = array_shift($rdata);
      
         //
-        // an empty salt is represented as "-" per RFC5155 section 3.3
+        // an empty salt is represented as '-' per RFC5155 section 3.3
         //
         $salt = array_shift($rdata);
         if ($salt == '-') {
@@ -283,7 +283,7 @@ class Net_DNS2_RR_NSEC3 extends Net_DNS2_RR
         //
         // add the hash length and hash
         //
-        $data .= pack('C', $this->hash_length);
+        $data .= chr($this->hash_length);
         if ($this->hash_length > 0) {
 
             $data .= base64_decode($this->hashed_owner_name);

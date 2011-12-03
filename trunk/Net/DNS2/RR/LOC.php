@@ -147,7 +147,7 @@ class Net_DNS2_RR_LOC extends Net_DNS2_RR
                 sprintf('%.2fm', $this->vert_pre);
         }
         
-        return "";
+        return '';
     }
 
     /**
@@ -396,7 +396,7 @@ class Net_DNS2_RR_LOC extends Net_DNS2_RR
      * convert lat/lng in decimal to deg/min/sec/hem
      *
      * @param float  $data   the decimal value
-     * @param string $latlng either "LAT" or "LNG" so we can determine the HEM value
+     * @param string $latlng either LAT or LNG so we can determine the HEM value
      *
      * @return string
      * @access private
@@ -423,7 +423,7 @@ class Net_DNS2_RR_LOC extends Net_DNS2_RR
         $sec = (int)(((($data - $deg) * 60) - $min) * 60);
         $msec = round((((((($data - $deg) * 60) - $min) * 60) - $sec) * 1000));
 
-        return sprintf("%d %02d %02d.%03d %s", $deg, $min, $sec, round($msec), $hem);
+        return sprintf('%d %02d %02d.%03d %s', $deg, $min, $sec, round($msec), $hem);
     }
 }
 

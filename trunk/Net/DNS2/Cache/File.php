@@ -88,7 +88,7 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
             //
             // open the file for reading
             //
-            $fp = @fopen($this->cache_file, "r");
+            $fp = @fopen($this->cache_file, 'r');
             if ($fp !== false) {
                 
                 //
@@ -132,7 +132,7 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
         //
         // open the file for reading/writing
         //
-        $fp = fopen($this->cache_file, "a+");
+        $fp = fopen($this->cache_file, 'a+');
         if ($fp !== false) {
                 
             //

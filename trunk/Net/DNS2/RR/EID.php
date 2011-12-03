@@ -72,7 +72,7 @@ class Net_DNS2_RR_EID extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return "";
+        return '';
     }
 
     /**

@@ -85,7 +85,7 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        $out = "";
+        $out = '';
 
         foreach ($this->apl_items as $item) {
 
@@ -198,7 +198,7 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
                     }
 
                     $item['afd_part'] = sprintf(
-                        "%x:%x:%x:%x:%x:%x:%x:%x", 
+                        '%x:%x:%x:%x:%x:%x:%x:%x', 
                         $r[1], $r[2], $r[3], $r[4], $r[5], $r[6], $r[7], $r[8]
                     );
 
@@ -231,7 +231,7 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
     {
         if (count($this->apl_items) > 0) {
 
-            $out = "";
+            $out = '';
 
             foreach ($this->apl_items as $item) {
 
@@ -253,7 +253,7 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
                     );
 
                     foreach ($address as $b) {
-                        $out .= pack('C', $b);
+                        $out .= chr($b);
                     }
                     break;
                 case 2:
@@ -294,13 +294,13 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
 
         switch($family) {
         case 1:
-            $a = array_reverse(explode(".", $address));
+            $a = array_reverse(explode('.', $address));
             break;
         case 2:
-            $a = array_reverse(explode(":", $address));
+            $a = array_reverse(explode(':', $address));
             break;
         default:
-            return "";
+            return '';
         }
 
         foreach ($a as $value) {
@@ -311,7 +311,7 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
             }
         }
 
-        $out = "";
+        $out = '';
 
         switch($family) {
         case 1:
@@ -321,7 +321,7 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
             $out = implode(':', array_reverse($a));
             break;
         default:
-            return "";
+            return '';
         }
 
         return $out;
