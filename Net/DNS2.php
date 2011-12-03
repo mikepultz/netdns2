@@ -210,7 +210,7 @@ class Net_DNS2
         //
         switch($this->cache_type) {
         case 'shared':
-            if (extension_loaded("shmop")) {
+            if (extension_loaded('shmop')) {
 
                 $this->cache = new Net_DNS2_Cache_Shm;
                 $this->use_cache = true;
@@ -252,9 +252,9 @@ class Net_DNS2
     static public function autoload($name)
     {
         //
-        // only auto-load "our" classes
+        // only auto-load our classes
         //
-        if (strncmp($name, "Net_DNS2", 8) == 0) {
+        if (strncmp($name, 'Net_DNS2', 8) == 0) {
 
             include str_replace('_', '/', $name) . '.php';
         }
@@ -420,7 +420,7 @@ class Net_DNS2
      * @since  function available since release 1.1.0
      *
      */
-    public function signTSIG($keyname, $signature = "")
+    public function signTSIG($keyname, $signature = '')
     {
         //
         // if the TSIG was pre-created and passed in, then we can just used 
@@ -656,7 +656,7 @@ class Net_DNS2
 
         } else {
         
-            $part = explode(":", $_address);
+            $part = explode(':', $_address);
         }
 
         foreach ($part as &$p) {
