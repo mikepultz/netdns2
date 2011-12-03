@@ -65,7 +65,7 @@ class Net_DNS2_Cache
     /*
      * the filename of the cache file
      */
-    protected $cache_file = "";
+    protected $cache_file = '';
 
     /*
      * the local data store for the cache
@@ -247,7 +247,7 @@ class Net_DNS2_Cache
                 }
             }
 
-            if ($cache == "a:0:{}") {
+            if ($cache == 'a:0:{}') {
                 return null;
             } else {
                 return $cache;

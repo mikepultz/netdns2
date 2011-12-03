@@ -143,10 +143,10 @@ class Net_DNS2_RR_DNSKEY extends Net_DNS2_RR
 
             //
             // TODO: right now we're just displaying what's in DNS; we really 
-            // shoudl be parsing bit 7 and bit 15 of the flags field, and store
+            // should be parsing bit 7 and bit 15 of the flags field, and store
             // those separately.
             //
-            // right now the DNSSEC implementation is really jsut for "display",
+            // right now the DNSSEC implementation is really just for display,
             // we don't validate or handle any of the keys
             //
             $this->flags        = $x['flags'];

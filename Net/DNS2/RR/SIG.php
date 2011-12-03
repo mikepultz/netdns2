@@ -304,7 +304,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             $data .= $name;
         }
 
-        $data .= pack('C', '0');
+        $data .= chr('0');
 
         //
         // if the signature is empty, and $this->private_key is an instance of a 

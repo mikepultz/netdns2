@@ -150,10 +150,8 @@ class Net_DNS2_RR_HINFO extends Net_DNS2_RR
     {
         if (strlen($this->cpu) > 0) {
 
-            // TODO: get rid of pack
-            //
-            $data  = pack('C', strlen($this->cpu)) . $this->cpu;
-            $data .= pack('C', strlen($this->os))  . $this->os;
+            $data  = chr(strlen($this->cpu)) . $this->cpu;
+            $data .= chr(strlen($this->os)) . $this->os;
 
             return $data;
         }

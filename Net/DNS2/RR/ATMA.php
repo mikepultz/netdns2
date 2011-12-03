@@ -177,7 +177,7 @@ class Net_DNS2_RR_ATMA extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
-        $data = pack('C', $this->format);
+        $data = chr($this->format);
 
         if ($this->format == 0) {
 

@@ -93,7 +93,7 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
         //
         if (!file_exists($cache_file)) {
 
-            if (file_put_contents($cache_file, "") === false) {
+            if (file_put_contents($cache_file, '') === false) {
         
                 throw new Net_DNS2_Exception(
                     'failed to create empty SHM file: ' . $cache_file,
@@ -156,7 +156,7 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
      */
     public function __destruct()
     {
-        $fp = fopen($this->cache_file, "r");
+        $fp = fopen($this->cache_file, 'r');
         if ($fp !== false) {
 
             //
@@ -246,7 +246,7 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
                 $o = shmop_write($this->_cache_id, $data, 0);
             } else {
 
-                $o = shmop_write($this->_cache_id, "", 0);
+                $o = shmop_write($this->_cache_id, '', 0);
             }
 
             //
