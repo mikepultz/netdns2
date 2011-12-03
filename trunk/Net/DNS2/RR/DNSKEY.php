@@ -154,9 +154,11 @@ class Net_DNS2_RR_DNSKEY extends Net_DNS2_RR
             $this->algorithm    = $x['algorithm'];
 
             $this->key          = base64_encode(substr($this->rdata, 4));
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

@@ -116,20 +116,21 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
 
             if (preg_match('/^(!?)([1|2])\:([^\/]*)\/([0-9]{1,3})$/', $item, $m)) {
 
-                    $i = array(
+                $i = array(
 
-                        'address_family'    => $m[2],
-                        'prefix'            => $m[4],
-                        'n'                 => ($m[1] == '!') ? 1 : 0,
-                        'afd_part'          => strtolower($m[3])
-                    );
+                    'address_family'    => $m[2],
+                    'prefix'            => $m[4],
+                    'n'                 => ($m[1] == '!') ? 1 : 0,
+                    'afd_part'          => strtolower($m[3])
+                );
 
-                    $address = $this->_trimZeros(
-                        $i['address_family'], $i['afd_part']
-                    );
-                    $i['afd_length'] = count(explode('.', $address));
+                $address = $this->_trimZeros(
+                    $i['address_family'], $i['afd_part']
+                );
+                    
+                $i['afd_length'] = count(explode('.', $address));
 
-                    $this->apl_items[] = $i;
+                $this->apl_items[] = $i;
             }
         }
 
@@ -211,9 +212,11 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
 
                 $offset += 4 + $item['afd_length'];
             }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

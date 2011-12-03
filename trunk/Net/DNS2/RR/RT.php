@@ -131,9 +131,11 @@ class Net_DNS2_RR_RT extends Net_DNS2_RR
             $offset                 = $packet->offset + 2;
 
             $this->intermediatehost =  Net_DNS2_Packet::expand($packet, $offset);
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

@@ -150,11 +150,12 @@ class Net_DNS2_RR_DS extends Net_DNS2_RR
             //
             $digest_size = 0;
             if ($this->digesttype == 1) {
+
                 $digest_size = 20; // SHA1
 
             } else if ($this->digesttype == 2) {
-                $digest_size = 32; // SHA256
 
+                $digest_size = 32; // SHA256
             }
 
             //

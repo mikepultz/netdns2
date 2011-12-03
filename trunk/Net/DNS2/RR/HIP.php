@@ -219,9 +219,11 @@ class Net_DNS2_RR_HIP extends Net_DNS2_RR
                     $packet, $offset
                 );
             }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

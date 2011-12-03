@@ -182,7 +182,13 @@ abstract class Net_DNS2_RR
     {
         if ( (!is_null($packet)) && (!is_null($rr)) ) {
 
-            $this->set($packet, $rr);
+            if ($this->set($packet, $rr) == false)
+            {
+                throw new Net_DNS2_Exception(
+                    'failed to generate resource record',
+                    Net_DNS2_Lookups::E_RR_INVALID
+                );
+            }
         } else {
 
             $class = Net_DNS2_Lookups::$rr_types_class_to_id[get_called_class()];

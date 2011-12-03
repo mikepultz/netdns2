@@ -114,8 +114,11 @@ class Net_DNS2_RR_CNAME extends Net_DNS2_RR
 
             $offset = $packet->offset;
             $this->cname = Net_DNS2_Packet::expand($packet, $offset);
+
+            return true;
         }
-        return true;
+
+        return false;
     }
 
     /**
@@ -135,6 +138,7 @@ class Net_DNS2_RR_CNAME extends Net_DNS2_RR
 
             return $packet->compress($this->cname, $packet->offset);
         }
+
         return null;
     }
 }

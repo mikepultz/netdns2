@@ -2,11 +2,11 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
  * PHP Version 5
  *
- * Copyright (c) 2010, Mike Pultz <mike@mikepultz.com>.
+ * Copyright (c) 2011, Mike Pultz <mike@mikepultz.com>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -21,8 +21,8 @@
  *     the documentation and/or other materials provided with the
  *     distribution.
  *
- *   * Neither the name of Mike Pultz nor the names of his contributors 
- *     may be used to endorse or promote products derived from this 
+ *   * Neither the name of Mike Pultz nor the names of his contributors
+ *     may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -41,27 +41,25 @@
  * @category  Networking
  * @package   Net_DNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2010 Mike Pultz <mike@mikepultz.com>
+ * @copyright 2011 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
- * @since     File available since Release 0.6.0
+ * @since     File available since Release 1.2.0
  *
  */
 
 /**
- * DHCID Resource Record - RFC4701 section 3.1
+ * CAA Resource Record - http://tools.ietf.org/html/draft-ietf-pkix-caa-03
  *
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *    |                  ID Type Code                 |       
+ *    |          FLAGS        |      TAG LENGTH       |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *    |       Digest Type     |                       /       
- *    +--+--+--+--+--+--+--+--+                       /
- *    /                                               /       
- *    /                    Digest                     /       
- *    /                                               /       
+ *    /                      TAG                      /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- * 
+ *    /                      DATA                     /
+ *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *
  * @category Networking
  * @package  Net_DNS2
  * @author   Mike Pultz <mike@mikepultz.com>
@@ -70,24 +68,23 @@
  * @see      Net_DNS2_RR
  *
  */
-class Net_DNS2_RR_DHCID extends Net_DNS2_RR
+class Net_DNS2_RR_CAA extends Net_DNS2_RR
 {
     /*
-     * Identifier type
+     * The critcal flag
      */
-    public $id_type;
+    public $flags;
 
     /*
-     * Digest Type
+     * The property identifier
      */
-    public $digest_type;
+    public $tag;
 
     /*
-     * The digest
+      * The property value
      */
-    public $digest;
+    public $value;
 
-    
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -97,10 +94,8 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        $out = pack('nC', $this->id_type, $this->digest_type);
-        $out .= base64_decode($this->digest);
-
-        return base64_encode($out);
+        return $this->flags . ' ' . $this->tag . ' "' . 
+            trim($this->cleanString($this->value),'"') . '".';
     }
 
     /**
@@ -114,26 +109,12 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $data = base64_decode(array_shift($rdata));
-        if (strlen($data) > 0) {
+        $this->flags    = array_shift($rdata);
+        $this->tag      = array_shift($rdata);
 
-            //
-            // unpack the id type and digest type
-            //
-            $x = unpack('nid_type/Cdigest_type', $data);
-
-            $this->id_type      = $x['id_type'];
-            $this->digest_type  = $x['digest_type'];
-
-            //
-            // copy out the digest
-            //
-            $this->digest = base64_encode(substr($data, 3, strlen($data) - 3));
-
-            return true;
-        }
-
-        return false;
+        $this->value    = trim($this->cleanString(implode($rdata, ' ')), '"');
+        
+        return true;
     }
 
     /**
@@ -148,21 +129,19 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
         if ($this->rdlength > 0) {
+            
+            //
+            // unpack the flags and tag length
+            //
+            $x = unpack('Cflags/Ctag_length', $this->rdata);
 
-            //
-            // unpack the id type and digest type
-            //
-            $x = unpack('nid_type/Cdigest_type', $this->rdata);
+            $this->flags    = $x['flags'];
+            $offset         = 2;
 
-            $this->id_type      = $x['id_type'];
-            $this->digest_type  = $x['digest_type'];
+            $this->tag      = substr($this->rdata, $offset, $x['tag_length']);
+            $offset         += $x['tag_length'];
 
-            //
-            // copy out the digest
-            //
-            $this->digest = base64_encode(
-                substr($this->rdata, 3, $this->rdlength - 3)
-            );
+            $this->value    = substr($this->rdata, $offset);
 
             return true;
         }
@@ -183,21 +162,16 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
-        if (strlen($this->digest) > 0) {
+        if (strlen($this->value) > 0) {
 
-            return pack('nC', $this->id_type, $this->digest_type) . 
-                base64_decode($this->digest);
+            $data  = chr($this->flags);
+            $data .= chr(strlen($this->tag)) . $this->tag . $this->value;
+
+            return $data;
         }
-    
+
         return null;
     }
 }
 
-/*
- * Local variables:
- * tab-width: 4
- * c-basic-offset: 4
- * c-hanging-comment-ender-p: nil
- * End:
- */
 ?>

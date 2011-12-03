@@ -191,9 +191,11 @@ class Net_DNS2_RR_SOA extends Net_DNS2_RR
             $this->retry    = $x['retry'];
             $this->expire   = $x['expire'];
             $this->minimum  = $x['minimum'];
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

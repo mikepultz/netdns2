@@ -118,8 +118,10 @@ class Net_DNS2_RR_X25 extends Net_DNS2_RR
         if ($this->rdlength > 0) {
 
             $this->psdnaddress = Net_DNS2_Packet::label($packet, $packet->offset);
+            return true;
         }
-        return true;
+
+        return false;
     }
 
     /**

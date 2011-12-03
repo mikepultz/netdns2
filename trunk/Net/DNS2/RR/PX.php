@@ -141,9 +141,11 @@ class Net_DNS2_RR_PX extends Net_DNS2_RR
 
             $this->map822   = Net_DNS2_Packet::expand($packet, $offset);
             $this->mapx400  = Net_DNS2_Packet::expand($packet, $offset);
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

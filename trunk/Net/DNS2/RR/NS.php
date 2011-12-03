@@ -114,9 +114,11 @@ class Net_DNS2_RR_NS extends Net_DNS2_RR
 
             $offset = $packet->offset;
             $this->nsdname = Net_DNS2_Packet::expand($packet, $offset);
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -133,6 +135,7 @@ class Net_DNS2_RR_NS extends Net_DNS2_RR
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
         if (strlen($this->nsdname) > 0) {
+
             return $packet->compress($this->nsdname, $packet->offset);
         }
         

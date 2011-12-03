@@ -105,17 +105,17 @@ class Net_DNS2_RR_ATMA extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $address = array_shift($rdata);
+        $value = array_shift($rdata);
 
-        if (ctype_xdigit($address) == true) {
+        if (ctype_xdigit($value) == true) {
             
-            $this->format = 0;
-            $this->address = $address;
+            $this->format   = 0;
+            $this->address  = $value;
 
-        } else if (is_numeric($address) == true) {
+        } else if (is_numeric($value) == true) {
 
-            $this->format = 1;
-            $this->address = $address;
+            $this->format   = 1;
+            $this->address  = $value;
 
         } else {
 
@@ -159,9 +159,11 @@ class Net_DNS2_RR_ATMA extends Net_DNS2_RR
 
                 return false;
             }
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**

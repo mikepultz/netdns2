@@ -126,13 +126,16 @@ class Net_DNS2_RR_HINFO extends Net_DNS2_RR
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
         if ($this->rdlength > 0) {
+
             $offset = $packet->offset;
     
             $this->cpu  = trim(Net_DNS2_Packet::label($packet, $offset), '"');
             $this->os   = trim(Net_DNS2_Packet::label($packet, $offset), '"');
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
