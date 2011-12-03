@@ -259,8 +259,8 @@ class Net_DNS2_Lookups
         'HIP'           => 55,      // RFC 5205
         'NINFO'         => 56,      // Not implemented
         'RKEY'          => 57,      // Not implemented
-        'TALINK'        => 58,      // tools.ietf.org/html/draft-ietf-dnsop-dnssec-trust-history-01
-        'CDS'           => 59,      // tools.ietf.org/html/draft-barwood-dnsop-ds-publish-02
+        'TALINK'        => 58,      // IETF (draft-barwood-dnsop-ds-publish-02)
+        'CDS'           => 59,      // IETF (draft-barwood-dnsop-ds-publish-02)
 
                                     // 60 - 98 unassigned
 

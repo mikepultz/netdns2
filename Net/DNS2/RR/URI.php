@@ -171,7 +171,7 @@ class Net_DNS2_RR_URI extends Net_DNS2_RR
             $data = pack('nn', $this->priority, $this->weight);
             $packet->offset += 4;
 
-            $data .= $packet->compress(trim($this->target,'"'), $packet->offset);
+            $data .= $packet->compress(trim($this->target, '"'), $packet->offset);
 
             return $data;
         }
