@@ -98,7 +98,7 @@ class Net_DNS2_RR_URI extends Net_DNS2_RR
         // presentation format has double quotes (") around the target.
         //
         return $this->priority . ' ' . $this->weight . ' "' . 
-            $this->cleanString($this->target) . '".';
+            $this->cleanString($this->target) . '"';
     }
 
     /**
