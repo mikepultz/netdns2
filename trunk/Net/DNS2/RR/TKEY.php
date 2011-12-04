@@ -160,7 +160,7 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
         // the rest of the data is set manually
         //
         $this->inception    = time();
-        $this->expiration   = time() + 24 * 60 * 60; // 1 day
+        $this->expiration   = time() + 86400; // 1 day
         $this->error        = 0;
         $this->key_size     = strlen($this->key_data);
         $this->other_size   = 0;
