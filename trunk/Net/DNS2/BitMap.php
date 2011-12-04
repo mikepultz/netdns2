@@ -108,7 +108,8 @@ class Net_DNS2_BitMap
                 $bitstr .= sprintf('%08b', $r);
             }
 
-            for ($i=0; $i<strlen($bitstr); $i++) {
+            $blen = strlen($bitstr);
+            for ($i=0; $i<$blen; $i++) {
 
                 if ($bitstr[$i] == '1') {
                 

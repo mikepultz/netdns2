@@ -640,19 +640,20 @@ class Net_DNS2
     {
         if (strpos($_address, '::') !== false) {
         
-            $part = explode('::', $_address);
-            $part[0] = explode(':', $part[0]);
-            $part[1] = explode(':', $part[1]);
+            $part       = explode('::', $_address);
+            $part[0]    = explode(':', $part[0]);
+            $part[1]    = explode(':', $part[1]);
         
             $missing = array();
         
-            for ($i = 0; $i < (8 - (count($part[0]) + count($part[1]))); $i++) {
+            $x = (8 - (count($part[0]) + count($part[1])));
+            for ($i = 0; $i < $x; $i++) {
             
                 array_push($missing, '0000');
             }
 
-            $missing = array_merge($part[0], $missing);
-            $part = array_merge($missing, $part[1]);
+            $missing    = array_merge($part[0], $missing);
+            $part       = array_merge($missing, $part[1]);
 
         } else {
         
