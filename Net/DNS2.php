@@ -55,12 +55,6 @@
  */
 spl_autoload_register('Net_DNS2::autoload');
 
-/*
- * generate the lookups so they're available everwhere
- *
- */
-$GLOBALS['_Net_DNS2_Lookups'] = new Net_DNS2_Lookups();
-
 /**
  * This is the base class for the Net_DNS2_Resolver and Net_DNS2_Updater
  * classes.
