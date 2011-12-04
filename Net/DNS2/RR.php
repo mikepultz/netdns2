@@ -227,16 +227,7 @@ abstract class Net_DNS2_RR
      */
     protected function formatString($string)
     {
-        //
-        // make sure first it doesn't already have some
-        //
-        $s = trim($string, '"');
-
-        if (preg_match('/\s+/', $s)) {
-            return '"' . str_replace('"', '\"', $s) . '"';
-        }
-        
-        return $s;
+        return '"' . str_replace('"', '\"', trim($string, '"')) . '"';
     }
     
     /**

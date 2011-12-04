@@ -80,6 +80,11 @@ class Net_DNS2_RR_TXT extends Net_DNS2_RR
      */
     protected function rrToString()
     {
+        if (count($this->text) == 0)
+        {
+            return '""';
+        }
+
         $data = '';
 
         foreach ($this->text as $t) {
@@ -153,9 +158,7 @@ class Net_DNS2_RR_TXT extends Net_DNS2_RR
         $data = null;
 
         foreach ($this->text as $t) {
-
-            $data .= chr(strlen($t));
-            $data .= $t;
+            $data .= chr(strlen($t)) . $t;
         }
 
         return $data;

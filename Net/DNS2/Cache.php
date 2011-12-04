@@ -123,7 +123,7 @@ class Net_DNS2_Cache
      */
     public function put($key, $data)
     {
-        $ttl = 60 * 60 * 24 * 365;
+        $ttl = 86400 * 365;
 
         //
         // find the lowest TTL, and use that as the TTL for the whole cached 
