@@ -49,6 +49,24 @@
  *
  */
 
+//
+// initalize the packet id value
+//
+Net_DNS2_Lookups::$next_packet_id   = mt_rand(0, 65535);
+
+//
+// build the reverse lookup tables; this is just so we don't have to
+// have duplicate static content laying around.
+//
+Net_DNS2_Lookups::$rr_types_by_id       = array_flip(Net_DNS2_Lookups::$rr_types_by_name);
+Net_DNS2_Lookups::$classes_by_id        = array_flip(Net_DNS2_Lookups::$classes_by_name);
+Net_DNS2_Lookups::$rr_types_class_to_id = array_flip(Net_DNS2_Lookups::$rr_types_id_to_class);
+Net_DNS2_Lookups::$algorithm_name_to_id = array_flip(Net_DNS2_Lookups::$algorithm_id_to_name);
+Net_DNS2_Lookups::$digest_name_to_id    = array_flip(Net_DNS2_Lookups::$digest_id_to_name);
+Net_DNS2_Lookups::$rr_qtypes_by_id      = array_flip(Net_DNS2_Lookups::$rr_qtypes_by_name);
+Net_DNS2_Lookups::$rr_metatypes_by_id   = array_flip(Net_DNS2_Lookups::$rr_metatypes_by_name);
+Net_DNS2_Lookups::$protocol_by_id       = array_flip(Net_DNS2_Lookups::$protocol_by_name);
+
 /**
  * This class provides simple lookups used througout the Net_DNS2 code
  * 
@@ -500,33 +518,6 @@ class Net_DNS2_Lookups
         // 80 - 254     - Unassigned
         // 255          - Reserved
     );
-
-    /**
-     * Constructor - generates some static arrays 
-     *
-     * @access public
-     *
-     */
-    public function __construct()
-    {
-        //
-        // initalize the packet id value
-        //
-        self::$next_packet_id               = mt_rand(0, 65535);
-
-        //
-        // build the reverse lookup tables; this is just so we don't have to
-        // have duplicate static content laying around.
-        //
-        self::$rr_types_by_id       = array_flip(self::$rr_types_by_name);
-        self::$classes_by_id        = array_flip(self::$classes_by_name);
-        self::$rr_types_class_to_id = array_flip(self::$rr_types_id_to_class);
-        self::$algorithm_name_to_id = array_flip(self::$algorithm_id_to_name);
-        self::$digest_name_to_id    = array_flip(self::$digest_id_to_name);
-        self::$rr_qtypes_by_id      = array_flip(self::$rr_qtypes_by_name);
-        self::$rr_metatypes_by_id   = array_flip(self::$rr_metatypes_by_name);
-        self::$protocol_by_id       = array_flip(self::$protocol_by_name);
-    }
 }
 
 /*
