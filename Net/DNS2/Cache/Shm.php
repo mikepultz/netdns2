@@ -83,10 +83,11 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
      * @return void
      *
      */
-    public function open($cache_file, $size)
+    public function open($cache_file, $size, $serializer)
     {
-        $this->cache_size = $size;
-        $this->cache_file = $cache_file;
+        $this->cache_size       = $size;
+        $this->cache_file       = $cache_file;
+        $this->cache_serializer = $serializer;
 
         //
         // make sure the file exists first
@@ -137,7 +138,11 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
                     //
                     // unserialize and store the data
                     //
-                    $this->cache_data = @unserialize($data);
+                    if ($this->cache_serializer == 'json') {
+                        $this->cache_data = json_decode($data, true);
+                    } else {
+                        $this->cache_data = unserialize($data);
+                    }
 
                     //
                     // call clean to clean up old entries
@@ -205,37 +210,24 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
                 //
                 // unserialize and store the data
                 //
-                $this->cache_data = array_merge(
-                    $this->cache_data, @unserialize($data)
-                );
-            }
+                $c = $this->cache_data;
 
-            //
-            // if the size allocated to the segment, is different than 
-            // our cache_size setting, then the size changed, and we need to 
-            // re-crate it before writing the content.
-            //
-            if ( ($allocated != $this->cache_size) && ($allocated > 0) ) {
-
-                //
-                // delete the segment
-                //
-                shmop_delete($this->_cache_id);
-
-                //
-                // create segment with the new size
-                //
-                $this->_cache_id = @shmop_open(
-                    $this->_cache_file_tok, 'c', 0644, $this->cache_size
-                );
-                if ($this->_cache_id === false) {
-
-                    //
-                    // not much to do here
-                    //
-                    return;
+                if ($this->cache_serializer == 'json') {
+                    $this->cache_data = array_merge($c, json_decode($data, true));
+                } else {
+                    $this->cache_data = array_merge($c, unserialize($data));
                 }
             }
+
+            //
+            // delete the segment
+            //
+            shmop_delete($this->_cache_id);
+
+            //
+            // clean the data
+            //
+            $this->clean();
 
             //
             // clean up and write the data
@@ -243,10 +235,17 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
             $data = $this->resize();
             if (!is_null($data)) {
 
-                $o = shmop_write($this->_cache_id, $data, 0);
-            } else {
+                //
+                // re-create segment
+                //
+                $this->_cache_id = @shmop_open(
+                    $this->_cache_file_tok, 'c', 0644, $this->cache_size
+                );
+                if ($this->_cache_id === false) {
+                    return;
+                }
 
-                $o = shmop_write($this->_cache_id, '', 0);
+                $o = shmop_write($this->_cache_id, $data, 0);
             }
 
             //

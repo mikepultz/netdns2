@@ -131,6 +131,17 @@ class Net_DNS2
     public $cache_size = 10000;
 
     /*
+     * the method to use for storing cache data; either "serialize" or "json"
+     *
+     * json is faster, but can't remember the class names (everything comes back as a
+     * "stdClass Object"; all the data is the same though. serialize is slower, but will
+     * have all the class info.
+     *
+     * defaults to 'serialize'
+     */
+    public $cache_serializer = 'serialize';
+
+    /*
      * local sockets
      */
     protected $sock = array('udp' => array(), 'tcp' => array());
