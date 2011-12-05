@@ -46,6 +46,12 @@ The file to use for the cache. This is used for both the shared memory and file 
 
 The number of bytes Net_DNS2 is allowed to use as a cache- the bigger the better.
 
+*cache_serializer* - string, defaults to 'serialize' _(since v1.2.0)_
+
+Defines the serialization method to use when storing the cache content. Can be either 'serialize' to use the PHP serialize function, or 'json' to store the data as a JSON object.
+
+JSON is much faster, but loses the object definition; all content becomes a stdClass object- but all the data is still accessible.
+
 == Example Usage ==
 
 {{{
