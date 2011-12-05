@@ -1,0 +1,43 @@
+= Change Log =
+
+=== Version 1.2.0 ===
+
+ * added numeric error codes to the Lookups class, and had each method that throws an exception throw a numeric error code along with the message.
+ * dropped all references to InvalidArgumentException; we only use the Net_DNS2_Exception from now on.
+ * added the CAA, URI, TALINK, CDS and TA resource records. Some of these are experimental, but are pretty straight forward.
+ * fixed a bug in formatString(); my version was only putting double quotes around strings that have spaces, but apparently ALL strings should have double quotes around them. This is how BIND does it.
+ * re-organized the Net_DNS2_Lookups initialization code; it no longer creates a global object of itself.
+ * fixed a bug in the caching code; in some cases it wouldn't cache the same content more then once.
+ * added an option to use JSON to serialize the cache data rather than using the PHP serialize function. JSON is much faster, but loses the class definition, and becomes a stdClass object.
+ * fixed a handful of cases where I was using double quotes (") where a single quote (') would be fine.
+
+=== Version 1.1.4 ===
+
+ * fixed a math issue with the name compress logic; this would somtimes screw up Updates with multiple RR's
+ * added a new test in the test suite, that validates that the domain name compression and expansion works properly
+
+=== Version 1.1.3 ===
+
+ * added support for IPv6 DNS servers; from resolv.conf files, and from name server arrays
+ * added new IPv4 and IPv6 validation functions, and a IPv6 expand function
+ * changed the A, AAAA and IPSECKEY RR&apos;s to use the new validation methods
+ * added support for IPv6 PTR records
+ * dropped the old IPv4 regex from the lookups class
+
+=== Version 1.1.2 ===
+
+ * fixed a bug in the Net_DNS2_Updater class; I wasn't resetting the internal packet request values, so in some cases making more than one request on the same instance would fail.
+ * Fixed a bug in Net_DNS2; I wasn't handling comments properly when parsing the resolv.conf file.
+ * check for duplicate entries when adding/deleting entries in the Updater() class; BIND will throw and error if you try to delete the same RR twice in the same request, not sure if this is expected behaviour
+ * modified several RR's to clean up the trailing period when it's displayed on hosts.
+
+=== Version 1.1.1 ===
+
+ * fixed a bug in the autoload function; if you had another autoload function defined, and tried to load a class with an underscore in the name, it would fail.
+
+=== Version 1.1.0 ===
+
+ * added support for signing requests using SIG(0); uses the PHP openssl extension, and only currently supports RSA- DSA support in PHP is limited.
+ * moved the signing code for SIG(0) and TSIG to the base class so it can be used for both updates and queries (for AXFR)
+ * added a simple local cache feature using shared memory (shmop extension) or using a flat fille. This feature is disabled by default.
+ * added support for the ATMA resource record (supported in Windows)
