@@ -25,7 +25,7 @@ $pkg->setAPIVersion('1.2.0');
 $pkg->setReleaseVersion('1.2.0');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
-$pkg->setNotes("- fixed a docblock issue in the Net_DNS2 class\n- added error codes to the Lookups class, and had each method that throws an exception throw a numeric error code along with the message");
+$pkg->setNotes("- added numeric error codes to the Lookups class, and had each method that throws an exception throw a numeric error code along with the message.\n- dropped all references to InvalidArgumentException; we only use the Net_DNS2_Exception from now on.\n- added the CAA, URI, TALINK, CDS and TA resource records. Some of these are experimental, but are pretty straight forward.\n- fixed a bug in formatString(); my version was only putting double quotes around strings that have spaces, but apparently ALL strings should have double quotes around them. This is how BIND does it.\n- re-organized the Net_DNS2_Lookups initialization code; it no longer creates a global object of itself.\n- fixed a bug in the caching code; in some cases it wouldn't cache the same content more than once.\n- added an option to use JSON to serialize the cache data rather than using the PHP serialize function. JSON is much faster, but loses the class definition, and becomes a stdClass object.\n- fixed a handful of cases where I was using double quotes where a single quote would be fine.");
 $pkg->setPackageType('php');
 $pkg->addRelease();
 $pkg->setPhpDep('5.1.2');
