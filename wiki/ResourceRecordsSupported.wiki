@@ -42,6 +42,12 @@
  * NSEC3
  * NSEC3PARAM
  * HIP
+ * TALINK _(as of version 1.2.0)_
+ * CDS _(as of version 1.2.0)_
  * SPF
  * TKEY
  * TSIG
+ * URI _(as of version 1.2.0)_
+ * CAA _(as of version 1.2.0)_
+ * TA _(as of version 1.2.0)_
+ * DLV
