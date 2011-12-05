@@ -2,6 +2,8 @@
 
 === Version 1.2.0 ===
 
+*This version changes the way some exceptions are thrown, and may break your code!*
+
  * added numeric error codes to the Lookups class, and had each method that throws an exception throw a numeric error code along with the message.
  * dropped all references to InvalidArgumentException; we only use the Net_DNS2_Exception from now on.
  * added the CAA, URI, TALINK, CDS and TA resource records. Some of these are experimental, but are pretty straight forward.
