@@ -73,10 +73,11 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
      * @return void
      *
      */
-    public function open($cache_file, $size)
+    public function open($cache_file, $size, $serializer)
     {
-        $this->cache_size = $size;
-        $this->cache_file = $cache_file;
+        $this->cache_size       = $size;
+        $this->cache_file       = $cache_file;
+        $this->cache_serializer = $serializer;
 
         //
         // check that the file exists first
@@ -99,9 +100,15 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
                 //
                 // read the file contents
                 //
-                $this->cache_data = unserialize(
-                    fread($fp, filesize($this->cache_file))
-                );
+                if ($this->cache_serializer == 'json') {
+                    $this->cache_data = json_decode(
+                        fread($fp, filesize($this->cache_file)), true
+                    );
+                } else {
+                    $this->cache_data = unserialize(
+                        fread($fp, filesize($this->cache_file))
+                    );
+                }
 
                 //
                 // unlock
@@ -154,15 +161,24 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
                 //
                 // unserialize and store the data
                 //
-                $this->cache_data = array_merge(
-                    $this->cache_data, @unserialize($data)
-                );
+                $c = $this->cache_data;
+
+                if ($this->cache_serializer == 'json') {
+                    $this->cache_data = array_merge($c, json_decode($data, true));
+                } else {
+                    $this->cache_data = array_merge($c, unserialize($data));
+                }
             }
 
             //
             // trucate the file
             //
             ftruncate($fp, 0);
+
+            //
+            // clean the data
+            //
+            $this->clean();
 
             //
             // resize the data

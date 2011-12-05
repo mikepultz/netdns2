@@ -77,6 +77,11 @@ class Net_DNS2_Cache
      */
     protected $cache_size = 0;
 
+    /*
+     * the cache serializer
+     */
+    protected $cache_serializer;
+
     /**
      * returns true/false if the provided key is defined in the cache
      * 
@@ -104,7 +109,11 @@ class Net_DNS2_Cache
     {
         if (isset($this->cache_data[$key])) {
 
-            return unserialize($this->cache_data[$key]['object']);
+            if ($this->cache_serializer == 'json') {
+                return json_decode($this->cache_data[$key]['object']);
+            } else {
+                return unserialize($this->cache_data[$key]['object']);
+            }
         } else {
 
             return false;
@@ -158,7 +167,7 @@ class Net_DNS2_Cache
 
             'cache_date'    => time(),
             'ttl'           => $ttl,
-            'object'        => serialize($data)
+            'object'        => ($this->cache_serializer == 'json') ? json_encode($data) : serialize($data)
         );
     }
 
@@ -209,7 +218,11 @@ class Net_DNS2_Cache
             //
             // serialize the cache data
             //
-            $cache = serialize($this->cache_data);
+            if ($this->cache_serializer == 'json') {
+                $cache = json_encode($this->cache_data);
+            } else {
+                $cache = serialize($this->cache_data);
+            }
 
             //
             // only do this part if the size allocated to the cache storage
@@ -243,11 +256,15 @@ class Net_DNS2_Cache
                     //
                     // re-serialize
                     //
-                    $cache = serialize($this->cache_data);
+                    if ($this->cache_serializer == 'json') {
+                        $cache = json_encode($this->cache_data);
+                    } else {
+                        $cache = serialize($this->cache_data);
+                    }
                 }
             }
 
-            if ($cache == 'a:0:{}') {
+            if ( ($cache == 'a:0:{}') || ($cache == '{}') ) {
                 return null;
             } else {
                 return $cache;
