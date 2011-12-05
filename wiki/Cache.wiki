@@ -37,3 +37,76 @@ $r = new Net_DNS2_Resolver(array(
 ));
 
 }}}
+
+== Serialization Method ==
+
+You can also adjust the serialization method used when storing the cache data. By default, Net_DNS2 uses the PHP serialize()/unserialize(), but you can also use JSON encoding.
+
+JSON encoding is much faster then the PHP serialize functions, but it loses the class information of the objects- everything comes back as stdClass objects.
+
+To change the serialization method, set "cache_serializer" to either "serialize" or "json".
+
+=== Example ===
+
+{{{
+
+$r = new Net_DNS2_Resolver(array(
+
+	'cache_type'	    => 'file',
+	'cache_file'	    => '/tmp/net_dns2.cache',
+	'cache_size'	    => 100000,
+        'cache_serializer'  => 'json'
+));
+
+}}}
+
+The speed difference is significant.
+
+{{{
+
+A Query lookup against Google DNS- NO cache
+time: 0.0340800285339
+
+	Net_DNS2_RR_A Object
+	(
+	    [address] => 199.59.148.82
+	    [name] => twitter.com
+	    [type] => A
+	    [class] => IN
+	    [ttl] => 28
+	    [rdlength] => 4
+	    [rdata] => 
+	)
+
+
+with cache + serialize
+time: 0.00258994102478
+
+	Net_DNS2_RR_A Object
+	(
+	    [address] => 199.59.148.82
+	    [name] => twitter.com
+	    [type] => A
+	    [class] => IN
+	    [ttl] => 28
+	    [rdlength] => 4
+	    [rdata] => 
+	)
+
+
+with cache + json
+time: 0.00178384780884
+
+	stdClass Object
+	(
+	    [address] => 199.59.148.82
+	    [name] => twitter.com
+	    [type] => A
+	    [class] => IN
+	    [ttl] => 28
+	    [rdlength] => 4
+	    [rdata] => 
+	)
+
+
+}}}
