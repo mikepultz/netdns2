@@ -110,14 +110,14 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 
             if (Net_DNS2::isIPv4($this->host) == true) {
 
-                $this->_sock = @stream_socket_client(
+                $this->sock = @stream_socket_client(
                     'tcp://' . $this->host . ':' . $this->port, 
                     $errno, $errstr, $this->timeout, 
                     STREAM_CLIENT_CONNECT, $this->_context
                 );
             } else if (Net_DNS2::isIPv6($this->host) == true) {
 
-                $this->_sock = @stream_socket_client(
+                $this->sock = @stream_socket_client(
                     'tcp://[' . $this->host . ']:' . $this->port, 
                     $errno, $errstr, $this->timeout, 
                     STREAM_CLIENT_CONNECT, $this->_context
@@ -134,14 +134,14 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 
             if (Net_DNS2::isIPv4($this->host) == true) {
 
-                $this->_sock = @stream_socket_client(
+                $this->sock = @stream_socket_client(
                     'udp://' . $this->host . ':' . $this->port, 
                     $errno, $errstr, $this->timeout, 
                     STREAM_CLIENT_CONNECT, $this->_context
                 );
             } else if (Net_DNS2::isIPv6($this->host) == true) {
 
-                $this->_sock = @stream_socket_client(
+                $this->sock = @stream_socket_client(
                     'udp://[' . $this->host . ']:' . $this->port, 
                     $errno, $errstr, $this->timeout, 
                     STREAM_CLIENT_CONNECT, $this->_context
@@ -159,7 +159,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
             return false;
         }
 
-        if ($this->_sock === false) {
+        if ($this->sock === false) {
 
             $this->last_error = $errstr;
             return false;
@@ -168,8 +168,8 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         //
         // set it to non-blocking and set the timeout
         //
-        @stream_set_blocking($this->_sock, 0);
-        @stream_set_timeout($this->_sock, $this->timeout);
+        @stream_set_blocking($this->sock, 0);
+        @stream_set_timeout($this->sock, $this->timeout);
 
         return true;
     }
@@ -183,9 +183,9 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
      */
     public function close()
     {
-        if (is_resource($this->_sock) === true) {
+        if (is_resource($this->sock) === true) {
 
-            @fclose($this->_sock);
+            @fclose($this->sock);
         }
         return true;
     }
@@ -209,7 +209,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         }
 
         $read   = null;
-        $write  = array($this->_sock);
+        $write  = array($this->sock);
         $except = null;
 
         //
@@ -237,7 +237,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 
             $s = chr($length >> 8) . chr($length);
 
-            if (@fwrite($this->_sock, $s) === false) {
+            if (@fwrite($this->sock, $s) === false) {
 
                 $this->last_error = 'failed to fwrite() 16bit length';
                 return false;
@@ -247,7 +247,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         //
         // write the data to the socket
         //
-        $size = @fwrite($this->_sock, $data);
+        $size = @fwrite($this->sock, $data);
         if ( ($size === false) || ($size != $length) ) {
         
             $this->last_error = 'failed to fwrite() packet';
@@ -268,7 +268,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
      */
     public function read(&$size)
     {
-        $read   = array($this->_sock);
+        $read   = array($this->sock);
         $write  = null;
         $except = null;
 
@@ -299,7 +299,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         //
         if ($this->type == SOCK_STREAM) {
     
-            if (($data = fread($this->_sock, 2)) === false) {
+            if (($data = fread($this->sock, 2)) === false) {
                 
                 $this->last_error = 'failed on fread() for data length';
                 return false;
@@ -315,7 +315,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         //
         // read the data from the socket
         //
-        if (($data = fread($this->_sock, $length)) === false) {
+        if (($data = fread($this->sock, $length)) === false) {
             
             $this->last_error = 'failed on fread() for data';
             return false;

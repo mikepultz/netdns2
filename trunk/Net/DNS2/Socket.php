@@ -63,8 +63,7 @@
  */
 abstract class Net_DNS2_Socket
 {
-    private $_sock;
-
+    protected $sock;
     protected $type;
     protected $host;
     protected $port;

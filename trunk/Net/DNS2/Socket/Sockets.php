@@ -80,14 +80,14 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         //
         if (Net_DNS2::isIPv4($this->host) == true) {
 
-            $this->_sock = @socket_create(
+            $this->sock = @socket_create(
                 AF_INET, $this->type, 
                 ($this->type == SOCK_STREAM) ? SOL_TCP : SOL_UDP
             );
 
         } else if (Net_DNS2::isIPv6($this->host) == true) {
         
-            $this->_sock = @socket_create(
+            $this->sock = @socket_create(
                 AF_INET6, $this->type, 
                 ($this->type == SOCK_STREAM) ? SOL_TCP : SOL_UDP
             );
@@ -98,13 +98,13 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
             return false;
         }
 
-        if ($this->_sock === false) {
+        if ($this->sock === false) {
 
             $this->last_error = socket_strerror(socket_last_error());
             return false;
         }
 
-        @socket_set_option($this->_sock, SOL_SOCKET, SO_REUSEADDR, 1);
+        @socket_set_option($this->sock, SOL_SOCKET, SO_REUSEADDR, 1);
 
         //
         // bind to a local IP/port if it's set
@@ -112,7 +112,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         if (strlen($this->local_host) > 0) {
 
             $result = @socket_bind(
-                $this->_sock, $this->local_host, 
+                $this->sock, $this->local_host, 
                 ($this->local_port > 0) ? $this->local_port : null
             );
             if ($result === false) {
@@ -125,7 +125,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         //
         // connect to the socket
         //
-        if (@socket_connect($this->_sock, $this->host, $this->port) === false) {
+        if (@socket_connect($this->sock, $this->host, $this->port) === false) {
 
             $this->last_error = socket_strerror(socket_last_error());
             return false;
@@ -134,7 +134,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         //
         // mark the socket as non-blocking
         //
-        if (@socket_set_nonblock($this->_sock) === false) {
+        if (@socket_set_nonblock($this->sock) === false) {
 
             $this->last_error = socket_strerror(socket_last_error());
             return false;
@@ -152,9 +152,9 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
      */
     public function close()
     {
-        if (is_resource($this->_sock) === true) {
+        if (is_resource($this->sock) === true) {
 
-            @socket_close($this->_sock);
+            @socket_close($this->sock);
         }
         return true;
     }
@@ -178,7 +178,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         }
 
         $read   = null;
-        $write  = array($this->_sock);
+        $write  = array($this->sock);
         $except = null;
 
         //
@@ -206,7 +206,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
 
             $s = chr($length >> 8) . chr($length);
 
-            if (@socket_write($this->_sock, $s) === false) {
+            if (@socket_write($this->sock, $s) === false) {
 
                 $this->last_error = socket_strerror(socket_last_error());
                 return false;
@@ -216,7 +216,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         //
         // write the data to the socket
         //
-        $size = @socket_write($this->_sock, $data);
+        $size = @socket_write($this->sock, $data);
         if ( ($size === false) || ($size != $length) ) {
 
             $this->last_error = socket_strerror(socket_last_error());
@@ -237,7 +237,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
      */
     public function read(&$size)
     {
-        $read   = array($this->_sock);
+        $read   = array($this->sock);
         $write  = null;
         $except = null;
 
@@ -268,7 +268,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         //
         if ($this->type == SOCK_STREAM) {
 
-            if (($size = @socket_recv($this->_sock, $data, 2, 0)) === false) {
+            if (($size = @socket_recv($this->sock, $data, 2, 0)) === false) {
 
                 $this->last_error = socket_strerror(socket_last_error());
                 return false;
@@ -284,7 +284,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         //
         // read the data from the socket
         //
-        $size = @socket_recv($this->_sock, $data, $length, MSG_WAITALL);
+        $size = @socket_recv($this->sock, $data, $length, MSG_WAITALL);
         if ($size === false) {
 
             $this->last_error = socket_strerror(socket_last_error());
