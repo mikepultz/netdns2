@@ -549,7 +549,11 @@ class Net_DNS2
     /**
      * PHP doesn't support unsigned integers, but many of the RR's return
      * unsigned values (like SOA), so there is the possibility that the
-     * value will overrun, and you'll end up with a negative value.
+     * value will overrun on 32bit systems, and you'll end up with a 
+     * negative value.
+     *
+     * 64bit systems are not affected, as their PHP_IN_MAX value should
+     * be 64bit (ie 9223372036854775807)
      *
      * This function returns a negative integer value, as a string, with
      * the correct unsigned value.
@@ -562,7 +566,7 @@ class Net_DNS2
      */
     public static function expandUint32($_int)
     {
-        if ($_int < 0) {
+        if ( ($_int < 0) && (PHP_INT_MAX == 2147483647) ) {
             return sprintf('%u', $_int);
         } else {
             return $_int;
