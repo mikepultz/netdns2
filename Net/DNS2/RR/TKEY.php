@@ -196,8 +196,8 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
                 $packet->rdata
             );
 
-            $this->inception    = $x['inception'];
-            $this->expiration   = $x['expiration'];
+            $this->inception    = Net_DNS2::expandUint32($x['inception']);
+            $this->expiration   = Net_DNS2::expandUint32($x['expiration']);
             $this->mode         = $x['mode'];
             $this->error        = $x['error'];
             $this->key_size     = $x['key_size'];

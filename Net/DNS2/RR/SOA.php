@@ -186,11 +186,11 @@ class Net_DNS2_RR_SOA extends Net_DNS2_RR
                 $packet->rdata
             );
 
-            $this->serial   = $x['serial'];
-            $this->refresh  = $x['refresh'];
-            $this->retry    = $x['retry'];
-            $this->expire   = $x['expire'];
-            $this->minimum  = $x['minimum'];
+            $this->serial   = Net_DNS2::expandUint32($x['serial']);
+            $this->refresh  = Net_DNS2::expandUint32($x['refresh']);
+            $this->retry    = Net_DNS2::expandUint32($x['retry']);
+            $this->expire   = Net_DNS2::expandUint32($x['expire']);
+            $this->minimum  = Net_DNS2::expandUint32($x['minimum']);
 
             return true;
         }

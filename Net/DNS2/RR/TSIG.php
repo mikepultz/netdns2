@@ -225,7 +225,7 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
                 $this->rdata
             );
 
-            $this->time_signed  = $x['time_low'];
+            $this->time_signed  = Net_DNS2::expandUint32($x['time_low']);
             $this->fudge        = $x['fudge'];
             $this->mac_size     = $x['mac_size'];
 
