@@ -547,6 +547,29 @@ class Net_DNS2
     }
 
     /**
+     * PHP doesn't support unsigned integers, but many of the RR's return
+     * unsigned values (like SOA), so there is the possibility that the
+     * value will overrun, and you'll end up with a negative value.
+     *
+     * This function returns a negative integer value, as a string, with
+     * the correct unsigned value.
+     *
+     * @param string $_int the unsigned integer value to check
+     *
+     * @return string returns the unsigned value as a string.
+     * @access public
+     *
+     */
+    public static function expandUint32($_int)
+    {
+        if ($_int < 0) {
+            return sprintf('%u', $_int);
+        } else {
+            return $_int;
+        }
+    }
+
+    /**
      * returns true/false if the given address is a valid IPv4 address
      *
      * @param string $_address the IPv4 address to check

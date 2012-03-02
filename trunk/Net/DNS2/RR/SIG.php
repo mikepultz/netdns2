@@ -227,7 +227,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             $this->typecovered  = Net_DNS2_Lookups::$rr_types_by_id[$x['tc']];
             $this->algorithm    = $x['algorithm'];
             $this->labels       = $x['labels'];
-            $this->origttl      = $x['origttl'];
+            $this->origttl      = Net_DNS2::expandUint32($x['origttl']);
 
             //
             // the dates are in GM time
