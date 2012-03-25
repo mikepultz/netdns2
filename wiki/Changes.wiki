@@ -1,5 +1,10 @@
 = Change Log =
 
+=== Version 1.2.1 ===
+
+ * changed the Net_DNS2_Sockets::sock property from private to protected; this was causing some problems when the request was failing.
+ * PHP doesn't support unsigned integers, but many of the RR's return unsigned values (like SOA), so there is the possibility that the value will overrun on 32bit systems, and you'll end up with a negative value. So a new function was added to convert the negative value to a string with the correct unsigned value.
+
 === Version 1.2.0 ===
 
 *This version changes the way some exceptions are thrown, and may break your code!*
