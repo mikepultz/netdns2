@@ -247,6 +247,11 @@ abstract class Net_DNS2_RR
 
         foreach ($chunks as $r) {
 
+            $r = trim($r);
+            if (strlen($r) == 0) {
+                continue;
+            }
+
             if ( ($r[0] == '"')
                 && ($r[strlen($r) - 1] == '"')
                 && ($r[strlen($r) - 2] != '\\')
