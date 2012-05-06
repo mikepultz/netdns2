@@ -171,7 +171,7 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
 
                     throw new Net_DNS2_Exception(
                         'unsupported PTR value: ' . $name,
-                        Net_DNS2_Lookup::E_PACKET_INVALID
+                        Net_DNS2_Lookups::E_PACKET_INVALID
                     );
                 }
 
@@ -185,7 +185,7 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
 
                 throw new Net_DNS2_Exception(
                     'unsupported PTR value: ' . $name,
-                    Net_DNS2_Lookup::E_PACKET_INVALID
+                    Net_DNS2_Lookups::E_PACKET_INVALID
                 );
             }
         }
