@@ -619,7 +619,7 @@ class Net_DNS2_Updater extends Net_DNS2
         ) {
             throw new Net_DNS2_Exception(
                 'empty headers- nothing to send!',
-                Net_DNS2_Lookup::E_PACKET_INVALID
+                Net_DNS2_Lookups::E_PACKET_INVALID
             );
         }
 
