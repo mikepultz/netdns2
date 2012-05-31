@@ -159,6 +159,50 @@ class Net_DNS2_Resolver extends Net_DNS2
             $packet, ($type == 'AXFR') ? true : $this->use_tcp
         );
 
+        //
+        // if strict mode is enabled, then make sure that the name that was
+        // looked up is *actually* in the response object.
+        //
+        // only do this is strict_query_mode is turned on, AND we've received
+        // some answers; no point doing any else if there were no answers.
+        //
+        if ( ($this->strict_query_mode == true) && ($response->header->ancount > 0) ) {
+
+            $found = false;
+
+            //
+            // look for the requested name/type/class
+            //
+            foreach($response->answer as $index => $object) {
+
+                if ( (strcasecmp($object->name, $name) == 0) &&
+                    ($object->type == $type) &&
+                    ($object->class == $class) ) {
+
+                    $found = true;
+                    break;
+                }
+            }
+
+            //
+            // if it's not found, then unset the answer section; it's not correct to
+            // throw an exception here; if the hostname didn't exist, then sendPacket()
+            // would have already thrown an NXDOMAIN error- so the host *exists*, but
+            // just not the request type/class.
+            //
+            // the correct response in this case, is an empty answer section; the
+            // authority section may still have usual information, like a SOA record.
+            //
+            if ($found == false) {
+                
+                $response->answer = array();
+                $response->header->ancount = 0;
+            }
+        }
+
+        //
+        // cache the response object
+        //
         if ($this->use_cache == true) {
 
             $this->cache->put($packet_hash, $response);
