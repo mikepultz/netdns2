@@ -142,6 +142,29 @@ class Net_DNS2
     public $cache_serializer = 'serialize';
 
     /*
+     * by default, according to RFC 1034
+     *
+     * CNAME RRs cause special action in DNS software.  When a name server
+     * fails to find a desired RR in the resource set associated with the
+     * domain name, it checks to see if the resource set consists of a CNAME
+     * record with a matching class.  If so, the name server includes the CNAME
+     * record in the response and restarts the query at the domain name
+     * specified in the data field of the CNAME record.
+     *
+     * this can cause "unexpected" behavious, since i'm sure *most* people
+     * don't know DNS does this; there may be cases where Net_DNS2 returns a
+     * positive response, even though the hostname the user looked up did not
+     * actually exist.
+     *
+     * strict_query_mode means that if the hostname that was looked up isn't
+     * actually in the answer section of the response, Net_DNS2 will return an 
+     * empty answer section, instead of an answer section that could contain 
+     * CNAME records.
+     *
+     */
+    public $strict_query_mode = false;
+
+    /*
      * local sockets
      */
     protected $sock = array('udp' => array(), 'tcp' => array());
@@ -930,9 +953,15 @@ class Net_DNS2
             }
         }
 
+        //
+        // if $response is null, then we didn't even try once; which shouldn't
+        // actually ever happen
+        //
         if (is_null($response)) {
 
-            return false;
+            throw new Net_DNS2_Exception(
+                'empty response object', Net_DNS2_Lookups::E_NS_FAILED
+            );
         }
 
         //
