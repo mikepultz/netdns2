@@ -100,14 +100,24 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
                 //
                 // read the file contents
                 //
+                $data = fread($fp, filesize($this->cache_file));
+
+                $decoded = null;
+                    
                 if ($this->cache_serializer == 'json') {
-                    $this->cache_data = json_decode(
-                        fread($fp, filesize($this->cache_file)), true
-                    );
+
+                    $decoded = json_decode($data, true);         
                 } else {
-                    $this->cache_data = unserialize(
-                        fread($fp, filesize($this->cache_file))
-                    );
+
+                    $decoded = unserialize($data);                
+                }
+
+                if (is_array($decoded) == true) {
+
+                    $this->cache_data = $decoded;
+                } else {
+
+                    $this->cache_data = array();
                 }
 
                 //
@@ -163,10 +173,19 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
                 //
                 $c = $this->cache_data;
 
+                $decoded = null;
+
                 if ($this->cache_serializer == 'json') {
-                    $this->cache_data = array_merge($c, json_decode($data, true));
+
+                    $decoded = json_decode($data, true);
                 } else {
-                    $this->cache_data = array_merge($c, unserialize($data));
+
+                    $decoded = unserialize($data);
+                }
+                
+                if (is_array($decoded) == true) {
+
+                    $this->cache_data = array_merge($c, $decoded);
                 }
             }
 
