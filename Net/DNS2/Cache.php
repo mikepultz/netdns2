@@ -166,9 +166,14 @@ class Net_DNS2_Cache
         $this->cache_data[$key] = array(
 
             'cache_date'    => time(),
-            'ttl'           => $ttl,
-            'object'        => ($this->cache_serializer == 'json') ? json_encode($data) : serialize($data)
+            'ttl'           => $ttl
         );
+
+        if ($this->cache_serializer == 'json') {
+            $this->cache_data[$key]['object'] = json_encode($data);
+        } else {
+            $this->cache_data[$key]['object'] = serialize($data);
+        }
     }
 
     /**
