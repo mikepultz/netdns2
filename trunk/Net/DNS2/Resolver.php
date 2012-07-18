@@ -135,7 +135,7 @@ class Net_DNS2_Resolver extends Net_DNS2
         $packet_hash = '';
 
         if ( ($this->use_cache == true) && ($type != 'AXFR') ) {
-echo "cACHE FILE " . $this->cache_file . "\n";
+
             //
             // open the cache
             //
