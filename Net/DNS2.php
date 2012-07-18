@@ -72,7 +72,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = '1.2.1';
+    const VERSION = '1.2.2';
 
     /*
      * the default path to a resolv.conf file
@@ -900,6 +900,7 @@ class Net_DNS2
 
                                 //
                                 // count the SOA records
+                                //
                                 if ($rr->type == 'SOA') {
                                     $soa_count++;
                                 }
@@ -908,6 +909,7 @@ class Net_DNS2
                             //
                             // if we have 2 or more SOA records, then we're done; otherwise
                             // continue out so we read the rest of the packets off the socket
+                            //
                             if ($soa_count >= 2) {
                                 break;
                             } else {

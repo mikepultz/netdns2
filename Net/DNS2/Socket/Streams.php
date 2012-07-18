@@ -273,6 +273,11 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         $except = null;
 
         //
+        // make sure our socket is non-blocking
+        //
+        @stream_set_blocking($this->sock, 0);
+
+        //
         // select on read
         //
         switch(stream_select($read, $write, $except, $this->timeout)) {
