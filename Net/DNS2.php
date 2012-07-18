@@ -857,19 +857,108 @@ class Net_DNS2
                 // read the content, using select to wait for a response
                 //
                 $size = 0;
+                $result = null;
 
-                $result = $this->sock['tcp'][$ns]->read($size);
-                if ( ($result === false) 
-                    ||  ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) 
-                ) {
-                    $this->_last_socket_error = $this->sock['tcp'][$ns]->last_error;
-                    continue;
+                //
+                // handle zone transfer requests differently than other requests.
+                //
+                if ($request->question[0]->qtype == 'AXFR') {
+
+                    $soa_count = 0;
+
+                    while(1) {
+
+                        //
+                        // read the data off the socket
+                        //
+                        $result = $this->sock['tcp'][$ns]->read($size);
+                        if ( ($result === false) 
+                            ||  ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) 
+                        ) {
+                            $this->_last_socket_error = $this->sock['tcp'][$ns]->last_error;
+                            break;
+                        }
+
+                        //
+                        // parse the first chunk as a packet
+                        //
+                        $chunk = new Net_DNS2_Packet_Response($result, $size);
+
+                        //
+                        // if this is the first packet, then clone it directly, then
+                        // go through it to see if there are two SOA records (indicating
+                        // that it's the only packet)
+                        //
+                        if (is_null($response) == true)
+                        {
+                            $response = clone $chunk;
+
+                            //
+                            // go through each answer
+                            //
+                            foreach($response->answer as $index => $rr) {
+
+                                //
+                                // count the SOA records
+                                if ($rr->type == 'SOA') {
+                                    $soa_count++;
+                                }
+                            }
+
+                            //
+                            // if we have 2 or more SOA records, then we're done; otherwise
+                            // continue out so we read the rest of the packets off the socket
+                            if ($soa_count >= 2) {
+                                break;
+                            } else {
+                                continue;
+                            }
+
+                        } else {
+
+                            //
+                            // go through all these answers, and look for SOA records
+                            //
+                            foreach ($chunk->answer as $index => $rr) {
+
+                                //
+                                // count the number of SOA records we find
+                                //
+                                if ($rr->type == 'SOA') {
+                                    $soa_count++;
+                                }
+
+                                //
+                                // add the records to a single response object
+                                //
+                                $response->answer[] = $rr;
+                            }
+
+                            //
+                            // if we've found the second SOA record, we're done
+                            //
+                            if ($soa_count >= 2) {
+                                break;
+                            }
+                        }
+                    }
+
+                } else
+                {
+                    $result = $this->sock['tcp'][$ns]->read($size);
+                    if ( ($result === false) 
+                        ||  ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) 
+                    ) {
+                        $this->_last_socket_error = $this->sock['tcp'][$ns]->last_error;
+                        continue;
+                    }
+
+                    //
+                    // create the packet object
+                    //
+                    $response = new Net_DNS2_Packet_Response($result, $size);
                 }
 
-                //
-                // create the packet object
-                //
-                $response = new Net_DNS2_Packet_Response($result, $size);
                 break;
 
             } else {

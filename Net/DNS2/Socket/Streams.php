@@ -313,12 +313,39 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         }
 
         //
+        // at this point, we know that there is data on the socket to be read,
+        // because we've already extracted the length from the first two bytes.
+        //
+        // so the easiest thing to do, is just turn off socket blocking, and
+        // wait for the data.
+        //
+        @stream_set_blocking($this->sock, 1);
+
+        //
         // read the data from the socket
         //
-        if (($data = fread($this->sock, $length)) === false) {
+        $chunk = '';
+        $chunk_size = $length;
+        $data = '';
+
+        //
+        // loop so we make sure we read all the data
+        //
+        while(1) {
+
+            $chunk = fread($this->sock, $chunk_size);
+            if ($chunk === false) {
             
-            $this->last_error = 'failed on fread() for data';
-            return false;
+                $this->last_error = 'failed on fread() for data';
+                return false;
+            }
+
+            $data .= $chunk;
+            $chunk_size -= strlen($chunk);
+
+            if (strlen($data) >= $length) {
+                break;
+            }
         }
         
         $size = strlen($data);

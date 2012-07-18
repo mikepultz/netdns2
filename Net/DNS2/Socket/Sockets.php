@@ -242,6 +242,15 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         $except = null;
 
         //
+        // make sure our socket is non-blocking
+        //
+        if (@socket_set_nonblock($this->sock) === false) {
+    
+            $this->last_error = socket_strerror(socket_last_error());
+            return false;
+        }
+
+        //
         // select on read
         //
         switch(@socket_select($read, $write, $except, $this->timeout)) {
@@ -279,6 +288,19 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
 
                 return false;
             }
+        }
+
+        //
+        // at this point, we know that there is data on the socket to be read,
+        // because we've already extracted the length from the first two bytes.
+        //
+        // so the easiest thing to do, is just turn off socket blocking, and
+        // wait for the data.
+        //
+        if (@socket_set_block($this->sock) === false) {
+    
+            $this->last_error = socket_strerror(socket_last_error());
+            return false;
         }
 
         //
