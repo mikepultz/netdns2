@@ -130,10 +130,12 @@ class Net_DNS2_Resolver extends Net_DNS2
         // if caching is turned on, then check then hash the question, and
         // do a cache lookup.
         //
+        // don't use the cache for zone transfers
+        //
         $packet_hash = '';
 
-        if ($this->use_cache == true) {
-    
+        if ( ($this->use_cache == true) && ($type != 'AXFR') ) {
+echo "cACHE FILE " . $this->cache_file . "\n";
             //
             // open the cache
             //
@@ -154,6 +156,8 @@ class Net_DNS2_Resolver extends Net_DNS2
 
         //
         // send the packet and get back the response
+        //
+        // *always* use TCP for zone transfers- does this cause any problems?
         //
         $response = $this->sendPacket(
             $packet, ($type == 'AXFR') ? true : $this->use_tcp
@@ -203,7 +207,7 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         // cache the response object
         //
-        if ($this->use_cache == true) {
+        if ( ($this->use_cache == true) && ($type != 'AXFR') ) {
 
             $this->cache->put($packet_hash, $response);
         }

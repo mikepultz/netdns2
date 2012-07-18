@@ -173,6 +173,14 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
      */
     public function __destruct()
     {
+        //
+        // if there's no cache file set, then there's nothing to do
+        //
+        if (strlen($this->cache_file) == 0)
+        {
+            return;
+        }
+
         $fp = fopen($this->cache_file, 'r');
         if ($fp !== false) {
 
