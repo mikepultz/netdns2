@@ -139,7 +139,9 @@ class Net_DNS2_Resolver extends Net_DNS2
             //
             // open the cache
             //
-            $this->cache->open($this->cache_file, $this->cache_size, $this->cache_serializer);
+            $this->cache->open(
+                $this->cache_file, $this->cache_size, $this->cache_serializer
+            );
 
             //
             // build the key and check for it in the cache.
@@ -170,19 +172,21 @@ class Net_DNS2_Resolver extends Net_DNS2
         // only do this is strict_query_mode is turned on, AND we've received
         // some answers; no point doing any else if there were no answers.
         //
-        if ( ($this->strict_query_mode == true) && ($response->header->ancount > 0) ) {
+        if ( ($this->strict_query_mode == true) 
+            && ($response->header->ancount > 0) 
+        ) {
 
             $found = false;
 
             //
             // look for the requested name/type/class
             //
-            foreach($response->answer as $index => $object) {
+            foreach ($response->answer as $index => $object) {
 
-                if ( (strcasecmp($object->name, $name) == 0) &&
-                    ($object->type == $type) &&
-                    ($object->class == $class) ) {
-
+                if ( (strcasecmp($object->name, $name) == 0)
+                    && ($object->type == $type)
+                    && ($object->class == $class)
+                ) {
                     $found = true;
                     break;
                 }
@@ -190,9 +194,9 @@ class Net_DNS2_Resolver extends Net_DNS2
 
             //
             // if it's not found, then unset the answer section; it's not correct to
-            // throw an exception here; if the hostname didn't exist, then sendPacket()
-            // would have already thrown an NXDOMAIN error- so the host *exists*, but
-            // just not the request type/class.
+            // throw an exception here; if the hostname didn't exist, then 
+            // sendPacket() would have already thrown an NXDOMAIN error- so the host 
+            // *exists*, but just not the request type/class.
             //
             // the correct response in this case, is an empty answer section; the
             // authority section may still have usual information, like a SOA record.

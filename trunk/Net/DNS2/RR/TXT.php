@@ -80,8 +80,7 @@ class Net_DNS2_RR_TXT extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        if (count($this->text) == 0)
-        {
+        if (count($this->text) == 0) {
             return '""';
         }
 

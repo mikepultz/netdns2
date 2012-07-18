@@ -77,6 +77,7 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
      *
      * @param string  $cache_file path to a file to use for cache storage
      * @param integer $size       the size of the shared memory segment to create
+     * @param string  $serializer the name of the cache serialize to use
      *
      * @throws Net_DNS2_Exception
      * @access public
@@ -176,8 +177,7 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
         //
         // if there's no cache file set, then there's nothing to do
         //
-        if (strlen($this->cache_file) == 0)
-        {
+        if (strlen($this->cache_file) == 0) {
             return;
         }
 

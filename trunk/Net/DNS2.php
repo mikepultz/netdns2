@@ -133,9 +133,9 @@ class Net_DNS2
     /*
      * the method to use for storing cache data; either "serialize" or "json"
      *
-     * json is faster, but can't remember the class names (everything comes back as a
-     * "stdClass Object"; all the data is the same though. serialize is slower, but will
-     * have all the class info.
+     * json is faster, but can't remember the class names (everything comes back 
+     * as a "stdClass Object"; all the data is the same though. serialize is 
+     * slower, but will have all the class info.
      *
      * defaults to 'serialize'
      */
@@ -866,7 +866,7 @@ class Net_DNS2
 
                     $soa_count = 0;
 
-                    while(1) {
+                    while (1) {
 
                         //
                         // read the data off the socket
@@ -886,17 +886,17 @@ class Net_DNS2
 
                         //
                         // if this is the first packet, then clone it directly, then
-                        // go through it to see if there are two SOA records (indicating
-                        // that it's the only packet)
+                        // go through it to see if there are two SOA records 
+                        // (indicating that it's the only packet)
                         //
-                        if (is_null($response) == true)
-                        {
+                        if (is_null($response) == true) {
+
                             $response = clone $chunk;
 
                             //
                             // go through each answer
                             //
-                            foreach($response->answer as $index => $rr) {
+                            foreach ($response->answer as $index => $rr) {
 
                                 //
                                 // count the SOA records
@@ -907,8 +907,9 @@ class Net_DNS2
                             }
 
                             //
-                            // if we have 2 or more SOA records, then we're done; otherwise
-                            // continue out so we read the rest of the packets off the socket
+                            // if we have 2 or more SOA records, then we're done; 
+                            // otherwise continue out so we read the rest of the 
+                            // packets off the socket
                             //
                             if ($soa_count >= 2) {
                                 break;
@@ -945,8 +946,8 @@ class Net_DNS2
                         }
                     }
 
-                } else
-                {
+                } else {
+
                     $result = $this->sock['tcp'][$ns]->read($size);
                     if ( ($result === false) 
                         ||  ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) 

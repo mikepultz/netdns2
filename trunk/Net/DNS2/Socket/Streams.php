@@ -336,7 +336,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         //
         // loop so we make sure we read all the data
         //
-        while(1) {
+        while (1) {
 
             $chunk = fread($this->sock, $chunk_size);
             if ($chunk === false) {
