@@ -3,14 +3,14 @@
 require_once 'Net/DNS2.php';
 
 //
-// This test requires a /etc/resolv.conf file to work- so it will unfortunately
-// break on windows machines.
+// This test uses the Google public DNS servers to perform a resolution test; this should work on
+// *nix and Windows, but will require an internet connection.
 //
 class Net_DNS2_ResolverTest extends PHPUnit_Framework_TestCase
 {
     public function testResolver()
     {
-        $r = new Net_DNS2_Resolver(array('nameservers' => '/etc/resolv.conf'));
+        $r = new Net_DNS2_Resolver(array('nameservers' => array('8.8.8.8', '8.8.4.4')));
 
         $result = $r->query('google.com', 'MX');
 
