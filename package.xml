@@ -15,11 +15,11 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2012-08-06</date>
- <time>21:34:25</time>
+ <date>2012-08-13</date>
+ <time>18:50:44</time>
  <version>
-  <release>1.2.2</release>
-  <api>1.2.2</api>
+  <release>1.2.3</release>
+  <api>1.2.3</api>
  </version>
  <stability>
   <release>stable</release>
@@ -27,18 +27,13 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
  <notes>
-- added some trimming of whitespace to Net_DNS2_RR::buildString(); we&apos;d get some Uninitialized string offset errors if there was some blank space at the end.
-- fixed a few cases where Net_DNS2_Lookup where it should Net_DNS2_Lookups
-- added support for a strict query mode, that lets you handle the weird way DNS handles failed lookups + CNAME recors; see RFC 1034 section 3.6.2 for more information.
-- fixed some warning messages that were coming from the cache classes when a json_decode() would fail.
-- fixed a bug in Net_DNS2_Cache_File and Net_DNS2_Cache_Shm; it would try to write the file even if caching was turned off
-- made sure we don&apos;t cache records when we do a zone transfer
-- added some blocking in both the Sockets.php and Streams.php file around the read function
-- I wasn&apos;t handling multi-message zone transfers properly; now we loop through and read all the messages and pack them together as one big result
+- added a LICENSE file to satisfy fedora packaging guidelines
+- included the tests folder in the PEAR package
+- updated the tests to not include a specific include_path, and to use the Google public DNS servers for the resolution tests, rather than the /etc/resolv.conf file (which won&apos;t exist on a Windows system)
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
-   <file baseinstalldir="/" md5sum="d2b517112a1c4ab7fa1fbd5463438488" name="Net/DNS2.php" role="php" />
+   <file baseinstalldir="/" md5sum="2ee8ce3b25d1c1247c1d85c6ea7696f1" name="Net/DNS2.php" role="php" />
    <file baseinstalldir="/" md5sum="2efc00a001d784af4f745d6e68c1f2b8" name="Net/DNS2/BitMap.php" role="php" />
    <file baseinstalldir="/" md5sum="7f2ad435cf7d0daefe047ff042439291" name="Net/DNS2/Cache.php" role="php" />
    <file baseinstalldir="/" md5sum="605b57298371bb1d2ed9c8fc1dab0a58" name="Net/DNS2/Exception.php" role="php" />
@@ -107,6 +102,10 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="06a2d0ab1d29ff38bc23409d7770ce54" name="Net/DNS2/RR/X25.php" role="php" />
    <file baseinstalldir="/" md5sum="9f59089bd745d71761220d66a9961d7e" name="Net/DNS2/Socket/Sockets.php" role="php" />
    <file baseinstalldir="/" md5sum="285286650e4bad532642cf27a36b9409" name="Net/DNS2/Socket/Streams.php" role="php" />
+   <file baseinstalldir="/" md5sum="734394ba7e023d0c2803c70089141c00" name="tests/AllTests.php" role="test" />
+   <file baseinstalldir="/" md5sum="0cdb3771ff36be02a21d6963e76b4188" name="tests/Net_DNS2_ParserTest.php" role="test" />
+   <file baseinstalldir="/" md5sum="77e6eeff2df6fe6360fcd62e3cc7dc40" name="tests/Net_DNS2_ResolverTest.php" role="test" />
+   <file baseinstalldir="/" md5sum="13abf1d3d0c6877a8cb996fbce0c3423" name="LICENSE" role="doc" />
   </dir>
  </contents>
  <dependencies>
@@ -303,7 +302,7 @@ Initial Beta release of Net_DNS2
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2012-08-06</date>
+   <date>2012-08-13</date>
    <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
    <notes>
 - added some trimming of whitespace to Net_DNS2_RR::buildString(); we&apos;d get some Uninitialized string offset errors if there was some blank space at the end.
@@ -314,6 +313,23 @@ Initial Beta release of Net_DNS2
 - made sure we don&apos;t cache records when we do a zone transfer
 - added some blocking in both the Sockets.php and Streams.php file around the read function
 - I wasn&apos;t handling multi-message zone transfers properly; now we loop through and read all the messages and pack them together as one big result
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.2.3</release>
+    <api>1.2.3</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2012-08-13</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- added a LICENSE file to satisfy fedora packaging guidelines
+- included the tests folder in the PEAR package
+- updated the tests to not include a specific include_path, and to use the Google public DNS servers for the resolution tests, rather than the /etc/resolv.conf file (which won&apos;t exist on a Windows system)
    </notes>
   </release>
  </changelog>

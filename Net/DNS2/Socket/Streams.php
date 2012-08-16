@@ -329,27 +329,51 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         //
         // read the data from the socket
         //
-        $chunk = '';
-        $chunk_size = $length;
         $data = '';
 
         //
-        // loop so we make sure we read all the data
+        // the streams socket is weird for TCP sockets; it doesn't seem to always
+        // return all the data properly; but the looping code I added broke UDP
+        // packets- my fault- 
         //
-        while (1) {
+        // the sockets library works much better.
+        //
+        if ($this->type == SOCK_STREAM) {
 
-            $chunk = fread($this->sock, $chunk_size);
-            if ($chunk === false) {
+            $chunk = '';
+            $chunk_size = $length;
+
+            //
+            // loop so we make sure we read all the data
+            //
+            while (1) {
+
+                $chunk = fread($this->sock, $chunk_size);
+                if ($chunk === false) {
+            
+                    $this->last_error = 'failed on fread() for data';
+                    return false;
+                }
+
+                $data .= $chunk;
+                $chunk_size -= strlen($chunk);
+
+                if (strlen($data) >= $length) {
+                    break;
+                }
+            }
+
+        //
+        // if it's UDP, ti's a single fixed-size frame, and the streams library
+        // doesn't seem to have a problem reading it.
+        //
+        } else {
+
+            $data = fread($this->sock, $length);
+            if ($length === false) {
             
                 $this->last_error = 'failed on fread() for data';
                 return false;
-            }
-
-            $data .= $chunk;
-            $chunk_size -= strlen($chunk);
-
-            if (strlen($data) >= $length) {
-                break;
             }
         }
         

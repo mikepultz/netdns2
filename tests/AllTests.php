@@ -1,7 +1,12 @@
 <?php
 
+//
+// This test suite assumes that Net_DNS2 will be in the include path, otherwise it
+// will fail. There's no other way to hardcode a include_path in here that would make
+// it work everywhere.
+//
+
 error_reporting(E_ALL | E_STRICT);
-ini_set("include_path", ".:/u/devel/www/Net_DNS2/:/usr/local/php/lib/php/");
 
 if (!defined('PHPUnit_MAIN_METHOD')) {
     define('PHPUnit_MAIN_METHOD', 'Net_DNS2_AllTests::main');
