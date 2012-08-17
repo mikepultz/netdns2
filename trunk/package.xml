@@ -15,8 +15,8 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2012-08-13</date>
- <time>18:50:44</time>
+ <date>2012-08-17</date>
+ <time>16:23:19</time>
  <version>
   <release>1.2.3</release>
   <api>1.2.3</api>
@@ -30,6 +30,7 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
 - added a LICENSE file to satisfy fedora packaging guidelines
 - included the tests folder in the PEAR package
 - updated the tests to not include a specific include_path, and to use the Google public DNS servers for the resolution tests, rather than the /etc/resolv.conf file (which won&apos;t exist on a Windows system)
+- fixed a endless loop bug in the Streams.php file; this was related to the code changes I made + UDP packets
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -101,7 +102,7 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="73c72804d91a294fd3db83630bec7700" name="Net/DNS2/RR/WKS.php" role="php" />
    <file baseinstalldir="/" md5sum="06a2d0ab1d29ff38bc23409d7770ce54" name="Net/DNS2/RR/X25.php" role="php" />
    <file baseinstalldir="/" md5sum="9f59089bd745d71761220d66a9961d7e" name="Net/DNS2/Socket/Sockets.php" role="php" />
-   <file baseinstalldir="/" md5sum="285286650e4bad532642cf27a36b9409" name="Net/DNS2/Socket/Streams.php" role="php" />
+   <file baseinstalldir="/" md5sum="ef28caf86ded69bde2e828bc9f0a3c42" name="Net/DNS2/Socket/Streams.php" role="php" />
    <file baseinstalldir="/" md5sum="734394ba7e023d0c2803c70089141c00" name="tests/AllTests.php" role="test" />
    <file baseinstalldir="/" md5sum="0cdb3771ff36be02a21d6963e76b4188" name="tests/Net_DNS2_ParserTest.php" role="test" />
    <file baseinstalldir="/" md5sum="77e6eeff2df6fe6360fcd62e3cc7dc40" name="tests/Net_DNS2_ResolverTest.php" role="test" />
@@ -324,12 +325,13 @@ Initial Beta release of Net_DNS2
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2012-08-13</date>
+   <date>2012-08-17</date>
    <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
    <notes>
 - added a LICENSE file to satisfy fedora packaging guidelines
 - included the tests folder in the PEAR package
 - updated the tests to not include a specific include_path, and to use the Google public DNS servers for the resolution tests, rather than the /etc/resolv.conf file (which won&apos;t exist on a Windows system)
+- fixed a endless loop bug in the Streams.php file; this was related to the code changes I made + UDP packets
    </notes>
   </release>
  </changelog>
