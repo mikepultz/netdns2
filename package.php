@@ -31,7 +31,7 @@ $pkg->setAPIVersion('1.2.3');
 $pkg->setReleaseVersion('1.2.3');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
-$pkg->setNotes("- added a LICENSE file to satisfy fedora packaging guidelines\n- included the tests folder in the PEAR package\n- updated the tests to not include a specific include_path, and to use the Google public DNS servers for the resolution tests, rather than the /etc/resolv.conf file (which won't exist on a Windows system)\n");
+$pkg->setNotes("- added a LICENSE file to satisfy fedora packaging guidelines\n- included the tests folder in the PEAR package\n- updated the tests to not include a specific include_path, and to use the Google public DNS servers for the resolution tests, rather than the /etc/resolv.conf file (which won't exist on a Windows system)\n- fixed a endless loop bug in the Streams.php file; this was related to the code changes I made + UDP packets\n");
 $pkg->setPackageType('php');
 $pkg->addRelease();
 $pkg->setPhpDep('5.1.2');
