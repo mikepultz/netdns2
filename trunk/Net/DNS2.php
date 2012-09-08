@@ -72,7 +72,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = '1.2.3';
+    const VERSION = '1.2.4';
 
     /*
      * the default path to a resolv.conf file
@@ -1044,6 +1044,11 @@ class Net_DNS2
                 break;
             }
         }
+
+        //
+        // add the name server that the response came from to the response object.
+        //
+        $response->answerfrom = $ns;
 
         //
         // if $response is null, then we didn't even try once; which shouldn't

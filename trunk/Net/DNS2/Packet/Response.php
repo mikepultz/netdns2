@@ -64,6 +64,11 @@
  */
 class Net_DNS2_Packet_Response extends Net_DNS2_Packet
 {
+    /*
+     * The name servers that this response came from
+     */
+    public $answerfrom;
+
     /**
      * Constructor - builds a new Net_DNS2_Packet_Response object
      *
