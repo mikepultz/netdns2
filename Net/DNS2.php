@@ -773,6 +773,7 @@ class Net_DNS2
         //
         $response = null;
         $ns = '';
+        $socket_type = null;
         $tcp_fallback = false;
 
         while (1) {
@@ -804,6 +805,7 @@ class Net_DNS2
                 || ($tcp_fallback == true)
             ) {
                 $tcp_fallback = false;
+                $socket_type = Net_DNS2_Socket::SOCK_STREAM;
 
                 //
                 // create the socket object
@@ -814,12 +816,12 @@ class Net_DNS2
                     if ($this->sockets_enabled === true) {
 
                         $this->sock['tcp'][$ns] = new Net_DNS2_Socket_Sockets(
-                            SOCK_STREAM, $ns, $this->dns_port, $this->timeout
+                            Net_DNS2_Socket::SOCK_STREAM, $ns, $this->dns_port, $this->timeout
                         );
                     } else {
 
                         $this->sock['tcp'][$ns] = new Net_DNS2_Socket_Streams(
-                            SOCK_STREAM, $ns, $this->dns_port, $this->timeout
+                            Net_DNS2_Socket::SOCK_STREAM, $ns, $this->dns_port, $this->timeout
                         );
                     }
                 }
@@ -966,6 +968,8 @@ class Net_DNS2
 
             } else {
 
+                $socket_type = Net_DNS2_Socket::SOCK_DGRAM;
+
                 //
                 // create the socket object
                 //
@@ -975,12 +979,12 @@ class Net_DNS2
                     if ($this->sockets_enabled === true) {
 
                         $this->sock['udp'][$ns] = new Net_DNS2_Socket_Sockets(
-                            SOCK_DGRAM, $ns, $this->dns_port, $this->timeout
+                            Net_DNS2_Socket::SOCK_DGRAM, $ns, $this->dns_port, $this->timeout
                         );
                     } else {
 
                         $this->sock['udp'][$ns] = new Net_DNS2_Socket_Streams(
-                            SOCK_DGRAM, $ns, $this->dns_port, $this->timeout
+                            Net_DNS2_Socket::SOCK_DGRAM, $ns, $this->dns_port, $this->timeout
                         );
                     }
                 }            
@@ -1046,9 +1050,11 @@ class Net_DNS2
         }
 
         //
-        // add the name server that the response came from to the response object.
+        // add the name server that the response came from to the response object,
+        // and the socket type that was used.
         //
-        $response->answerfrom = $ns;
+        $response->answer_from = $ns;
+        $response->answer_socket_type = $socket_type;
 
         //
         // if $response is null, then we didn't even try once; which shouldn't
