@@ -82,14 +82,14 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
 
             $this->sock = @socket_create(
                 AF_INET, $this->type, 
-                ($this->type == SOCK_STREAM) ? SOL_TCP : SOL_UDP
+                ($this->type == Net_DNS2_Socket::SOCK_STREAM) ? SOL_TCP : SOL_UDP
             );
 
         } else if (Net_DNS2::isIPv6($this->host) == true) {
         
             $this->sock = @socket_create(
                 AF_INET6, $this->type, 
-                ($this->type == SOCK_STREAM) ? SOL_TCP : SOL_UDP
+                ($this->type == Net_DNS2_Socket::SOCK_STREAM) ? SOL_TCP : SOL_UDP
             );
 
         } else {
@@ -202,7 +202,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         // if it's a TCP socket, then we need to packet and send the length of the
         // data as the first 16bit of data.
         //
-        if ($this->type == SOCK_STREAM) {
+        if ($this->type == Net_DNS2_Socket::SOCK_STREAM) {
 
             $s = chr($length >> 8) . chr($length);
 
@@ -275,7 +275,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         // packet- we need to read that off first, then use that value for the 
         // packet read.
         //
-        if ($this->type == SOCK_STREAM) {
+        if ($this->type == Net_DNS2_Socket::SOCK_STREAM) {
 
             if (($size = @socket_recv($this->sock, $data, 2, 0)) === false) {
 

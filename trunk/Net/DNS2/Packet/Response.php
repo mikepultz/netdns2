@@ -67,7 +67,12 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
     /*
      * The name servers that this response came from
      */
-    public $answerfrom;
+    public $answer_from;
+
+    /*
+     * The socket type the answer came from (TCP/UDP)
+     */
+    public $answer_socket_type;
 
     /**
      * Constructor - builds a new Net_DNS2_Packet_Response object

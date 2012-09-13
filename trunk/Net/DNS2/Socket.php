@@ -74,6 +74,12 @@ abstract class Net_DNS2_Socket
 
     public $last_error;
 
+    /*
+     * type of sockets
+     */
+    const SOCK_STREAM   = 1;
+    const SOCK_DGRAM    = 2;
+
     /**   
      * constructor - set the port details
      *

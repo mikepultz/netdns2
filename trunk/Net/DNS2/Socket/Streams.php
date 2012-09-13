@@ -106,7 +106,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         $errstr;
 
         switch($this->type) {
-        case SOCK_STREAM:
+        case Net_DNS2_Socket::SOCK_STREAM:
 
             if (Net_DNS2::isIPv4($this->host) == true) {
 
@@ -130,7 +130,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
 
             break;
         
-        case SOCK_DGRAM:
+        case Net_DNS2_Socket::SOCK_DGRAM:
 
             if (Net_DNS2::isIPv4($this->host) == true) {
 
@@ -233,7 +233,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         // if it's a TCP socket, then we need to packet and send the length of the
         // data as the first 16bit of data.
         //        
-        if ($this->type == SOCK_STREAM) {
+        if ($this->type == Net_DNS2_Socket::SOCK_STREAM) {
 
             $s = chr($length >> 8) . chr($length);
 
@@ -302,7 +302,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         // packet- we need to read that off first, then use that value for the    
         // packet read.
         //
-        if ($this->type == SOCK_STREAM) {
+        if ($this->type == Net_DNS2_Socket::SOCK_STREAM) {
     
             if (($data = fread($this->sock, 2)) === false) {
                 
@@ -338,7 +338,7 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         //
         // the sockets library works much better.
         //
-        if ($this->type == SOCK_STREAM) {
+        if ($this->type == Net_DNS2_Socket::SOCK_STREAM) {
 
             $chunk = '';
             $chunk_size = $length;
