@@ -896,6 +896,15 @@ class Net_DNS2
                             $response = clone $chunk;
 
                             //
+                            // look for a failed response; if the zone transfer
+                            // failed, then we don't need to do anything else at this
+                            // point, and we should just break out.
+                            //
+                            if ($response->header->rcode != Net_DNS2_Lookups::RCODE_NOERROR) {
+                                break;
+                            }
+
+                            //
                             // go through each answer
                             //
                             foreach ($response->answer as $index => $rr) {
