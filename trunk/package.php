@@ -31,7 +31,7 @@ $pkg->setAPIVersion('1.2.4');
 $pkg->setReleaseVersion('1.2.4');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
-$pkg->setNotes("- added the name server that the response came from to the Net_DNS2_Packet_Response object\n- added the socket type (TCP or UDP) that was used for the request.\n- changed the internal socket logic to use a local define for SOCK_STREAM and SOCK_DGRAM rather than the one provied with the sockets library; this isn't available if you're not using the library.");
+$pkg->setNotes("- added the name server that the response came from to the Net_DNS2_Packet_Response object\n- added the socket type (TCP or UDP) that was used for the request.\n- changed the internal socket logic to use a local define for SOCK_STREAM and SOCK_DGRAM rather than the one provied with the sockets library; this isn't available if you're not using the library.\n- fixed a bug when an AXFR fails; rather than returning right away, it was waiting until there was a timeout condition. Now it returns right away on failure.");
 $pkg->setPackageType('php');
 $pkg->addRelease();
 $pkg->setPhpDep('5.1.2');
