@@ -15,11 +15,11 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2012-08-17</date>
- <time>16:23:19</time>
+ <date>2012-09-19</date>
+ <time>21:35:03</time>
  <version>
-  <release>1.2.3</release>
-  <api>1.2.3</api>
+  <release>1.2.4</release>
+  <api>1.2.4</api>
  </version>
  <stability>
   <release>stable</release>
@@ -27,14 +27,14 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
  <notes>
-- added a LICENSE file to satisfy fedora packaging guidelines
-- included the tests folder in the PEAR package
-- updated the tests to not include a specific include_path, and to use the Google public DNS servers for the resolution tests, rather than the /etc/resolv.conf file (which won&apos;t exist on a Windows system)
-- fixed a endless loop bug in the Streams.php file; this was related to the code changes I made + UDP packets
+- added the name server that the response came from to the Net_DNS2_Packet_Response object
+- added the socket type (TCP or UDP) that was used for the request.
+- changed the internal socket logic to use a local define for SOCK_STREAM and SOCK_DGRAM rather than the one provied with the sockets library; this isn&apos;t available if you&apos;re not using the library.
+- fixed a bug when an AXFR fails; rather than returning right away, it was waiting until there was a timeout condition. Now it returns right away on failure.
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
-   <file baseinstalldir="/" md5sum="2ee8ce3b25d1c1247c1d85c6ea7696f1" name="Net/DNS2.php" role="php" />
+   <file baseinstalldir="/" md5sum="c99981eb4a4dcc01c10eb1818b04d39d" name="Net/DNS2.php" role="php" />
    <file baseinstalldir="/" md5sum="2efc00a001d784af4f745d6e68c1f2b8" name="Net/DNS2/BitMap.php" role="php" />
    <file baseinstalldir="/" md5sum="7f2ad435cf7d0daefe047ff042439291" name="Net/DNS2/Cache.php" role="php" />
    <file baseinstalldir="/" md5sum="605b57298371bb1d2ed9c8fc1dab0a58" name="Net/DNS2/Exception.php" role="php" />
@@ -45,12 +45,12 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="1d88fe97757f44906c8e6d20b44d638f" name="Net/DNS2/Question.php" role="php" />
    <file baseinstalldir="/" md5sum="8a21c033f29959498b1eff0160a51232" name="Net/DNS2/Resolver.php" role="php" />
    <file baseinstalldir="/" md5sum="892283c383a26716d279336bf678012c" name="Net/DNS2/RR.php" role="php" />
-   <file baseinstalldir="/" md5sum="a97c9e875510f7f6c927b302f08fc8ea" name="Net/DNS2/Socket.php" role="php" />
+   <file baseinstalldir="/" md5sum="6f34253f889acf016befed3bcdd833e0" name="Net/DNS2/Socket.php" role="php" />
    <file baseinstalldir="/" md5sum="2dadc2faf5f3d309c608f442d5912e7c" name="Net/DNS2/Updater.php" role="php" />
    <file baseinstalldir="/" md5sum="ad70b88129897c136b17b7b459fd3777" name="Net/DNS2/Cache/File.php" role="php" />
    <file baseinstalldir="/" md5sum="8016337c1af51717044d9e4169c7f41c" name="Net/DNS2/Cache/Shm.php" role="php" />
    <file baseinstalldir="/" md5sum="193dd33a81f2c2e43a82eef9c321982a" name="Net/DNS2/Packet/Request.php" role="php" />
-   <file baseinstalldir="/" md5sum="ed95b21e5208a1e4a3fcbd9d0eb381af" name="Net/DNS2/Packet/Response.php" role="php" />
+   <file baseinstalldir="/" md5sum="d10ef6cfd8198789a4f2ede3e19158da" name="Net/DNS2/Packet/Response.php" role="php" />
    <file baseinstalldir="/" md5sum="85293b9b208dc60be2372951e40fc33f" name="Net/DNS2/RR/A.php" role="php" />
    <file baseinstalldir="/" md5sum="d2f52e249ed4dbf72fc39df196da3b21" name="Net/DNS2/RR/AAAA.php" role="php" />
    <file baseinstalldir="/" md5sum="9c324b133c3fcc0bb4617ebf05816229" name="Net/DNS2/RR/AFSDB.php" role="php" />
@@ -101,8 +101,8 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="ad3f5c7131dc70735d86b2b5777946e1" name="Net/DNS2/RR/URI.php" role="php" />
    <file baseinstalldir="/" md5sum="73c72804d91a294fd3db83630bec7700" name="Net/DNS2/RR/WKS.php" role="php" />
    <file baseinstalldir="/" md5sum="06a2d0ab1d29ff38bc23409d7770ce54" name="Net/DNS2/RR/X25.php" role="php" />
-   <file baseinstalldir="/" md5sum="9f59089bd745d71761220d66a9961d7e" name="Net/DNS2/Socket/Sockets.php" role="php" />
-   <file baseinstalldir="/" md5sum="ef28caf86ded69bde2e828bc9f0a3c42" name="Net/DNS2/Socket/Streams.php" role="php" />
+   <file baseinstalldir="/" md5sum="fc176d61412c6bc6781d0531bbdde11b" name="Net/DNS2/Socket/Sockets.php" role="php" />
+   <file baseinstalldir="/" md5sum="7b76db59d8b32cec288ac46a8bee7ae6" name="Net/DNS2/Socket/Streams.php" role="php" />
    <file baseinstalldir="/" md5sum="734394ba7e023d0c2803c70089141c00" name="tests/AllTests.php" role="test" />
    <file baseinstalldir="/" md5sum="0cdb3771ff36be02a21d6963e76b4188" name="tests/Net_DNS2_ParserTest.php" role="test" />
    <file baseinstalldir="/" md5sum="77e6eeff2df6fe6360fcd62e3cc7dc40" name="tests/Net_DNS2_ResolverTest.php" role="test" />
@@ -332,6 +332,24 @@ Initial Beta release of Net_DNS2
 - included the tests folder in the PEAR package
 - updated the tests to not include a specific include_path, and to use the Google public DNS servers for the resolution tests, rather than the /etc/resolv.conf file (which won&apos;t exist on a Windows system)
 - fixed a endless loop bug in the Streams.php file; this was related to the code changes I made + UDP packets
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.2.4</release>
+    <api>1.2.4</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2012-09-19</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- added the name server that the response came from to the Net_DNS2_Packet_Response object
+- added the socket type (TCP or UDP) that was used for the request.
+- changed the internal socket logic to use a local define for SOCK_STREAM and SOCK_DGRAM rather than the one provied with the sockets library; this isn&apos;t available if you&apos;re not using the library.
+- fixed a bug when an AXFR fails; rather than returning right away, it was waiting until there was a timeout condition. Now it returns right away on failure.
    </notes>
   </release>
  </changelog>
