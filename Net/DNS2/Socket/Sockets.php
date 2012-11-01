@@ -123,21 +123,39 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         }
 
         //
-        // connect to the socket
-        //
-        if (@socket_connect($this->sock, $this->host, $this->port) === false) {
-
-            $this->last_error = socket_strerror(socket_last_error());
-            return false;
-        }
-
-        //
         // mark the socket as non-blocking
         //
         if (@socket_set_nonblock($this->sock) === false) {
 
             $this->last_error = socket_strerror(socket_last_error());
             return false;
+        }
+
+        //
+        // connect to the socket; don't check for status here, we'll check it on the
+        // socket_select() call so we can handle timeouts properly
+        //
+        @socket_connect($this->sock, $this->host, $this->port);
+
+        $read   = null;
+        $write  = array($this->sock);
+        $except = null;
+
+        //
+        // select on write to check if the call to connect worked
+        //
+        switch(@socket_select($read, $write, $except, $this->timeout)) {
+        case false:
+            $this->last_error = socket_strerror(socket_last_error());
+            return false;
+            break;
+
+        case 0:
+            return false;
+            break;
+            
+        default:
+            ;
         }
 
         return true;
