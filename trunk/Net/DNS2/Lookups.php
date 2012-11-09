@@ -271,6 +271,7 @@ class Net_DNS2_Lookups
         'DHCID'         => 49,      // RFC 4701
         'NSEC3'         => 50,      // RFC 5155
         'NSEC3PARAM'    => 51,      // RFC 5155
+        'TLSA'          => 52,      // RFC 6698
 
                                     // 52 - 54 unassigned
 
@@ -372,6 +373,7 @@ class Net_DNS2_Lookups
         49          => 'Net_DNS2_RR_DHCID',
         50          => 'Net_DNS2_RR_NSEC3',
         51          => 'Net_DNS2_RR_NSEC3PARAM',
+        52          => 'Net_DNS2_RR_TLSA',
         55          => 'Net_DNS2_RR_HIP',
         58          => 'Net_DNS2_RR_TALINK',
         59          => 'Net_DNS2_RR_CDS',
