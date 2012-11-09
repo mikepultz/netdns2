@@ -1,5 +1,30 @@
 = Change Log =
 
+=== Version 1.2.4 ===
+
+ * added the name server that the response came from to the Net_DNS2_Packet_Response object.
+ * added the socket type (TCP or UDP) that was used for the request.
+ * changed the internal socket logic to use a local define for SOCK_STREAM and SOCK_DGRAM rather than the one provided with the sockets library; this isn't available if you're not using the library.
+ * fixed a bug when an AXFR fails; rather than returning right away, it was waiting until there was a timeout condition. Now it returns right away on failure.
+
+=== Version 1.2.3 ===
+
+ * added a LICENSE file to satisfy fedora packaging guidelines.
+ * included the tests folder in the PEAR package.
+ * updated the tests to not include a specific include_path, and to use the Google public DNS servers for the resolution tests, rather than the /etc/resolv.conf file (which won't exist on a Windows system)
+ * fixed a endless loop bug in the Streams.php file; this was related to the code changes I made + UDP packets.
+
+=== Version 1.2.2 ===
+
+ * added some trimming of whitespace to Net_DNS2_RR::buildString(); we'd get some uninitialized string offset errors if there was some blank space at the end.
+ * fixed a few cases where Net_DNS2_Lookup where it should Net_DNS2_Lookups.
+ * added support for a strict query mode, that lets you handle the weird way DNS handles failed lookups + CNAME records; see RFC 1034 section 3.6.2 for more information.
+ * fixed some warning messages that were coming from the cache classes when a json_decode() would fail.
+ * fixed a bug in Net_DNS2_Cache_File and Net_DNS2_Cache_Shm; it would try to write the file even if caching was turned off
+ * made sure we don't cache records when we do a zone transfer.
+ * added some blocking in both the Sockets.php and Streams.php file around the read function.
+ * I wasn't handling multi-message zone transfers properly; now we loop through and read all the messages and pack them together as one big result
+
 === Version 1.2.1 ===
 
  * changed the Net_DNS2_Sockets::sock property from private to protected; this was causing some problems when the request was failing.
@@ -10,7 +35,7 @@
 *This version changes the way some exceptions are thrown, and may break your code!*
 
  * added numeric error codes to the Lookups class, and had each method that throws an exception throw a numeric error code along with the message.
- * dropped all references to InvalidArgumentException; we only use the Net_DNS2_Exception from now on.
+ * dropped all references to InvalidArgumentException- we only use the Net_DNS2_Exception from now on.
  * added the CAA, URI, TALINK, CDS and TA resource records. Some of these are experimental, but are pretty straight forward.
  * fixed a bug in formatString(); my version was only putting double quotes around strings that have spaces, but apparently ALL strings should have double quotes around them. This is how BIND does it.
  * re-organized the Net_DNS2_Lookups initialization code; it no longer creates a global object of itself.
