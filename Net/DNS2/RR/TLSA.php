@@ -6,7 +6,7 @@
  *
  * PHP Version 5
  *
- * Copyright (c) 2010, Mike Pultz <mike@mikepultz.com>.
+ * Copyright (c) 2012, Mike Pultz <mike@mikepultz.com>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -72,22 +72,22 @@
 class Net_DNS2_RR_TLSA extends Net_DNS2_RR
 {
     /*
-      * certificate usage
+     * The Certificate Usage Field
      */
     public $cert_usage;
 
     /*
-     * selector
+     * The Selector Field
      */
     public $selector;
 
     /*
-     * matching type
+     * The Matching Type Field
      */
     public $matching_type;
 
     /*
-     * certificate association data
+     * The Certificate Association Data Field
      */
     public $certificate;
 
