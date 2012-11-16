@@ -582,12 +582,13 @@ class Net_DNS2_Updater extends Net_DNS2
     /**
      * executes the update request with the object informaton
      *
+     * @param  Net_DNS2_Packet_Response &$response ref to the response object if required
      * @return boolean
      * @throws Net_DNS2_Exception
      * @access public
      *
      */
-    public function update()
+    public function update(&$response = null)
     {
         //
         // make sure we have some name servers set
@@ -626,7 +627,7 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // send the packet and get back the response
         //
-        $r = $this->sendPacket($this->_packet, $this->use_tcp);
+        $response = $this->sendPacket($this->_packet, $this->use_tcp);
 
         //
         // clear the internal packet so if we make another request, we don't have
