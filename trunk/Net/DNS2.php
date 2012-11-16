@@ -1044,6 +1044,13 @@ class Net_DNS2
                 //
                 $response = new Net_DNS2_Packet_Response($result, $size);
 
+                if (is_null($response)) {
+
+                    throw new Net_DNS2_Exception(
+                        'empty response object', Net_DNS2_Lookups::E_NS_FAILED
+                    );
+                }
+
                 //
                 // check the packet header for a trucated bit; if it was truncated,
                 // then re-send the request as TCP.
@@ -1059,13 +1066,6 @@ class Net_DNS2
         }
 
         //
-        // add the name server that the response came from to the response object,
-        // and the socket type that was used.
-        //
-        $response->answer_from = $ns;
-        $response->answer_socket_type = $socket_type;
-
-        //
         // if $response is null, then we didn't even try once; which shouldn't
         // actually ever happen
         //
@@ -1075,6 +1075,13 @@ class Net_DNS2
                 'empty response object', Net_DNS2_Lookups::E_NS_FAILED
             );
         }
+
+        //
+        // add the name server that the response came from to the response object,
+        // and the socket type that was used.
+        //
+        $response->answer_from = $ns;
+        $response->answer_socket_type = $socket_type;
 
         //
         // make sure header id's match between the request and response
