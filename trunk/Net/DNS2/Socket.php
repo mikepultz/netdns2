@@ -49,6 +49,16 @@
  *
  */
 
+/*
+ * check to see if the socket defines exist; if they don't, then define them
+ */
+if (defined('SOCK_STREAM') == false) {
+    define('SOCK_STREAM', 1);
+}
+if (defined('SOCK_DGRAM') == false) {
+    define('SOCK_DGRAM', 2);
+}
+
 /**
  * This is the abstract base class for the two sockets classes; this simply
  * provides the class definition for the two sockets classes.
@@ -77,8 +87,8 @@ abstract class Net_DNS2_Socket
     /*
      * type of sockets
      */
-    const SOCK_STREAM   = 1;
-    const SOCK_DGRAM    = 2;
+    const SOCK_STREAM   = SOCK_STREAM;
+    const SOCK_DGRAM    = SOCK_DGRAM;
 
     /**   
      * constructor - set the port details
