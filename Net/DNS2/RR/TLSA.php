@@ -171,8 +171,12 @@ class Net_DNS2_RR_TLSA extends Net_DNS2_RR
     {
         if (strlen($this->certificate) > 0) {
 
-            return pack('CCC', $this->cert_usage, $this->selector, $this->matching_type) . 
+            $data = pack('CCC', $this->cert_usage, $this->selector, $this->matching_type) . 
                 $this->certificate;
+
+            $packet->offset += strlen($data);
+
+            return $data;
         }
 
         return null;

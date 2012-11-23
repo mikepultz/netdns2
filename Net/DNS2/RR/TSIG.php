@@ -393,6 +393,8 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
                 $data .= pack('nN', 0, $this->other_data);
             }
 
+            $packet->offset += strlen($data);
+
             return $data;
         }
 

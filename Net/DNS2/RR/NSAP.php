@@ -225,7 +225,7 @@ class Net_DNS2_RR_NSAP extends Net_DNS2_RR
             $id = unpack('A8a/A4b', $this->id);
 
             //
-            $out = pack(
+            $data = pack(
                 'CnCCCCnnnNnC', 
                 hexdec($this->afi), 
                 hexdec($this->idi),
@@ -241,9 +241,10 @@ class Net_DNS2_RR_NSAP extends Net_DNS2_RR
                 hexdec($this->sel)
             );
 
-            if (strlen($out) == 20) {
+            if (strlen($data) == 20) {
                 
-                return $out;
+                $packet->offset += 20;
+                return $data;
             }
         }
 

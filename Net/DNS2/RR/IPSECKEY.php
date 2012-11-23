@@ -369,6 +369,8 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
         default:
             return null;
         }
+
+        $packet->offset += strlen($data);
         
         return $data;
     }

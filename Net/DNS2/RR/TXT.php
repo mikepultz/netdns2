@@ -157,8 +157,11 @@ class Net_DNS2_RR_TXT extends Net_DNS2_RR
         $data = null;
 
         foreach ($this->text as $t) {
+
             $data .= chr(strlen($t)) . $t;
         }
+
+        $packet->offset += strlen($data);
 
         return $data;
     }

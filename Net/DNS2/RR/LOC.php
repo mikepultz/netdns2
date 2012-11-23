@@ -318,6 +318,8 @@ class Net_DNS2_RR_LOC extends Net_DNS2_RR
                 $lng = ($this->longitude * self::CONV_DEG) + self::REFERENCE_LATLON;
             }
 
+            $packet->offset += 16;
+
             return pack(
                 'CCCCNNN', 
                 $this->version,

@@ -293,6 +293,8 @@ class Net_DNS2_RR_NSEC3 extends Net_DNS2_RR
         // conver the array of RR names to a type bitmap
         //
         $data .= Net_DNS2_BitMap::arrayToBitMap($this->type_bit_maps);
+
+        $packet->offset += strlen($data);
      
         return $data;
     }

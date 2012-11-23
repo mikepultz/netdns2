@@ -270,8 +270,12 @@ class Net_DNS2_RR_CERT extends Net_DNS2_RR
     {
         if (strlen($this->certificate) > 0) {
 
-            return pack('nnC', $this->format, $this->keytag, $this->algorithm) . 
+            $data = pack('nnC', $this->format, $this->keytag, $this->algorithm) . 
                 $this->certificate;
+
+            $packet->offset += strlen($data);
+
+            return $data;
         }
 
         return null;

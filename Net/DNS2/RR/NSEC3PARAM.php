@@ -199,10 +199,12 @@ class Net_DNS2_RR_NSEC3PARAM extends Net_DNS2_RR
         $salt = pack('H*', $this->salt);
         $this->salt_length = strlen($salt);
 
-        return pack(
+        $data = pack(
             'CCnC', 
             $this->algorithm, $this->flags, $this->iterations, $this->salt_length
         ) . $salt;
+
+        $packet->offset += strlen($data);
 
         return $data;
     }

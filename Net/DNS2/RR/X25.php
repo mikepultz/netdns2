@@ -139,7 +139,11 @@ class Net_DNS2_RR_X25 extends Net_DNS2_RR
     {
         if (strlen($this->psdnaddress) > 0) {
 
-            return chr(strlen($this->psdnaddress)) . $this->psdnaddress;
+            $data = chr(strlen($this->psdnaddress)) . $this->psdnaddress;
+            
+            $packet->offset += strlen($data);
+
+            return $data;
         }
         
         return null; 
