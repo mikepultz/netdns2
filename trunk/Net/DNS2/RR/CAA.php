@@ -167,6 +167,8 @@ class Net_DNS2_RR_CAA extends Net_DNS2_RR
             $data  = chr($this->flags);
             $data .= chr(strlen($this->tag)) . $this->tag . $this->value;
 
+            $packet->offset += strlen($data);
+
             return $data;
         }
 

@@ -310,6 +310,8 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
             //
             $data .= base64_decode($this->signature);
 
+            $packet->offset += strlen($data);
+
             return $data;
         }
         

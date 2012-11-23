@@ -156,6 +156,8 @@ class Net_DNS2_RR_HINFO extends Net_DNS2_RR
             $data  = chr(strlen($this->cpu)) . $this->cpu;
             $data .= chr(strlen($this->os)) . $this->os;
 
+            $packet->offset += strlen($data);
+
             return $data;
         }
 

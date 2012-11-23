@@ -288,6 +288,8 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
                 $data .= $this->other_data;
             }
 
+            $packet->offset += strlen($data);
+
             return $data;
         }
 

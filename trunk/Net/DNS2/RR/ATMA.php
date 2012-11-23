@@ -193,6 +193,8 @@ class Net_DNS2_RR_ATMA extends Net_DNS2_RR
 
             return null;
         }
+
+        $packet->offset += strlen($data);
         
         return $data;
     }

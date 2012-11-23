@@ -171,6 +171,8 @@ class Net_DNS2_RR_ISDN extends Net_DNS2_RR
                 $data .= $this->sa;
             }
 
+            $packet->offset += strlen($data);
+
             return $data;
         }
         

@@ -149,8 +149,12 @@ class Net_DNS2_RR_TALINK extends Net_DNS2_RR
     {
         if ( (strlen($this->previous) > 0) || (strlen($this->next) > 0) ) {
 
-            return chr(strlen($this->previous)) . $this->previous . 
+            $data = chr(strlen($this->previous)) . $this->previous . 
                 chr(strlen($this->next)) . $this->next;
+
+            $packet->offset += strlen($data);
+
+            return $data;
         }
 
         return null;

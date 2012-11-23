@@ -206,8 +206,12 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
         
             $this->ttl = $ttl[1];
 
-            return pack('nn', $this->option_code, $this->option_length) . 
+            $data = pack('nn', $this->option_code, $this->option_length) . 
                 $this->option_data;
+
+            $packet->offset += strlen($data);
+
+            return $data;
         }
 
         return null;

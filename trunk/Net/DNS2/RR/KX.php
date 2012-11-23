@@ -157,8 +157,12 @@ class Net_DNS2_RR_KX extends Net_DNS2_RR
     {
         if (strlen($this->exchange) > 0) {
      
-            return pack('nC', $this->preference, strlen($this->exchange)) . 
+            $data = pack('nC', $this->preference, strlen($this->exchange)) . 
                 $this->exchange;
+
+            $packet->offset += strlen($data);
+
+            return $data;
         }
     
         return null;

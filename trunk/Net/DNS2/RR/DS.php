@@ -185,10 +185,14 @@ class Net_DNS2_RR_DS extends Net_DNS2_RR
     {
         if (strlen($this->digest) > 0) {
 
-            return pack(
+            $data = pack(
                 'nCCH*', 
                 $this->keytag, $this->algorithm, $this->digesttype, $this->digest
             );
+
+            $packet->offset += strlen($data);
+
+            return $data;
         }
         
         return null;

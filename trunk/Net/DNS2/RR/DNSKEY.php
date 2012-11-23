@@ -179,6 +179,8 @@ class Net_DNS2_RR_DNSKEY extends Net_DNS2_RR
             $data = pack('nCC', $this->flags, $this->protocol, $this->algorithm);
             $data .= base64_decode($this->key);
 
+            $packet->offset += strlen($data);
+
             return $data;
         }
         

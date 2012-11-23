@@ -185,8 +185,12 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
     {
         if (strlen($this->digest) > 0) {
 
-            return pack('nC', $this->id_type, $this->digest_type) . 
+            $data = pack('nC', $this->id_type, $this->digest_type) . 
                 base64_decode($this->digest);
+
+            $packet->offset += strlen($data);
+
+            return $data;
         }
     
         return null;

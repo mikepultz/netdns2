@@ -221,9 +221,13 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
     {
         if (strlen($this->fingerprint) > 0) {
 
-            return pack(
+            $data = pack(
                 'CCH*', $this->algorithm, $this->fp_type, $this->fingerprint
             );
+
+            $packet->offset += strlen($data);
+
+            return $data;
         }
 
         return null;

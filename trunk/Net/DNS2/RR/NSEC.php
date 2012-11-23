@@ -163,9 +163,11 @@ class Net_DNS2_RR_NSEC extends Net_DNS2_RR
         if (strlen($this->next_domain_name) > 0) {
 
             $data = $packet->compress($this->next_domain_name, $packet->offset);
-            $data .= Net_DNS2_BitMap::arrayToBitMap($this->type_bit_maps);
+            $bitmap = Net_DNS2_BitMap::arrayToBitMap($this->type_bit_maps);
     
-            return $data;
+            $packet->offset += strlen($bitmap);
+
+            return $data . $bitmap;
         }
 
         return null;

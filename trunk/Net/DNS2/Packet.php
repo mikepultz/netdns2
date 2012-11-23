@@ -274,9 +274,8 @@ class Net_DNS2_Packet
             $offset += $length + 1;
         }
 
-        if (empty($names)) {
-            $compname .= "\0";
-        }
+        $compname .= "\0";
+        $offset++;
 
         return $compname;
     }
