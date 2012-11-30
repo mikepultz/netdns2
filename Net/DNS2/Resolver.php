@@ -157,6 +157,16 @@ class Net_DNS2_Resolver extends Net_DNS2
         }
 
         //
+        // set the RD (recursion desired) bit to 1 / 0 depending on the config
+        // setting.
+        //
+        if ($this->recurse == false) {
+            $packet->header->rd = 0;
+        } else {
+            $packet->header->rd = 1;
+        }
+
+        //
         // send the packet and get back the response
         //
         // *always* use TCP for zone transfers- does this cause any problems?

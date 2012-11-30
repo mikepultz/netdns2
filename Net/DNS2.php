@@ -165,6 +165,15 @@ class Net_DNS2
     public $strict_query_mode = false;
 
     /*
+     * if we should set the recursion desired bit to 1 or 0.
+     *
+     * by default this is set to true, we want the DNS server to perform a recursive
+     * request. If set to false, the RD bit will be set to 0, and the server will not 
+     * perform recursion on the request.
+     */
+    public $recurse = true;
+
+    /*
      * local sockets
      */
     protected $sock = array('udp' => array(), 'tcp' => array());
