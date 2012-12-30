@@ -31,7 +31,7 @@ $pkg->setAPIVersion('1.2.5');
 $pkg->setReleaseVersion('1.2.5');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
-$pkg->setNotes("- added the name server that the response came from to the Net_DNS2_Packet_Response object\n- added the socket type (TCP or UDP) that was used for the request.\n- changed the internal socket logic to use a local define for SOCK_STREAM and SOCK_DGRAM rather than the one provied with the sockets library; this isn't available if you're not using the library.\n- fixed a bug when an AXFR fails; rather than returning right away, it was waiting until there was a timeout condition. Now it returns right away on failure.");
+$pkg->setNotes("- changed the socket_connect() code to start off non-blocking, and call select() after connect() so a timeout on a invalid server works properly\n- added the new TLSA RR - RFC 6698\n- fixed the socket defines again; apparently the values of the SOCK_* are different under solaris\n- changed the Net_DNS2_Updater::update() so you can pass a reference to a variable that will be populated with the response object\n- moved the lines that add the response server/type to after the is_null() check- it should have been there to begin with.\n- fixed a whole bunch of cases where I wasn't incrementing the offset values properly\n- added support to set the RD (recursion desired) bit when making a request\n");
 $pkg->setPackageType('php');
 $pkg->addRelease();
 $pkg->setPhpDep('5.1.2');
