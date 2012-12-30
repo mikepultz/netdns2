@@ -6,7 +6,7 @@
  * NS
  * CNAME
  * SOA
- * WKS (as of version 1.0.1)
+ * WKS _(as of version 1.0.1)_
  * PTR
  * HINFO
  * MX
@@ -25,7 +25,7 @@
  * EID      
  * NIMLOC
  * SRV
- * ATMA (as of version 1.1.0)
+ * ATMA _(as of version 1.1.0)_
  * NAPTR
  * KX
  * CERT
@@ -41,6 +41,7 @@
  * DHCID    
  * NSEC3
  * NSEC3PARAM
+ * TLSA _(as of version 1.2.5)_
  * HIP
  * TALINK _(as of version 1.2.0)_
  * CDS _(as of version 1.2.0)_
