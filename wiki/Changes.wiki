@@ -1,5 +1,15 @@
 = Change Log =
 
+=== Version 1.2.5 ===
+
+ * changed the socket_connect() code to start off non-blocking, and call select() after connect() so a timeout on a invalid server works properly
+ * added the new TLSA RR - RFC 6698
+ * fixed the socket defines again; apparently the values of the SOCK are different under solaris
+ * changed the Net_DNS2_Updater::update() so you can pass a reference to a variable that will be populated with the response object
+ * moved the lines that add the response server/type to after the is_null() check- it should have been there to begin with.
+ * fixed a whole bunch of cases where I wasn't incrementing the offset values properly
+ * added support to set the RD (recursion desired) bit when making a request
+
 === Version 1.2.4 ===
 
  * added the name server that the response came from to the Net_DNS2_Packet_Response object.
