@@ -1052,7 +1052,6 @@ class Net_DNS2
                 // create the packet object
                 //
                 $response = new Net_DNS2_Packet_Response($result, $size);
-
                 if (is_null($response)) {
 
                     throw new Net_DNS2_Exception(
