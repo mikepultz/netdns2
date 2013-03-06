@@ -191,7 +191,7 @@ abstract class Net_DNS2_RR
             }
         } else {
 
-            $class = Net_DNS2_Lookups::$rr_types_class_to_id[get_called_class()];
+            $class = Net_DNS2_Lookups::$rr_types_class_to_id[get_class($this)];
             if (isset($class)) {
 
                 $this->type = Net_DNS2_Lookups::$rr_types_by_id[$class];
