@@ -174,6 +174,31 @@ class Net_DNS2
     public $recurse = true;
 
     /*
+     * request DNSSEC values, by setting the DO flag to 1; this actually makes
+     * the resolver add a OPT RR to the additional section, and sets the DO flag
+     * in this RR to 1
+     *
+     */
+    public $dnssec = false;
+
+    /*
+     * set the DNSSEC CD (Checking Disabled) bit on/off; turning this off, means that
+     * the DNS resolver will perform it's own signature validation- so the DNS servers
+     * simply pass through all the details.
+     *
+     */
+    public $dnssec_checking_disabled = false;
+
+    /*
+     * the EDNS(0) UDP payload size to use when making DNSSEC requests
+     * see RFC 2671 section 6.2.3 for more details
+     *
+     * http://tools.ietf.org/html/draft-ietf-dnsext-rfc2671bis-edns0-10
+     *
+     */
+    public $dnssec_payload_size = 1280;
+
+    /*
      * local sockets
      */
     protected $sock = array('udp' => array(), 'tcp' => array());
@@ -576,6 +601,26 @@ class Net_DNS2
         }
 
         return true;
+    }
+
+    /**
+     * a simple function to determine if the RR type is cacheable
+     *
+     * @param stream $_type the RR type string
+     *
+     * @return bool returns true/false if the RR type if cachable
+     * @access public
+     *
+     */
+    public function cacheable($_type)
+    {
+        switch($_type) {
+        case 'AXFR':
+        case 'OPT':
+            return false;
+        }
+
+        return true;   
     }
 
     /**

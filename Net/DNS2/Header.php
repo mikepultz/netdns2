@@ -57,12 +57,13 @@
  * by section 4.1.1 of RFC1035.
  * 
  *  DNS header format - RFC1035 section 4.1.1
+ *  DNS header format - RFC4035 section 3.2
  *
  *      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *    |                      ID                       |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *    |QR|   Opcode  |AA|TC|RD|RA|   Z    |   RCODE   |
+ *    |QR|   Opcode  |AA|TC|RD|RA| Z|AD|CD|   RCODE   |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *    |                    QDCOUNT                    |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
@@ -89,7 +90,9 @@ class Net_DNS2_Header
     public $tc;         //  1 bit - TrunCation
     public $rd;         //  1 bit - Recursion Desired
     public $ra;         //  1 bit - Recursion Available
-    public $z;          //  3 bit - Reserved
+    public $z;          //  1 bit - Reserved
+    public $ad;         //  1 bit - Authentic Data (RFC4035)
+    public $cd;         //  1 bit - Checking Disabled (RFC4035)
     public $rcode;      //  4 bit - Response code
     public $qdcount;    // 16 bit - entries in the question section
     public $ancount;    // 16 bit - resource records in the answer section
@@ -120,6 +123,8 @@ class Net_DNS2_Header
             $this->rd       = 1;
             $this->ra       = 0;
             $this->z        = 0;
+            $this->ad       = 0;
+            $this->cd       = 0;
             $this->rcode    = Net_DNS2_Lookups::RCODE_NOERROR;
             $this->qdcount  = 1;
             $this->ancount  = 0;
@@ -164,6 +169,8 @@ class Net_DNS2_Header
         $output .= ";;\t rd         = " . $this->rd . "\n";
         $output .= ";;\t ra         = " . $this->ra . "\n";
         $output .= ";;\t z          = " . $this->z . "\n";
+        $output .= ";;\t ad         = " . $this->ad . "\n";
+        $output .= ";;\t cd         = " . $this->cd . "\n";
         $output .= ";;\t rcode      = " . $this->rcode . "\n";
         $output .= ";;\t qdcount    = " . $this->qdcount . "\n";
         $output .= ";;\t ancount    = " . $this->ancount . "\n";
@@ -213,7 +220,9 @@ class Net_DNS2_Header
 
         ++$offset;
         $this->ra       = (ord($packet->rdata[$offset]) >> 7) & 0x1;
-        $this->z        = 0;
+        $this->z        = (ord($packet->rdata[$offset]) >> 6) & 0x1;
+        $this->ad       = (ord($packet->rdata[$offset]) >> 5) & 0x1;
+        $this->cd       = (ord($packet->rdata[$offset]) >> 4) & 0x1;
         $this->rcode    = ord($packet->rdata[$offset]) & 0xf;
             
         $this->qdcount  = ord($packet->rdata[++$offset]) << 8 | 
@@ -249,7 +258,7 @@ class Net_DNS2_Header
                 ($this->qr << 7) | ($this->opcode << 3) | 
                 ($this->aa << 2) | ($this->tc << 1) | ($this->rd)
             ) .
-            chr(($this->ra << 7) | $this->rcode) .
+            chr(($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode) .
             chr($this->qdcount << 8) . chr($this->qdcount) .
             chr($this->ancount << 8) . chr($this->ancount) . 
             chr($this->nscount << 8) . chr($this->nscount) .
