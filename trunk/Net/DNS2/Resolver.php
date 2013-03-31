@@ -142,7 +142,6 @@ class Net_DNS2_Resolver extends Net_DNS2
             //
             $opt->do                = 1;
             $opt->class             = $this->dnssec_payload_size;
-            $opt->extended_rcode    = 1;
 
             //
             // add the RR to the additional section.

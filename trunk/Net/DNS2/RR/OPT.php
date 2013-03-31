@@ -107,8 +107,25 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      */
     public $z;
 
-    public function __construct()
+    /**
+     * Constructor - builds a new Net_DNS2_RR_OPT object; normally you wouldn't call
+     * this directly, but OPT RR's are a little different
+     *
+     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet or null to create
+     *                                 an empty object
+     * @param array           $rr      an array with RR parse values or null to
+     *                                 create an empty object
+     *
+     * @throws Net_DNS2_Exception
+     * @access public
+     *
+     */
+    public function __construct(Net_DNS2_Packet &$packet = null, array $rr = null)
     {
+        //
+        // this is for when we're manually building an OPT RR object; we aren't
+        // passing in binary data to parse, we just want a clean/empty object.
+        //
         $this->type             = 'OPT';
         $this->rdlength         = 0;
 
@@ -117,6 +134,14 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
         $this->version          = 0;
         $this->do               = 0;
         $this->z                = 0;
+
+        //
+        // everthing else gets passed through to the parent.
+        //
+        if ( (!is_null($packet)) && (!is_null($rr)) ) {
+
+            parent::__construct($packet, $rr);
+        }
     }
 
     /**
@@ -150,11 +175,11 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
         $this->option_data      = array_shift($rdata);
         $this->option_length    = strlen($this->option_data);
 
-        $x = unpack('Cextended/Cversion/nz', pack('N', $this->ttl));
+        $x = unpack('Cextended/Cversion/Cdo/Cz', pack('N', $this->ttl));
 
         $this->extended_rcode   = $x['extended'];
         $this->version          = $x['version'];
-        $this->do               = (ord($x['z']) >> 7) & 0x1;
+        $this->do               = ($x['do'] >> 7);
         $this->z                = $x['z'];
 
         return true;
@@ -178,7 +203,7 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
 
         $this->extended_rcode   = $x['extended'];
         $this->version          = $x['version'];
-        $this->do               = ($x['do'] << 7);
+        $this->do               = ($x['do'] >> 7);
         $this->z                = $x['z'];
 
         //
@@ -203,6 +228,15 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
         return true;
     }
 
+    /**
+     * pre-builds the TTL value for this record; we needed to separate this out
+     * from the rrGet() function, as the logic in the Net_DNS2_RR packs the TTL
+     * value before it builds the rdata value.
+     *
+     * @return void
+     * @access protected
+     *
+     */
     protected function preBuild()
     {
         //
@@ -214,7 +248,7 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
 
         $this->ttl = $ttl[1];
 
-        return true;
+        return;
     }
 
     /**
