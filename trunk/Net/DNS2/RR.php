@@ -309,7 +309,17 @@ abstract class Net_DNS2_RR
     {
         $this->name     = $rr['name'];
         $this->type     = Net_DNS2_Lookups::$rr_types_by_id[$rr['type']];
-        $this->class    = Net_DNS2_Lookups::$classes_by_id[$rr['class']];
+
+        //
+        // for RR OPT (41), the class value includes the requestors UDP payload size,
+        // and not a class value
+        //
+        if ($this->type == 'OPT') {
+            $this->class = $rr['class'];
+        } else {
+            $this->class = Net_DNS2_Lookups::$classes_by_id[$rr['class']];
+        }
+
         $this->ttl      = $rr['ttl'];
         $this->rdlength = $rr['rdlength'];
         $this->rdata    = substr($packet->rdata, $packet->offset, $rr['rdlength']);
@@ -341,12 +351,31 @@ abstract class Net_DNS2_RR
         //
         // pack the main values
         //
-        $data .= pack(
-            'nnN', 
-            Net_DNS2_Lookups::$rr_types_by_name[$this->type],
-            Net_DNS2_Lookups::$classes_by_name[$this->class],
-            $this->ttl
-        );
+        if ($this->type == 'OPT') {
+
+            //
+            // pre-build the TTL value
+            //
+            $this->preBuild();
+
+            //
+            // the class value is different for OPT types
+            //
+            $data .= pack(
+                'nnN', 
+                Net_DNS2_Lookups::$rr_types_by_name[$this->type],
+                $this->class,
+                $this->ttl
+            );
+        } else {
+
+            $data .= pack(
+                'nnN', 
+                Net_DNS2_Lookups::$rr_types_by_name[$this->type],
+                Net_DNS2_Lookups::$classes_by_name[$this->class],
+                $this->ttl
+            );
+        }
 
         //
         // increase the offset, and allow for the rdlength
@@ -428,8 +457,8 @@ abstract class Net_DNS2_RR
         //
         // lookup the class to use
         //
-        $o         = null;
-        $class     = Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']];
+        $o      = null;
+        $class  = Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']];
 
         if (isset($class)) {
 

@@ -98,9 +98,26 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
     public $version;
 
     /*
+     * the DO bit used for DNSSEC - RFC3225
+     */
+    public $do;
+
+    /*
      * the extended flags
      */
     public $z;
+
+    public function __construct()
+    {
+        $this->type             = 'OPT';
+        $this->rdlength         = 0;
+
+        $this->option_length    = 0;
+        $this->extended_rcode   = 0;
+        $this->version          = 0;
+        $this->do               = 0;
+        $this->z                = 0;
+    }
 
     /**
      * method to return the rdata portion of the packet as a string. There is no
@@ -137,6 +154,7 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
 
         $this->extended_rcode   = $x['extended'];
         $this->version          = $x['version'];
+        $this->do               = (ord($x['z']) >> 7) & 0x1;
         $this->z                = $x['z'];
 
         return true;
@@ -153,6 +171,19 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      */
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
+        //
+        // parse out the TTL value
+        //
+        $x = unpack('Cextended/Cversion/Cdo/Cz', pack('N', $this->ttl));
+
+        $this->extended_rcode   = $x['extended'];
+        $this->version          = $x['version'];
+        $this->do               = ($x['do'] << 7);
+        $this->z                = $x['z'];
+
+        //
+        // parse the data, if there is any
+        //
         if ($this->rdlength > 0) {
 
             //
@@ -167,22 +198,23 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
             // copy out the data based on the length
             //
             $this->option_data      = substr($this->rdata, 4);
-
-            //
-            // parse out the TTL value
-            //
-            $ttl = pack('N', $this->ttl);
-
-            $x = unpack('Cextended/Cversion/nz', $ttl);
-
-            $this->extended_rcode   = $x['extended'];
-            $this->version          = $x['version'];
-            $this->z                = $x['z'];
-
-            return true;
         }
 
-        return false;
+        return true;
+    }
+
+    protected function preBuild()
+    {
+        //
+        // build the TTL value based on the local values
+        //
+        $ttl = unpack(
+            'N', pack('CCCC', $this->extended_rcode, $this->version, ($this->do << 7), 0)
+        );
+
+        $this->ttl = $ttl[1];
+
+        return true;
     }
 
     /**
@@ -198,13 +230,10 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
+        //
+        // if there is an option code, then pack that data too
+        //
         if ($this->option_code) {
-
-            $ttl = unpack(
-                'N', pack('CCn', $this->extended_rcode, $this->version, $this->z)
-            );
-        
-            $this->ttl = $ttl[1];
 
             $data = pack('nn', $this->option_code, $this->option_length) . 
                 $this->option_data;
