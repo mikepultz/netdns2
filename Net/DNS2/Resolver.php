@@ -140,8 +140,8 @@ class Net_DNS2_Resolver extends Net_DNS2
             //
             // set the DO flag, and the other values
             //
-            $opt->do                = 1;
-            $opt->class             = $this->dnssec_payload_size;
+            $opt->do = 1;
+            $opt->class = $this->dnssec_payload_size;
 
             //
             // add the RR to the additional section.
@@ -151,9 +151,13 @@ class Net_DNS2_Resolver extends Net_DNS2
         }
 
         //
-        // set the DNSSEC checking disabled flag
+        // set the DNSSEC AD or CD bits
         //
-        if ($this->dnssec_checking_disabled == true) {
+        if ($this->dnssec_ad_flag == true) {
+
+            $packet->header->ad = 1;
+        }
+        if ($this->dnssec_cd_flag == true) {
 
             $packet->header->cd = 1;
         }
