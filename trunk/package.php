@@ -31,7 +31,7 @@ $pkg->setAPIVersion('1.2.6');
 $pkg->setReleaseVersion('1.2.6');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
-$pkg->setNotes("- re-worked a lot of the code around OPT RR's, including adding support for the DO flag\n- added the AD and CD flags to the Net_DNS2_Header class for DNSSEC\n- added a new function to keep track of RR's that should NOT be cached.\n- added a new flag (dnssec) to request DNSSEC lookups; this adds an OPT RR to the additional section\n- added a new flag (dnssec_payload_size) to adjust the EDNS(0) UDP payload size.\n- added a new flag (dnssec_checking_disabled) to set the DNSSEC CD bit to disable signature validation.\n- fixed an issue in Net_DNS2_Socket_Sockets; Windows (specifically < 2003) has problems with MSG_WAITALL\n");
+$pkg->setNotes("- re-worked a lot of the code around OPT RR's, including adding support for the DO flag\n- added the AD and CD flags to the Net_DNS2_Header class for DNSSEC\n- added a new function to keep track of RR's that should NOT be cached.\n- added a new flag (dnssec) to request DNSSEC lookups; this adds an OPT RR to the additional section\n- added a new flag (dnssec_payload_size) to adjust the EDNS(0) UDP payload size.\n- added a new flag (dnssec_cd_flag) to set the DNSSEC CD bit to disable signature validation.\n- added a new flag (dnssec_ad_flag) to set the DNSSEC AD bit to request authentic data without needing to set the DO flag.\n- fixed an issue in Net_DNS2_Socket_Sockets; Windows (specifically < 2003) has problems with MSG_WAITALL\n");
 $pkg->setPackageType('php');
 $pkg->addRelease();
 $pkg->setPhpDep('5.1.2');

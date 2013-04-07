@@ -182,12 +182,24 @@ class Net_DNS2
     public $dnssec = false;
 
     /*
+     * set the DNSSEC AD (Authentic Data) bit on/off; the AD bit on the request side was
+     * previously undefined, and resolvers we instructed to always clear the AD bit when
+     * sending a request.
+     *
+     * RFC6840 section 5.7 defines setting the AD bit in the query as a signal to the
+     * server that it wants the value of the AD bit, without needed to request all the
+     * DNSSEC data via the DO bit.
+     *
+     */
+    public $dnssec_ad_flag = false;
+
+    /*
      * set the DNSSEC CD (Checking Disabled) bit on/off; turning this off, means that
      * the DNS resolver will perform it's own signature validation- so the DNS servers
      * simply pass through all the details.
      *
      */
-    public $dnssec_checking_disabled = false;
+    public $dnssec_cd_flag = false;
 
     /*
      * the EDNS(0) UDP payload size to use when making DNSSEC requests
