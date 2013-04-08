@@ -52,6 +52,30 @@ Defines the serialization method to use when storing the cache content. Can be e
 
 JSON is much faster, but loses the object definition; all content becomes a stdClass object- but all the data is still accessible.
 
+*strict_query_mode* - _boolean, defaults to false_
+
+strict_query_mode means that if the hostname that was looked up isn't actually in the answer section of the response, Net_DNS2 will return an empty answer section, instead of an answer section that could contain CNAME records.
+
+*recurse* - _boolean, defaults to true_
+
+if we should set the recursion desired bit to 1 or 0.
+
+*dnssec* - _boolean, defaults to false_
+
+request DNSSEC values, by setting the DO flag to 1; this actually makes the resolver add a OPT RR to the additional section, and sets the DO flag in this RR to 1.
+
+*dnssec_ad_flag* - _boolean, defaults to false_
+
+set the DNSSEC AD (Authentic Data) bit on/off.
+
+*dnssec_cd_flag* - _boolean, defaults to false_
+
+set the DNSSEC CD (Checking Disabled) bit on/off
+
+*dnssec_payload_size* - _integer, defaults to 1280_
+
+the EDNS(0) UDP payload size to use when making DNSSEC requests; see RFC 2671 section 6.2.3 for more details
+
 == Example Usage ==
 
 {{{
