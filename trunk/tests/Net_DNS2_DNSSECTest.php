@@ -1,4 +1,4 @@
-<?
+<?php
 
 require_once 'Net/DNS2.php';
 
