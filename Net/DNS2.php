@@ -820,7 +820,9 @@ class Net_DNS2
 
             throw new Net_DNS2_Exception(
                 'invalid or empty packet for sending!',
-                Net_DNS2_Lookups::E_PACKET_INVALID
+                Net_DNS2_Lookups::E_PACKET_INVALID,
+                null,
+                $request
             );
         }
 
@@ -1112,7 +1114,10 @@ class Net_DNS2
                 if (is_null($response)) {
 
                     throw new Net_DNS2_Exception(
-                        'empty response object', Net_DNS2_Lookups::E_NS_FAILED
+                        'empty response object', 
+                        Net_DNS2_Lookups::E_NS_FAILED,
+                        null,
+                        $request
                     );
                 }
 
@@ -1137,7 +1142,10 @@ class Net_DNS2
         if (is_null($response)) {
 
             throw new Net_DNS2_Exception(
-                'empty response object', Net_DNS2_Lookups::E_NS_FAILED
+                'empty response object', 
+                Net_DNS2_Lookups::E_NS_FAILED,
+                null,
+                $request
             );
         }
 
@@ -1155,7 +1163,10 @@ class Net_DNS2
 
             throw new Net_DNS2_Exception(
                 'invalid header: the request and response id do not match.',
-                Net_DNS2_Lookups::E_HEADER_INVALID
+                Net_DNS2_Lookups::E_HEADER_INVALID,
+                null,
+                $request,
+                $response
             );
         }
 
@@ -1168,7 +1179,10 @@ class Net_DNS2
 
             throw new Net_DNS2_Exception(
                 'invalid header: the response provided is not a response packet.',
-                Net_DNS2_Lookups::E_HEADER_INVALID
+                Net_DNS2_Lookups::E_HEADER_INVALID,
+                null,
+                $request,
+                $response
             );
         }
 
@@ -1180,7 +1194,10 @@ class Net_DNS2
             throw new Net_DNS2_Exception(
                 'DNS request failed: ' . 
                 Net_DNS2_Lookups::$result_code_messages[$response->header->rcode],
-                $response->header->rcode
+                $response->header->rcode,
+                null,
+                $request,
+                $response
             );
         }
 
