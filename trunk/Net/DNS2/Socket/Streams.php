@@ -363,12 +363,12 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
                 }
             }
 
-        //
-        // if it's UDP, ti's a single fixed-size frame, and the streams library
-        // doesn't seem to have a problem reading it.
-        //
         } else {
 
+            //
+            // if it's UDP, it's a single fixed-size frame, and the streams library
+            // doesn't seem to have a problem reading it.
+            //
             $data = fread($this->sock, $length);
             if ($length === false) {
             

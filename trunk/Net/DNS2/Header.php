@@ -258,7 +258,9 @@ class Net_DNS2_Header
                 ($this->qr << 7) | ($this->opcode << 3) | 
                 ($this->aa << 2) | ($this->tc << 1) | ($this->rd)
             ) .
-            chr(($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode) .
+            chr(
+                ($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode
+            ) .
             chr($this->qdcount << 8) . chr($this->qdcount) .
             chr($this->ancount << 8) . chr($this->ancount) . 
             chr($this->nscount << 8) . chr($this->nscount) .

@@ -582,7 +582,8 @@ class Net_DNS2_Updater extends Net_DNS2
     /**
      * executes the update request with the object informaton
      *
-     * @param  Net_DNS2_Packet_Response &$response ref to the response object if required
+     * @param Net_DNS2_Packet_Response &$response ref to the response object
+     *
      * @return boolean
      * @throws Net_DNS2_Exception
      * @access public

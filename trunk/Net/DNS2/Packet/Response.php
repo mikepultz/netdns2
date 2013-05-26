@@ -118,12 +118,13 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
         $this->header = new Net_DNS2_Header($this);
 
         //
-        // if the truncation bit is set, then just return right here, because the rest
-        // of the packet is probably empty; and there's no point in processing anything else.
+        // if the truncation bit is set, then just return right here, because the
+        // rest of the packet is probably empty; and there's no point in processing
+        // anything else.
         //
-        // we also don't need to worry about checking to see if the the header is null or
-        // not, since the Net_DNS2_Header() constructor will throw an exception if the packet
-        // is invalid.
+        // we also don't need to worry about checking to see if the the header is 
+        // null or not, since the Net_DNS2_Header() constructor will throw an 
+        // exception if the packet is invalid.
         //
         if ($this->header->tc == 1) {
 

@@ -195,7 +195,7 @@ class Net_DNS2_BitMap
             }
 
             $bm[$current_window][$val] = 1;
-            $bm[$current_window]['length'] = ceil( ($max + 1) / 8);
+            $bm[$current_window]['length'] = ceil(($max + 1) / 8);
         }
 
         $output = '';
