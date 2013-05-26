@@ -327,17 +327,17 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         // loop while reading since some OS's (specifically Win < 2003) don't support
         // MSG_WAITALL properly, so they may return with less data than is available.
         //
-        // According to M$, XP and below don't support MSG_WAITALL at all; and there 
-        // also seems to be some issue in 2003 and 2008 where the MSG_WAITALL is defined
-        // as 0, but if you actually pass 8 (which is the correct defined value), it
-        // works as it's supposed to- so in these cases, it's just the define that's
-        // incorrect- this is likely a PHP issue.
+        // According to M$, XP and below don't support MSG_WAITALL at all; and there
+        // also seems to be some issue in 2003 and 2008 where the MSG_WAITALL is 
+        // defined as 0, but if you actually pass 8 (which is the correct defined 
+        // value), it works as it's supposed to- so in these cases, it's just the 
+        // define that's incorrect- this is likely a PHP issue.
         //
         $data = '';
         $size = 0;
 
-        while(1)
-        {
+        while (1) {
+
             $chunk_size = @socket_recv($this->sock, $chunk, $length, MSG_WAITALL);
             if ($chunk_size === false) {
 

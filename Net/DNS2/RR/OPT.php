@@ -243,7 +243,8 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
         // build the TTL value based on the local values
         //
         $ttl = unpack(
-            'N', pack('CCCC', $this->extended_rcode, $this->version, ($this->do << 7), 0)
+            'N', 
+            pack('CCCC', $this->extended_rcode, $this->version, ($this->do << 7), 0)
         );
 
         $this->ttl = $ttl[1];

@@ -100,8 +100,8 @@ class Net_DNS2_RR_TLSA extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->cert_usage . ' ' . $this->selector . ' ' . $this->matching_type . 
-            ' ' . base64_encode($this->certificate);
+        return $this->cert_usage . ' ' . $this->selector . ' ' . 
+            $this->matching_type . ' ' . base64_encode($this->certificate);
     }
 
     /**
@@ -171,8 +171,9 @@ class Net_DNS2_RR_TLSA extends Net_DNS2_RR
     {
         if (strlen($this->certificate) > 0) {
 
-            $data = pack('CCC', $this->cert_usage, $this->selector, $this->matching_type) . 
-                $this->certificate;
+            $data = pack(
+                'CCC', $this->cert_usage, $this->selector, $this->matching_type
+            ) . $this->certificate;
 
             $packet->offset += strlen($data);
 

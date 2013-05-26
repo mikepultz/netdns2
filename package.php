@@ -31,7 +31,11 @@ $pkg->setAPIVersion('1.3.1');
 $pkg->setReleaseVersion('1.3.1');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
-$pkg->setNotes("- added the Net_DNS2_Packet_Request and Net_DNS2_Packet_Response objects to the Net_DNS2_Exception object\n");
+$pkg->setNotes(
+"- added the Net_DNS2_Packet_Request and Net_DNS2_Packet_Response objects to the Net_DNS2_Exception object\n" .
+"- added support in the TSIG class for SHA algorithms (requires the hash extension, which is included in PHP >= 5.1.2), patch provided by Manuel Mausz\n" .
+"- lots of phpcs cleanup\n"
+);
 $pkg->setPackageType('php');
 $pkg->addRelease();
 $pkg->setPhpDep('5.1.2');
