@@ -6,6 +6,9 @@
     "keywords": ["dns","network"],
     "homepage": "https://code.google.com/p/netdns2/",
     "license": "BSD-2-Clause",
+    "support": {
+        "issues": "https://code.google.com/p/netdns2/issues/list" 
+    },
     "authors": [
         {
             "name": "Mike Pultz",
