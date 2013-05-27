@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id$
+ * @version   SVN: $Id: RR.php 154 2012-04-23 16:36:34Z mike.pultz $
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -191,7 +191,7 @@ abstract class Net_DNS2_RR
             }
         } else {
 
-            $class = Net_DNS2_Lookups::$rr_types_class_to_id[get_class($this)];
+            $class = Net_DNS2_Lookups::$rr_types_class_to_id[get_called_class()];
             if (isset($class)) {
 
                 $this->type = Net_DNS2_Lookups::$rr_types_by_id[$class];
@@ -309,17 +309,7 @@ abstract class Net_DNS2_RR
     {
         $this->name     = $rr['name'];
         $this->type     = Net_DNS2_Lookups::$rr_types_by_id[$rr['type']];
-
-        //
-        // for RR OPT (41), the class value includes the requestors UDP payload size,
-        // and not a class value
-        //
-        if ($this->type == 'OPT') {
-            $this->class = $rr['class'];
-        } else {
-            $this->class = Net_DNS2_Lookups::$classes_by_id[$rr['class']];
-        }
-
+        $this->class    = Net_DNS2_Lookups::$classes_by_id[$rr['class']];
         $this->ttl      = $rr['ttl'];
         $this->rdlength = $rr['rdlength'];
         $this->rdata    = substr($packet->rdata, $packet->offset, $rr['rdlength']);
@@ -351,31 +341,12 @@ abstract class Net_DNS2_RR
         //
         // pack the main values
         //
-        if ($this->type == 'OPT') {
-
-            //
-            // pre-build the TTL value
-            //
-            $this->preBuild();
-
-            //
-            // the class value is different for OPT types
-            //
-            $data .= pack(
-                'nnN', 
-                Net_DNS2_Lookups::$rr_types_by_name[$this->type],
-                $this->class,
-                $this->ttl
-            );
-        } else {
-
-            $data .= pack(
-                'nnN', 
-                Net_DNS2_Lookups::$rr_types_by_name[$this->type],
-                Net_DNS2_Lookups::$classes_by_name[$this->class],
-                $this->ttl
-            );
-        }
+        $data .= pack(
+            'nnN', 
+            Net_DNS2_Lookups::$rr_types_by_name[$this->type],
+            Net_DNS2_Lookups::$classes_by_name[$this->class],
+            $this->ttl
+        );
 
         //
         // increase the offset, and allow for the rdlength
@@ -457,8 +428,8 @@ abstract class Net_DNS2_RR
         //
         // lookup the class to use
         //
-        $o      = null;
-        $class  = Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']];
+        $o         = null;
+        $class     = Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']];
 
         if (isset($class)) {
 

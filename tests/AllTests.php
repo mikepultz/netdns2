@@ -15,7 +15,6 @@ if (!defined('PHPUnit_MAIN_METHOD')) {
 require_once 'PHPUnit/TextUI/TestRunner.php';
 require_once 'Net_DNS2_ParserTest.php';
 require_once 'Net_DNS2_ResolverTest.php';
-require_once 'Net_DNS2_DNSSECTest.php';
 
 class Net_DNS2_AllTests
 {
@@ -29,7 +28,6 @@ class Net_DNS2_AllTests
 
         $suite->addTestSuite('Net_DNS2_ParserTest');
         $suite->addTestSuite('Net_DNS2_ResolverTest');
-        $suite->addTestSuite('Net_DNS2_DNSSECTest');
 
         return $suite;
     }

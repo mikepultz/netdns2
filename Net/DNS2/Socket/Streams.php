@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id$
+ * @version   SVN: $Id: Streams.php 168 2012-09-13 02:01:29Z mike.pultz $
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -363,12 +363,12 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
                 }
             }
 
+        //
+        // if it's UDP, ti's a single fixed-size frame, and the streams library
+        // doesn't seem to have a problem reading it.
+        //
         } else {
 
-            //
-            // if it's UDP, it's a single fixed-size frame, and the streams library
-            // doesn't seem to have a problem reading it.
-            //
             $data = fread($this->sock, $length);
             if ($length === false) {
             

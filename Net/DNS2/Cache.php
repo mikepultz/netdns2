@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id$
+ * @version   SVN: $Id: Cache.php 160 2012-07-18 03:57:32Z mike.pultz $
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 1.1.0
  *

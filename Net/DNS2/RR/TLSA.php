@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2012 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id$
+ * @version   SVN: $Id: TLSA.php 179 2012-11-23 05:49:01Z mike.pultz $
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 1.2.5
  *
@@ -100,8 +100,8 @@ class Net_DNS2_RR_TLSA extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->cert_usage . ' ' . $this->selector . ' ' . 
-            $this->matching_type . ' ' . base64_encode($this->certificate);
+        return $this->cert_usage . ' ' . $this->selector . ' ' . $this->matching_type . 
+            ' ' . base64_encode($this->certificate);
     }
 
     /**
@@ -171,9 +171,8 @@ class Net_DNS2_RR_TLSA extends Net_DNS2_RR
     {
         if (strlen($this->certificate) > 0) {
 
-            $data = pack(
-                'CCC', $this->cert_usage, $this->selector, $this->matching_type
-            ) . $this->certificate;
+            $data = pack('CCC', $this->cert_usage, $this->selector, $this->matching_type) . 
+                $this->certificate;
 
             $packet->offset += strlen($data);
 
