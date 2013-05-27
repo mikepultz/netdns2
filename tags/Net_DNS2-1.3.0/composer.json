@@ -1,0 +1,22 @@
+{
+    "name": "pear/net_dns2",
+    "type": "library",
+    "description": "Native PHP5 DNS Resolver and Updater Library",
+    "keywords": ["dns","network"],
+    "homepage": "https://code.google.com/p/netdns2/",
+    "license": "BSD-2-Clause",
+    "authors": [
+        {
+            "name": "Mike Pultz",
+            "email": "mike@mikepultz.com",
+            "homepage": "http://mikepultz.com/",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.1.2"
+    },
+    "autoload": {
+        "psr-0": { "Net_DNS2": "" }
+    }
+}
