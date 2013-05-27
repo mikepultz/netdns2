@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id$
+ * @version   SVN: $Id: Header.php 188 2013-03-31 01:25:46Z mike.pultz $
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -258,9 +258,7 @@ class Net_DNS2_Header
                 ($this->qr << 7) | ($this->opcode << 3) | 
                 ($this->aa << 2) | ($this->tc << 1) | ($this->rd)
             ) .
-            chr(
-                ($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode
-            ) .
+            chr(($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode) .
             chr($this->qdcount << 8) . chr($this->qdcount) .
             chr($this->ancount << 8) . chr($this->ancount) . 
             chr($this->nscount << 8) . chr($this->nscount) .

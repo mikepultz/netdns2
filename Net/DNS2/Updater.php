@@ -43,7 +43,7 @@
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2010 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @version   SVN: $Id$
+ * @version   SVN: $Id: Updater.php 177 2012-11-16 05:04:47Z mike.pultz $
  * @link      http://pear.php.net/package/Net_DNS2
  * @since     File available since Release 0.6.0
  *
@@ -582,8 +582,7 @@ class Net_DNS2_Updater extends Net_DNS2
     /**
      * executes the update request with the object informaton
      *
-     * @param Net_DNS2_Packet_Response &$response ref to the response object
-     *
+     * @param  Net_DNS2_Packet_Response &$response ref to the response object if required
      * @return boolean
      * @throws Net_DNS2_Exception
      * @access public
