@@ -12,7 +12,9 @@ $e = $pkg->setOptions(array(
         'packagedirectory'  => '/u/devel/www/Net_DNS2/',
         'ignore'            => array(
             'package.php',
-            'package.xml'
+            'package.xml',
+            'TODO',
+            'composer.json'
         ),
         'installexceptions' => array('phpdoc' => '/*'),
         'dir_roles'         => array(
