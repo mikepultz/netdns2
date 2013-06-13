@@ -288,8 +288,12 @@ class Net_DNS2_Lookups
         'UID'           => 101,     // no RFC, Not implemented
         'GID'           => 102,     // no RFC, Not implemented
         'UNSPEC'        => 103,     // no RFC, Not implemented
+        'NID'           => 104,     // RFC 6742
+        'L32'           => 105,     // RFC 6742
+        'L64'           => 106,     // RFC 6742
+        'LP'            => 107,     // RFC 6742
 
-                                    // 104 - 248 unassigned
+                                    // 108 - 248 unassigned
 
         'TKEY'          => 249,     // RFC 2930
         'TSIG'          => 250,     // RFC 2845
@@ -378,6 +382,10 @@ class Net_DNS2_Lookups
         58          => 'Net_DNS2_RR_TALINK',
         59          => 'Net_DNS2_RR_CDS',
         99          => 'Net_DNS2_RR_SPF',
+        104         => 'Net_DNS2_RR_NID',
+        105         => 'Net_DNS2_RR_L32',
+        106         => 'Net_DNS2_RR_L64',
+        107         => 'Net_DNS2_RR_LP',
         249         => 'Net_DNS2_RR_TKEY',
         250         => 'Net_DNS2_RR_TSIG',
 
