@@ -34,6 +34,7 @@ $pkg->setAPIStability('stable');
 $pkg->setNotes(
 "- added the Net_DNS2_Packet_Request and Net_DNS2_Packet_Response objects to the Net_DNS2_Exception object\n" .
 "- added support in the TSIG class for SHA algorithms (requires the hash extension, which is included in PHP >= 5.1.2), patch provided by Manuel Mausz\n" .
+"- added support for the NID, L32, L64, and LP DNS RR's (RFC6742)\n" . 
 "- lots of phpcs cleanup\n"
 );
 $pkg->setPackageType('php');
