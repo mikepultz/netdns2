@@ -133,8 +133,10 @@ class Net_DNS2_RR_NID extends Net_DNS2_RR
             //
             // build the node id
             //
-            $this->nodeid = dechex($x['nodeid1']) . ':' . dechex($x['nodeid2']) . ':' .
-                dechex($x['nodeid3']) . ':' . dechex($x['nodeid4']);
+            $this->nodeid = dechex($x['nodeid1']) . ':' . 
+                dechex($x['nodeid2']) . ':' .
+                dechex($x['nodeid3']) . ':' . 
+                dechex($x['nodeid4']);
 
             return true;
         }
