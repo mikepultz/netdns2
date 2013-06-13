@@ -133,8 +133,10 @@ class Net_DNS2_RR_L64 extends Net_DNS2_RR
             //
             // build the locator64
             //
-            $this->locator64 = dechex($x['locator1']) . ':' . dechex($x['locator2']) . ':' .
-                dechex($x['locator3']) . ':' . dechex($x['locator4']);
+            $this->locator64 = dechex($x['locator1']) . ':' . 
+                dechex($x['locator2']) . ':' .
+                dechex($x['locator3']) . ':' . 
+                dechex($x['locator4']);
       
             return true;
         }
