@@ -391,8 +391,8 @@ class Net_DNS2_Lookups
 
     //    251            - IXFR - handled as a full zone transfer (252)
     //    252            - AXFR - handled as a function call
-    //    255            - ANY - used only for queries
 
+        255         => 'Net_DNS2_RR_ANY',
         256         => 'Net_DNS2_RR_URI',
         257         => 'Net_DNS2_RR_CAA',
         32768       => 'Net_DNS2_RR_TA',
