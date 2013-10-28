@@ -92,6 +92,8 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             'L32'           => 'example.com. 300 IN L32 10 10.1.2.0',
             'L64'           => 'example.com. 300 IN L64 10 2001:db8:1140:1000',
             'LP'            => 'example.com. 300 IN LP 10 l64-subnet1.example.com.',
+            'EUI48'         => 'example.com. 300 IN EUI48 00-00-5e-00-53-2a',
+            'EUI64'         => 'example.com. 300 IN EUI64 00-00-5e-ef-10-00-00-2a',
             'TKEY'          => 'example.com. 300 IN TKEY gss.microsoft.com. 3 123456.',
             'URI'           => 'example.com. 300 IN URI 10 1 "http://mrdns.com"',
             'CAA'           => 'example.com. 300 IN CAA 0 issue "ca.example.net; policy=ev"',

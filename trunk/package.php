@@ -29,15 +29,12 @@ $pkg->setPackage('Net_DNS2');
 $pkg->setSummary('PHP5 Resolver library used to communicate with a DNS server.');
 $pkg->setDescription("Provides (roughly) the same functionality as Net_DNS, but using PHP5 objects, exceptions for error handling, better sockets support.\n\nThis release is (in most cases) 2x - 10x faster than Net_DNS, as well as includes more RR's (including DNSSEC RR's), and improved sockets and streams support.");
 $pkg->setChannel('pear.php.net');
-$pkg->setAPIVersion('1.3.1');
-$pkg->setReleaseVersion('1.3.1');
+$pkg->setAPIVersion('1.3.2');
+$pkg->setReleaseVersion('1.3.2');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
 $pkg->setNotes(
-"- added the Net_DNS2_Packet_Request and Net_DNS2_Packet_Response objects to the Net_DNS2_Exception object\n" .
-"- added support in the TSIG class for SHA algorithms (requires the hash extension, which is included in PHP >= 5.1.2), patch provided by Manuel Mausz\n" .
-"- added support for the NID, L32, L64, and LP DNS RR's (RFC6742)\n" . 
-"- lots of phpcs cleanup\n"
+"- added support for the EUI48 and EUI64 resource records (RFC7043)\n"
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();

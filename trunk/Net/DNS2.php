@@ -72,7 +72,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = '1.3.1';
+    const VERSION = '1.3.2';
 
     /*
      * the default path to a resolv.conf file
@@ -259,7 +259,7 @@ class Net_DNS2
         //
         // check for the sockets extension
         //
-        $this->sockets_enabled = extension_loaded('sockets');
+        //$this->sockets_enabled = extension_loaded('sockets');
 
         //
         // load any options that were provided
