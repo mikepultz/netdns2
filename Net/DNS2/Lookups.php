@@ -292,8 +292,10 @@ class Net_DNS2_Lookups
         'L32'           => 105,     // RFC 6742
         'L64'           => 106,     // RFC 6742
         'LP'            => 107,     // RFC 6742
+        'EUI48'         => 108,     // RFC 7043
+        'EUI64'         => 109,     // RFC 7043
 
-                                    // 108 - 248 unassigned
+                                    // 110 - 248 unassigned
 
         'TKEY'          => 249,     // RFC 2930
         'TSIG'          => 250,     // RFC 2845
@@ -386,6 +388,9 @@ class Net_DNS2_Lookups
         105         => 'Net_DNS2_RR_L32',
         106         => 'Net_DNS2_RR_L64',
         107         => 'Net_DNS2_RR_LP',
+        108         => 'Net_DNS2_RR_EUI48',
+        109         => 'Net_DNS2_RR_EUI64',
+
         249         => 'Net_DNS2_RR_TKEY',
         250         => 'Net_DNS2_RR_TSIG',
 
