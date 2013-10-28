@@ -259,7 +259,7 @@ class Net_DNS2
         //
         // check for the sockets extension
         //
-        //$this->sockets_enabled = extension_loaded('sockets');
+        $this->sockets_enabled = extension_loaded('sockets');
 
         //
         // load any options that were provided
