@@ -215,18 +215,16 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         //
         // select on write
         //
-        switch(@stream_select($read, $write, $except, $this->timeout)) {
-        case false:
-            $this->last_error = 'failed on stream_select()';
+        $result = stream_select($read, $write, $except, $this->timeout);
+        if ($result === false) {
+
+            $this->last_error = 'failed on write select()';
             return false;
-            break;
-       
-        case 0:
+
+        } else if ($result == 0) {
+
+            $this->last_error = 'timeout on write select()';
             return false;
-            break;
-            
-        default:
-            ;
         }
 
         //
@@ -280,18 +278,16 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         //
         // select on read
         //
-        switch(stream_select($read, $write, $except, $this->timeout)) {
-        case false:
-            $this->last_error = 'error on stream_select()';
+        $result = stream_select($read, $write, $except, $this->timeout);
+        if ($result === false) {
+
+            $this->last_error = 'error on read select()';
             return false;
-            break;
-            
-        case 0:
+
+        } else if ($result == 0) {
+
+            $this->last_error = 'timeout on read select()';
             return false;
-            break;
-            
-        default:
-            ;
         }
 
         $data = '';
