@@ -34,7 +34,9 @@ $pkg->setReleaseVersion('1.3.2');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
 $pkg->setNotes(
-"- added support for the EUI48 and EUI64 resource records (RFC7043)\n"
+"- added support for the EUI48 and EUI64 resource records (RFC7043)\n" .
+"- fixed how we handle the return values from socket select() statements; this wasn't causing a problem, but it wasn't quite right\n" .
+"- added some error messaging when the socket times out\n"
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();
