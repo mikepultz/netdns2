@@ -422,7 +422,7 @@ class Net_DNS2_Packet
     
         return true;
     }
-    
+
     /**
      * formats an IPv6 IP address in the preferred format
      *
