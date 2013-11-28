@@ -36,7 +36,8 @@ $pkg->setAPIStability('stable');
 $pkg->setNotes(
 "- added support for the EUI48 and EUI64 resource records (RFC7043)\n" .
 "- fixed how we handle the return values from socket select() statements; this wasn't causing a problem, but it wasn't quite right\n" .
-"- added some error messaging when the socket times out\n"
+"- added some error messaging when the socket times out\n" .
+"- before we cache the data, unset the rdata value; this was causing some JSON errors to be generated, and we don't need the data anyway.\n"
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();

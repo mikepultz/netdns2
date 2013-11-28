@@ -135,6 +135,12 @@ class Net_DNS2_Cache
         $ttl = 86400 * 365;
 
         //
+        // clear the rdata values
+        //
+        $data->rdata = '';
+        $data->rdlength = 0;
+
+        //
         // find the lowest TTL, and use that as the TTL for the whole cached 
         // object. The downside to using one TTL for the whole object, is that
         // we'll invalidate entries before they actuall expire, causing a
@@ -149,18 +155,27 @@ class Net_DNS2_Cache
             if ($rr->ttl < $ttl) {
                 $ttl = $rr->ttl;
             }
+
+            $rr->rdata = '';
+            $rr->rdlength = 0;
         }
         foreach ($data->authority as $index => $rr) {
                     
             if ($rr->ttl < $ttl) {
                 $ttl = $rr->ttl;
             }
+
+            $rr->rdata = '';
+            $rr->rdlength = 0;
         }
         foreach ($data->additional as $index => $rr) {
                     
             if ($rr->ttl < $ttl) {
                 $ttl = $rr->ttl;
             }
+
+            $rr->rdata = '';
+            $rr->rdlength = 0;
         }
 
         $this->cache_data[$key] = array(
