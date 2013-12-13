@@ -92,7 +92,17 @@ class Net_DNS2_Exception extends Exception
         //
         // call the parent constructor
         //
-        parent::__construct($message, $code, $previous);
+        // the "previous" argument was added in PHP 5.3.0
+        //
+        //      https://code.google.com/p/netdns2/issues/detail?id=25
+        //
+        if (version_compare(PHP_VERSION, '5.3.0', '>=') == true) {
+
+            parent::__construct($message, $code, $previous);
+        } else {
+
+            parent::__construct($message, $code);
+        }
     }
 
     /**
