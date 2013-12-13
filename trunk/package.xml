@@ -15,11 +15,11 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2013-06-12</date>
- <time>21:26:38</time>
+ <date>2013-11-30</date>
+ <time>19:08:49</time>
  <version>
-  <release>1.3.1</release>
-  <api>1.3.1</api>
+  <release>1.3.2</release>
+  <api>1.3.2</api>
  </version>
  <stability>
   <release>stable</release>
@@ -27,20 +27,20 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
  <notes>
-- added the Net_DNS2_Packet_Request and Net_DNS2_Packet_Response objects to the Net_DNS2_Exception object
-- added support in the TSIG class for SHA algorithms (requires the hash extension, which is included in PHP &gt;= 5.1.2), patch provided by Manuel Mausz
-- added support for the NID, L32, L64, and LP DNS RR&apos;s (RFC6742)
-- lots of phpcs cleanup
+- added support for the EUI48 and EUI64 resource records (RFC7043)
+- fixed how we handle the return values from socket select() statements; this wasn&apos;t causing a problem, but it wasn&apos;t quite right
+- added some error messaging when the socket times out
+- before we cache the data, unset the rdata value; this was causing some JSON errors to be generated, and we don&apos;t need the data anyway.
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
-   <file baseinstalldir="/" md5sum="66a23d94ee6b0c14db73bdd5c98e6af8" name="Net/DNS2.php" role="php" />
+   <file baseinstalldir="/" md5sum="978d7aded587ee179b176b6bb6b4c413" name="Net/DNS2.php" role="php" />
    <file baseinstalldir="/" md5sum="668e7cc8f1c22440109fd03eb3e6437b" name="Net/DNS2/BitMap.php" role="php" />
-   <file baseinstalldir="/" md5sum="7f2ad435cf7d0daefe047ff042439291" name="Net/DNS2/Cache.php" role="php" />
+   <file baseinstalldir="/" md5sum="a58c2f7c621a981d1859506bfd273781" name="Net/DNS2/Cache.php" role="php" />
    <file baseinstalldir="/" md5sum="96525fedc7e1c726de88e0b8c0941576" name="Net/DNS2/Exception.php" role="php" />
    <file baseinstalldir="/" md5sum="88acc364631e76974a5d4f309e7574be" name="Net/DNS2/Header.php" role="php" />
-   <file baseinstalldir="/" md5sum="b1571dc636ddb9bcd0bd1dfe5b750928" name="Net/DNS2/Lookups.php" role="php" />
-   <file baseinstalldir="/" md5sum="9e0dce6a637c5bf038a10afbce320357" name="Net/DNS2/Packet.php" role="php" />
+   <file baseinstalldir="/" md5sum="82968282ff244ea065420bd85ea28679" name="Net/DNS2/Lookups.php" role="php" />
+   <file baseinstalldir="/" md5sum="e4172d04181437d6539564a88b742dcf" name="Net/DNS2/Packet.php" role="php" />
    <file baseinstalldir="/" md5sum="f3d060b849a7770692e3a902b5344388" name="Net/DNS2/PrivateKey.php" role="php" />
    <file baseinstalldir="/" md5sum="1d88fe97757f44906c8e6d20b44d638f" name="Net/DNS2/Question.php" role="php" />
    <file baseinstalldir="/" md5sum="5ee50993e50c4f5082be13e63835d3e6" name="Net/DNS2/Resolver.php" role="php" />
@@ -67,6 +67,8 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="1d323b8eb84746786c10eb873c0970c1" name="Net/DNS2/RR/DNSKEY.php" role="php" />
    <file baseinstalldir="/" md5sum="ce20ade1db6d6a50a0a2ea1794951c81" name="Net/DNS2/RR/DS.php" role="php" />
    <file baseinstalldir="/" md5sum="a6dcd14184f5468220b3c0c485bab750" name="Net/DNS2/RR/EID.php" role="php" />
+   <file baseinstalldir="/" md5sum="c686c825068a7c43746f32b7cc2ea1c9" name="Net/DNS2/RR/EUI48.php" role="php" />
+   <file baseinstalldir="/" md5sum="9fa0470a8b59d11c6b086b1f0932dc64" name="Net/DNS2/RR/EUI64.php" role="php" />
    <file baseinstalldir="/" md5sum="75b8ec406a262c4a150be0789e6c8b51" name="Net/DNS2/RR/HINFO.php" role="php" />
    <file baseinstalldir="/" md5sum="9435c778e93dbec1862c05f0579af858" name="Net/DNS2/RR/HIP.php" role="php" />
    <file baseinstalldir="/" md5sum="74b66546f605819f8fc4ff41bdf3956a" name="Net/DNS2/RR/IPSECKEY.php" role="php" />
@@ -106,15 +108,13 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="ad3f5c7131dc70735d86b2b5777946e1" name="Net/DNS2/RR/URI.php" role="php" />
    <file baseinstalldir="/" md5sum="48e7326c5406377f37174149d82b6215" name="Net/DNS2/RR/WKS.php" role="php" />
    <file baseinstalldir="/" md5sum="97de458e2cfd3acca103f418ab511b38" name="Net/DNS2/RR/X25.php" role="php" />
-   <file baseinstalldir="/" md5sum="8c8eedf879d141da6bd1e403c5f246ac" name="Net/DNS2/Socket/Sockets.php" role="php" />
-   <file baseinstalldir="/" md5sum="fb6b3f8ef3a991f0788412b9efb91189" name="Net/DNS2/Socket/Streams.php" role="php" />
+   <file baseinstalldir="/" md5sum="0afc43c4d614aa63af02464f5769d646" name="Net/DNS2/Socket/Sockets.php" role="php" />
+   <file baseinstalldir="/" md5sum="4f00d336823dd44c1631be5ccfc04266" name="Net/DNS2/Socket/Streams.php" role="php" />
    <file baseinstalldir="/" md5sum="7117b54bd1494b2c3b880c709228b4dc" name="tests/AllTests.php" role="test" />
    <file baseinstalldir="/" md5sum="6b3b3108d5c11baea6b55224e71d573f" name="tests/Net_DNS2_DNSSECTest.php" role="test" />
-   <file baseinstalldir="/" md5sum="860bc2d26604d1c29b00ac2bbf82ca6d" name="tests/Net_DNS2_ParserTest.php" role="test" />
+   <file baseinstalldir="/" md5sum="87a85485fc06c37e7a93359b01b6a62f" name="tests/Net_DNS2_ParserTest.php" role="test" />
    <file baseinstalldir="/" md5sum="77e6eeff2df6fe6360fcd62e3cc7dc40" name="tests/Net_DNS2_ResolverTest.php" role="test" />
-   <file baseinstalldir="/" md5sum="5ee939cf2b02a731bc010eaeb3b16443" name="composer.json" role="data" />
-   <file baseinstalldir="/" md5sum="13abf1d3d0c6877a8cb996fbce0c3423" name="LICENSE" role="doc" />
-   <file baseinstalldir="/" md5sum="75e3fc574c30ad841d26d5d81494a8b2" name="TODO" role="data" />
+   <file baseinstalldir="/" md5sum="46ec3bdb18dbe41d1c9f345939ea76a6" name="LICENSE" role="doc" />
   </dir>
  </contents>
  <dependencies>
@@ -420,6 +420,24 @@ Initial Beta release of Net_DNS2
 - added support in the TSIG class for SHA algorithms (requires the hash extension, which is included in PHP &gt;= 5.1.2), patch provided by Manuel Mausz
 - added support for the NID, L32, L64, and LP DNS RR&apos;s (RFC6742)
 - lots of phpcs cleanup
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.3.2</release>
+    <api>1.3.2</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2013-11-30</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- added support for the EUI48 and EUI64 resource records (RFC7043)
+- fixed how we handle the return values from socket select() statements; this wasn&apos;t causing a problem, but it wasn&apos;t quite right
+- added some error messaging when the socket times out
+- before we cache the data, unset the rdata value; this was causing some JSON errors to be generated, and we don&apos;t need the data anyway.
    </notes>
   </release>
  </changelog>
