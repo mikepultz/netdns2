@@ -74,6 +74,11 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
      */
     public $answer_socket_type;
 
+    /*
+     * The query response time in microseconds
+     */
+    public $response_time = 0;
+
     /**
      * Constructor - builds a new Net_DNS2_Packet_Response object
      *

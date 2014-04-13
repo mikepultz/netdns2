@@ -361,6 +361,14 @@ class Net_DNS2
         } else {
 
             //
+            // temporary list of name servers; do it this way rather than just 
+            // resetting the local nameservers value, just incase an exception 
+            // is thrown here; this way we might avoid ending up with an empty 
+            // namservers list.
+            //
+            $ns = array();
+
+            //
             // check to see if the file is readable
             //
             if (is_readable($nameservers) === true) {
@@ -404,7 +412,7 @@ class Net_DNS2
                             || (self::isIPv6($value) == true)
                         ) {
 
-                            $this->nameservers[] = $value;
+                            $ns[] = $value;
                         } else {
 
                             throw new Net_DNS2_Exception(
@@ -443,7 +451,20 @@ class Net_DNS2
                     Net_DNS2_Lookups::E_NS_INVALID_FILE
                 );
             }
+
+            //
+            // store the name servers locally
+            //
+            if (count($ns) > 0) {
+                $this->nameservers = $ns;
+            }
         }
+
+        //
+        // remove any duplicates; not sure if we should bother with this- if people
+        // put duplicate name servers, who I am to stop them?
+        //
+        $this->nameservers = array_unique($this->nameservers);
 
         //
         // check the name servers
@@ -685,9 +706,7 @@ class Net_DNS2
         //
         if (extension_loaded('filter') == true) {
 
-            if (filter_var(
-                $_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4
-            ) == false) {
+            if (filter_var($_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == false) {
                 return false;
             }
         } else {
@@ -702,10 +721,7 @@ class Net_DNS2
             //
             // then make sure we're not a IPv6 address
             //
-            if (preg_match(
-                '/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', 
-                $_address
-            ) == 0) {
+            if (preg_match('/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $_address) == 0) {
                 return false;
             }
         }
@@ -728,9 +744,7 @@ class Net_DNS2
         // use filter_var() if it's available; it's faster than preg
         //
         if (extension_loaded('filter') == true) {
-            if (filter_var(
-                $_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6
-            ) == false) {
+            if (filter_var($_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == false) {
                 return false;
             }
         } else {
@@ -745,9 +759,7 @@ class Net_DNS2
             //
             // then make sure it doesn't match a IPv4 address
             //
-            if (preg_match(
-                '/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $_address
-            ) == 1) {
+            if (preg_match('/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $_address) == 1) {
                 return false;
             }
         }
@@ -850,6 +862,7 @@ class Net_DNS2
         $ns = '';
         $socket_type = null;
         $tcp_fallback = false;
+        $start_time = 0;
 
         while (1) {
 
@@ -916,6 +929,11 @@ class Net_DNS2
                         $this->local_host, $this->local_port
                     );
                 }
+
+                //
+                // grab the start time
+                //
+                $start_time = microtime(true);
 
                 //
                 // open it; if it fails, continue in the while loop
@@ -1090,6 +1108,11 @@ class Net_DNS2
                 }
 
                 //
+                // grab the start time
+                //
+                $start_time = microtime(true);
+
+                //
                 // open it
                 //
                 if ($this->sock['udp'][$ns]->open() === false) {
@@ -1161,6 +1184,11 @@ class Net_DNS2
                 $request
             );
         }
+
+        //
+        // store the query time
+        //
+        $response->response_time = microtime(true) - $start_time;
 
         //
         // add the name server that the response came from to the response object,
