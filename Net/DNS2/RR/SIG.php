@@ -386,9 +386,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             //
             // sign the data
             //
-            if (openssl_sign(
-                $sigdata, $this->signature, $this->private_key->instance, $algorithm
-            ) == false) {
+            if (openssl_sign($sigdata, $this->signature, $this->private_key->instance, $algorithm) == false) {
 
                 throw new Net_DNS2_Exception(
                     openssl_error_string(), 

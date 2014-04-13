@@ -104,9 +104,15 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
         //
         $q = new Net_DNS2_Question();
 
-        $name   = trim(strtolower($name), " \t\n\r\0\x0B.");
-        $type   = strtoupper(trim($type));
-        $class  = strtoupper(trim($class));
+        //
+        // allow queries directly to . for the root name servers
+        //
+        if ($name != '.') {
+            $name = trim(strtolower($name), " \t\n\r\0\x0B.");
+        }
+
+        $type = strtoupper(trim($type));
+        $class = strtoupper(trim($class));
 
         //
         // check that the input string has some data in it

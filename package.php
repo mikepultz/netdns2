@@ -34,7 +34,10 @@ $pkg->setReleaseVersion('1.3.3');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
 $pkg->setNotes(
-"- fixed a bug in the Net_DNS2_Exception class; the 'previous' argument was only added in PHP 5.3.0\n";
+"- fixed a bug in the Net_DNS2_Exception class; the 'previous' argument was only added in PHP 5.3.0\n" .
+"- fixed Net_DNS2_Packet_Request::set so we can pass '.' in as name value for querying the root name severs\n" .
+"- fixed Net_DNS2::setServers() so it overrides any existing values, rather than just adding to them. Also made it remove any duplicate nameserver entries.\n"
+"- added the query response_time to the Net_DNS2_Packet_Response object.\n"
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();
