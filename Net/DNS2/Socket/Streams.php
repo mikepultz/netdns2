@@ -53,7 +53,7 @@
  * Socket handling class using the PHP Streams
  *
  * The sockets extension is faster than the stream functions in PHP, but it's
- * not standard. So if the extension is loaded, then the Net_DNS_Socket_Sockets
+ * not standard. So if the extension is loaded, then the Net_DNS2_Socket_Sockets
  * class it used, otherwise, this class it used.
  *   
  * @category Networking
