@@ -53,7 +53,7 @@
  * The CDS RR is implemented exactly like the DS record, so
  * for now we just extend the DS RR and use it.
  *
- * http://tools.ietf.org/html/draft-barwood-dnsop-ds-publish-02
+ * http://www.rfc-editor.org/rfc/rfc7344.txt
  *
  * @category Networking
  * @package  Net_DNS2

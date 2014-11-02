@@ -279,10 +279,12 @@ class Net_DNS2_Lookups
         'HIP'           => 55,      // RFC 5205
         'NINFO'         => 56,      // Not implemented
         'RKEY'          => 57,      // Not implemented
-        'TALINK'        => 58,      // IETF (draft-barwood-dnsop-ds-publish-02)
-        'CDS'           => 59,      // IETF (draft-barwood-dnsop-ds-publish-02)
+        'TALINK'        => 58,      // 
+        'CDS'           => 59,      // RFC 7344
+        'CDNSKEY'       => 60,      // RFC 7344
+        'OPENPGPKEY'    => 61,      // IETF (draft-ietf-dane-openpgpkey)
 
-                                    // 60 - 98 unassigned
+                                    // 62 - 98 unassigned
 
         'SPF'           => 99,      // RFC 4408
         'UINFO'         => 100,     // no RFC, Not implemented
@@ -384,6 +386,8 @@ class Net_DNS2_Lookups
         55          => 'Net_DNS2_RR_HIP',
         58          => 'Net_DNS2_RR_TALINK',
         59          => 'Net_DNS2_RR_CDS',
+        60          => 'Net_DNS2_RR_CDNSKEY',
+        61          => 'Net_DNS2_RR_OPENPGPKEY',
         99          => 'Net_DNS2_RR_SPF',
         104         => 'Net_DNS2_RR_NID',
         105         => 'Net_DNS2_RR_L32',

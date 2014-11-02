@@ -50,7 +50,7 @@
  *
  */
 
-require_once 'Net/DNS2.php';
+require_once '../Net/DNS2.php';
 
 /**
  * Test class to test the DNSSEC logic
