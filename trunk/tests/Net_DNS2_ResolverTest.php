@@ -50,7 +50,7 @@
  *
  */
 
-require_once 'Net/DNS2.php';
+require_once '../Net/DNS2.php';
 
 /**  
  * This test uses the Google public DNS servers to perform a resolution test; 

@@ -72,7 +72,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = '1.3.3';
+    const VERSION = '1.4.0';
 
     /*
      * the default path to a resolv.conf file
@@ -221,14 +221,14 @@ class Net_DNS2
     public $last_exception_list = array();
 
     /*
+     * name server list
+     */
+    public $nameservers = array();
+
+    /*
      * local sockets
      */
     protected $sock = array('udp' => array(), 'tcp' => array());
-
-    /*
-     * name server list
-     */
-    protected $nameservers = array();
 
     /*
      * if the socket extension is loaded
