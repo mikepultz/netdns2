@@ -134,27 +134,27 @@ class Net_DNS2_PrivateKey
     /*
      * DSA: prime
      */
-    //private $_prime;
+    public $prime;
     
     /*
      * DSA: subprime
      */
-    //private $_subprime;
+    public $subprime;
 
     /*
      * DSA: base
      */
-    //private $_base;
+    public $base;
 
     /*
      * DSA: private value
      */
-    //private $_private_value;
+    public $private_value;
 
     /*
      * DSA: public value
      */
-    //private $_public_value;
+    public $public_value;
 
     /**
      * Constructor - base constructor the private key container class
@@ -308,26 +308,26 @@ class Net_DNS2_PrivateKey
             //
             // DSA - this won't work in PHP until the OpenSSL extension is better
             //
-            /*case 'prime(p)':
-                $this->_prime = $value;
+            case 'prime(p)':
+                $this->prime = $value;
                 break;
 
             case 'subprime(q)':
-                $this->_subprime = $value;
+                $this->subprime = $value;
                 break;
 
             case 'base(g)':
-                $this->_base = $value;
+                $this->base = $value;
                 break;
 
             case 'private_value(x)':
-                $this->_private_value = $value;
+                $this->private_value = $value;
                 break;
 
             case 'public_value(y)':
-                $this->_public_value = $value;
+                $this->public_value = $value;
                 break;
-            */
+
             default:
                 throw new Net_DNS2_Exception(
                     'unknown private key data: ' . $key . ': ' . $value,
@@ -348,6 +348,8 @@ class Net_DNS2_PrivateKey
         //
         case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSAMD5:
         case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA1:
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:
 
             $args = array(
 
@@ -369,22 +371,22 @@ class Net_DNS2_PrivateKey
         //
         // DSA - this won't work in PHP until the OpenSSL extension is better
         //
-        /*case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
 
             $args = array(
 
                 'dsa' => array(
 
-                    'p'                 => base64_decode($this->_prime),
-                    'q'                 => base64_decode($this->_subprime),
-                    'g'                 => base64_decode($this->_base),
-                    'priv_key'          => base64_decode($this->_private_value),
-                    'pub_key'           => base64_decode($this->_public_value)
+                    'p'                 => base64_decode($this->prime),
+                    'q'                 => base64_decode($this->subprime),
+                    'g'                 => base64_decode($this->base),
+                    'priv_key'          => base64_decode($this->private_value),
+                    'pub_key'           => base64_decode($this->public_value)
                 )
             );
 
             break;
-        */
+
         default:
             throw new Net_DNS2_Exception(
                 'we only currently support RSAMD5 and RSASHA1 encryption.',
