@@ -632,11 +632,14 @@ class Net_DNS2
         }
 
         //
-        // only RSAMD5 and RSASHA1 are supported for SIG(0)
+        // only RSA algorithms are supported for SIG(0)
         //
         switch($this->auth_signature->algorithm) {
         case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSAMD5:
         case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA1:
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:
+        case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
             break;
         default:
             throw new Net_DNS2_Exception(
