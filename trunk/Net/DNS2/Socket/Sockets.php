@@ -249,7 +249,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
      * @access public
      *
      */
-    public function read(&$size)
+    public function read(&$size, $max_size)
     {
         $read   = array($this->sock);
         $write  = null;
@@ -280,7 +280,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         }
 
         $data = '';
-        $length = Net_DNS2_Lookups::DNS_MAX_UDP_SIZE;
+        $length = $max_size;
 
         //
         // if it's a TCP socket, then the first two bytes is the length of the DNS

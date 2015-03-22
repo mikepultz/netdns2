@@ -170,13 +170,14 @@ abstract class Net_DNS2_Socket
     /**   
      * reads a response from a DNS server
      *
-     * @param integer &$size the size of the DNS packet read is passed back
+     * @param integer &$size    the size of the DNS packet read is passed back
+     * @param integer $max_size the max data size returned.
      *
      * @return mixed         returns the data on success and false on error
      * @access public
      *       
      */
-    abstract public function read(&$size);
+    abstract public function read(&$size, $max_size);
 }
 
 /*
