@@ -128,7 +128,7 @@ class Net_DNS2
     /*
      * the max size of the cache file (in bytes)
      */
-    public $cache_size = 10000;
+    public $cache_size = 50000;
 
     /*
      * the method to use for storing cache data; either "serialize" or "json"
@@ -203,12 +203,15 @@ class Net_DNS2
 
     /*
      * the EDNS(0) UDP payload size to use when making DNSSEC requests
-     * see RFC 2671 section 6.2.3 for more details
+     * see RFC 4035 section 4.1 - EDNS Support.
      *
-     * http://tools.ietf.org/html/draft-ietf-dnsext-rfc2671bis-edns0-10
+     * there is some different ideas on the suggest size to supprt; but it seems to
+     * be "at least 1220 bytes, but SHOULD support 4000 bytes.
+     *
+     * we'll just support 4000
      *
      */
-    public $dnssec_payload_size = 1280;
+    public $dnssec_payload_size = 4000;
 
     /*
      * the last exeception that was generated
@@ -892,10 +895,17 @@ class Net_DNS2
             $ns = $ns[1];
 
             //
-            // if the use TCP flag (force TCP) is set, or the packet is bigger 
-            // than 512 bytes, use TCP for sending the packet
+            // if the use TCP flag (force TCP) is set, or the packet is bigger than our 
+            // max allowed UDP size- which is either 512, or if this is DNSSEC request,
+            // then whatever the configured dnssec_payload_size is.
             //
-            if ( ($use_tcp == true) || (strlen($data) > Net_DNS2_Lookups::DNS_MAX_UDP_SIZE) ) {
+            $max_udp_size = Net_DNS2_Lookups::DNS_MAX_UDP_SIZE;
+            if ($this->dnssec == true)
+            {
+                $max_udp_size = $this->dnssec_payload_size;
+            }
+
+            if ( ($use_tcp == true) || (strlen($data) > $max_udp_size) ) {
 
                 try
                 {
@@ -1096,7 +1106,7 @@ class Net_DNS2
                 //
                 // read the data off the socket
                 //
-                $result = $this->sock['tcp'][$_ns]->read($size);
+                $result = $this->sock['tcp'][$_ns]->read($size, ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
                 if ( ($result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
 
                     throw new Net_DNS2_Exception(
@@ -1185,7 +1195,7 @@ class Net_DNS2
         //
         } else {
 
-            $result = $this->sock['tcp'][$_ns]->read($size);
+            $result = $this->sock['tcp'][$_ns]->read($size, ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
             if ( ($result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
 
                 throw new Net_DNS2_Exception(
@@ -1298,7 +1308,7 @@ class Net_DNS2
         //
         $size = 0;
 
-        $result = $this->sock['udp'][$_ns]->read($size);
+        $result = $this->sock['udp'][$_ns]->read($size, ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
         if (( $result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE)) {
 
             throw new Net_DNS2_Exception(
