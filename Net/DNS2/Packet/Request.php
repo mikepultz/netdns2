@@ -145,12 +145,15 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
             );
         }
 
-        //
-        // if it's a PTR request for an IP address, then make sure we tack on 
-        // the arpa domain
-        //
         if ($type == 'PTR') {
 
+            //
+            // if it's a PTR request for an IP address, then make sure we tack on
+            // the arpa domain.
+            //
+            // there are other types of PTR requests, so if an IP adress doesn't match,
+            // then just let it flow through and assume it's a hostname
+            //
             if (Net_DNS2::isIPv4($name) == true) {
 
                 //
@@ -180,19 +183,6 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
                         Net_DNS2_Lookups::E_PACKET_INVALID
                     );
                 }
-
-            } else if (preg_match('/arpa$/', $name) == true) {
-
-                //
-                // an already formatted IPv4 or IPv6 address in the arpa domain
-                //
-
-            } else {
-
-                throw new Net_DNS2_Exception(
-                    'unsupported PTR value: ' . $name,
-                    Net_DNS2_Lookups::E_PACKET_INVALID
-                );
             }
         }
 
