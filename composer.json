@@ -4,10 +4,10 @@
     "version": "1.4.1",
     "description": "Native PHP5 DNS Resolver and Updater Library",
     "keywords": ["dns","network"],
-    "homepage": "https://code.google.com/p/netdns2/",
+    "homepage": "http://netdns2.com/",
     "license": "BSD-2-Clause",
     "support": {
-        "issues": "https://code.google.com/p/netdns2/issues/list"
+        "issues": "https://github.com/mikepultz/netdns2/issues"
     },
     "authors": [
         {
