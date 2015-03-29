@@ -265,9 +265,17 @@ class Net_DNS2
     public function __construct(array $options = null)
     {
         //
-        // check for the sockets extension
+        // check for the sockets extension; we no longer support the sockets library under 
+        // windows- there have been too many errors related to sockets under windows- 
+        // specifically inconsistent socket defines between versions of windows- 
         //
-        $this->sockets_enabled = extension_loaded('sockets');
+        // and since I can't seem to find a way to get the actual windows version, it 
+        // doesn't seem fixable in the code.
+        //
+        if ( (extension_loaded('sockets') == true) && (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') ) {
+
+            $this->sockets_enabled = true;
+        }
 
         //
         // load any options that were provided

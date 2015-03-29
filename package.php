@@ -36,7 +36,8 @@ $pkg->setAPIStability('stable');
 $pkg->setNotes(
 "- increased the default DNSSEC payload size value to 4000 bytes per RFC 4035 section 4.1; this is still configurable" .
 "- fixed a bug where I was still using the DNS_MAX_UDP_SIZE default (512 bytes) for all requests, event DNSSEC, where I should have been using the dnssec_payload_size config value" .
-"- removed the limitation that PTR records had to look like IP addresses; you can add other things to PTR records, like service discovery objects- RFC 6763"
+"- removed the limitation that PTR records had to look like IP addresses; you can add other things to PTR records, like service discovery objects- RFC 6763" .
+"- dropped support for using the Sockets library on Windows. There have been too many inconsistencies between versions of Windows; we'll just default to use the Streams library."
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();
