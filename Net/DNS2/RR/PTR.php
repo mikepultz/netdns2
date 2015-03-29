@@ -80,7 +80,7 @@ class Net_DNS2_RR_PTR extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->cleanString($this->ptrdname) . '.';
+        return rtrim($this->ptrdname, '.') . '.';
     }
 
     /**
@@ -94,7 +94,7 @@ class Net_DNS2_RR_PTR extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $this->ptrdname = $this->cleanString(array_shift($rdata));
+        $this->ptrdname = rtrim(implode(' ', $rdata), '.');
         return true;
     }
 
