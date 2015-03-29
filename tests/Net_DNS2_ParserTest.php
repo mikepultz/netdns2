@@ -164,6 +164,7 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             'TALINK'        => 'example.com. 300 IN TALINK c1.example.com. c3.example.com.',
             'CDS'           => 'example.com. 300 IN CDS 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
             'OPENPGPKEY'    => '8d5730bd8d76d417bf974c03f59eedb7af98cb5c3dc73ea8ebbd54b7._openpgpkey.example.com. 300 IN OPENPGPKEY AwEAAYCXh/ZABi8kiJIDXYmyUlHzC0CHeBzqcpyZAIjC7dK1wkRYVcUvIlpTOpnOVVfcC3Py9Ui/x45qKb0LytvK7WYAe3WyOOwk5klwIqRC/0p4luafbd2yhRMF7quOBVqYrLoHwv8i9LrV+r8dhB7rXv/lkTSI6mEZsg5rDfee8Yy1',
+            'CSYNC'         => 'example.com. 300 IN CSYNC 1278700841 3 A NS AAAA',
             'SPF'           => 'example.com. 300 IN SPF "v=spf1 ip4:192.168.0.1/24 mx ?all"',
             'NID'           => 'example.com. 300 IN NID 10 14:4fff:ff20:ee64',
             'L32'           => 'example.com. 300 IN L32 10 10.1.2.0',

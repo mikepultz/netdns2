@@ -274,7 +274,7 @@ class Net_DNS2_Lookups
         'NSEC3PARAM'    => 51,      // RFC 5155
         'TLSA'          => 52,      // RFC 6698
 
-                                    // 52 - 54 unassigned
+                                    // 53 - 54 unassigned
 
         'HIP'           => 55,      // RFC 5205
         'NINFO'         => 56,      // Not implemented
@@ -283,8 +283,9 @@ class Net_DNS2_Lookups
         'CDS'           => 59,      // RFC 7344
         'CDNSKEY'       => 60,      // RFC 7344
         'OPENPGPKEY'    => 61,      // IETF (draft-ietf-dane-openpgpkey)
+        'CSYNC'         => 62,      // RFC 7477
 
-                                    // 62 - 98 unassigned
+                                    // 63 - 98 unassigned
 
         'SPF'           => 99,      // RFC 4408
         'UINFO'         => 100,     // no RFC, Not implemented
@@ -388,6 +389,7 @@ class Net_DNS2_Lookups
         59          => 'Net_DNS2_RR_CDS',
         60          => 'Net_DNS2_RR_CDNSKEY',
         61          => 'Net_DNS2_RR_OPENPGPKEY',
+        62          => 'Net_DNS2_RR_CSYNC',
         99          => 'Net_DNS2_RR_SPF',
         104         => 'Net_DNS2_RR_NID',
         105         => 'Net_DNS2_RR_L32',
