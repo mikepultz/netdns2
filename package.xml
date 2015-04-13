@@ -15,8 +15,8 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2015-04-12</date>
- <time>20:51:30</time>
+ <date>2015-04-13</date>
+ <time>18:31:57</time>
  <version>
   <release>1.4.1</release>
   <api>1.4.1</api>
@@ -120,7 +120,7 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="4ff30101e288ed6084db6795ceaffd49" name="tests/Net_DNS2_ParserTest.php" role="test" />
    <file baseinstalldir="/" md5sum="3667edbb50ebfa4089bb678168f1899f" name="tests/Net_DNS2_ResolverTest.php" role="test" />
    <file baseinstalldir="/" md5sum="46ec3bdb18dbe41d1c9f345939ea76a6" name="LICENSE" role="doc" />
-   <file baseinstalldir="/" md5sum="029c7ee07807607df1dc22f06a55dbaa" name="README.md" role="data" />
+   <file baseinstalldir="/" md5sum="029c7ee07807607df1dc22f06a55dbaa" name="README.md" role="doc" />
   </dir>
  </contents>
  <dependencies>
@@ -455,7 +455,7 @@ Initial Beta release of Net_DNS2
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2015-04-12</date>
+   <date>2015-04-13</date>
    <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
    <notes>
 - increased the default DNSSEC payload size value to 4000 bytes per RFC 4035 section 4.1; this is still configurable.

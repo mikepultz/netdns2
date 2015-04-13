@@ -72,7 +72,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = '1.4.1';
+    const VERSION = '1.4.2';
 
     /*
      * the default path to a resolv.conf file
