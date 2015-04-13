@@ -1,5 +1,7 @@
 <?php
 
+date_default_timezone_set('America/Toronto');
+
 ini_set("include_path", ".:/usr/local/php/lib/php/:/usr/local/php/lib/php/PEAR/PackageFileManager");
 require_once 'PEAR/PackageFileManager/File.php';
 require_once 'PEAR/PackageFileManager2.php';
@@ -39,7 +41,7 @@ $pkg->setNotes(
 "- removed the limitation that PTR records had to look like IP addresses; you can add other things to PTR records, like service discovery objects- RFC 6763.\n" .
 "- dropped support for using the Sockets library on Windows. There have been too many inconsistencies between versions of Windows; we'll just default to use the Streams library.\n" .
 "- fixed the Net_DNS2_RR_PTR class so we can pass ptrdname's with spaces in them so that we can support DNS-Based Service Discovery (RFC 6763).\n" .
-"- added support for the CSYNC resource record - see RFC 7477.\n" .
+"- added support for the CSYNC resource record - see RFC 7477.\n"
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();
