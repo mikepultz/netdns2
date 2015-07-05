@@ -37,7 +37,9 @@ $pkg->setReleaseVersion('1.4.2');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
 $pkg->setNotes(
-"- changed the role for the README.md file to doc\n"
+"- changed the role for the README.md file to doc\n" .
+"- parse the resolv.conf options line; right now I just support the timeout and rotate options.\n" .
+"- the options values only work if you set the new option use_resolv_options to true; this is to keep backwards compatibility.\n"
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();

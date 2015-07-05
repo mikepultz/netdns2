@@ -80,6 +80,15 @@ class Net_DNS2
     const RESOLV_CONF = '/etc/resolv.conf';
 
     /*
+     * override options from the resolv.conf file
+     *
+     * if this is set, then certain values from the resolv.conf file will override
+     * local settings. This is disabled by default to remain backwards compatible.
+     *
+     */
+    public $use_resolv_options = false;
+
+    /*
      * use TCP only (true/false)
      */
     public $use_tcp = false;
@@ -413,6 +422,13 @@ class Net_DNS2
                         continue;
                     }
 
+                    //
+                    // ignore lines with no spaces in them.
+                    //
+                    if (strpos($line, ' ') === false) {
+                        continue;
+                    }
+
                     list($key, $value) = preg_split('/\s+/', $line, 2);
 
                     $key    = trim(strtolower($key));
@@ -444,6 +460,10 @@ class Net_DNS2
 
                     case 'search':
                         $this->search_list = preg_split('/\s+/', $value);
+                        break;
+
+                    case 'options':
+                        $this->parseOptions($value);
                         break;
 
                     default:
@@ -489,6 +509,55 @@ class Net_DNS2
 
         return true;
     }
+
+    /**
+     * parses the options line from a resolv.conf file; we don't support all the options
+     * yet, and using them is optional.
+     *
+     * @param string $value is the options string from the resolv.conf file.
+     *
+     * @return boolean
+     * @access private
+     *
+     */
+    private function parseOptions($value)
+    {
+        //
+        // if overrides are disabled (the default), or the options list is empty for some
+        // reason, then we don't need to do any of this work.
+        //
+        if ( ($this->use_resolv_options == false) || (strlen($value) == 0) ) {
+
+            return true;
+        }
+
+        $options = preg_split('/\s+/', strtolower($value));
+
+        foreach ($options as $option) {
+
+            //
+            // override the timeout value from the resolv.conf file.
+            //
+            if ( (strncmp($option, 'timeout', 7) == 0) && (strpos($option, ':') !== false) ) {
+
+                list($key, $val) = explode(':', $option);
+
+                if ( ($val > 0) && ($val <= 30) ) {
+
+                    $this->timeout = $val;
+                }
+
+            //
+            // the rotate option just enabled the ns_random option
+            //
+            } else if (strncmp($option, 'rotate', 6) == 0) {
+
+                $this->ns_random = true;
+            }
+        }
+
+        return true;
+    }    
 
     /**
      * checks the list of name servers to make sure they're set
