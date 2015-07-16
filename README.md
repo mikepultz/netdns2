@@ -14,18 +14,21 @@
 
 ## Installing Net\_DNS2 ##
 
-Net\_DNS2 is available via the download section above as a PEAR library, or get it directly from the PEAR site:
-
 http://pear.php.net/package/Net_DNS2
 
-Or you can use the command line PEAR installer:
+You can download it directly from PEAR: http://pear.php.net/package/Net_DNS2
 
 ```
-
 pear install Net_DNS2
-
 ```
 
+You can require it direction via Composer: https://packagist.org/packages/pear/net_dns2
+
+```
+composer require pear/net_dns2
+```
+
+Or download the source above.
 
 ## Using Net\_DNS2 ##
 
