@@ -30,4 +30,4 @@ Or download the source above.
 
 ## Using Net\_DNS2 ##
 
-See the Net\_DNS2 Website for more details - http://netdns2.com/
+See the Net\_DNS2 Website for more details - https://netdns2.com/
