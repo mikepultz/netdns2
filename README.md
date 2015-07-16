@@ -14,8 +14,6 @@
 
 ## Installing Net\_DNS2 ##
 
-http://pear.php.net/package/Net_DNS2
-
 You can download it directly from PEAR: http://pear.php.net/package/Net_DNS2
 
 ```
