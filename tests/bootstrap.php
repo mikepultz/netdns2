@@ -46,43 +46,40 @@
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Net_DNS2
- * @since     File available since Release 1.0.0
+ * @since     File available since Release 1.4.2
  *
  */
 
 /**
- * Test class to test the DNSSEC logic
- *
- * @category Networking
- * @package  Net_DNS2
- * @author   Mike Pultz <mike@mikepultz.com>
- * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link     http://pear.php.net/package/Net_DNS2
- *
+ * Bootstrap the testing environment.
  */
-class Net_DNS2_DNSSECTest extends PHPUnit_Framework_TestCase
-{
-    /**
-     * function to test the TSIG logic
-     *
-     * @return void
-     * @access public
-     *
-     */
-    public function testDNSSEC()
-    {
-        $ns = array('8.8.8.8', '8.8.4.4');
 
-        $r = new Net_DNS2_Resolver(array('nameservers' => $ns));
+//
+// Crank error reporting to max volume, and do this first so that
+// that we can see whatever PHP might complain about.
+//
+error_reporting(E_ALL | E_STRICT);
 
-        $r->dnssec = true;
+//
+// If we have composer autoloading, use that.
+//
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
 
-        $result = $r->query('org', 'SOA', 'IN');
-
-        $this->assertTrue(($result->header->ad == 1));
-        $this->assertTrue(($result->additional[0] instanceof Net_DNS2_RR_OPT));
-        $this->assertTrue(($result->additional[0]->do == 1));
+//
+// Otherwise, if we're running inside PHPUnit, load all our files the
+// manual way.
+//
+} else if (class_exists('PHPUnit_Framework_TestCase')) {
+    set_include_path(__DIR__ . '/..' . PATH_SEPARATOR . __DIR__);
+    require_once __DIR__ . '/../Net/DNS2.php';
+    foreach (glob(__DIR__ . '/*Test.php') as $file) {
+        require_once $file;
     }
-}
 
-?>
+//
+// Otherwise, we're dead in the water.
+//
+} else {
+    die('PHPUnit not installed. Refer to README.md for how to run tests.' . PHP_EOL);
+}
