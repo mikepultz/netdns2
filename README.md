@@ -34,9 +34,10 @@ Or download the source above.
 * PHP 5.1.2+
 * The PHP INI setting `mbstring.func_overload` equals 0, 1, 4, or 5.
 
-### Running the test suite ###
+### Checking requirements ###
 
-If PHPUnit is already installed, use it:
+Run the provided test suite to ensure Net\_DNS2 is compatible. If PHPUnit is
+already installed, use it:
 
 ```
 $ phpunit tests/AllTests.php
