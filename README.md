@@ -46,7 +46,7 @@ $ phpunit tests/AllTests.php
 Otherwise, install PHPUnit according to its [directions][1] or with Composer:
 
 ```
-$ curl -sSO getcomposer.org/installer | php
+$ curl -sS https://getcomposer.org/installer | php
 $ composer install
 $ vendor/bin/phpunit
 ```
