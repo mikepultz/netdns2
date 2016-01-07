@@ -39,7 +39,8 @@ $pkg->setAPIStability('stable');
 $pkg->setNotes(
 "- changed the role for the README.md file to doc\n" .
 "- parse the resolv.conf options line; right now I just support the timeout and rotate options.\n" .
-"- the options values only work if you set the new option use_resolv_options to true; this is to keep backwards compatibility.\n"
+"- the options values only work if you set the new option use_resolv_options to true; this is to keep backwards compatibility.\n" .
+"- Adds support for RFC 6594; support for SHA-256 and ECDSA in the SSHFP resource record.\n"
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();
