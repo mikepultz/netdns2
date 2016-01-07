@@ -72,7 +72,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = '1.4.2';
+    const VERSION = '2.0.0';
 
     /*
      * the default path to a resolv.conf file
@@ -238,6 +238,12 @@ class Net_DNS2
     public $nameservers = array();
 
     /*
+     * the PSR-3 conformant logging object
+     * @since 2.0.0
+     */
+    public $logger = null;
+
+    /*
      * local sockets
      */
     protected $sock = array('udp' => array(), 'tcp' => array());
@@ -296,6 +302,9 @@ class Net_DNS2
                 if ($key == 'nameservers') {
 
                     $this->setServers($value);
+                } else if ($key == 'logger') {
+
+                    $this->setLogger($value);
                 } else {
 
                     $this->$key = $value;
@@ -508,6 +517,34 @@ class Net_DNS2
         $this->checkServers();
 
         return true;
+    }
+
+    /**
+     * sets the logger to use
+     *
+     * @param \Psr\Log\LoggerInterface $logger the PSR-3 compatible logger
+     *
+     * @access public
+     * @since 2.0.0
+     *
+     */
+    public function setLogger(\Psr\Log\LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * gets the logger in use, if any
+     *
+     * @return \Psr\Log\LoggerInterface|null
+     *
+     * @access public
+     * @since 2.0.0
+     *
+     */
+    public function getLogger()
+    {
+        return $this->logger;
     }
 
     /**
