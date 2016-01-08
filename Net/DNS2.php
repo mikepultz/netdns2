@@ -1,6 +1,9 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+
 /**
  * DNS Library for handling lookups and updates. 
  *
@@ -62,6 +65,7 @@ spl_autoload_register('Net_DNS2::autoload');
  * @category Networking
  * @package  Net_DNS2
  * @author   Mike Pultz <mike@mikepultz.com>
+ * @author   Bishop Bettini <bishop@php.net>
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link     http://pear.php.net/package/Net_DNS2
  * @see      Net_DNS2_Resolver, Net_DNS2_Updater
@@ -528,7 +532,7 @@ class Net_DNS2
      * @since 2.0.0
      *
      */
-    public function setLogger(\Psr\Log\LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
@@ -545,6 +549,24 @@ class Net_DNS2
     public function getLogger()
     {
         return $this->logger;
+    }
+
+    /**
+     * logs a message to any defined logger
+     *
+     * @param string $message The log message itself.
+     * @param array $context Additional details to pass to the logger.
+     * @param mixed $level One of the \Psr\Log\LogLevel constants or their string equivalents.
+     *
+     * @return null
+     * @since 2.0.0
+     *
+     */
+    protected function log($message, array $context = array (), $level = LogLevel::DEBUG)
+    {
+        if ($this->logger instanceof LoggerInterface) {
+            $this->logger->log($level, $message, $context);
+        }
     }
 
     /**
