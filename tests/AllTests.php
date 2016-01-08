@@ -50,17 +50,16 @@
  *
  */
 
-error_reporting(E_ALL | E_STRICT);
+require_once __DIR__ . '/bootstrap.php';
 
 if (!defined('PHPUNIT_MAIN_METHOD')) {
     define('PHPUNIT_MAIN_METHOD', 'Net_DNS2_AllTests::main');
 }
 
+require_once 'Net_DNS2_EnvironmentTest.php';
 require_once 'Net_DNS2_ParserTest.php';
 require_once 'Net_DNS2_ResolverTest.php';
 require_once 'Net_DNS2_DNSSECTest.php';
-
-set_include_path('..:.');
 
 /**
  * This test suite assumes that Net_DNS2 will be in the include path, otherwise it
@@ -99,6 +98,7 @@ class Net_DNS2_AllTests
     {
         $suite = new PHPUnit_Framework_TestSuite('PEAR - Net_DNS2');
 
+        $suite->addTestSuite('Net_DNS2_EnvironmentTest');
         $suite->addTestSuite('Net_DNS2_ParserTest');
         $suite->addTestSuite('Net_DNS2_ResolverTest');
         $suite->addTestSuite('Net_DNS2_DNSSECTest');

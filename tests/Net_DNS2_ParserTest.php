@@ -50,9 +50,6 @@
  *
  */
 
-require_once '../Net/DNS2.php';
-
-
 /**
  * Test class to test the parsing code
  *   
