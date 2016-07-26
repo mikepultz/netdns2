@@ -63,6 +63,13 @@
 class Net_DNS2_Cache_File extends Net_DNS2_Cache
 {
     /**
+     * @var boolean $auto_close close the cache_file on cache destruction
+     * @since 1.4.2
+     * @access public
+     */
+    public $auto_close = true;
+
+    /**
      * open a cache object
      *
      * @param string  $cache_file path to a file to use for cache storage
@@ -140,12 +147,14 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
     }
 
     /**
-     * Destructor
+     * close the cache, committing any keys that have been set
      *
      * @access public
+     * @return void
+     * @since 1.4.2
      *
      */
-    public function __destruct()
+    public function close()
     {
         //
         // if there's no cache file set, then there's nothing to do
@@ -228,6 +237,19 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
             // close the file
             //
             fclose($fp);
+        }
+    }
+
+    /**
+     * Destructor
+     *
+     * @access public
+     *
+     */
+    public function __destruct()
+    {
+        if ($this->auto_close) {
+            $this->close();
         }
     }
 };
