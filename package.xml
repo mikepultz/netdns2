@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.9.4" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
+<package packagerversion="1.10.1" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
     http://pear.php.net/dtd/tasks-1.0.xsd
     http://pear.php.net/dtd/package-2.0
     http://pear.php.net/dtd/package-2.0.xsd">
@@ -15,11 +15,11 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2015-04-13</date>
- <time>18:31:57</time>
+ <date>2016-08-22</date>
+ <time>23:37:12</time>
  <version>
-  <release>1.4.1</release>
-  <api>1.4.1</api>
+  <release>1.4.2</release>
+  <api>1.4.2</api>
  </version>
  <stability>
   <release>stable</release>
@@ -27,22 +27,26 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
  <notes>
-- increased the default DNSSEC payload size value to 4000 bytes per RFC 4035 section 4.1; this is still configurable.
-- fixed a bug where I was still using the DNS_MAX_UDP_SIZE default (512 bytes) for all requests, event DNSSEC, where I should have been using the dnssec_payload_size config value.
-- removed the limitation that PTR records had to look like IP addresses; you can add other things to PTR records, like service discovery objects- RFC 6763.
-- dropped support for using the Sockets library on Windows. There have been too many inconsistencies between versions of Windows; we&apos;ll just default to use the Streams library.
-- fixed the Net_DNS2_RR_PTR class so we can pass ptrdname&apos;s with spaces in them so that we can support DNS-Based Service Discovery (RFC 6763).
-- added support for the CSYNC resource record - see RFC 7477.
+- changed the role for the README.md file to doc
+- parse the resolv.conf options line; right now I just support the timeout and rotate options.
+- the options values only work if you set the new option use_resolv_options to true; this is to keep backwards compatibility.
+- added support for RFC 6594; support for SHA-256 and ECDSA in the SSHFP resource record.
+- added the SMIMEA resource record; this just extends the TLSA record.
+- added the AVC resource records; this just extends the TXT record.
+- added error and EDNS0 defines for DNS Cookies (RFC7873)
+- added EDNS0 defines to the lookup class
+- dropped the Net_DNS2_Packet::formatIPv6() function; this was deprecated in v1.1.3
+- re-wrote the Net_DNS2::expandIPv6() function. Based on testing, the new version is about twice as fast.
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
-   <file baseinstalldir="/" md5sum="c01ec130223d7667a38e340825885028" name="Net/DNS2.php" role="php" />
+   <file baseinstalldir="/" md5sum="41bbd9d40c333761b4ac284d996eef7d" name="Net/DNS2.php" role="php" />
    <file baseinstalldir="/" md5sum="a60f2fcb5ed6ec1d81c4a94a45b3adf7" name="Net/DNS2/BitMap.php" role="php" />
    <file baseinstalldir="/" md5sum="0b5fad565a09a59e17495e7e4d76cac0" name="Net/DNS2/Cache.php" role="php" />
    <file baseinstalldir="/" md5sum="68264e0b4d6c30829ad7d46b41d4dc5a" name="Net/DNS2/Exception.php" role="php" />
    <file baseinstalldir="/" md5sum="dcb7f02189851fdc215dde140ce28383" name="Net/DNS2/Header.php" role="php" />
-   <file baseinstalldir="/" md5sum="30be5582bf7f37008d2708c9a2c76f07" name="Net/DNS2/Lookups.php" role="php" />
-   <file baseinstalldir="/" md5sum="cbf444dfecdc6fbf3287969029c48ca5" name="Net/DNS2/Packet.php" role="php" />
+   <file baseinstalldir="/" md5sum="7125216aad5f765eb5d01815b9023dd5" name="Net/DNS2/Lookups.php" role="php" />
+   <file baseinstalldir="/" md5sum="f7e40dbfd5905667e87e7dced94397f7" name="Net/DNS2/Packet.php" role="php" />
    <file baseinstalldir="/" md5sum="26e2e2061ba08e1520876a515e9ad511" name="Net/DNS2/PrivateKey.php" role="php" />
    <file baseinstalldir="/" md5sum="1fa5d7f3a68455ab7c023bf004e2751d" name="Net/DNS2/Question.php" role="php" />
    <file baseinstalldir="/" md5sum="2e6ae3e974c3f9ed6384ed46a1f9dac5" name="Net/DNS2/Resolver.php" role="php" />
@@ -59,6 +63,7 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="70d5ace71d06980515922de59266b7a5" name="Net/DNS2/RR/ANY.php" role="php" />
    <file baseinstalldir="/" md5sum="5cf029a7233a9f4a81fe0717befdc3cc" name="Net/DNS2/RR/APL.php" role="php" />
    <file baseinstalldir="/" md5sum="4f6fa9f6038cf2734c1de76d60f16750" name="Net/DNS2/RR/ATMA.php" role="php" />
+   <file baseinstalldir="/" md5sum="31839c759b721603877bc40756b82af2" name="Net/DNS2/RR/AVC.php" role="php" />
    <file baseinstalldir="/" md5sum="d14c7f98525d0fb7c9e0eadbabe85f73" name="Net/DNS2/RR/CAA.php" role="php" />
    <file baseinstalldir="/" md5sum="115adecfcc21bd17fa451d636c7f1133" name="Net/DNS2/RR/CDNSKEY.php" role="php" />
    <file baseinstalldir="/" md5sum="00fb9449af0f84a8d6854c9524c2e928" name="Net/DNS2/RR/CDS.php" role="php" />
@@ -92,7 +97,7 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="e3baf5bb9ca3259ab90371860944afd9" name="Net/DNS2/RR/NSEC.php" role="php" />
    <file baseinstalldir="/" md5sum="9240baed43a0cb95b5f3e3851fd9b632" name="Net/DNS2/RR/NSEC3.php" role="php" />
    <file baseinstalldir="/" md5sum="d04d56622dd6cfbf943d7dc8b5bb379e" name="Net/DNS2/RR/NSEC3PARAM.php" role="php" />
-   <file baseinstalldir="/" md5sum="29dbe4039917a36432f24570676f8c8a" name="Net/DNS2/RR/OPENPGPKEY.php" role="php" />
+   <file baseinstalldir="/" md5sum="29d2419f455d3cd7634fdf6599dd93ea" name="Net/DNS2/RR/OPENPGPKEY.php" role="php" />
    <file baseinstalldir="/" md5sum="94ac2415d9b04354966c41529ee65165" name="Net/DNS2/RR/OPT.php" role="php" />
    <file baseinstalldir="/" md5sum="2a10ec2ce75ecf0dde39c30a79257a52" name="Net/DNS2/RR/PTR.php" role="php" />
    <file baseinstalldir="/" md5sum="df719282e9e7942ff95aba24df75787c" name="Net/DNS2/RR/PX.php" role="php" />
@@ -100,10 +105,11 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="4860d050ca71d81aa747d6a1eb381b3f" name="Net/DNS2/RR/RRSIG.php" role="php" />
    <file baseinstalldir="/" md5sum="1854c3520f9a7fdab77d13578364194c" name="Net/DNS2/RR/RT.php" role="php" />
    <file baseinstalldir="/" md5sum="550120e35eaf854d95f00da0c4b8cc34" name="Net/DNS2/RR/SIG.php" role="php" />
+   <file baseinstalldir="/" md5sum="1678cdf44dde2faaa3986db39a8c9108" name="Net/DNS2/RR/SMIMEA.php" role="php" />
    <file baseinstalldir="/" md5sum="20573547ead5339cb197991d305fb13d" name="Net/DNS2/RR/SOA.php" role="php" />
    <file baseinstalldir="/" md5sum="41025887dd82c14781de35b938503e7e" name="Net/DNS2/RR/SPF.php" role="php" />
    <file baseinstalldir="/" md5sum="dda9d5030fdb1977de4cfba58a3cb3b0" name="Net/DNS2/RR/SRV.php" role="php" />
-   <file baseinstalldir="/" md5sum="f854ff60caf46861c3ad031183ae66c7" name="Net/DNS2/RR/SSHFP.php" role="php" />
+   <file baseinstalldir="/" md5sum="999a5d35f71a227d190b42e90a768c1f" name="Net/DNS2/RR/SSHFP.php" role="php" />
    <file baseinstalldir="/" md5sum="641614de862c9b02e405894c96e8ddfd" name="Net/DNS2/RR/TA.php" role="php" />
    <file baseinstalldir="/" md5sum="43c3d7b5d1dfd6536a0e95fdd7a63561" name="Net/DNS2/RR/TALINK.php" role="php" />
    <file baseinstalldir="/" md5sum="632607c3307ad5e9c3fa91232dbf9a4b" name="Net/DNS2/RR/TKEY.php" role="php" />
@@ -116,17 +122,17 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="6b88e0b40fe820dea5dc28149c98a792" name="Net/DNS2/Socket/Sockets.php" role="php" />
    <file baseinstalldir="/" md5sum="6c80cb53453ad0837532004c91e14dd7" name="Net/DNS2/Socket/Streams.php" role="php" />
    <file baseinstalldir="/" md5sum="3830c26904fd0ecdcd9b40af7aed3bb6" name="tests/AllTests.php" role="test" />
-   <file baseinstalldir="/" md5sum="edadf1d417c229b25166677ae608baa7" name="tests/Net_DNS2_DNSSECTest.php" role="test" />
-   <file baseinstalldir="/" md5sum="4ff30101e288ed6084db6795ceaffd49" name="tests/Net_DNS2_ParserTest.php" role="test" />
+   <file baseinstalldir="/" md5sum="cb25a9d8f3fc5073b2cbff941b2417f3" name="tests/Net_DNS2_DNSSECTest.php" role="test" />
+   <file baseinstalldir="/" md5sum="0c6ee7b01f564952c3a7f9b69ce8d85a" name="tests/Net_DNS2_ParserTest.php" role="test" />
    <file baseinstalldir="/" md5sum="3667edbb50ebfa4089bb678168f1899f" name="tests/Net_DNS2_ResolverTest.php" role="test" />
-   <file baseinstalldir="/" md5sum="46ec3bdb18dbe41d1c9f345939ea76a6" name="LICENSE" role="doc" />
-   <file baseinstalldir="/" md5sum="029c7ee07807607df1dc22f06a55dbaa" name="README.md" role="doc" />
+   <file baseinstalldir="/" md5sum="9290a83f15bd81ff0af2e0149d17fd1d" name="LICENSE" role="doc" />
+   <file baseinstalldir="/" md5sum="ffcaea84e3ca0d168ed4861c19d19049" name="README.md" role="doc" />
   </dir>
  </contents>
  <dependencies>
   <required>
    <php>
-    <min>5.1.2</min>
+    <min>5.2.1</min>
    </php>
    <pearinstaller>
     <min>1.4.0a12</min>
@@ -464,6 +470,30 @@ Initial Beta release of Net_DNS2
 - dropped support for using the Sockets library on Windows. There have been too many inconsistencies between versions of Windows; we&apos;ll just default to use the Streams library.
 - fixed the Net_DNS2_RR_PTR class so we can pass ptrdname&apos;s with spaces in them so that we can support DNS-Based Service Discovery (RFC 6763).
 - added support for the CSYNC resource record - see RFC 7477.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.4.2</release>
+    <api>1.4.2</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2016-08-22</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- changed the role for the README.md file to doc
+- parse the resolv.conf options line; right now I just support the timeout and rotate options.
+- the options values only work if you set the new option use_resolv_options to true; this is to keep backwards compatibility.
+- added support for RFC 6594; support for SHA-256 and ECDSA in the SSHFP resource record.
+- added the SMIMEA resource record; this just extends the TLSA record.
+- added the AVC resource records; this just extends the TXT record.
+- added error and EDNS0 defines for DNS Cookies (RFC7873)
+- added EDNS0 defines to the lookup class
+- dropped the Net_DNS2_Packet::formatIPv6() function; this was deprecated in v1.1.3
+- re-wrote the Net_DNS2::expandIPv6() function. Based on testing, the new version is about twice as fast.
    </notes>
   </release>
  </changelog>

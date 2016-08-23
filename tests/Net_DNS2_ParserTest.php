@@ -160,6 +160,7 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             'NSEC3'         => 'example.com. 300 IN NSEC3 1 1 12 AABBCCDD b4um86eghhds6nea196smvmlo4ors995 NS DS RRSIG',
             'NSEC3PARAM'    => 'example.com. 300 IN NSEC3PARAM 1 0 1 D399EAAB',
             'TLSA'          => '_443._tcp.www.example.com. 300 IN TLSA 1 1 2 92003ba34942dc74152e2f2c408d29eca5a520e7f2e06bb944f4dca346baf63c1b177615d466f6c4b71c216a50292bd58c9ebdd2f74e38fe51ffd48c43326cbc',
+            'SMIMEA'        => 'c93f1e400f26708f98cb19d936620da35eec8f72e57f9eec01c1afd6._smimecert.example.com. 300 IN SMIMEA 1 1 2 92003ba34942dc74152e2f2c408d29eca5a520e7f2e06bb944f4dca346baf63c1b177615d466f6c4b71c216a50292bd58c9ebdd2f74e38fe51ffd48c43326cbc',
             'HIP'           => 'example.com. 300 IN HIP 2 200100107B1A74DF365639CC39F1D578 AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQb1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D rvs.example.com. another.example.com. test.domain.org.',
             'TALINK'        => 'example.com. 300 IN TALINK c1.example.com. c3.example.com.',
             'CDS'           => 'example.com. 300 IN CDS 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
@@ -175,6 +176,7 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             'TKEY'          => 'example.com. 300 IN TKEY gss.microsoft.com. 3 123456.',
             'URI'           => 'example.com. 300 IN URI 10 1 "http://mrdns.com"',
             'CAA'           => 'example.com. 300 IN CAA 0 issue "ca.example.net; policy=ev"',
+            'AVC'           => 'example.com. 300 IN AVC "first record" "another records" "a third"',
             'TA'            => 'example.com. 300 IN TA 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
             'DLV'           => 'example.com. 300 IN DLV 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
         );

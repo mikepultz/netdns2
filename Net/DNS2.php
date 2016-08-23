@@ -866,43 +866,9 @@ class Net_DNS2
      */
     public static function expandIPv6($_address)
     {
-        if (strpos($_address, '::') !== false) {
-        
-            $part       = explode('::', $_address);
-            $part[0]    = explode(':', $part[0]);
-            $part[1]    = explode(':', $part[1]);
-        
-            $missing = array();
-        
-            $x = (8 - (count($part[0]) + count($part[1])));
-            for ($i = 0; $i < $x; $i++) {
-            
-                array_push($missing, '0000');
-            }
-
-            $missing    = array_merge($part[0], $missing);
-            $part       = array_merge($missing, $part[1]);
-
-        } else {
-        
-            $part = explode(':', $_address);
-        }
-
-        foreach ($part as &$p) {
-            while (strlen($p) < 4) {
-                $p = '0' . $p;
-            }
-        }
-
-        unset($p);
+        $hex = unpack('H*hex', inet_pton($_address));
     
-        $result = implode(':', $part);
-
-        if (strlen($result) == 39) {
-            return $result;
-        } else {
-            return false;
-        }
+        return substr(preg_replace('/([A-f0-9]{4})/', "$1:", $hex['hex']), 0, -1);
     }
 
     /**
