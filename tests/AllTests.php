@@ -60,7 +60,7 @@ require_once 'Net_DNS2_ParserTest.php';
 require_once 'Net_DNS2_ResolverTest.php';
 require_once 'Net_DNS2_DNSSECTest.php';
 
-set_include_path('..:.');
+set_include_path('..:' . get_include_path());
 
 /**
  * This test suite assumes that Net_DNS2 will be in the include path, otherwise it

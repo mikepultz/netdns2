@@ -212,7 +212,7 @@ class Net_DNS2_RR_NSAP extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
-        if ($this->afi == 0x47) {
+        if ($this->afi == "0x47") {
 
             //
             // build the aa field
