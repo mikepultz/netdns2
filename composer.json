@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Native PHP5 DNS Resolver and Updater Library",
     "keywords": ["dns","network", "pear"],
-    "homepage": "http://netdns2.com/",
+    "homepage": "https://netdns2.com/",
     "license": "BSD-2-Clause",
     "support": {
         "issues": "https://github.com/mikepultz/netdns2/issues",
@@ -13,7 +13,7 @@
         {
             "name": "Mike Pultz",
             "email": "mike@mikepultz.com",
-            "homepage": "http://mikepultz.com/",
+            "homepage": "https://mikepultz.com/",
             "role": "Developer"
         }
     ],

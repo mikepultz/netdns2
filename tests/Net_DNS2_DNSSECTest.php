@@ -80,7 +80,7 @@ class Net_DNS2_DNSSECTest extends PHPUnit_Framework_TestCase
         $r->dnssec = true;
 
         $result = $r->query('org', 'SOA', 'IN');
-print_r($result);
+
         $this->assertTrue(($result->header->ad == 1));
         $this->assertTrue(($result->additional[0] instanceof Net_DNS2_RR_OPT));
         $this->assertTrue(($result->additional[0]->do == 1));
