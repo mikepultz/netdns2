@@ -83,7 +83,7 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
         //
         // check that the file exists first
         //
-        if ( (file_exists($this->cache_file) == true) 
+        if ( !$this->cache_opened && (file_exists($this->cache_file) == true)
             && (filesize($this->cache_file) > 0)
         ) {
 
@@ -135,6 +135,8 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
                 // clean up the data
                 //
                 $this->clean();
+		
+                $this->cache_opened = true;
             }
         }
     }
