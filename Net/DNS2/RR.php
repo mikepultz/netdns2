@@ -548,16 +548,9 @@ abstract class Net_DNS2_RR
         //
         foreach ($values as $value) {
 
-            switch($value) {
+            switch(true) {
             case is_numeric($value):
 
-                $ttl = array_shift($values);
-                break;
-
-            //
-            // PHP SUCKS!
-            //
-            case ($value === 0):
                 $ttl = array_shift($values);
                 break;
 
@@ -569,8 +562,8 @@ abstract class Net_DNS2_RR
             case isset(Net_DNS2_Lookups::$rr_types_by_name[strtoupper($value)]):
 
                 $type = strtoupper(array_shift($values));
-                break 2;
-                break;   
+                break;
+
             default:
 
                 throw new Net_DNS2_Exception(
