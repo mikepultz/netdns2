@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
  * PHP Version 5
  *
@@ -21,8 +21,8 @@
  *     the documentation and/or other materials provided with the
  *     distribution.
  *
- *   * Neither the name of Mike Pultz nor the names of his contributors 
- *     may be used to endorse or promote products derived from this 
+ *   * Neither the name of Mike Pultz nor the names of his contributors
+ *     may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -82,9 +82,14 @@ class Net_DNS2_Cache
      */
     protected $cache_serializer;
 
+    /*
+     * the cache opened status
+     */
+    protected $cache_opened = false;
+
     /**
      * returns true/false if the provided key is defined in the cache
-     * 
+     *
      * @param string $key the key to lookup in the local cache
      *
      * @return boolean
@@ -98,7 +103,7 @@ class Net_DNS2_Cache
 
     /**
      * returns the value for the given key
-     * 
+     *
      * @param string $key the key to lookup in the local cache
      *
      * @return mixed returns the cache data on sucess, false on error
@@ -122,7 +127,7 @@ class Net_DNS2_Cache
 
     /**
      * adds a new key/value pair to the cache
-     * 
+     *
      * @param string $key  the key for the new cache entry
      * @param mixed  $data the data to store in cache
      *
@@ -141,7 +146,7 @@ class Net_DNS2_Cache
         $data->rdlength = 0;
 
         //
-        // find the lowest TTL, and use that as the TTL for the whole cached 
+        // find the lowest TTL, and use that as the TTL for the whole cached
         // object. The downside to using one TTL for the whole object, is that
         // we'll invalidate entries before they actuall expire, causing a
         // real lookup to happen.
@@ -151,7 +156,7 @@ class Net_DNS2_Cache
         // unserialize the actual RR object when it's get() from the cache.
         //
         foreach ($data->answer as $index => $rr) {
-                    
+
             if ($rr->ttl < $ttl) {
                 $ttl = $rr->ttl;
             }
@@ -160,7 +165,7 @@ class Net_DNS2_Cache
             $rr->rdlength = 0;
         }
         foreach ($data->authority as $index => $rr) {
-                    
+
             if ($rr->ttl < $ttl) {
                 $ttl = $rr->ttl;
             }
@@ -169,7 +174,7 @@ class Net_DNS2_Cache
             $rr->rdlength = 0;
         }
         foreach ($data->additional as $index => $rr) {
-                    
+
             if ($rr->ttl < $ttl) {
                 $ttl = $rr->ttl;
             }
@@ -203,7 +208,7 @@ class Net_DNS2_Cache
         if (count($this->cache_data) > 0) {
 
             //
-            // go through each entry and adjust their TTL, and remove entries that 
+            // go through each entry and adjust their TTL, and remove entries that
             // have expired
             //
             $now = time();
@@ -234,7 +239,7 @@ class Net_DNS2_Cache
     protected function resize()
     {
         if (count($this->cache_data) > 0) {
-        
+
             //
             // serialize the cache data
             //
