@@ -37,6 +37,7 @@ $pkg->setReleaseVersion('1.4.3');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
 $pkg->setNotes(
+"- fixed a bug in the caching logic where I was loading the content more than once per instance, when really I only need to do it once.\n" .
 "- changed the Net_DNS2::sock array to use the SOCK_DGRAM and SOCK_STREAM defines, rather than the strings 'tcp' or 'udp'.\n" .
 "- fixed a bug in the Net_DNS2_Header and Net_DNS2_Question classes, where I was using the wrong bit-shift operators when parsing some of the values. This only became apparent when somebody was trying to use the CAA class (id 257); it was causing this to roll over to the next 8 bit value, and returning 1 (RR A) instead of the CAA class.\n" .
 "- fixed a bug that occurs when a DNS lookup request times out, and then the same class is reused for a subsequent request. Because I'm caching the sockets, the timed out data could eventually come in, and end up being seen as the result for a subsequent lookup.\n" .
