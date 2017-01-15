@@ -172,6 +172,7 @@ class Net_DNS2_Lookups
     const E_NS_INVALID_ENTRY    = 201;
     const E_NS_FAILED           = 202;
     const E_NS_SOCKET_FAILED    = 203;
+    const E_NS_INVALID_SOCKET   = 204;
 
     const E_PACKET_INVALID      = 300;
     const E_PARSE_ERROR         = 301;
