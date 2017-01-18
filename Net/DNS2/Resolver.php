@@ -229,7 +229,7 @@ class Net_DNS2_Resolver extends Net_DNS2
             //
             foreach ($response->answer as $index => $object) {
 
-                if ( (strcasecmp($object->name, $name) == 0)
+                if ( (strcasecmp($object->name, $packet->name) == 0)
                     && ($object->type == $type)
                     && ($object->class == $class)
                 ) {
