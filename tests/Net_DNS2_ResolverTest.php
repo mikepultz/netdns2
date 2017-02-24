@@ -50,8 +50,6 @@
  *
  */
 
-require_once '../Net/DNS2.php';
-
 /**  
  * This test uses the Google public DNS servers to perform a resolution test; 
  * this should work on *nix and Windows, but will require an internet connection.

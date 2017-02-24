@@ -51,37 +51,32 @@
  */
 
 /**
- * Test class to test the DNSSEC logic
+ * Tests that the test environment meets our library preconditions. If any
+ * of these tests fail, the results from any other tests are dubious.
  *
  * @category Networking
  * @package  Net_DNS2
- * @author   Mike Pultz <mike@mikepultz.com>
+ * @author   Bishop Bettini <bishop@php.net>
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link     http://pear.php.net/package/Net_DNS2
  *
  */
-class Net_DNS2_DNSSECTest extends PHPUnit_Framework_TestCase
+class Net_DNS2_EnvironmentTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * function to test the TSIG logic
+     * function to test the mbstring.func_overload setting.
      *
      * @return void
      * @access public
      *
      */
-    public function testDNSSEC()
+    public function testMbstringFuncOverload()
     {
-        $ns = array('8.8.8.8', '8.8.4.4');
-
-        $r = new Net_DNS2_Resolver(array('nameservers' => $ns));
-
-        $r->dnssec = true;
-
-        $result = $r->query('org', 'SOA', 'IN');
-
-        $this->assertTrue(($result->header->ad == 1));
-        $this->assertTrue(($result->additional[0] instanceof Net_DNS2_RR_OPT));
-        $this->assertTrue(($result->additional[0]->do == 1));
+        $this->assertContains(
+            (int)ini_get('mbstring.func_overload'),
+            array (0, 1, 4, 5),
+            'The INI setting "mbstring.func_overload" must be either 0, 1, 4, or 5.'
+        );
     }
 }
 

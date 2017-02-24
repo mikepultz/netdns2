@@ -28,13 +28,65 @@ composer require pear/net_dns2
 
 Or download the source above.
 
+
 ## Requirements ##
 
 * PHP 5.1.2+
 * The PHP INI setting `mbstring.func_overload` equals 0, 1, 4, or 5.
 
+### Checking requirements ###
+
+Run the provided test suite to ensure Net\_DNS2 is compatible. If PHPUnit is
+already installed, use it:
+
+```
+$ phpunit tests/AllTests.php
+```
+
+Otherwise, install PHPUnit according to its [directions][1] or with Composer:
+
+```
+$ curl -sS https://getcomposer.org/installer | php
+$ composer install
+$ vendor/bin/phpunit
+```
 
 ## Using Net\_DNS2 ##
 
+Using Net_DNS2 is simple:
+
+```
+// First, create the resolver
+$resolver = new \Net_DNS2_Resolver();
+
+// Then, ask the resolver for resource record sets for any domain:
+// Here, the domain is Google and the RR set is the Start Of Authority
+try {
+    $result = $resolver->query('google.com', 'SOA');
+} catch(\Net_DNS2_Exception $ex) {
+    die($ex->getMessage());
+}
+
+// Finally, iterate over each resource record:
+foreach ($result->answer as $answer) {
+    // echo out to get a printable dump in zone file format:
+    echo $answer . PHP_EOL;
+
+    // or extract specific details with member variables:
+    printf(
+        '%s %d %s %s %d %d %d %d' . PHP_EOL,
+        $answer->name,
+        $answer->ttl,
+        $answer->class,
+        $answer->type,
+        $answer->refresh,
+        $answer->retry,
+        $answer->minimum,
+        $answer->expire
+    );
+}
+```
+
 See the Net\_DNS2 Website for more details - https://netdns2.com/
 
+[1]: https://phpunit.de/manual/current/en/installation.html

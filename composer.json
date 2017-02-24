@@ -22,5 +22,8 @@
     },
     "autoload": {
         "psr-0": { "Net_DNS2": "" }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.1"
     }
 }
