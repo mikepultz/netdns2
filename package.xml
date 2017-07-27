@@ -15,11 +15,11 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2016-08-22</date>
- <time>23:37:12</time>
+ <date>2017-03-06</date>
+ <time>23:45:35</time>
  <version>
-  <release>1.4.2</release>
-  <api>1.4.2</api>
+  <release>1.4.3</release>
+  <api>1.4.3</api>
  </version>
  <stability>
   <release>stable</release>
@@ -27,34 +27,30 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
  <notes>
-- changed the role for the README.md file to doc
-- parse the resolv.conf options line; right now I just support the timeout and rotate options.
-- the options values only work if you set the new option use_resolv_options to true; this is to keep backwards compatibility.
-- added support for RFC 6594; support for SHA-256 and ECDSA in the SSHFP resource record.
-- added the SMIMEA resource record; this just extends the TLSA record.
-- added the AVC resource records; this just extends the TXT record.
-- added error and EDNS0 defines for DNS Cookies (RFC7873)
-- added EDNS0 defines to the lookup class
-- dropped the Net_DNS2_Packet::formatIPv6() function; this was deprecated in v1.1.3
-- re-wrote the Net_DNS2::expandIPv6() function. Based on testing, the new version is about twice as fast.
+- fixed an issue when looking up . or com., when using the strict_query_mode flag.
+- fixed a bug in the caching logic where I was loading the content more than once per instance, when really I only need to do it once.
+- changed the Net_DNS2::sock array to use the SOCK_DGRAM and SOCK_STREAM defines, rather than the strings &apos;tcp&apos; or &apos;udp&apos;.
+- fixed a bug in the Net_DNS2_Header and Net_DNS2_Question classes, where I was using the wrong bit-shift operators when parsing some of the values. This only became apparent when somebody was trying to use the CAA class (id 257); it was causing this to roll over to the next 8 bit value, and returning 1 (RR A) instead of the CAA class.
+- fixed a bug that occurs when a DNS lookup request times out, and then the same class is reused for a subsequent request. Because I&apos;m caching the sockets, the timed out data could eventually come in, and end up being seen as the result for a subsequent lookup.
+- fixed a couple cases in NSAP.php where I was comparing a string to to an integer.
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
-   <file baseinstalldir="/" md5sum="41bbd9d40c333761b4ac284d996eef7d" name="Net/DNS2.php" role="php" />
+   <file baseinstalldir="/" md5sum="bf405dbb3f025da8d3b9b31057cee956" name="Net/DNS2.php" role="php" />
    <file baseinstalldir="/" md5sum="a60f2fcb5ed6ec1d81c4a94a45b3adf7" name="Net/DNS2/BitMap.php" role="php" />
-   <file baseinstalldir="/" md5sum="0b5fad565a09a59e17495e7e4d76cac0" name="Net/DNS2/Cache.php" role="php" />
+   <file baseinstalldir="/" md5sum="08e1d62b213510e895fa870991e5f2b6" name="Net/DNS2/Cache.php" role="php" />
    <file baseinstalldir="/" md5sum="68264e0b4d6c30829ad7d46b41d4dc5a" name="Net/DNS2/Exception.php" role="php" />
-   <file baseinstalldir="/" md5sum="dcb7f02189851fdc215dde140ce28383" name="Net/DNS2/Header.php" role="php" />
-   <file baseinstalldir="/" md5sum="7125216aad5f765eb5d01815b9023dd5" name="Net/DNS2/Lookups.php" role="php" />
+   <file baseinstalldir="/" md5sum="894fef7acfaf756232f6b462352f2b09" name="Net/DNS2/Header.php" role="php" />
+   <file baseinstalldir="/" md5sum="77536126f583354be441562d2d5ab3a1" name="Net/DNS2/Lookups.php" role="php" />
    <file baseinstalldir="/" md5sum="f7e40dbfd5905667e87e7dced94397f7" name="Net/DNS2/Packet.php" role="php" />
    <file baseinstalldir="/" md5sum="26e2e2061ba08e1520876a515e9ad511" name="Net/DNS2/PrivateKey.php" role="php" />
-   <file baseinstalldir="/" md5sum="1fa5d7f3a68455ab7c023bf004e2751d" name="Net/DNS2/Question.php" role="php" />
-   <file baseinstalldir="/" md5sum="2e6ae3e974c3f9ed6384ed46a1f9dac5" name="Net/DNS2/Resolver.php" role="php" />
-   <file baseinstalldir="/" md5sum="3d176481b5fdc1a32aac8b005f451053" name="Net/DNS2/RR.php" role="php" />
+   <file baseinstalldir="/" md5sum="50e11cac12d7e1770c419dff9297ddfa" name="Net/DNS2/Question.php" role="php" />
+   <file baseinstalldir="/" md5sum="49d45c4f4f02eb6f4587720f7ca183ba" name="Net/DNS2/Resolver.php" role="php" />
+   <file baseinstalldir="/" md5sum="c1424f4f56ed35d8b277055b7e6dcf85" name="Net/DNS2/RR.php" role="php" />
    <file baseinstalldir="/" md5sum="22a88ed7b5e1c9c6eb4a9a6bbab2d4c8" name="Net/DNS2/Socket.php" role="php" />
    <file baseinstalldir="/" md5sum="49d26c34e26b210b40a0f2d5ca420086" name="Net/DNS2/Updater.php" role="php" />
-   <file baseinstalldir="/" md5sum="62c718aee017c3fbc0a59cacffa8b5f4" name="Net/DNS2/Cache/File.php" role="php" />
-   <file baseinstalldir="/" md5sum="1fb0774fe0dea42048c40ce0a5498e85" name="Net/DNS2/Cache/Shm.php" role="php" />
+   <file baseinstalldir="/" md5sum="aa4f061fac2e220a435de675fdcd2ed5" name="Net/DNS2/Cache/File.php" role="php" />
+   <file baseinstalldir="/" md5sum="9d8375ffd8dc017c40876315bd5ba135" name="Net/DNS2/Cache/Shm.php" role="php" />
    <file baseinstalldir="/" md5sum="aa728fd645f221f9ebd6c2709da85881" name="Net/DNS2/Packet/Request.php" role="php" />
    <file baseinstalldir="/" md5sum="f82736b04af10710da1fc17d62a5dfd9" name="Net/DNS2/Packet/Response.php" role="php" />
    <file baseinstalldir="/" md5sum="df207aedec72f3b7b0beff3a7af956da" name="Net/DNS2/RR/A.php" role="php" />
@@ -93,7 +89,7 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="5623865ce1ad4792ea4fd1bc4e35204f" name="Net/DNS2/RR/NID.php" role="php" />
    <file baseinstalldir="/" md5sum="22f57feca9b3ea46749bcb76d7fcc51c" name="Net/DNS2/RR/NIMLOC.php" role="php" />
    <file baseinstalldir="/" md5sum="b9f84e8459467093d997c221a882a566" name="Net/DNS2/RR/NS.php" role="php" />
-   <file baseinstalldir="/" md5sum="8bc697e607da39dd4d035f80e5110650" name="Net/DNS2/RR/NSAP.php" role="php" />
+   <file baseinstalldir="/" md5sum="ca8a42653ea2a5763119d4ff53031b60" name="Net/DNS2/RR/NSAP.php" role="php" />
    <file baseinstalldir="/" md5sum="e3baf5bb9ca3259ab90371860944afd9" name="Net/DNS2/RR/NSEC.php" role="php" />
    <file baseinstalldir="/" md5sum="9240baed43a0cb95b5f3e3851fd9b632" name="Net/DNS2/RR/NSEC3.php" role="php" />
    <file baseinstalldir="/" md5sum="d04d56622dd6cfbf943d7dc8b5bb379e" name="Net/DNS2/RR/NSEC3PARAM.php" role="php" />
@@ -122,7 +118,7 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="6b88e0b40fe820dea5dc28149c98a792" name="Net/DNS2/Socket/Sockets.php" role="php" />
    <file baseinstalldir="/" md5sum="6c80cb53453ad0837532004c91e14dd7" name="Net/DNS2/Socket/Streams.php" role="php" />
    <file baseinstalldir="/" md5sum="3830c26904fd0ecdcd9b40af7aed3bb6" name="tests/AllTests.php" role="test" />
-   <file baseinstalldir="/" md5sum="cb25a9d8f3fc5073b2cbff941b2417f3" name="tests/Net_DNS2_DNSSECTest.php" role="test" />
+   <file baseinstalldir="/" md5sum="edadf1d417c229b25166677ae608baa7" name="tests/Net_DNS2_DNSSECTest.php" role="test" />
    <file baseinstalldir="/" md5sum="0c6ee7b01f564952c3a7f9b69ce8d85a" name="tests/Net_DNS2_ParserTest.php" role="test" />
    <file baseinstalldir="/" md5sum="3667edbb50ebfa4089bb678168f1899f" name="tests/Net_DNS2_ResolverTest.php" role="test" />
    <file baseinstalldir="/" md5sum="9290a83f15bd81ff0af2e0149d17fd1d" name="LICENSE" role="doc" />
@@ -494,6 +490,26 @@ Initial Beta release of Net_DNS2
 - added EDNS0 defines to the lookup class
 - dropped the Net_DNS2_Packet::formatIPv6() function; this was deprecated in v1.1.3
 - re-wrote the Net_DNS2::expandIPv6() function. Based on testing, the new version is about twice as fast.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.4.3</release>
+    <api>1.4.3</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2017-03-06</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- fixed an issue when looking up . or com., when using the strict_query_mode flag.
+- fixed a bug in the caching logic where I was loading the content more than once per instance, when really I only need to do it once.
+- changed the Net_DNS2::sock array to use the SOCK_DGRAM and SOCK_STREAM defines, rather than the strings &apos;tcp&apos; or &apos;udp&apos;.
+- fixed a bug in the Net_DNS2_Header and Net_DNS2_Question classes, where I was using the wrong bit-shift operators when parsing some of the values. This only became apparent when somebody was trying to use the CAA class (id 257); it was causing this to roll over to the next 8 bit value, and returning 1 (RR A) instead of the CAA class.
+- fixed a bug that occurs when a DNS lookup request times out, and then the same class is reused for a subsequent request. Because I&apos;m caching the sockets, the timed out data could eventually come in, and end up being seen as the result for a subsequent lookup.
+- fixed a couple cases in NSAP.php where I was comparing a string to to an integer.
    </notes>
   </release>
  </changelog>
