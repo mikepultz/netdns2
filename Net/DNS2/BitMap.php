@@ -77,7 +77,7 @@ class Net_DNS2_BitMap
     public static function bitMapToArray($data)
     {
         if (strlen($data) == 0) {
-            return null;
+            return array();
         }
 
         $output = array();
@@ -141,7 +141,7 @@ class Net_DNS2_BitMap
     public static function arrayToBitMap(array $data)
     {
         if (count($data) == 0) {
-            return null;
+            return '';
         }
 
         $current_window = 0;
