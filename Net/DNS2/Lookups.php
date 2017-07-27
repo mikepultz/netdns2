@@ -338,7 +338,8 @@ class Net_DNS2_Lookups
                                     // 259 - 32767 unassigned
 
         'TA'            => 32768,   // same as DS
-        'DLV'           => 32769    // RFC 4431
+        'DLV'           => 32769,   // RFC 4431
+        'TYPE65534'     => 65534    // Private Bind record
     );
 
     /*
@@ -434,7 +435,8 @@ class Net_DNS2_Lookups
         257         => 'Net_DNS2_RR_CAA',
         258         => 'Net_DNS2_RR_AVC',
         32768       => 'Net_DNS2_RR_TA',
-        32769       => 'Net_DNS2_RR_DLV'
+        32769       => 'Net_DNS2_RR_DLV',
+        65534       => 'Net_DNS2_RR_TYPE65534'
     );
 
     /*
