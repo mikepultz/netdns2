@@ -91,6 +91,11 @@ class Net_DNS2_RR_DNSKEY extends Net_DNS2_RR
      */
     public $key;
 
+    /*
+     * calculated key tag
+     */
+    public $keytag;
+
     /**
      * method to return the rdata portion of the packet as a string
      *
@@ -155,6 +160,8 @@ class Net_DNS2_RR_DNSKEY extends Net_DNS2_RR
 
             $this->key          = base64_encode(substr($this->rdata, 4));
 
+            $this->keytag       = $this->getKeyTag();
+
             return true;
         }
 
@@ -185,6 +192,27 @@ class Net_DNS2_RR_DNSKEY extends Net_DNS2_RR
         }
         
         return null;
+    }
+
+    /**
+     * compute keytag from rdata (rfc4034)
+     * (invalid for algorithm 1, but it's not recommended)
+     *
+     * @return integer
+     * @access protected
+     *
+     */
+    protected function getKeyTag()
+    {
+        $key = array_values(unpack("C*", $this->rdata));
+        $keysize = $this->rdlength;
+
+        $ac = 0;
+        for( $i = 0; $i < $keysize; $i++ )
+            $ac += ($i & 1) ? $key[$i] : $key[$i] << 8;
+
+        $ac += ($ac >> 16) & 0xFFFF;
+        return $ac & 0xFFFF;
     }
 }
 
