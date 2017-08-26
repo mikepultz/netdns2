@@ -262,6 +262,13 @@ class Net_DNS2
      */
     protected $use_cache = false;
 
+    /*
+     * if set asks this resolver to ignore server failures and
+     * pass through the server response (if the rcode was the
+     * only offense in the response).
+     */
+    public $server_passthru = false;
+
     /**
      * Constructor - base constructor for the Resolver and Updater
      *
@@ -1027,23 +1034,25 @@ class Net_DNS2
                 continue;
             }
 
-            //
-            // make sure the response code in the header is ok
-            //
-            if ($response->header->rcode != Net_DNS2_Lookups::RCODE_NOERROR) {
-            
-                $this->last_exception = new Net_DNS2_Exception(
-                
-                    'DNS request failed: ' . 
-                    Net_DNS2_Lookups::$result_code_messages[$response->header->rcode],
-                    $response->header->rcode,
-                    null,
-                    $request,
-                    $response
-                );
+            if(!$this->server_passthru) {
+                //
+                // make sure the response code in the header is ok
+                //
+                if ($response->header->rcode != Net_DNS2_Lookups::RCODE_NOERROR) {
 
-                $this->last_exception_list[$ns] = $this->last_exception;
-                continue;
+                    $this->last_exception = new Net_DNS2_Exception(
+
+                        'DNS request failed: ' .
+                        Net_DNS2_Lookups::$result_code_messages[$response->header->rcode],
+                        $response->header->rcode,
+                        null,
+                        $request,
+                        $response
+                    );
+
+                    $this->last_exception_list[$ns] = $this->last_exception;
+                    continue;
+                }
             }
 
             break;
