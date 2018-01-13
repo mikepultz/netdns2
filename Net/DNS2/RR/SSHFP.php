@@ -141,7 +141,7 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
         if ( ($algorithm != self::SSHFP_ALGORITHM_RSA) 
             && ($algorithm != self::SSHFP_ALGORITHM_DSS) 
             && ($algorithm != self::SSHFP_ALGORITHM_ECDSA)
-            && ($algorithm != self::SSHFP_ALGORITHM_ED25519) 
+            && ($algorithm != self::SSHFP_ALGORITHM_ED25519)
         ) {
             return false;
         }
