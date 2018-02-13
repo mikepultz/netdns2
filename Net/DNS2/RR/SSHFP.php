@@ -89,10 +89,11 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
     /*
      * Algorithms
      */
-    const SSHFP_ALGORITHM_RES   = 0;
-    const SSHFP_ALGORITHM_RSA   = 1;
-    const SSHFP_ALGORITHM_DSS   = 2;
-    const SSHFP_ALGORITHM_ECDSA = 3;
+    const SSHFP_ALGORITHM_RES       = 0;
+    const SSHFP_ALGORITHM_RSA       = 1;
+    const SSHFP_ALGORITHM_DSS       = 2;
+    const SSHFP_ALGORITHM_ECDSA     = 3;
+    const SSHFP_ALGORITHM_ED25519   = 4;
 
     /*
      * Fingerprint Types
@@ -140,6 +141,7 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
         if ( ($algorithm != self::SSHFP_ALGORITHM_RSA) 
             && ($algorithm != self::SSHFP_ALGORITHM_DSS) 
             && ($algorithm != self::SSHFP_ALGORITHM_ECDSA) 
+            && ($algorithm != self::SSHFP_ALGORITHM_ED25519)
         ) {
             return false;
         }
@@ -187,6 +189,7 @@ class Net_DNS2_RR_SSHFP extends Net_DNS2_RR
             if ( ($this->algorithm != self::SSHFP_ALGORITHM_RSA) 
                 && ($this->algorithm != self::SSHFP_ALGORITHM_DSS)
                 && ($this->algorithm != self::SSHFP_ALGORITHM_ECDSA)
+                && ($this->algorithm != self::SSHFP_ALGORITHM_ED25519)
             ) {
                 return false;
             }

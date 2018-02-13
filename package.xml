@@ -15,11 +15,11 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2017-03-06</date>
- <time>23:45:35</time>
+ <date>2018-02-12</date>
+ <time>22:06:45</time>
  <version>
-  <release>1.4.3</release>
-  <api>1.4.3</api>
+  <release>1.4.4</release>
+  <api>1.4.4</api>
  </version>
  <stability>
   <release>stable</release>
@@ -27,21 +27,20 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
  <notes>
-- fixed an issue when looking up . or com., when using the strict_query_mode flag.
-- fixed a bug in the caching logic where I was loading the content more than once per instance, when really I only need to do it once.
-- changed the Net_DNS2::sock array to use the SOCK_DGRAM and SOCK_STREAM defines, rather than the strings &apos;tcp&apos; or &apos;udp&apos;.
-- fixed a bug in the Net_DNS2_Header and Net_DNS2_Question classes, where I was using the wrong bit-shift operators when parsing some of the values. This only became apparent when somebody was trying to use the CAA class (id 257); it was causing this to roll over to the next 8 bit value, and returning 1 (RR A) instead of the CAA class.
-- fixed a bug that occurs when a DNS lookup request times out, and then the same class is reused for a subsequent request. Because I&apos;m caching the sockets, the timed out data could eventually come in, and end up being seen as the result for a subsequent lookup.
-- fixed a couple cases in NSAP.php where I was comparing a string to to an integer.
+- bugfix when returning an empty bitmap-type in BitMap.php - patch from BugMaster510945.
+- added the BIND 9 private record RR (TYPE65534) - patch from BugMaster510945.
+- added DNSSEC algorithms 13-16 (ECDSAP256SHA256, ECDSAP384SHA384, ED25519, and ED448).
+- added SSHFP algoritm ED25519.
+- modified Net_DNS2::sendPacket() to use current()/next() rather than the deprecated each() (deprecated in 7.2).
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
-   <file baseinstalldir="/" md5sum="bf405dbb3f025da8d3b9b31057cee956" name="Net/DNS2.php" role="php" />
-   <file baseinstalldir="/" md5sum="a60f2fcb5ed6ec1d81c4a94a45b3adf7" name="Net/DNS2/BitMap.php" role="php" />
+   <file baseinstalldir="/" md5sum="4cd5671d4e2e09b4a0888e60e6acd9df" name="Net/DNS2.php" role="php" />
+   <file baseinstalldir="/" md5sum="57eeb66e51a0e5bce10959bc77ff0d97" name="Net/DNS2/BitMap.php" role="php" />
    <file baseinstalldir="/" md5sum="08e1d62b213510e895fa870991e5f2b6" name="Net/DNS2/Cache.php" role="php" />
    <file baseinstalldir="/" md5sum="68264e0b4d6c30829ad7d46b41d4dc5a" name="Net/DNS2/Exception.php" role="php" />
    <file baseinstalldir="/" md5sum="894fef7acfaf756232f6b462352f2b09" name="Net/DNS2/Header.php" role="php" />
-   <file baseinstalldir="/" md5sum="77536126f583354be441562d2d5ab3a1" name="Net/DNS2/Lookups.php" role="php" />
+   <file baseinstalldir="/" md5sum="13b384fe3d01adf574f6f11ee4022f59" name="Net/DNS2/Lookups.php" role="php" />
    <file baseinstalldir="/" md5sum="f7e40dbfd5905667e87e7dced94397f7" name="Net/DNS2/Packet.php" role="php" />
    <file baseinstalldir="/" md5sum="26e2e2061ba08e1520876a515e9ad511" name="Net/DNS2/PrivateKey.php" role="php" />
    <file baseinstalldir="/" md5sum="50e11cac12d7e1770c419dff9297ddfa" name="Net/DNS2/Question.php" role="php" />
@@ -105,13 +104,14 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="20573547ead5339cb197991d305fb13d" name="Net/DNS2/RR/SOA.php" role="php" />
    <file baseinstalldir="/" md5sum="41025887dd82c14781de35b938503e7e" name="Net/DNS2/RR/SPF.php" role="php" />
    <file baseinstalldir="/" md5sum="dda9d5030fdb1977de4cfba58a3cb3b0" name="Net/DNS2/RR/SRV.php" role="php" />
-   <file baseinstalldir="/" md5sum="999a5d35f71a227d190b42e90a768c1f" name="Net/DNS2/RR/SSHFP.php" role="php" />
+   <file baseinstalldir="/" md5sum="be047ba5b6c4852371b67e21fb45e3dd" name="Net/DNS2/RR/SSHFP.php" role="php" />
    <file baseinstalldir="/" md5sum="641614de862c9b02e405894c96e8ddfd" name="Net/DNS2/RR/TA.php" role="php" />
    <file baseinstalldir="/" md5sum="43c3d7b5d1dfd6536a0e95fdd7a63561" name="Net/DNS2/RR/TALINK.php" role="php" />
    <file baseinstalldir="/" md5sum="632607c3307ad5e9c3fa91232dbf9a4b" name="Net/DNS2/RR/TKEY.php" role="php" />
    <file baseinstalldir="/" md5sum="501b17ab5d0c356d02773c62c69748ea" name="Net/DNS2/RR/TLSA.php" role="php" />
    <file baseinstalldir="/" md5sum="8c0661c90848c1a3ffc007d8656d705e" name="Net/DNS2/RR/TSIG.php" role="php" />
    <file baseinstalldir="/" md5sum="d0551a32ecf1ac08b2f42f1042ce1ff1" name="Net/DNS2/RR/TXT.php" role="php" />
+   <file baseinstalldir="/" md5sum="7cd488d38cf2881988a9c7a506638f4c" name="Net/DNS2/RR/TYPE65534.php" role="php" />
    <file baseinstalldir="/" md5sum="3d4a204508acc1c4c9cc0ec85f630a50" name="Net/DNS2/RR/URI.php" role="php" />
    <file baseinstalldir="/" md5sum="101703d7f0b9347db6651f35f78a98a6" name="Net/DNS2/RR/WKS.php" role="php" />
    <file baseinstalldir="/" md5sum="a589db31b862ac5308eaacf9c2223ae1" name="Net/DNS2/RR/X25.php" role="php" />
@@ -510,6 +510,25 @@ Initial Beta release of Net_DNS2
 - fixed a bug in the Net_DNS2_Header and Net_DNS2_Question classes, where I was using the wrong bit-shift operators when parsing some of the values. This only became apparent when somebody was trying to use the CAA class (id 257); it was causing this to roll over to the next 8 bit value, and returning 1 (RR A) instead of the CAA class.
 - fixed a bug that occurs when a DNS lookup request times out, and then the same class is reused for a subsequent request. Because I&apos;m caching the sockets, the timed out data could eventually come in, and end up being seen as the result for a subsequent lookup.
 - fixed a couple cases in NSAP.php where I was comparing a string to to an integer.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.4.4</release>
+    <api>1.4.4</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2018-02-12</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- bugfix when returning an empty bitmap-type in BitMap.php - patch from BugMaster510945.
+- added the BIND 9 private record RR (TYPE65534) - patch from BugMaster510945.
+- added DNSSEC algorithms 13-16 (ECDSAP256SHA256, ECDSAP384SHA384, ED25519, and ED448).
+- added SSHFP algoritm ED25519.
+- modified Net_DNS2::sendPacket() to use current()/next() rather than the deprecated each() (deprecated in 7.2).
    </notes>
   </release>
  </changelog>

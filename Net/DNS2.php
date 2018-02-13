@@ -920,7 +920,9 @@ class Net_DNS2
             //
             // grab the next DNS server
             //
-            $ns = each($this->nameservers);
+            $ns = current($this->nameservers);
+            next($this->nameservers);
+
             if ($ns === false) {
 
                 if (is_null($this->last_exception) == false) {
@@ -934,8 +936,6 @@ class Net_DNS2
                     );
                 }
             }
-
-            $ns = $ns[1];
 
             //
             // if the use TCP flag (force TCP) is set, or the packet is bigger than our 
