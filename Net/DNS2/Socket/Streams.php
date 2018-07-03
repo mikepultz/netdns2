@@ -102,8 +102,8 @@ class Net_DNS2_Socket_Streams extends Net_DNS2_Socket
         //
         // create socket
         //
-        $errno;
-        $errstr;
+        $errno = '';
+        $errstr = '';
 
         switch($this->type) {
         case Net_DNS2_Socket::SOCK_STREAM:
