@@ -257,7 +257,7 @@ class Net_DNS2_PrivateKey
             switch(strtolower($key)) {
 
             case 'private-key-format':
-                $this->_key_format = $value;
+                $this->key_format = $value;
                 break;
 
             case 'algorithm':
