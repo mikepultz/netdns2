@@ -734,7 +734,7 @@ class Net_DNS2
     /**
      * a simple function to determine if the RR type is cacheable
      *
-     * @param stream $_type the RR type string
+     * @param string $_type the RR type string
      *
      * @return bool returns true/false if the RR type if cachable
      * @access public
