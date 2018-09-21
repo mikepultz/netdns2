@@ -198,7 +198,7 @@ class Net_DNS2_Header
         if ($packet->rdlength < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
 
             throw new Net_DNS2_Exception(
-                'invalid header data provided; to small',
+                'invalid header data provided; too small',
                 Net_DNS2_Lookups::E_HEADER_INVALID
             );
         }
