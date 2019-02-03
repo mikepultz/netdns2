@@ -161,9 +161,9 @@ class Net_DNS2_Notifier extends Net_DNS2
      * @deprecated function deprecated in 1.1.0
      *
      */
-    public function signature($keyname, $signature)
+    public function signature($keyname, $signature, $algorithm = Net_DNS2_RR_TSIG::HMAC_MD5)
     {
-        return $this->signTSIG($keyname, $signature);
+        return $this->signTSIG($keyname, $signature, $algorithm);
     }
 
     /**
