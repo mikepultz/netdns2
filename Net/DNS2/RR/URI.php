@@ -98,7 +98,7 @@ class Net_DNS2_RR_URI extends Net_DNS2_RR
         // presentation format has double quotes (") around the target.
         //
         return $this->priority . ' ' . $this->weight . ' "' . 
-            $this->cleanString($this->target) . '"';
+           $this->target . '"';
     }
 
     /**
@@ -114,11 +114,7 @@ class Net_DNS2_RR_URI extends Net_DNS2_RR
     {
         $this->priority = $rdata[0];
         $this->weight   = $rdata[1];
-
-        //
-        // make sure to trim the lead/trailing double quote if it's there.
-        //
-        $this->target   = trim($this->cleanString($rdata[2]), '"');
+        $this->target   = trim($rdata[2], '"');
         
         return true;
     }
@@ -143,9 +139,7 @@ class Net_DNS2_RR_URI extends Net_DNS2_RR
 
             $this->priority = $x['priority'];
             $this->weight   = $x['weight'];
-
-            $offset         = $packet->offset + 4;
-            $this->target   = Net_DNS2_Packet::expand($packet, $offset);
+            $this->target   = substr($this->rdata, 4);
 
             return true;
         }
