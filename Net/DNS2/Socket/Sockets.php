@@ -295,16 +295,6 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
                 return false;
             }
 
-            //
-            // If an error occurs, if the connection is reset, or if no data is 
-            // available, buf will be set to NULL.
-            //
-            if (is_null($data) == true)
-            {
-                $this->last_error = socket_strerror(socket_last_error());
-                return false;
-            }
-
             $length = ord($data[0]) << 8 | ord($data[1]);
             if ($length < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
 
@@ -343,7 +333,7 @@ class Net_DNS2_Socket_Sockets extends Net_DNS2_Socket
         while (1) {
 
             $chunk_size = @socket_recv($this->sock, $chunk, $length, MSG_WAITALL);
-            if ( ($chunk_size === false) || (is_null($chunk) == true) ) {
+            if ($chunk_size === false) {
 
                 $size = $chunk_size;
                 $this->last_error = socket_strerror(socket_last_error());

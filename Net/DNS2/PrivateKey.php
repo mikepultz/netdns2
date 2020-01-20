@@ -82,7 +82,7 @@ class Net_DNS2_PrivateKey
     public $algorithm;
 
     /*
-     * the key format of the signature
+     * the key format fo the signature
      */
     public $key_format;
 
@@ -257,7 +257,7 @@ class Net_DNS2_PrivateKey
             switch(strtolower($key)) {
 
             case 'private-key-format':
-                $this->key_format = $value;
+                $this->_key_format = $value;
                 break;
 
             case 'algorithm':

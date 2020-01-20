@@ -103,7 +103,6 @@ class Net_DNS2_Lookups
     const OPCODE_STATUS         = 2;        // RFC 1035
     const OPCODE_NOTIFY         = 4;        // RFC 1996
     const OPCODE_UPDATE         = 5;        // RFC 2136
-    const OPCODE_DSO            = 6;        // RFC 8490
 
     /*
      * Resource Record Classes
@@ -128,9 +127,8 @@ class Net_DNS2_Lookups
     const RCODE_NXRRSET         = 8;        // RFC 2136
     const RCODE_NOTAUTH         = 9;        // RFC 2136
     const RCODE_NOTZONE         = 10;       // RFC 2136
-    const RCODE_DSOTYPENI       = 11;       // RFC 8490
 
-    // 12-15 unassigned
+    // 11-15 reserved
 
     const RCODE_BADSIG          = 16;       // RFC 2845
     const RCODE_BADVERS         = 16;       // RFC 6891    
@@ -209,11 +207,6 @@ class Net_DNS2_Lookups
     const EDNS0_OPT_PADDING         = 12;
     const EDNS0_OPT_CHAIN           = 13;
     const EDNS0_OPT_KEY_TAG         = 14;
-    // 15 - unsassigned
-    const EDNS0_OPT_CLIENT_TAG      = 16;
-    const EDNS0_OPT_SERVER_TAG      = 17;
-    // 18-26945 - unassigned
-    const EDNS0_OPT_DEVICEID        = 26946;
 
     /*
      * DNSSEC Algorithms
@@ -319,9 +312,8 @@ class Net_DNS2_Lookups
         'CDNSKEY'       => 60,      // RFC 7344
         'OPENPGPKEY'    => 61,      // RFC 7929
         'CSYNC'         => 62,      // RFC 7477
-        'ZONEMD'        => 63,      // Not implemented yet
 
-                                    // 64 - 98 unassigned
+                                    // 63 - 98 unassigned
 
         'SPF'           => 99,      // RFC 4408
         'UINFO'         => 100,     // no RFC, Not implemented
@@ -347,8 +339,6 @@ class Net_DNS2_Lookups
         'URI'           => 256,     // tools.ietf.org/html/draft-faltstrom-uri-06
         'CAA'           => 257,     // tools.ietf.org/html/draft-ietf-pkix-caa-03
         'AVC'           => 258,     // Application Visibility and Control
-        'DOA'           => 259,     // Not implemented yet
-        'AMTRELAY'      => 260,     // Not implemented yet
 
                                     // 259 - 32767 unassigned
 
