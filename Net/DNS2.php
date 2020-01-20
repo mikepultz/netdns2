@@ -72,7 +72,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = '1.4.4';
+    const VERSION = '1.4.5';
 
     /*
      * the default path to a resolv.conf file
@@ -734,7 +734,7 @@ class Net_DNS2
     /**
      * a simple function to determine if the RR type is cacheable
      *
-     * @param stream $_type the RR type string
+     * @param string $_type the RR type string
      *
      * @return bool returns true/false if the RR type if cachable
      * @access public
@@ -878,7 +878,7 @@ class Net_DNS2
      * @param boolean         $use_tcp true/false if the function should
      *                                 use TCP for the request
      *
-     * @return mixed returns a Net_DNS2_Packet_Response object, or false on error
+     * @return Net_DNS2_Packet_Response
      * @throws Net_DNS2_Exception
      * @access protected
      *

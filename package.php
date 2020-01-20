@@ -32,16 +32,15 @@ $pkg->setPackage('Net_DNS2');
 $pkg->setSummary('PHP5 Resolver library used to communicate with a DNS server.');
 $pkg->setDescription("Provides (roughly) the same functionality as Net_DNS, but using PHP5 objects, exceptions for error handling, better sockets support.\n\nThis release is (in most cases) 2x - 10x faster than Net_DNS, as well as includes more RR's (including DNSSEC RR's), and improved sockets and streams support.");
 $pkg->setChannel('pear.php.net');
-$pkg->setAPIVersion('1.4.4');
-$pkg->setReleaseVersion('1.4.4');
+$pkg->setAPIVersion('1.4.5');
+$pkg->setReleaseVersion('1.4.5');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
 $pkg->setNotes(
-"- bugfix when returning an empty bitmap-type in BitMap.php - patch from BugMaster510945.\n" .
-"- added the BIND 9 private record RR (TYPE65534) - patch from BugMaster510945.\n" .
-"- added DNSSEC algorithms 13-16 (ECDSAP256SHA256, ECDSAP384SHA384, ED25519, and ED448).\n" .
-"- added SSHFP algoritm ED25519.\n" .
-"- modified Net_DNS2::sendPacket() to use current()/next() rather than the deprecated each() (deprecated in 7.2).\n"
+"- the Net_DNS2_RR_NIMLOC class was incorrectly named Net_DNS2_RR_NIMLOCK.\n" .
+"- fixed a couple inconsistencies in the docs.\n" .
+"- fixed a PHP 7.4 bug in Sockets.php; accessing a null value as an array throws an exception now.\n" .
+"- Net_DNS2_PrivateKey was using the wrong member variable name for the key_format value.\n"
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();

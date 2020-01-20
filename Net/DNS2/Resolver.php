@@ -82,7 +82,7 @@ class Net_DNS2_Resolver extends Net_DNS2
      * @param string $type  the name of the RR type to lookup
      * @param string $class the name of the RR class to lookup
      *
-     * @return Net_DNS2_RR object
+     * @return Net_DNS2_Packet_Response object
      * @throws Net_DNS2_Exception
      * @access public
      *
