@@ -50,7 +50,7 @@
  */
 
 /**
- * NIMLOCK Resource Record - undefined; the rdata is simply used as-is in it's
+ * NIMLOC Resource Record - undefined; the rdata is simply used as-is in it's
  *                              binary format, so not process has to be done.
  * 
  * @category Networking
@@ -61,7 +61,7 @@
  * @see      Net_DNS2_RR
  *
  */
-class Net_DNS2_RR_NIMLOCK extends Net_DNS2_RR
+class Net_DNS2_RR_NIMLOC extends Net_DNS2_RR
 {
     /**
      * method to return the rdata portion of the packet as a string
