@@ -94,7 +94,7 @@ class Net_DNS2_RR_PX extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->preference . ' ' . $this->cleanString($this->map822) . '. ' . 
             $this->cleanString($this->mapx400) . '.';

@@ -78,7 +78,7 @@ class Net_DNS2_RR_TYPE65534 extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return base64_encode($this->private_data);
     }

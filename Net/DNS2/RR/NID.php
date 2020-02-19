@@ -88,7 +88,7 @@ class Net_DNS2_RR_NID extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->preference . ' ' . $this->nodeid;
     }

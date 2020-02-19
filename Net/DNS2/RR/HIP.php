@@ -122,7 +122,7 @@ class Net_DNS2_RR_HIP extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         $out = $this->pk_algorithm . ' ' . 
             $this->hit . ' ' . $this->public_key . ' ';

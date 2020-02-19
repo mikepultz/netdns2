@@ -79,7 +79,7 @@ class Net_DNS2_RR_NS extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->cleanString($this->nsdname) . '.';
     }

@@ -78,7 +78,7 @@ class Net_DNS2_RR_PTR extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return rtrim($this->ptrdname, '.') . '.';
     }

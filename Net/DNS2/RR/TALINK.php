@@ -87,7 +87,7 @@ class Net_DNS2_RR_TALINK extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->cleanString($this->previous) . '. ' . 
             $this->cleanString($this->next) . '.';

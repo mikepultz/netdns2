@@ -98,7 +98,7 @@ class Net_DNS2_RR_TLSA extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->cert_usage . ' ' . $this->selector . ' ' . 
             $this->matching_type . ' ' . base64_encode($this->certificate);

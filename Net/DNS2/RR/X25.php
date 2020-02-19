@@ -78,7 +78,7 @@ class Net_DNS2_RR_X25 extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->formatString($this->psdnaddress);
     }

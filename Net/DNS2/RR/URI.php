@@ -92,7 +92,7 @@ class Net_DNS2_RR_URI extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         //
         // presentation format has double quotes (") around the target.

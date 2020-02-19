@@ -153,7 +153,7 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->option_code . ' ' . $this->option_data;
     }

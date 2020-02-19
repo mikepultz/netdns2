@@ -149,7 +149,7 @@ class Net_DNS2_RR_CERT extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->format . ' ' . $this->keytag . ' ' . $this->algorithm . 
             ' ' . base64_encode($this->certificate);

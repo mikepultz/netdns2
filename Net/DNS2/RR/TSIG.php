@@ -165,7 +165,7 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         $out = $this->cleanString($this->algorithm) . '. ' . 
             $this->time_signed . ' ' . 

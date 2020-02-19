@@ -93,7 +93,7 @@ class Net_DNS2_RR_CSYNC extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         $out = $this->serial . ' ' . $this->flags;
 

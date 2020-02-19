@@ -95,7 +95,7 @@ class Net_DNS2_RR_DHCID extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         $out = pack('nC', $this->id_type, $this->digest_type);
         $out .= base64_decode($this->digest);

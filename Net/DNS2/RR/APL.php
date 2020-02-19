@@ -83,7 +83,7 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         $out = '';
 

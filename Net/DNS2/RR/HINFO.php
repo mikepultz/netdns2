@@ -85,7 +85,7 @@ class Net_DNS2_RR_HINFO extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->formatString($this->cpu) . ' ' . 
             $this->formatString($this->os);

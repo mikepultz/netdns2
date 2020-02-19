@@ -99,7 +99,7 @@ class Net_DNS2_RR_SRV extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->priority . ' ' . $this->weight . ' ' . 
             $this->port . ' ' . $this->cleanString($this->target) . '.';

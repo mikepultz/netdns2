@@ -98,7 +98,7 @@ class Net_DNS2_RR_DNSKEY extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->flags . ' ' . $this->protocol . ' ' . 
             $this->algorithm . ' ' . $this->key;

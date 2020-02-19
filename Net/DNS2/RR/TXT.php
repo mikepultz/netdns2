@@ -78,7 +78,7 @@ class Net_DNS2_RR_TXT extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         if (count($this->text) == 0) {
             return '""';

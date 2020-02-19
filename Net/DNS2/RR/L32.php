@@ -86,7 +86,7 @@ class Net_DNS2_RR_L32 extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->preference . ' ' . $this->locator32;
     }

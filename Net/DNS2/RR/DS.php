@@ -98,7 +98,7 @@ class Net_DNS2_RR_DS extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->keytag . ' ' . $this->algorithm . ' ' . 
             $this->digesttype . ' ' . $this->digest;

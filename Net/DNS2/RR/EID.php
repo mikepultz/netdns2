@@ -70,7 +70,7 @@ class Net_DNS2_RR_EID extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return '';
     }

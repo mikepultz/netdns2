@@ -126,7 +126,7 @@ class Net_DNS2_RR_SOA extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->cleanString($this->mname) . '. ' . 
             $this->cleanString($this->rname) . '. ' . 

@@ -86,7 +86,7 @@ class Net_DNS2_RR_NSEC extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         $data = $this->cleanString($this->next_domain_name) . '.';
 

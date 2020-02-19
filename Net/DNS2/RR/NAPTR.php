@@ -117,7 +117,7 @@ class Net_DNS2_RR_NAPTR extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->order . ' ' . $this->preference . ' ' . 
             $this->formatString($this->flags) . ' ' . 

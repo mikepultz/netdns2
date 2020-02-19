@@ -103,7 +103,7 @@ class Net_DNS2_RR_NSEC3PARAM extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         $out = $this->algorithm . ' ' . $this->flags . ' ' . $this->iterations . ' ';
 

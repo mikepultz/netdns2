@@ -124,7 +124,7 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         $out = $this->cleanString($this->algorithm) . '. ' . $this->mode;
         if ($this->key_size > 0) {

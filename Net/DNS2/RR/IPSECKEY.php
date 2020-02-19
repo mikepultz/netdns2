@@ -128,7 +128,7 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         $out = $this->precedence . ' ' . $this->gateway_type . ' ' . 
             $this->algorithm . ' ';

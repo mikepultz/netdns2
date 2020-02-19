@@ -129,7 +129,7 @@ abstract class Net_DNS2_RR
      * @access protected
      *
      */
-    abstract protected function rrToString();
+    abstract public function rrToString();
 
     /**
      * abstract definition - parses a RR from a standard DNS config line

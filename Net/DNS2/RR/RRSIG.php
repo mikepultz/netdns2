@@ -159,7 +159,7 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
      * @access  protected
      *
      */
-    protected function rrToString()
+    public function rrToString()
     {
         return $this->typecovered . ' ' . $this->algorithm . ' ' . 
             $this->labels . ' ' . $this->origttl . ' ' .
