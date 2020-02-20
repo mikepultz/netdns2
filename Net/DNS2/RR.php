@@ -216,6 +216,26 @@ abstract class Net_DNS2_RR
     }
 
     /**
+     * return the same data as __toString(), but as an array, so each value can be 
+     * used without having to parse the string.
+     *
+     * @return array
+     * @access public
+     *
+     */
+    public function asArray()
+    {
+        return array(
+
+            'name'  => $this->name,
+            'ttl'   => $this->ttl,
+            'class' => $this->class,
+            'type'  => $this->type,
+            'rdata' => $this->rrToString()
+        );
+    }
+
+    /**
      * return a formatted string; if a string has spaces in it, then return 
      * it with double quotes around it, otherwise, return it as it was passed in.
      *

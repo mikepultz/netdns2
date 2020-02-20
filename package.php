@@ -40,7 +40,8 @@ $pkg->setNotes(
 "- the Net_DNS2_RR_NIMLOC class was incorrectly named Net_DNS2_RR_NIMLOCK.\n" .
 "- fixed a couple inconsistencies in the docs.\n" .
 "- fixed a PHP 7.4 bug in Sockets.php; accessing a null value as an array throws an exception now.\n" .
-"- Net_DNS2_PrivateKey was using the wrong member variable name for the key_format value.\n"
+"- Net_DNS2_PrivateKey was using the wrong member variable name for the key_format value.\n" .
+"- added Net_DNS2_RR::asArray(), which returns the same values as __toString(), but as an array for easier access.\n"
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();
