@@ -80,7 +80,7 @@ class Net_DNS2_RR_TYPE65534 extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return base64_encode($this->private_data);
+        return sprintf("\# %u %s", strlen($this->private_data), bin2hex($this->private_data));
     }
 
     /**
@@ -94,7 +94,36 @@ class Net_DNS2_RR_TYPE65534 extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        $this->private_data = base64_decode(implode('', $rdata));
+		// first element must be a literal a backslash immediately followed by a hash sign
+		if ('\#' != array_shift($rdata)) {
+
+            return false;
+        }
+
+        // next value is the length of the private data
+        $len = (int)array_shift($rdata);
+
+		// remaining part is the data encoded in hex
+
+        // discard anything not hex
+		$data = preg_replace('/[^0-9a-f]/', '', strtolower(implode('', $rdata)));
+
+		if (0 != strlen($data) % 2) {
+            // must be an even number of hex digits
+
+            return false;
+        }
+
+		// convert the hex to binary
+		$private_data = hex2bin($data);
+
+        if (strlen($private_data) != $len) {
+            // length of data doesn't match $len
+
+            return false;
+        }
+
+        $this->private_data = $private_data;
 
         return true;
     }
