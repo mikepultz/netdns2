@@ -288,12 +288,13 @@ class Net_DNS2_Packet
      *
      * @param Net_DNS2_Packet &$packet the DNS packet to look in for the domain name
      * @param integer         &$offset the offset into the given packet object
+     * @param boolean         $escape_dots whether to escape literal dots found in some labels (for example, in SOA rname fields)
      *
      * @return mixed either the domain name or null if it's not found.
      * @access public
      *
      */
-    public static function expand(Net_DNS2_Packet &$packet, &$offset)
+    public static function expand(Net_DNS2_Packet &$packet, &$offset, $escape_dots=false)
     {
         $name = '';
 
@@ -338,6 +339,12 @@ class Net_DNS2_Packet
 
                 $elem = '';
                 $elem = substr($packet->rdata, $offset, $xlen);
+
+                if ($escape_dots && false !== strpos($elem, '.')) {
+                    // label contains a literal dot which must be escaped
+                    $elem = str_replace('.', '\.', $elem);
+                }
+
                 $name .= $elem . '.';
                 $offset += $xlen;
             }

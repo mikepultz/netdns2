@@ -176,7 +176,7 @@ class Net_DNS2_RR_SOA extends Net_DNS2_RR
             $offset = $packet->offset;
 
             $this->mname = Net_DNS2_Packet::expand($packet, $offset);
-            $this->rname = Net_DNS2_Packet::expand($packet, $offset);
+            $this->rname = Net_DNS2_Packet::expand($packet, $offset, true);
 
             //
             // get the SOA values
