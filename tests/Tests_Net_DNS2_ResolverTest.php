@@ -53,7 +53,8 @@
 require_once '../Net/DNS2.php';
 
 /**
- * Test class to test the DNSSEC logic
+ * This test uses the Google public DNS servers to perform a resolution test;
+ * this should work on *nix and Windows, but will require an internet connection.
  *
  * @category Networking
  * @package  Net_DNS2
@@ -62,29 +63,28 @@ require_once '../Net/DNS2.php';
  * @link     http://pear.php.net/package/Net_DNS2
  *
  */
-class Net_DNS2_DNSSECTest extends PHPUnit_Framework_TestCase
+class Tests_Net_DNS2_ResolverTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * function to test the TSIG logic
+     * function to test the resolver
      *
      * @return void
      * @access public
      *
      */
-    public function testDNSSEC()
+    public function testResolver()
     {
         $ns = array('8.8.8.8', '8.8.4.4');
 
         $r = new Net_DNS2_Resolver(array('nameservers' => $ns));
 
-        $r->dnssec = true;
+        $result = $r->query('google.com', 'MX');
 
-        $result = $r->query('org', 'SOA', 'IN');
-
-        $this->assertTrue(($result->header->ad == 1));
-        $this->assertTrue(($result->additional[0] instanceof Net_DNS2_RR_OPT));
-        $this->assertTrue(($result->additional[0]->do == 1));
+        $this->assertSame($result->header->qr, Net_DNS2_Lookups::QR_RESPONSE);
+        $this->assertSame(count($result->question), 1);
+        $this->assertTrue(count($result->answer) > 0);
+        $this->assertTrue($result->answer[0] instanceof Net_DNS2_RR_MX);
     }
-};
+}
 
 ?>
