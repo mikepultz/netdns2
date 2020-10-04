@@ -50,65 +50,41 @@
  *
  */
 
-error_reporting(E_ALL | E_STRICT);
-
-if (!defined('PHPUNIT_MAIN_METHOD')) {
-    define('PHPUNIT_MAIN_METHOD', 'Net_DNS2_AllTests::main');
-}
-
-require_once 'Net_DNS2_ParserTest.php';
-require_once 'Net_DNS2_ResolverTest.php';
-require_once 'Net_DNS2_DNSSECTest.php';
-
-set_include_path('..:.');
+require_once '../Net/DNS2.php';
 
 /**
- * This test suite assumes that Net_DNS2 will be in the include path, otherwise it
- * will fail. There's no other way to hardcode a include_path in here that would 
- * make it work everywhere.
+ * Test class to test the DNSSEC logic
  *
  * @category Networking
  * @package  Net_DNS2
  * @author   Mike Pultz <mike@mikepultz.com>
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link     http://pear.php.net/package/Net_DNS2
- * 
+ *
  */
-class Net_DNS2_AllTests
+class Tests_Net_DNS2_DNSSECTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * the main runner
+     * function to test the TSIG logic
      *
      * @return void
      * @access public
-     *     
-     */
-    public static function main()
-    {
-        PHPUnit_TextUI_TestRunner::run(self::suite());
-    }
-
-    /**
-     * test suite
      *
-     * @return void
-     * @access public
-     *     
      */
-    public static function suite()
+    public function testDNSSEC()
     {
-        $suite = new PHPUnit_Framework_TestSuite('PEAR - Net_DNS2');
+        $ns = array('8.8.8.8', '8.8.4.4');
 
-        $suite->addTestSuite('Net_DNS2_ParserTest');
-        $suite->addTestSuite('Net_DNS2_ResolverTest');
-        $suite->addTestSuite('Net_DNS2_DNSSECTest');
+        $r = new Net_DNS2_Resolver(array('nameservers' => $ns));
 
-        return $suite;
+        $r->dnssec = true;
+
+        $result = $r->query('org', 'SOA', 'IN');
+
+        $this->assertTrue(($result->header->ad == 1));
+        $this->assertTrue(($result->additional[0] instanceof Net_DNS2_RR_OPT));
+        $this->assertTrue(($result->additional[0]->do == 1));
     }
-}
-
-if (PHPUNIT_MAIN_METHOD == 'Net_DNS2_AllTests::main') {
-    Net_DNS2_AllTests::main();
-}
+};
 
 ?>

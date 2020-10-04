@@ -55,7 +55,7 @@ require_once '../Net/DNS2.php';
 
 /**
  * Test class to test the parsing code
- *   
+ *
  * @category Networking
  * @package  Net_DNS2
  * @author   Mike Pultz <mike@mikepultz.com>
@@ -63,7 +63,7 @@ require_once '../Net/DNS2.php';
  * @link     http://pear.php.net/package/Net_DNS2
  *
  */
-class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
+class Tests_Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
 {
     /**
      * function to test the TSIG logic
@@ -91,8 +91,8 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
         $request->additional[] = Net_DNS2_RR::fromString('mykey TSIG Zm9vYmFy');
         $request->header->arcount = 1;
 
-        $line = $request->additional[0]->name . '. ' . $request->additional[0]->ttl . ' ' . 
-        $request->additional[0]->class . ' ' . $request->additional[0]->type . ' ' . 
+        $line = $request->additional[0]->name . '. ' . $request->additional[0]->ttl . ' ' .
+        $request->additional[0]->class . ' ' . $request->additional[0]->type . ' ' .
         $request->additional[0]->algorithm . '. ' . $request->additional[0]->time_signed  . ' '.
         $request->additional[0]->fudge;
 
@@ -200,10 +200,10 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             $a = Net_DNS2_RR::fromString($line);
 
             //
-            // check that the object is right 
+            // check that the object is right
             //
             $this->assertTrue($a instanceof $class_name);
-                        
+
             //
             // set it on the packet
             //
@@ -214,7 +214,7 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             // get the binary packet data
             //
             $data = $request->get();
-                        
+
             //
             // parse the binary
             //
@@ -273,10 +273,10 @@ class Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             $a = Net_DNS2_RR::fromString($line);
 
             //
-            // check that the object is right 
+            // check that the object is right
             //
             $this->assertTrue($a instanceof $class_name);
-                        
+
             //
             // set it on the packet
             //

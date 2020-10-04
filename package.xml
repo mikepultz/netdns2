@@ -117,10 +117,10 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
    <file baseinstalldir="/" md5sum="a589db31b862ac5308eaacf9c2223ae1" name="Net/DNS2/RR/X25.php" role="php" />
    <file baseinstalldir="/" md5sum="6b88e0b40fe820dea5dc28149c98a792" name="Net/DNS2/Socket/Sockets.php" role="php" />
    <file baseinstalldir="/" md5sum="6c80cb53453ad0837532004c91e14dd7" name="Net/DNS2/Socket/Streams.php" role="php" />
-   <file baseinstalldir="/" md5sum="3830c26904fd0ecdcd9b40af7aed3bb6" name="tests/AllTests.php" role="test" />
-   <file baseinstalldir="/" md5sum="edadf1d417c229b25166677ae608baa7" name="tests/Net_DNS2_DNSSECTest.php" role="test" />
-   <file baseinstalldir="/" md5sum="0c6ee7b01f564952c3a7f9b69ce8d85a" name="tests/Net_DNS2_ParserTest.php" role="test" />
-   <file baseinstalldir="/" md5sum="3667edbb50ebfa4089bb678168f1899f" name="tests/Net_DNS2_ResolverTest.php" role="test" />
+   <file baseinstalldir="/" md5sum="3e70e41fba9ca537689f0246d2891c5e" name="tests/Tests_Net_DNS2_AllTests.php" role="test" />
+   <file baseinstalldir="/" md5sum="1d99f542ce6eddc2a574d7eef729a5fe" name="tests/Tests_Net_DNS2_DNSSECTest.php" role="test" />
+   <file baseinstalldir="/" md5sum="45f5dbbb9b5c67aa9674dc9e5aa2403a" name="tests/Tests_Net_DNS2_ParserTest.php" role="test" />
+   <file baseinstalldir="/" md5sum="32f515bc864f1d3a1861f1cb04636bec" name="tests/Tests_Net_DNS2_ResolverTest.php" role="test" />
    <file baseinstalldir="/" md5sum="9290a83f15bd81ff0af2e0149d17fd1d" name="LICENSE" role="doc" />
    <file baseinstalldir="/" md5sum="ffcaea84e3ca0d168ed4861c19d19049" name="README.md" role="doc" />
   </dir>
