@@ -5,8 +5,8 @@
     http://pear.php.net/dtd/package-2.0.xsd">
  <name>Net_DNS2</name>
  <channel>pear.php.net</channel>
- <summary>PHP5 Resolver library used to communicate with a DNS server.</summary>
- <description>Provides (roughly) the same functionality as Net_DNS, but using PHP5 objects, exceptions for error handling, better sockets support.
+ <summary>PHP Resolver library used to communicate with a DNS server.</summary>
+ <description>Provides (roughly) the same functionality as Net_DNS, but using modern PHP objects, exceptions for error handling, better sockets support.
 
 This release is (in most cases) 2x - 10x faster than Net_DNS, as well as includes more RR&apos;s (including DNSSEC RR&apos;s), and improved sockets and streams support.</description>
  <lead>
