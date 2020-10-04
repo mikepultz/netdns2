@@ -50,41 +50,65 @@
  *
  */
 
-require_once '../Net/DNS2.php';
+error_reporting(E_ALL | E_STRICT);
 
-/**  
- * This test uses the Google public DNS servers to perform a resolution test; 
- * this should work on *nix and Windows, but will require an internet connection.
- * 
+if (!defined('PHPUNIT_MAIN_METHOD')) {
+    define('PHPUNIT_MAIN_METHOD', 'Tests_Net_DNS2_AllTests::main');
+}
+
+require_once 'Tests_Net_DNS2_ParserTest.php';
+require_once 'Tests_Net_DNS2_ResolverTest.php';
+require_once 'Tests_Net_DNS2_DNSSECTest.php';
+
+set_include_path('..:.');
+
+/**
+ * This test suite assumes that Net_DNS2 will be in the include path, otherwise it
+ * will fail. There's no other way to hardcode a include_path in here that would
+ * make it work everywhere.
+ *
  * @category Networking
  * @package  Net_DNS2
  * @author   Mike Pultz <mike@mikepultz.com>
  * @license  http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link     http://pear.php.net/package/Net_DNS2      
+ * @link     http://pear.php.net/package/Net_DNS2
  *
  */
-class Net_DNS2_ResolverTest extends PHPUnit_Framework_TestCase
+class Tests_Net_DNS2_AllTests
 {
     /**
-     * function to test the resolver
+     * the main runner
      *
      * @return void
      * @access public
-     * 
+     *
      */
-    public function testResolver()
+    public static function main()
     {
-        $ns = array('8.8.8.8', '8.8.4.4');
-
-        $r = new Net_DNS2_Resolver(array('nameservers' => $ns));
-
-        $result = $r->query('google.com', 'MX');
-
-        $this->assertSame($result->header->qr, Net_DNS2_Lookups::QR_RESPONSE);
-        $this->assertSame(count($result->question), 1);
-        $this->assertTrue(count($result->answer) > 0);
-        $this->assertTrue($result->answer[0] instanceof Net_DNS2_RR_MX);
+        PHPUnit_TextUI_TestRunner::run(self::suite());
     }
+
+    /**
+     * test suite
+     *
+     * @return void
+     * @access public
+     *
+     */
+    public static function suite()
+    {
+        $suite = new PHPUnit_Framework_TestSuite('PEAR - Net_DNS2');
+
+        $suite->addTestSuite('Tests_Net_DNS2_ParserTest');
+        $suite->addTestSuite('Tests_Net_DNS2_ResolverTest');
+        $suite->addTestSuite('Tests_Net_DNS2_DNSSECTest');
+
+        return $suite;
+    }
+}
+
+if (PHPUNIT_MAIN_METHOD == 'Tests_Net_DNS2_AllTests::main') {
+    Tests_Net_DNS2_AllTests::main();
 }
 
 ?>
