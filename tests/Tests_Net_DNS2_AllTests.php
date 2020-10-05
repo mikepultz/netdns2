@@ -110,5 +110,3 @@ class Tests_Net_DNS2_AllTests
 if (PHPUNIT_MAIN_METHOD == 'Tests_Net_DNS2_AllTests::main') {
     Tests_Net_DNS2_AllTests::main();
 }
-
-?>

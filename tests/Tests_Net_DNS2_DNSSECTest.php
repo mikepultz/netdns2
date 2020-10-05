@@ -50,7 +50,7 @@
  *
  */
 
-require_once '../Net/DNS2.php';
+require_once 'Net/DNS2.php';
 
 /**
  * Test class to test the DNSSEC logic
@@ -62,7 +62,7 @@ require_once '../Net/DNS2.php';
  * @link     http://pear.php.net/package/Net_DNS2
  *
  */
-class Tests_Net_DNS2_DNSSECTest extends PHPUnit_Framework_TestCase
+class Tests_Net_DNS2_DNSSECTest extends PHPUnit\Framework\TestCase
 {
     /**
      * function to test the TSIG logic
@@ -73,9 +73,9 @@ class Tests_Net_DNS2_DNSSECTest extends PHPUnit_Framework_TestCase
      */
     public function testDNSSEC()
     {
-        $ns = array('8.8.8.8', '8.8.4.4');
+        $ns = [ '8.8.8.8', '8.8.4.4' ];
 
-        $r = new Net_DNS2_Resolver(array('nameservers' => $ns));
+        $r = new Net_DNS2_Resolver([ 'nameservers' => $ns ]);
 
         $r->dnssec = true;
 
@@ -86,5 +86,3 @@ class Tests_Net_DNS2_DNSSECTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(($result->additional[0]->do == 1));
     }
 };
-
-?>

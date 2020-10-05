@@ -50,8 +50,7 @@
  *
  */
 
-require_once '../Net/DNS2.php';
-
+require_once 'Net/DNS2.php';
 
 /**
  * Test class to test the parsing code
@@ -63,7 +62,7 @@ require_once '../Net/DNS2.php';
  * @link     http://pear.php.net/package/Net_DNS2
  *
  */
-class Tests_Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
+class Tests_Net_DNS2_ParserTest extends PHPUnit\Framework\TestCase
 {
     /**
      * function to test the TSIG logic
@@ -121,18 +120,18 @@ class Tests_Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
      */
     public function testParser()
     {
-        $rrs = array(
+        $rrs = [
 
             'A'             => 'example.com. 300 IN A 172.168.0.50',
             'NS'            => 'example.com. 300 IN NS ns1.mrdns.com.',
             'CNAME'         => 'example.com. 300 IN CNAME www.example.com.',
-            'SOA'           => 'example.com. 300 IN SOA ns1.mrdns.com. help.mrhost.ca. 1278700841 900 1800 86400 21400',
+            'SOA'           => 'example.com. 300 IN SOA ns1.mrdns.com. help\.team.mrhost.ca. 1278700841 900 1800 86400 21400',
             'WKS'           => 'example.com. 300 IN WKS 128.8.1.14 6 21 25',
             'PTR'           => '1.0.0.127.in-addr.arpa. 300 IN PTR localhost.',
             'HINFO'         => 'example.com. 300 IN HINFO "PC-Intel-700mhz" "Redhat \"Linux\" 7.1"',
             'MX'            => 'example.com. 300 IN MX 10 mx1.mrhost.ca.',
             'TXT'           => 'example.com. 300 IN TXT "first record" "another records" "a third"',
-            'RP'            => 'example.com. 300 IN RP louie.trantor.umd.edu. lam1.people.test.com.',
+            'RP'            => 'example.com. 300 IN RP louie\.trantor.umd.edu. lam1.people.test.com.',
             'AFSDB'         => 'example.com. 300 IN AFSDB 3 afsdb.example.com.',
             'X25'           => 'example.com. 300 IN X25 "311 06 17 0 09 56"',
             'ISDN'          => 'example.com. 300 IN ISDN "150 862 028 003 217" "42"',
@@ -174,12 +173,16 @@ class Tests_Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             'EUI48'         => 'example.com. 300 IN EUI48 00-00-5e-00-53-2a',
             'EUI64'         => 'example.com. 300 IN EUI64 00-00-5e-ef-10-00-00-2a',
             'TKEY'          => 'example.com. 300 IN TKEY gss.microsoft.com. 3 123456.',
-            'URI'           => 'example.com. 300 IN URI 10 1 "http://mrdns.com"',
+            'URI'           => 'example.com. 300 IN URI 10 1 "http://mrdns.com/contact.html"',
             'CAA'           => 'example.com. 300 IN CAA 0 issue "ca.example.net; policy=ev"',
             'AVC'           => 'example.com. 300 IN AVC "first record" "another records" "a third"',
+            'AMTRELAY'      => 'example.com. 300 IN AMTRELAY 10 0 0 .',
+            'AMTRELAY'      => 'example.com. 300 IN AMTRELAY 10 0 1 203.0.113.15',
+            'AMTRELAY'      => 'example.com. 300 IN AMTRELAY 10 0 2 2600:1f16:17c:3950:47ac:cb79:62ba:702e',
+            'AMTRELAY'      => 'example.com. 300 IN AMTRELAY 10 0 3 test.google.com.',
             'TA'            => 'example.com. 300 IN TA 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
             'DLV'           => 'example.com. 300 IN DLV 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
-        );
+        ];
 
         foreach ($rrs as $rr => $line) {
 
@@ -239,13 +242,13 @@ class Tests_Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
         //
         // this list of RR's uses name compression
         //
-        $rrs = array(
+        $rrs = [
 
             'NS'            => 'example.com. 300 IN NS ns1.mrdns.com.',
             'CNAME'         => 'example.com. 300 IN CNAME www.example.com.',
-            'SOA'           => 'example.com. 300 IN SOA ns1.mrdns.com. help.mrhost.ca. 1278700841 900 1800 86400 21400',
+            'SOA'           => 'example.com. 300 IN SOA ns1.mrdns.com. help\.desk.mrhost.ca. 1278700841 900 1800 86400 21400',
             'MX'            => 'example.com. 300 IN MX 10 mx1.mrhost.ca.',
-            'RP'            => 'example.com. 300 IN RP louie.trantor.umd.edu. lam1.people.test.com.',
+            'RP'            => 'example.com. 300 IN RP louie\.trantor.umd.edu. lam1.people.test.com.',
             'AFSDB'         => 'example.com. 300 IN AFSDB 3 afsdb.example.com.',
             'RT'            => 'example.com. 300 IN RT 2 relay.prime.com.',
             'PX'            => 'example.com. 300 IN PX 10 ab.net2.it. o-ab.prmd-net2.admdb.c-it.',
@@ -253,12 +256,12 @@ class Tests_Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
             'NAPTR'         => 'example.com. 300 IN NAPTR 100 10 S SIP+D2U !^.*$!sip:customer-service@example.com! _sip._udp.example.com.',
             'DNAME'         => 'example.com. 300 IN DNAME frobozz-division.acme.example.',
             'HIP'           => 'example.com. 300 IN HIP 2 200100107B1A74DF365639CC39F1D578 AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQb1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D rvs.example.com. another.example.com. test.domain.org.'
-        );
+        ];
 
         //
         // create a new updater object
         //
-        $u = new Net_DNS2_Updater("example.com", array('nameservers' => array('10.10.0.1')));
+        $u = new Net_DNS2_Updater("example.com", [ 'nameservers' => [ '10.10.0.1' ] ]);
 
         //
         // add each RR to the same object, so we can build a build compressed name list
@@ -326,6 +329,3 @@ class Tests_Net_DNS2_ParserTest extends PHPUnit_Framework_TestCase
         $this->assertSame($a, $b);
     }
 }
-
-
-?>
