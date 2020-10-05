@@ -40,6 +40,7 @@ $pkg->setNotes(
 "- added the AMTRELAY resource record type (RFC 8777).\n" .
 "- added Net_DNS2_RR::asArray(), which returns the same values as __toString(), but as an array for easier access.\n" .
 "- added Net_DNS2::closeSockets(), which lets you close all cached network sockets in the resolver object.\n" .
+"- added Net_DNS2::getSockets(), which returns the local sockets cache array.\n" .
 "- added date_created and date_last_used to the Net_DNS2_Socket object, to track usage stats on each socket object.\n" .
 "- dropped the Net_DNS2_Socket_Sockets, and switch to just using the streams code. There's no speed difference anymore.\n" .
 "- fixed a bug in Net_DNS2_Packet::compress() and Net_DNS2_Packet::expand() related to dot literals in compressed names.\n" .

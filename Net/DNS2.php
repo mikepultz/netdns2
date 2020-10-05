@@ -453,6 +453,17 @@ class Net_DNS2
     }
 
     /**
+     * return the internal $sock array
+     *
+     * @return array
+     * @access public
+     */
+    public function getSockets()
+    {
+        return $this->sock;
+    }
+
+    /**
      * give users access to close all open sockets on the resolver object; resetting each
      * array, calls the destructor on the Net_DNS2_Socket object, which calls the close()
      * method on each object.
