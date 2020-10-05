@@ -453,6 +453,23 @@ class Net_DNS2
     }
 
     /**
+     * give users access to close all open sockets on the resolver object; resetting each
+     * array, calls the destructor on the Net_DNS2_Socket object, which calls the close()
+     * method on each object.
+     *
+     * @return boolean
+     * @access public
+     *
+     */
+    public function closeSockets()
+    {
+        $this->sock[Net_DNS2_Socket::SOCK_DGRAM]    = [];
+        $this->sock[Net_DNS2_Socket::SOCK_STREAM]   = [];
+
+        return true;
+    }
+
+    /**
      * parses the options line from a resolv.conf file; we don't support all the options
      * yet, and using them is optional.
      *
@@ -1018,12 +1035,7 @@ class Net_DNS2
         $last_error = $this->sock[$_proto][$_ns]->last_error;
         
         //
-        // close it
-        //
-        $this->sock[$_proto][$_ns]->close();
-
-        //
-        // remove it from the socket cache
+        // remove it from the socket cache; this will call the destructor, which calls close() on the socket
         //
         unset($this->sock[$_proto][$_ns]);
 
@@ -1114,7 +1126,9 @@ class Net_DNS2
                 //
                 // read the data off the socket
                 //
-                $result = $this->sock[Net_DNS2_Socket::SOCK_STREAM][$_ns]->read($size, ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
+                $result = $this->sock[Net_DNS2_Socket::SOCK_STREAM][$_ns]->read($size, 
+                    ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
+
                 if ( ($result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
 
                     //
@@ -1210,7 +1224,9 @@ class Net_DNS2
         //
         } else {
 
-            $result = $this->sock[Net_DNS2_Socket::SOCK_STREAM][$_ns]->read($size, ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
+            $result = $this->sock[Net_DNS2_Socket::SOCK_STREAM][$_ns]->read($size, 
+                ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
+
             if ( ($result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
 
                 $this->generateError(Net_DNS2_Socket::SOCK_STREAM, $_ns, Net_DNS2_Lookups::E_NS_SOCKET_FAILED);
@@ -1305,7 +1321,9 @@ class Net_DNS2
         //
         $size = 0;
 
-        $result = $this->sock[Net_DNS2_Socket::SOCK_DGRAM][$_ns]->read($size, ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
+        $result = $this->sock[Net_DNS2_Socket::SOCK_DGRAM][$_ns]->read($size, 
+            ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
+
         if (( $result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE)) {
 
             $this->generateError(Net_DNS2_Socket::SOCK_DGRAM, $_ns, Net_DNS2_Lookups::E_NS_SOCKET_FAILED);

@@ -38,14 +38,19 @@ $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
 $pkg->setNotes(
 "- added the AMTRELAY resource record type (RFC 8777).\n" .
+"- added Net_DNS2_RR::asArray(), which returns the same values as __toString(), but as an array for easier access.\n" .
+"- added Net_DNS2::closeSockets(), which lets you close all cached network sockets in the resolver object.\n" .
+"- added date_created and date_last_used to the Net_DNS2_Socket object, to track usage stats on each socket object.\n" .
 "- dropped the Net_DNS2_Socket_Sockets, and switch to just using the streams code. There's no speed difference anymore.\n" .
+"- fixed a bug in Net_DNS2_Packet::compress() and Net_DNS2_Packet::expand() related to dot literals in compressed names.\n" .
 "- fixed a display issue in the IPSECKEY RR when displaying hostname / domain names in the gateway field.\n" .
-"- the Net_DNS2_RR_NIMLOC class was incorrectly named Net_DNS2_RR_NIMLOCK.\n" .
 "- fixed a couple inconsistencies in the docs.\n" .
 "- fixed a PHP 7.4 bug in Sockets.php; accessing a null value as an array throws an exception now.\n" .
+"- the Net_DNS2_RR_NIMLOC class was incorrectly named Net_DNS2_RR_NIMLOCK.\n" .
 "- Net_DNS2_PrivateKey was using the wrong member variable name for the key_format value.\n" .
-"- added Net_DNS2_RR::asArray(), which returns the same values as __toString(), but as an array for easier access.\n" .
-"- removed all sorts of license noise from the files.\n"
+"- changed all references to array() to [].\n" .
+"- removed all sorts of license noise from the files.\n" .
+"- updated the test cases to use PHPUnit v9+.\n"
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();

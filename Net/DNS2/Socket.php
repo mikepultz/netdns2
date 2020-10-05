@@ -40,10 +40,22 @@ class Net_DNS2_Socket
     private $timeout;
     private $context;
 
+    /*
+     * the local IP and port we'll send the request from
+     */
     private $local_host;
     private $local_port;
 
+    /*
+     * the last error message on the object
+     */
     public $last_error;
+
+    /*
+     * date the socket connection was created, and the date it was last used 
+     */
+    public $date_created;
+    public $date_last_used;
 
     /*
      * type of sockets
@@ -64,10 +76,11 @@ class Net_DNS2_Socket
      */
     public function __construct($type, $host, $port, $timeout)
     {
-        $this->type     = $type;
-        $this->host     = $host;
-        $this->port     = $port;
-        $this->timeout  = $timeout;
+        $this->type         = $type;
+        $this->host         = $host;
+        $this->port         = $port;
+        $this->timeout      = $timeout;
+        $this->date_created = microtime(true);
     }
 
     /**
@@ -244,6 +257,11 @@ class Net_DNS2_Socket
         $except = null;
 
         //
+        // increment the date last used timestamp
+        //
+        $this->date_last_used = microtime(true);
+
+        //
         // select on write
         //
         $result = stream_select($read, $write, $except, $this->timeout);
@@ -303,6 +321,11 @@ class Net_DNS2_Socket
         $except = null;
 
         //
+        // increment the date last used timestamp
+        //
+        $this->date_last_used = microtime(true);
+
+        //
         // make sure our socket is non-blocking
         //
         @stream_set_blocking($this->sock, 0);
@@ -337,7 +360,12 @@ class Net_DNS2_Socket
                 $this->last_error = 'failed on fread() for data length';
                 return false;
             }
-        
+            if (strlen($data) == 0)
+            {
+                $this->last_error = 'failed on fread() for data length';
+                return false;
+            }
+
             $length = ord($data[0]) << 8 | ord($data[1]);
             if ($length < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
 
