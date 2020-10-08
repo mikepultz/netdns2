@@ -204,6 +204,9 @@ class Net_DNS2_Lookups
      */
     const DNSSEC_DIGEST_RES                     = 0;
     const DNSSEC_DIGEST_SHA1                    = 1;
+    const DNSSEC_DIGEST_SHA256                  = 2;
+    const DNSSEC_DIGEST_GOST                    = 3;
+    const DNSSEC_DIGEST_SHA384                  = 4;
 
     /*
      * The packet id used when sending requests
@@ -491,7 +494,10 @@ class Net_DNS2_Lookups
     public static $digest_id_to_name = [
 
         self::DNSSEC_DIGEST_RES         => 'RES',
-        self::DNSSEC_DIGEST_SHA1        => 'SHA-1'
+        self::DNSSEC_DIGEST_SHA1        => 'SHA-1',
+        self::DNSSEC_DIGEST_SHA256      => 'SHA-256',
+        self::DNSSEC_DIGEST_GOST        => 'GOST-R-34.11-94',
+        self::DNSSEC_DIGEST_SHA384      => 'SHA-384'
     ];
 
     /*

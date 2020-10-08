@@ -61,8 +61,7 @@ class Net_DNS2_RR_DS extends Net_DNS2_RR
      */
     protected function rrToString()
     {
-        return $this->keytag . ' ' . $this->algorithm . ' ' . 
-            $this->digesttype . ' ' . $this->digest;
+        return $this->keytag . ' ' . $this->algorithm . ' ' . $this->digesttype . ' ' . $this->digest;
     }
 
     /**
@@ -100,30 +99,12 @@ class Net_DNS2_RR_DS extends Net_DNS2_RR
             //
             // unpack the keytag, algorithm and digesttype
             //
-            $x = unpack('nkeytag/Calgorithm/Cdigesttype', $this->rdata);
+            $x = unpack('nkeytag/Calgorithm/Cdigesttype/H*digest', $this->rdata);
 
             $this->keytag       = $x['keytag'];
             $this->algorithm    = $x['algorithm'];
             $this->digesttype   = $x['digesttype'];
-
-            //
-            // figure out the digest size
-            //
-            $digest_size = 0;
-            if ($this->digesttype == 1) {
-
-                $digest_size = 20; // SHA1
-
-            } else if ($this->digesttype == 2) {
-
-                $digest_size = 32; // SHA256
-            }
-
-            //
-            // copy the digest
-            //
-            $x = unpack('H*', substr($this->rdata, 4, $digest_size));
-            $this->digest = $x[1];
+            $this->digest       = $x['digest'];
 
             return true;
         }
@@ -146,16 +127,13 @@ class Net_DNS2_RR_DS extends Net_DNS2_RR
     {
         if (strlen($this->digest) > 0) {
 
-            $data = pack(
-                'nCCH*', 
-                $this->keytag, $this->algorithm, $this->digesttype, $this->digest
-            );
+            $data = pack('nCCH*', $this->keytag, $this->algorithm, $this->digesttype, $this->digest);
 
             $packet->offset += strlen($data);
 
             return $data;
         }
-        
+
         return null;
     }
 }

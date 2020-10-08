@@ -42,11 +42,13 @@ $pkg->setNotes(
 "- added Net_DNS2::closeSockets(), which lets you close all cached network sockets in the resolver object.\n" .
 "- added Net_DNS2::getSockets(), which returns the local sockets cache array.\n" .
 "- added date_created and date_last_used to the Net_DNS2_Socket object, to track usage stats on each socket object.\n" .
+"- added the SHA256, SHA384, and GOST digest defines to Lookups.php.\n" .
 "- dropped the Net_DNS2_Socket_Sockets, and switch to just using the streams code. There's no speed difference anymore.\n" .
 "- fixed a bug in Net_DNS2_Packet::compress() and Net_DNS2_Packet::expand() related to dot literals in compressed names.\n" .
 "- fixed a display issue in the IPSECKEY RR when displaying hostname / domain names in the gateway field.\n" .
 "- fixed a couple inconsistencies in the docs.\n" .
 "- fixed a PHP 7.4 bug in Sockets.php; accessing a null value as an array throws an exception now.\n" .
+"- fixed Net_DNS2_RR_DS so it will be able to support other digest definitions without any other changes.\n" .
 "- the Net_DNS2_RR_NIMLOC class was incorrectly named Net_DNS2_RR_NIMLOCK.\n" .
 "- Net_DNS2_PrivateKey was using the wrong member variable name for the key_format value.\n" .
 "- changed all references to array() to [].\n" .
