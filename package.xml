@@ -16,10 +16,10 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <active>yes</active>
  </lead>
  <date>2020-10-11</date>
- <time>13:19:13</time>
+ <time>13:33:23</time>
  <version>
-  <release>1.5.1</release>
-  <api>1.5.1</api>
+  <release>1.5.2</release>
+  <api>1.5.2</api>
  </version>
  <stability>
   <release>stable</release>
@@ -562,6 +562,21 @@ Initial Beta release of Net_DNS2
    <version>
     <release>1.5.1</release>
     <api>1.5.1</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2020-10-11</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- fixed a mistake in the autoload section of the composer.json file.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.5.2</release>
+    <api>1.5.2</api>
    </version>
    <stability>
     <release>stable</release>

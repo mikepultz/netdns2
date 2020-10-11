@@ -32,8 +32,8 @@ $pkg->setPackage('Net_DNS2');
 $pkg->setSummary('PHP Resolver library used to communicate with a DNS server.');
 $pkg->setDescription("Provides (roughly) the same functionality as Net_DNS, but using modern PHP objects, exceptions for error handling, better sockets support.\n\nThis release is (in most cases) 2x - 10x faster than Net_DNS, as well as includes more RR's (including DNSSEC RR's), and improved sockets and streams support.");
 $pkg->setChannel('pear.php.net');
-$pkg->setAPIVersion('1.5.1');
-$pkg->setReleaseVersion('1.5.1');
+$pkg->setAPIVersion('1.5.2');
+$pkg->setReleaseVersion('1.5.2');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
 $pkg->setNotes(
