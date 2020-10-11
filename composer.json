@@ -28,9 +28,9 @@
         "phpunit/phpunit": "^9"
     },
     "autoload": {
-        "psr-0": { "Net_DNS2": "" }
-    },
-    "autoload": {
-        "psr-0": { "Tests_Net_DNS2": "tests/" }
+        "psr-0": {
+            "Net_DNS2": "",
+            "Tests_Net_DNS2": "tests/"
+        }
     }
 }

@@ -15,11 +15,11 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
   <email>mike@mikepultz.com</email>
   <active>yes</active>
  </lead>
- <date>2020-10-08</date>
- <time>11:16:09</time>
+ <date>2020-10-11</date>
+ <time>13:19:13</time>
  <version>
-  <release>1.5.0</release>
-  <api>1.5.0</api>
+  <release>1.5.1</release>
+  <api>1.5.1</api>
  </version>
  <stability>
   <release>stable</release>
@@ -27,27 +27,11 @@ This release is (in most cases) 2x - 10x faster than Net_DNS, as well as include
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
  <notes>
-- added the AMTRELAY resource record type (RFC 8777).
-- added Net_DNS2_RR::asArray(), which returns the same values as __toString(), but as an array for easier access.
-- added Net_DNS2::closeSockets(), which lets you close all cached network sockets in the resolver object.
-- added Net_DNS2::getSockets(), which returns the local sockets cache array.
-- added date_created and date_last_used to the Net_DNS2_Socket object, to track usage stats on each socket object.
-- added the SHA256, SHA384, and GOST digest defines to Lookups.php.
-- dropped the Net_DNS2_Socket_Sockets, and switch to just using the streams code. There&apos;s no speed difference anymore.
-- fixed a bug in Net_DNS2_Packet::compress() and Net_DNS2_Packet::expand() related to dot literals in compressed names.
-- fixed a display issue in the IPSECKEY RR when displaying hostname / domain names in the gateway field.
-- fixed a couple inconsistencies in the docs.
-- fixed a PHP 7.4 bug in Sockets.php; accessing a null value as an array throws an exception now.
-- fixed Net_DNS2_RR_DS so it will be able to support other digest definitions without any other changes.
-- the Net_DNS2_RR_NIMLOC class was incorrectly named Net_DNS2_RR_NIMLOCK.
-- Net_DNS2_PrivateKey was using the wrong member variable name for the key_format value.
-- changed all references to array() to [].
-- removed all sorts of license noise from the files.
-- updated the test cases to use PHPUnit v9+.
+- fixed a mistake in the autoload section of the composer.json file.
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
-   <file baseinstalldir="/" md5sum="ec1748505471b15005696af6bea4b620" name="Net/DNS2.php" role="php" />
+   <file baseinstalldir="/" md5sum="60e78d78de1f7a6b60f349170ccca46d" name="Net/DNS2.php" role="php" />
    <file baseinstalldir="/" md5sum="a05ee07e0b50d137c4a5486872911093" name="Net/DNS2/BitMap.php" role="php" />
    <file baseinstalldir="/" md5sum="65fabaf95bc04552b66b22c0441bab73" name="Net/DNS2/Cache.php" role="php" />
    <file baseinstalldir="/" md5sum="1a0842fb4f719125ef964c270611964e" name="Net/DNS2/Exception.php" role="php" />
@@ -572,6 +556,21 @@ Initial Beta release of Net_DNS2
 - changed all references to array() to [].
 - removed all sorts of license noise from the files.
 - updated the test cases to use PHPUnit v9+.
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>1.5.1</release>
+    <api>1.5.1</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2020-10-11</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License</license>
+   <notes>
+- fixed a mistake in the autoload section of the composer.json file.
    </notes>
   </release>
  </changelog>
