@@ -29,7 +29,11 @@
     },
     "autoload": {
         "psr-0": {
-            "Net_DNS2": "",
+            "Net_DNS2": ""
+        }
+    },
+    "autoload-dev": {
+        "psr-0": {
             "Tests_Net_DNS2": "tests/"
         }
     }
