@@ -17,12 +17,6 @@
  *
  */
 
-/*
- * register the auto-load function
- *
- */
-spl_autoload_register('Net_DNS2::autoload');
-
 /**
  * This is the base class for the Net_DNS2_Resolver and Net_DNS2_Updater classes.
  *
@@ -1363,3 +1357,9 @@ class Net_DNS2
         return $response;
     }
 }
+
+/*
+ * register the auto-load function
+ *
+ */
+spl_autoload_register('Net_DNS2::autoload');
