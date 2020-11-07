@@ -30,7 +30,7 @@ namespace NetDNS2;
 /**
  * This is the base class that holds a standard DNS packet.
  *
- * The \NetDNS2\Packet_Request and \NetDNS2\Packet_Response classes extend this
+ * The \NetDNS2\Packet\Request and \NetDNS2\Packet\Response classes extend this
  * class.
  *
  */

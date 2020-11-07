@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -16,6 +16,8 @@
  * @since     File available since Release 0.6.0
  *
  */
+
+namespace NetDNS2\RR;
 
 /**
  * NSEC3 Resource Record - RFC5155 section 3.2
@@ -32,7 +34,7 @@
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-class Net_DNS2_RR_NSEC3 extends Net_DNS2_RR
+class NSEC3 extends \NetDNS2\RR
 {
     /*
      * Algorithm to use
@@ -151,15 +153,15 @@ class Net_DNS2_RR_NSEC3 extends Net_DNS2_RR
     }
 
     /**
-     * parses the rdata of the Net_DNS2_Packet object
+     * parses the rdata of the \NetDNS2\Packet object
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
      *
      * @return boolean
      * @access protected
      *
      */
-    protected function rrSet(Net_DNS2_Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$packet)
     {
         if ($this->rdlength > 0) {
         
@@ -203,7 +205,7 @@ class Net_DNS2_RR_NSEC3 extends Net_DNS2_RR
             //
             // parse out the RR bitmap
             //
-            $this->type_bit_maps = Net_DNS2_BitMap::bitMapToArray(
+            $this->type_bit_maps = \NetDNS2\BitMap::bitMapToArray(
                 substr($this->rdata, $offset)
             );
 
@@ -216,7 +218,7 @@ class Net_DNS2_RR_NSEC3 extends Net_DNS2_RR
     /**
      * returns the rdata portion of the DNS packet
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
      *                                 compressed names
      *
      * @return mixed                   either returns a binary packed
@@ -224,7 +226,7 @@ class Net_DNS2_RR_NSEC3 extends Net_DNS2_RR
      * @access protected
      *
      */
-    protected function rrGet(Net_DNS2_Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$packet)
     {
         //
         // pull the salt and build the length
@@ -253,7 +255,7 @@ class Net_DNS2_RR_NSEC3 extends Net_DNS2_RR
         //
         // conver the array of RR names to a type bitmap
         //
-        $data .= Net_DNS2_BitMap::arrayToBitMap($this->type_bit_maps);
+        $data .= \NetDNS2\BitMap::arrayToBitMap($this->type_bit_maps);
 
         $packet->offset += strlen($data);
      

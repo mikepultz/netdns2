@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,11 +17,13 @@
  *
  */
 
+namespace NetDNS2\RR;
+
 /**
  * The DLV RR is implemented exactly like the DS RR; so we just extend that
  * class, and use all of it's methods
  *
  */
-class Net_DNS2_RR_DLV extends Net_DNS2_RR_DS
+class DLV extends \NetDNS2\RR\DS
 {
 }

@@ -30,7 +30,7 @@ spl_autoload_register(function($_class)
         $file = \str_replace('\\', DIRECTORY_SEPARATOR, $_class) . '.php';
 echo "FILE=$file\n";
         
-        require $file;
+        require_once $file;
     }
 });
 

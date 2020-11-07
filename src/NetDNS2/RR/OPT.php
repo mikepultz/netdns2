@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -16,6 +16,8 @@
  * @since     File available since Release 1.0.0
  *
  */
+
+namespace NetDNS2\RR;
 
 /**
  * OPT Resource Record - RFC2929 section 3.1
@@ -31,7 +33,7 @@
  *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
  */
-class Net_DNS2_RR_OPT extends Net_DNS2_RR
+class OPT extends \NetDNS2\RR
 {
     /*
      * option code - assigned by IANA
@@ -69,19 +71,19 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
     public $z;
 
     /**
-     * Constructor - builds a new Net_DNS2_RR_OPT object; normally you wouldn't call
+     * Constructor - builds a new \NetDNS2\RR\OPT object; normally you wouldn't call
      * this directly, but OPT RR's are a little different
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet or null to create
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet or null to create
      *                                 an empty object
      * @param array           $rr      an array with RR parse values or null to
      *                                 create an empty object
      *
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
-    public function __construct(Net_DNS2_Packet &$packet = null, array $rr = null)
+    public function __construct(\NetDNS2\Packet &$packet = null, array $rr = null)
     {
         //
         // this is for when we're manually building an OPT RR object; we aren't
@@ -147,15 +149,15 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
     }
 
     /**
-     * parses the rdata of the Net_DNS2_Packet object
+     * parses the rdata of the \NetDNS2\Packet object
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
      *
      * @return boolean
      * @access protected
      *
      */
-    protected function rrSet(Net_DNS2_Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$packet)
     {
         //
         // parse out the TTL value
@@ -191,7 +193,7 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
 
     /**
      * pre-builds the TTL value for this record; we needed to separate this out
-     * from the rrGet() function, as the logic in the Net_DNS2_RR packs the TTL
+     * from the rrGet() function, as the logic in the \NetDNS2\RR packs the TTL
      * value before it builds the rdata value.
      *
      * @return void
@@ -216,7 +218,7 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
     /**
      * returns the rdata portion of the DNS packet
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
      *                                 compressed names
      *
      * @return mixed                   either returns a binary packed
@@ -224,7 +226,7 @@ class Net_DNS2_RR_OPT extends Net_DNS2_RR
      * @access protected
      *
      */
-    protected function rrGet(Net_DNS2_Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$packet)
     {
         //
         // if there is an option code, then pack that data too

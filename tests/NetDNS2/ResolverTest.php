@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,14 +17,14 @@
  *
  */
 
-require_once 'Net/DNS2.php';
+namespace NetDNS2\Tests;
 
 /**
  * This test uses the Google public DNS servers to perform a resolution test;
  * this should work on *nix and Windows, but will require an internet connection.
  *
  */
-class Tests_Net_DNS2_ResolverTest extends PHPUnit\Framework\TestCase
+class ResolverTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * function to test the resolver
@@ -37,13 +37,13 @@ class Tests_Net_DNS2_ResolverTest extends PHPUnit\Framework\TestCase
     {
         $ns = [ '8.8.8.8', '8.8.4.4' ];
 
-        $r = new Net_DNS2_Resolver([ 'nameservers' => $ns ]);
+        $r = new \NetDNS2\Resolver([ 'nameservers' => $ns ]);
 
         $result = $r->query('google.com', 'MX');
 
-        $this->assertSame($result->header->qr, Net_DNS2_Lookups::QR_RESPONSE);
+        $this->assertSame($result->header->qr, \NetDNS2\Lookups::QR_RESPONSE);
         $this->assertSame(count($result->question), 1);
         $this->assertTrue(count($result->answer) > 0);
-        $this->assertTrue($result->answer[0] instanceof Net_DNS2_RR_MX);
+        $this->assertTrue($result->answer[0] instanceof \NetDNS2\RR\MX);
     }
 }

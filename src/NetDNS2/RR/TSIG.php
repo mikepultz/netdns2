@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -16,6 +16,8 @@
  * @since     File available since Release 0.6.0
  *
  */
+
+namespace NetDNS2\RR;
 
 /**
  * TSIG Resource Record - RFC 2845
@@ -41,7 +43,7 @@
  *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-class Net_DNS2_RR_TSIG extends Net_DNS2_RR
+class TSIG extends \NetDNS2\RR
 {
     /*
      * TSIG Algorithm Identifiers
@@ -183,15 +185,15 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
     }
 
     /**
-     * parses the rdata of the Net_DNS2_Packet object
+     * parses the rdata of the \NetDNS2\Packet object
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
      *
      * @return boolean
      * @access protected
      *
      */
-    protected function rrSet(Net_DNS2_Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$packet)
     {
         if ($this->rdlength > 0) {
 
@@ -199,7 +201,7 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
             // expand the algorithm
             //
             $newoffset          = $packet->offset;
-            $this->algorithm    = Net_DNS2_Packet::expand($packet, $newoffset);
+            $this->algorithm    = \NetDNS2\Packet::expand($packet, $newoffset);
             $offset             = $newoffset - $packet->offset;
 
             //
@@ -210,7 +212,7 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
                 $this->rdata
             );
 
-            $this->time_signed  = Net_DNS2::expandUint32($x['time_low']);
+            $this->time_signed  = \NetDNS2\Client::expandUint32($x['time_low']);
             $this->fudge        = $x['fudge'];
             $this->mac_size     = $x['mac_size'];
 
@@ -244,7 +246,7 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
             // The other length should be 6, and the other data field includes the
             // servers current time - per RFC 2845 section 4.5.2
             //
-            if ($this->error == Net_DNS2_Lookups::RCODE_BADTIME) {
+            if ($this->error == \NetDNS2\Lookups::RCODE_BADTIME) {
 
                 if ($this->other_length != 6) {
 
@@ -270,7 +272,7 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
     /**
      * returns the rdata portion of the DNS packet
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
      *                                 compressed names
      *
      * @return mixed                   either returns a binary packed
@@ -278,14 +280,14 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      * @access protected
      *
      */
-    protected function rrGet(Net_DNS2_Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$packet)
     {
         if (strlen($this->key) > 0) {
 
             //
             // create a new packet for the signature-
             //
-            $new_packet = new Net_DNS2_Packet_Request('example.com', 'SOA', 'IN');
+            $new_packet = new \NetDNS2\Packet\Request('example.com', 'SOA', 'IN');
 
             //
             // copy the packet data over
@@ -306,19 +308,19 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
             //
             // add the name without compressing
             //
-            $sig_data .= Net_DNS2_Packet::pack($this->name);
+            $sig_data .= \NetDNS2\Packet::pack($this->name);
 
             //
             // add the class and TTL
             //
             $sig_data .= pack(
-                'nN', Net_DNS2_Lookups::$classes_by_name[$this->class], $this->ttl
+                'nN', \NetDNS2\Lookups::$classes_by_name[$this->class], $this->ttl
             );
 
             //
             // add the algorithm name without compression
             //
-            $sig_data .= Net_DNS2_Packet::pack(strtolower($this->algorithm));
+            $sig_data .= \NetDNS2\Packet::pack(strtolower($this->algorithm));
 
             //
             // add the rest of the values
@@ -343,7 +345,7 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
             //
             // compress the algorithm
             //
-            $data = Net_DNS2_Packet::pack(strtolower($this->algorithm));
+            $data = \NetDNS2\Packet::pack(strtolower($this->algorithm));
 
             //
             // pack the time, fudge and mac size
@@ -356,7 +358,7 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
             //
             // check the error and other_length
             //
-            if ($this->error == Net_DNS2_Lookups::RCODE_BADTIME) {
+            if ($this->error == \NetDNS2\Lookups::RCODE_BADTIME) {
 
                 $this->other_length = strlen($this->other_data);
                 if ($this->other_length != 6) {
@@ -396,7 +398,7 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
      * @param string $algorithm the algorithm to use; defaults to MD5
      *
      * @return string the signed digest
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access private
      *
      */
@@ -410,9 +412,9 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
 
             if (!isset(self::$hash_algorithms[$algorithm])) {
 
-                throw new Net_DNS2_Exception(
+                throw new \NetDNS2\Exception(
                     'invalid or unsupported algorithm',
-                    Net_DNS2_Lookups::E_PARSE_ERROR
+                    \NetDNS2\Lookups::E_PARSE_ERROR
                 );
             }
 
@@ -425,10 +427,10 @@ class Net_DNS2_RR_TSIG extends Net_DNS2_RR
         //
         if ($algorithm != self::HMAC_MD5) {
 
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'only HMAC-MD5 supported. please install the php-extension ' .
                 '"hash" in order to use the sha-family',
-                Net_DNS2_Lookups::E_PARSE_ERROR
+                \NetDNS2\Lookups::E_PARSE_ERROR
             );
         }
 

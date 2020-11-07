@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -42,6 +42,8 @@
  *
  */
 
+namespace NetDNS2\RR;
+
 /**
  * SIG Resource Record - RFC2535 section 4.1
  *
@@ -65,10 +67,10 @@
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-class Net_DNS2_RR_SIG extends Net_DNS2_RR
+class SIG extends \NetDNS2\RR
 {
     /*
-     * and instance of a Net_DNS2_PrivateKey object
+     * and instance of a \NetDNS2\PrivateKey object
      */
     public $private_key = null;
 
@@ -164,15 +166,15 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
     }
 
     /**
-     * parses the rdata of the Net_DNS2_Packet object
+     * parses the rdata of the \NetDNS2\Packet object
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
      *
      * @return boolean
      * @access protected
      *
      */
-    protected function rrSet(Net_DNS2_Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$packet)
     {
         if ($this->rdlength > 0) {
 
@@ -184,10 +186,10 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
                 $this->rdata
             );
 
-            $this->typecovered  = Net_DNS2_Lookups::$rr_types_by_id[$x['tc']];
+            $this->typecovered  = \NetDNS2\Lookups::$rr_types_by_id[$x['tc']];
             $this->algorithm    = $x['algorithm'];
             $this->labels       = $x['labels'];
-            $this->origttl      = Net_DNS2::expandUint32($x['origttl']);
+            $this->origttl      = \NetDNS2\Client::expandUint32($x['origttl']);
 
             //
             // the dates are in GM time
@@ -207,7 +209,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             $sigoffset          = $offset;
 
             $this->signname     = strtolower(
-                Net_DNS2_Packet::expand($packet, $sigoffset)
+                \NetDNS2\Packet::expand($packet, $sigoffset)
             );
             $this->signature    = base64_encode(
                 substr($this->rdata, 18 + ($sigoffset - $offset))
@@ -222,7 +224,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
     /**
      * returns the rdata portion of the DNS packet
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
      *                                 compressed names
      *
      * @return mixed                   either returns a binary packed
@@ -230,7 +232,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
      * @access protected
      *
      */
-    protected function rrGet(Net_DNS2_Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$packet)
     {
         //
         // parse the values out of the dates
@@ -247,7 +249,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
         //
         $data = pack(
             'nCCNNNn', 
-            Net_DNS2_Lookups::$rr_types_by_name[$this->typecovered],
+            \NetDNS2\Lookups::$rr_types_by_name[$this->typecovered],
             $this->algorithm,
             $this->labels,
             $this->origttl,
@@ -275,14 +277,14 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
         // is a SIG(0), and generate a new signature
         //
         if ( (strlen($this->signature) == 0)
-            && ($this->private_key instanceof Net_DNS2_PrivateKey)
+            && ($this->private_key instanceof \NetDNS2\PrivateKey)
             && (extension_loaded('openssl') === true)
         ) {
 
             //
             // create a new packet for the signature-
             //
-            $new_packet = new Net_DNS2_Packet_Request('example.com', 'SOA', 'IN');
+            $new_packet = new \NetDNS2\Packet\Request('example.com', 'SOA', 'IN');
 
             //
             // copy the packet data over
@@ -310,7 +312,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             //
             // MD5
             //
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSAMD5:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSAMD5:
 
                 $algorithm = OPENSSL_ALGO_MD5;
                 break;
@@ -318,7 +320,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             //
             // SHA1
             //
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA1:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA1:
 
                 $algorithm = OPENSSL_ALGO_SHA1;
                 break;
@@ -326,13 +328,13 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             //
             // SHA256 (PHP 5.4.8 or higher)
             //
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA256:
 
                 if (version_compare(PHP_VERSION, '5.4.8', '<') == true) {
 
-                    throw new Net_DNS2_Exception(
+                    throw new \NetDNS2\Exception(
                         'SHA256 support is only available in PHP >= 5.4.8',
-                        Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
+                        \NetDNS2\Lookups::E_OPENSSL_INV_ALGO
                     );
                 }
 
@@ -342,13 +344,13 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             //
             // SHA512 (PHP 5.4.8 or higher)
             //
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA512:
 
                 if (version_compare(PHP_VERSION, '5.4.8', '<') == true) {
 
-                    throw new Net_DNS2_Exception(
+                    throw new \NetDNS2\Exception(
                         'SHA512 support is only available in PHP >= 5.4.8',
-                        Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
+                        \NetDNS2\Lookups::E_OPENSSL_INV_ALGO
                     );
                 }
 
@@ -358,13 +360,13 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             //
             // unsupported at the moment
             //
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSA:
-            case Net_DNS2_Lookups::DSNSEC_ALGORITHM_RSASHA1NSEC3SHA1:
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_DSANSEC3SHA1:            
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_DSA:
+            case \NetDNS2\Lookups::DSNSEC_ALGORITHM_RSASHA1NSEC3SHA1:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_DSANSEC3SHA1:            
             default:
-                throw new Net_DNS2_Exception(
+                throw new \NetDNS2\Exception(
                     'invalid or unsupported algorithm',
-                    Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
+                    \NetDNS2\Lookups::E_OPENSSL_INV_ALGO
                 );
                 break;
             }
@@ -374,9 +376,9 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             //
             if (openssl_sign($sigdata, $this->signature, $this->private_key->instance, $algorithm) == false) {
 
-                throw new Net_DNS2_Exception(
+                throw new \NetDNS2\Exception(
                     openssl_error_string(), 
-                    Net_DNS2_Lookups::E_OPENSSL_ERROR
+                    \NetDNS2\Lookups::E_OPENSSL_ERROR
                 );
             }
 
@@ -388,10 +390,10 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             //
             // RSA- add it directly
             //
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSAMD5:
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA1:
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
-            case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSAMD5:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA1:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA256:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA512:
 
                 $this->signature = base64_encode($this->signature);
                 break;

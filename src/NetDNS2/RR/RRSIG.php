@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -42,6 +42,8 @@
  *
  */
 
+namespace NetDNS2\RR;
+
 /**
  * RRSIG Resource Record - RFC4034 sction 3.1
  *
@@ -65,7 +67,7 @@
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
+class RRSIG extends \NetDNS2\RR
 {
     /*
      * the RR type covered by this signature
@@ -159,15 +161,15 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
     }
 
     /**
-     * parses the rdata of the Net_DNS2_Packet object
+     * parses the rdata of the \NetDNS2\Packet object
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
      *
      * @return boolean
      * @access protected
      *
      */
-    protected function rrSet(Net_DNS2_Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$packet)
     {
         if ($this->rdlength > 0) {
 
@@ -179,10 +181,10 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
                 $this->rdata
             );
 
-            $this->typecovered  = Net_DNS2_Lookups::$rr_types_by_id[$x['tc']];
+            $this->typecovered  = \NetDNS2\Lookups::$rr_types_by_id[$x['tc']];
             $this->algorithm    = $x['algorithm'];
             $this->labels       = $x['labels'];
-            $this->origttl      = Net_DNS2::expandUint32($x['origttl']);
+            $this->origttl      = \NetDNS2\Client::expandUint32($x['origttl']);
 
             //
             // the dates are in GM time
@@ -202,7 +204,7 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
             $sigoffset          = $offset;
 
             $this->signname     = strtolower(
-                Net_DNS2_Packet::expand($packet, $sigoffset)
+                \NetDNS2\Packet::expand($packet, $sigoffset)
             );
             $this->signature    = base64_encode(
                 substr($this->rdata, 18 + ($sigoffset - $offset))
@@ -217,7 +219,7 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
     /**
      * returns the rdata portion of the DNS packet
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
      *                                 compressed names
      *
      * @return mixed                   either returns a binary packed
@@ -225,7 +227,7 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
      * @access protected
      *
      */
-    protected function rrGet(Net_DNS2_Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$packet)
     {
         if (strlen($this->signature) > 0) {
 
@@ -244,7 +246,7 @@ class Net_DNS2_RR_RRSIG extends Net_DNS2_RR
             //
             $data = pack(
                 'nCCNNNn', 
-                Net_DNS2_Lookups::$rr_types_by_name[$this->typecovered],
+                \NetDNS2\Lookups::$rr_types_by_name[$this->typecovered],
                 $this->algorithm,
                 $this->labels,
                 $this->origttl,

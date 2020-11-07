@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -16,6 +16,8 @@
  * @since     File available since Release 0.6.0
  *
  */
+
+namespace NetDNS2\RR;
 
 /**
  * NSEC Resource Record - RFC3845 section 2.1
@@ -28,7 +30,7 @@
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-class Net_DNS2_RR_NSEC extends Net_DNS2_RR
+class NSEC extends \NetDNS2\RR
 {
     /*
      * The next owner name
@@ -77,15 +79,15 @@ class Net_DNS2_RR_NSEC extends Net_DNS2_RR
     }
 
     /**
-     * parses the rdata of the Net_DNS2_Packet object
+     * parses the rdata of the \NetDNS2\Packet object
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
      *
      * @return boolean
      * @access protected
      *
      */
-    protected function rrSet(Net_DNS2_Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$packet)
     {
         if ($this->rdlength > 0) {
 
@@ -93,12 +95,12 @@ class Net_DNS2_RR_NSEC extends Net_DNS2_RR
             // expand the next domain name
             //
             $offset = $packet->offset;
-            $this->next_domain_name = Net_DNS2_Packet::expand($packet, $offset);
+            $this->next_domain_name = \NetDNS2\Packet::expand($packet, $offset);
 
             //
             // parse out the RR's from the bitmap
             //
-            $this->type_bit_maps = Net_DNS2_BitMap::bitMapToArray(
+            $this->type_bit_maps = \NetDNS2\BitMap::bitMapToArray(
                 substr($this->rdata, $offset - $packet->offset)
             );
 
@@ -111,7 +113,7 @@ class Net_DNS2_RR_NSEC extends Net_DNS2_RR
     /**
      * returns the rdata portion of the DNS packet
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
      *                                 compressed names
      *
      * @return mixed                   either returns a binary packed
@@ -119,12 +121,12 @@ class Net_DNS2_RR_NSEC extends Net_DNS2_RR
      * @access protected
      *
      */
-    protected function rrGet(Net_DNS2_Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$packet)
     {
         if (strlen($this->next_domain_name) > 0) {
 
             $data = $packet->compress($this->next_domain_name, $packet->offset);
-            $bitmap = Net_DNS2_BitMap::arrayToBitMap($this->type_bit_maps);
+            $bitmap = \NetDNS2\BitMap::arrayToBitMap($this->type_bit_maps);
     
             $packet->offset += strlen($bitmap);
 

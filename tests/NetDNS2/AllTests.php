@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,17 +17,21 @@
  *
  */
 
+namespace NetDNS2\Tests;
+
+use \NetDNS2\Tests\ParserTest;
+use \NetDNS2\Tests\ResolverTest;
+use \NetDNS2\Tests\DNSSECTest;
+
 error_reporting(E_ALL | E_STRICT);
 
 if (!defined('PHPUNIT_MAIN_METHOD')) {
-    define('PHPUNIT_MAIN_METHOD', 'Tests_Net_DNS2_AllTests::main');
+    define('PHPUNIT_MAIN_METHOD', '\NetDNS2\Tests\AllTests::main');
 }
 
-require_once 'Tests_Net_DNS2_ParserTest.php';
-require_once 'Tests_Net_DNS2_ResolverTest.php';
-require_once 'Tests_Net_DNS2_DNSSECTest.php';
+set_include_path('..:.:src/');
 
-set_include_path('..:.');
+echo "ALLTESTS\n";
 
 /**
  * This test suite assumes that Net_DNS2 will be in the include path, otherwise it
@@ -35,7 +39,7 @@ set_include_path('..:.');
  * make it work everywhere.
  *
  */
-class Tests_Net_DNS2_AllTests
+class AllTests
 {
     /**
      * the main runner
@@ -58,16 +62,16 @@ class Tests_Net_DNS2_AllTests
      */
     public static function suite()
     {
-        $suite = new PHPUnit_Framework_TestSuite('PEAR - Net_DNS2');
+        $suite = new PHPUnit_Framework_TestSuite('PEAR - NetDNS2');
 
-        $suite->addTestSuite('Tests_Net_DNS2_ParserTest');
-        $suite->addTestSuite('Tests_Net_DNS2_ResolverTest');
-        $suite->addTestSuite('Tests_Net_DNS2_DNSSECTest');
+        $suite->addTestSuite('\NetDNS2\Tests\ParserTest');
+        $suite->addTestSuite('\NetDNS2\Tests\ResolverTest');
+        $suite->addTestSuite('\NetDNS2\Tests\DNSSECTest');
 
         return $suite;
     }
 }
 
-if (PHPUNIT_MAIN_METHOD == 'Tests_Net_DNS2_AllTests::main') {
-    Tests_Net_DNS2_AllTests::main();
+if (PHPUNIT_MAIN_METHOD == '\NetDNS2\Tests\AllTests::main') {
+    \NetDNS2\Tests\AllTests::main();
 }

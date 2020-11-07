@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -16,6 +16,8 @@
  * @since     File available since Release 0.6.0
  *
  */
+
+namespace NetDNS2\RR;
 
 /**
  * the KEY RR is implemented the same as the DNSKEY RR, the only difference
@@ -32,6 +34,6 @@
  * class like this is fine.
  *
  */
-class Net_DNS2_RR_KEY extends Net_DNS2_RR_DNSKEY
+class KEY extends \NetDNS2\RR\DNSKEY
 {
 }

@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,11 +17,13 @@
  *
  */
 
+namespace NetDNS2\RR;
+
 /**
  * The SMIMEA RR is implemented exactly like the TLSA record, so
  * for now we just extend the TLSA RR and use it.
  *
  */
-class Net_DNS2_RR_SMIMEA extends Net_DNS2_RR_TLSA
+class SMIMEA extends \NetDNS2\RR\TLSA
 {
 }

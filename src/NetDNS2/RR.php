@@ -388,7 +388,7 @@ abstract class RR
      * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet used for 
      *                                 decompressing names
      *
-     * @return mixed                   returns a new \NetDNS2\RR_* object for
+     * @return mixed                   returns a new \NetDNS2\RR\* object for
      *                                 the given RR
      * @throws \NetDNS2\Exception
      * @access public
@@ -490,7 +490,7 @@ abstract class RR
      *
      * @param string $line a standard DNS config line 
      *
-     * @return mixed       returns a new \NetDNS2\RR_* object for the given RR
+     * @return mixed       returns a new \NetDNS2\RR\* object for the given RR
      * @throws \NetDNS2\Exception
      * @access public
      *

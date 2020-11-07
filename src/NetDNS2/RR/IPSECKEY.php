@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -16,6 +16,8 @@
  * @since     File available since Release 0.6.0
  *
  */
+
+namespace NetDNS2\RR;
 
 /**
  * IPSECKEY Resource Record - RFC4025 section 2.1
@@ -32,7 +34,7 @@
  *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
  *
  */
-class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
+class IPSECKEY extends \NetDNS2\RR
 {
     const GATEWAY_TYPE_NONE     = 0;
     const GATEWAY_TYPE_IPV4     = 1;
@@ -142,13 +144,13 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
             break;
 
         case self::GATEWAY_TYPE_IPV4:
-            if (Net_DNS2::isIPv4($gateway) == false) {
+            if (\NetDNS2\Client::isIPv4($gateway) == false) {
                 return false;
             }
             break;
 
         case self::GATEWAY_TYPE_IPV6:
-            if (Net_DNS2::isIPv6($gateway) == false) {
+            if (\NetDNS2\Client::isIPv6($gateway) == false) {
                 return false;
             }
             break;
@@ -191,15 +193,15 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
     }
 
     /**
-     * parses the rdata of the Net_DNS2_Packet object
+     * parses the rdata of the \NetDNS2\Packet object
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
      *
      * @return boolean
      * @access protected
      *
      */
-    protected function rrSet(Net_DNS2_Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$packet)
     {
         if ($this->rdlength > 0) {
 
@@ -242,7 +244,7 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
             case self::GATEWAY_TYPE_DOMAIN:
 
                 $doffset = $offset + $packet->offset;
-                $this->gateway = Net_DNS2_Packet::expand($packet, $doffset);
+                $this->gateway = \NetDNS2\Packet::expand($packet, $doffset);
                 $offset = ($doffset - $packet->offset);
                 break;
 
@@ -276,7 +278,7 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
     /**
      * returns the rdata portion of the DNS packet
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
      *                                 compressed names
      *
      * @return mixed                   either returns a binary packed
@@ -284,7 +286,7 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
      * @access protected
      *
      */
-    protected function rrGet(Net_DNS2_Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$packet)
     {
         //
         // pack the precedence, gateway type and algorithm

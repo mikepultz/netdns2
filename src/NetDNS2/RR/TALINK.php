@@ -6,7 +6,7 @@
  * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -14,6 +14,8 @@
  * @since     File available since Release 1.2.0
  *
  */
+
+namespace NetDNS2\RR;
 
 /**
  * TALINK Resource Record - DNSSEC Trust Anchor
@@ -27,7 +29,7 @@
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
-class Net_DNS2_RR_TALINK extends Net_DNS2_RR
+class TALINK extends \NetDNS2\RR
 {
     /*
      * the previous domain name
@@ -70,22 +72,22 @@ class Net_DNS2_RR_TALINK extends Net_DNS2_RR
     }
 
     /**
-     * parses the rdata of the Net_DNS2_Packet object
+     * parses the rdata of the \NetDNS2\Packet object
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
      *
      * @return boolean
      * @access protected
      *
      */
-    protected function rrSet(Net_DNS2_Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$packet)
     {
         if ($this->rdlength > 0) {
 
             $offset         = $packet->offset;
 
-            $this->previous = Net_DNS2_Packet::label($packet, $offset);
-            $this->next     = Net_DNS2_Packet::label($packet, $offset);
+            $this->previous = \NetDNS2\Packet::label($packet, $offset);
+            $this->next     = \NetDNS2\Packet::label($packet, $offset);
 
             return true;
         }
@@ -96,7 +98,7 @@ class Net_DNS2_RR_TALINK extends Net_DNS2_RR
     /**
      * returns the rdata portion of the DNS packet
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
      *                                 compressed names
      *
      * @return mixed                   either returns a binary packed
@@ -104,7 +106,7 @@ class Net_DNS2_RR_TALINK extends Net_DNS2_RR
      * @access protected
      *
      */
-    protected function rrGet(Net_DNS2_Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$packet)
     {
         if ( (strlen($this->previous) > 0) || (strlen($this->next) > 0) ) {
 
