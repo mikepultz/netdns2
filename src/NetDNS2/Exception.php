@@ -23,7 +23,7 @@ namespace NetDNS2;
  * Exception handler used by NetDNS2
  * 
  */
-class Exception extends Exception
+class Exception extends \Exception
 {
     private $_request;
     private $_response;

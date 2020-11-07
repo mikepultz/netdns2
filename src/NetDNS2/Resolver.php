@@ -27,13 +27,9 @@ spl_autoload_register(function($_class)
 {
     if (strncmp($_class, 'NetDNS2', 7) == 0)
     {
-        $file = \str_replace('\\', DIRECTORY_SEPARATOR, $_class) . '.php';
-echo "FILE=$file\n";
-        
-        require_once $file;
+        require_once \str_replace('\\', DIRECTORY_SEPARATOR, $_class) . '.php';
     }
 });
-
 
 /**
  * This is the main resolver class, providing DNS query functions.
@@ -41,6 +37,8 @@ echo "FILE=$file\n";
  */
 class Resolver extends Client
 {
+    use \NetDNS2\Opts;
+
     /**
      * Constructor - creates a new \NetDNS2\Resolver object
      *
@@ -109,23 +107,21 @@ class Resolver extends Client
         // check for the DNSSEC flag, and if it's true, then add an OPT
         // RR to the additional section, and set the DO flag to 1.
         //
-        if ($this->dnssec == true) {
+        if ($this->dnssec == true)
+        {
+            $this->dnssec(true);
+        }
 
-            //
-            // create a new OPT RR
-            //
-            $opt = new \NetDNS2\RR\OPT();
+        //
+        // look for additional EDNS0 request objects
+        //
+        if (count($this->opts) > 0)
+        {
+            foreach($this->opts as $opt)
+            {
+                $packet->additional[] = $opt;
+            }
 
-            //
-            // set the DO flag, and the other values
-            //
-            $opt->do = 1;
-            $opt->class = $this->dnssec_payload_size;
-
-            //
-            // add the RR to the additional section.
-            //
-            $packet->additional[] = $opt;
             $packet->header->arcount = count($packet->additional);
         }
 
@@ -180,7 +176,7 @@ class Resolver extends Client
         } else {
             $packet->header->rd = 1;
         }
-
+print_r($packet);
         //
         // send the packet and get back the response
         //
@@ -300,3 +296,4 @@ class Resolver extends Client
         return $this->sendPacket($packet, $this->use_tcp);
     }
 }
+

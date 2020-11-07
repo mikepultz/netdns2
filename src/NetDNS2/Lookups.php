@@ -145,6 +145,7 @@ class Lookups
     const E_HEADER_INVALID      = 302;
     const E_QUESTION_INVALID    = 303;
     const E_RR_INVALID          = 304;
+    const E_TCP_REQUIRED        = 305;
 
     const E_OPENSSL_ERROR       = 400;
     const E_OPENSSL_UNAVAIL     = 401;

@@ -38,17 +38,17 @@ class OPT extends \NetDNS2\RR
     /*
      * option code - assigned by IANA
      */
-    public $option_code;
+    public $option_code = 0;
 
     /*
      * the length of the option data
      */
-    public $option_length;
+    public $option_length = 0;
 
     /*
      * the option data
      */
-    public $option_data;
+    public $option_data = null;
 
     /*
      * the extended response code stored in the TTL
@@ -231,10 +231,9 @@ class OPT extends \NetDNS2\RR
         //
         // if there is an option code, then pack that data too
         //
-        if ($this->option_code) {
+        if ($this->option_code > 0) {
 
-            $data = pack('nn', $this->option_code, $this->option_length) . 
-                $this->option_data;
+            $data = pack('nn', $this->option_code, $this->option_length) . $this->option_data;
 
             $packet->offset += strlen($data);
 
