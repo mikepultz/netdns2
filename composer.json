@@ -28,13 +28,13 @@
         "phpunit/phpunit": "^9"
     },
     "autoload": {
-        "psr-0": {
-            "Net_DNS2": ""
+        "psr-4": {
+            "NetDNS2\\": "src/NetDNS2/"
         }
     },
     "autoload-dev": {
-        "psr-0": {
-            "Tests_Net_DNS2": "tests/"
+        "psr-4": {
+            "NetDNS2\\Tests\\": "tests/NetDNS2/"
         }
     }
 }

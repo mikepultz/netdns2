@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -16,6 +16,8 @@
  * @since     File available since Release 0.6.0
  *
  */
+
+namespace NetDNS2;
 
 /*
  * check to see if the socket defines exist; if they don't, then define them
@@ -31,7 +33,7 @@ if (defined('SOCK_DGRAM') == false) {
  * Socket handling class using the PHP Streams
  *
  */
-class Net_DNS2_Socket
+class Socket
 {
     private $sock;
     private $type;
@@ -150,16 +152,16 @@ class Net_DNS2_Socket
         $errstr;
 
         switch($this->type) {
-        case Net_DNS2_Socket::SOCK_STREAM:
+        case \NetDNS2\Socket::SOCK_STREAM:
 
-            if (Net_DNS2::isIPv4($this->host) == true) {
+            if (\NetDNS2\Client::isIPv4($this->host) == true) {
 
                 $this->sock = @stream_socket_client(
                     'tcp://' . $this->host . ':' . $this->port, 
                     $errno, $errstr, $this->timeout, 
                     STREAM_CLIENT_CONNECT, $this->context
                 );
-            } else if (Net_DNS2::isIPv6($this->host) == true) {
+            } else if (\NetDNS2\Client::isIPv6($this->host) == true) {
 
                 $this->sock = @stream_socket_client(
                     'tcp://[' . $this->host . ']:' . $this->port, 
@@ -174,16 +176,16 @@ class Net_DNS2_Socket
 
             break;
         
-        case Net_DNS2_Socket::SOCK_DGRAM:
+        case \NetDNS2\Socket::SOCK_DGRAM:
 
-            if (Net_DNS2::isIPv4($this->host) == true) {
+            if (\NetDNS2\Client::isIPv4($this->host) == true) {
 
                 $this->sock = @stream_socket_client(
                     'udp://' . $this->host . ':' . $this->port, 
                     $errno, $errstr, $this->timeout, 
                     STREAM_CLIENT_CONNECT, $this->context
                 );
-            } else if (Net_DNS2::isIPv6($this->host) == true) {
+            } else if (\NetDNS2\Client::isIPv6($this->host) == true) {
 
                 $this->sock = @stream_socket_client(
                     'udp://[' . $this->host . ']:' . $this->port, 
@@ -280,7 +282,7 @@ class Net_DNS2_Socket
         // if it's a TCP socket, then we need to packet and send the length of the
         // data as the first 16bit of data.
         //        
-        if ($this->type == Net_DNS2_Socket::SOCK_STREAM) {
+        if ($this->type == \NetDNS2\Socket::SOCK_STREAM) {
 
             $s = chr($length >> 8) . chr($length);
 
@@ -353,7 +355,7 @@ class Net_DNS2_Socket
         // packet- we need to read that off first, then use that value for the    
         // packet read.
         //
-        if ($this->type == Net_DNS2_Socket::SOCK_STREAM) {
+        if ($this->type == \NetDNS2\Socket::SOCK_STREAM) {
     
             if (($data = fread($this->sock, 2)) === false) {
                 
@@ -367,7 +369,7 @@ class Net_DNS2_Socket
             }
 
             $length = ord($data[0]) << 8 | ord($data[1]);
-            if ($length < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
+            if ($length < \NetDNS2\Lookups::DNS_HEADER_SIZE) {
 
                 return false;
             }
@@ -394,7 +396,7 @@ class Net_DNS2_Socket
         //
         // the sockets library works much better.
         //
-        if ($this->type == Net_DNS2_Socket::SOCK_STREAM) {
+        if ($this->type == \NetDNS2\Socket::SOCK_STREAM) {
 
             $chunk = '';
             $chunk_size = $length;

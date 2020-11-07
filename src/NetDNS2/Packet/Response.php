@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,12 +17,14 @@
  *
  */
 
+namespace NetDNS2\Packet;
+
 /**
  * This class handles building new DNS response packets; it parses binary packed
  * packets that come off the wire
  * 
  */
-class Net_DNS2_Packet_Response extends Net_DNS2_Packet
+class Response extends \NetDNS2\Packet
 {
     /*
      * The name servers that this response came from
@@ -40,12 +42,12 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
     public $response_time = 0;
 
     /**
-     * Constructor - builds a new Net_DNS2_Packet_Response object
+     * Constructor - builds a new \NetDNS2\Packet\Response object
      *
      * @param string  $data binary DNS packet
      * @param integer $size the length of the DNS packet
      *
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -55,13 +57,13 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
     }
 
     /**
-     * builds a new Net_DNS2_Packet_Response object
+     * builds a new \NetDNS2\Packet\Response object
      *
      * @param string  $data binary DNS packet
      * @param integer $size the length of the DNS packet
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -80,7 +82,7 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
         // header class does, is check the size and throw and exception if it's
         // invalid.
         //
-        $this->header = new Net_DNS2_Header($this);
+        $this->header = new \NetDNS2\Header($this);
 
         //
         // if the truncation bit is set, then just return right here, because the
@@ -88,7 +90,7 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
         // anything else.
         //
         // we also don't need to worry about checking to see if the the header is 
-        // null or not, since the Net_DNS2_Header() constructor will throw an 
+        // null or not, since the \NetDNS2\Header() constructor will throw an 
         // exception if the packet is invalid.
         //
         if ($this->header->tc == 1) {
@@ -101,7 +103,7 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
         //
         for ($x = 0; $x < $this->header->qdcount; ++$x) {
 
-            $this->question[$x] = new Net_DNS2_Question($this);
+            $this->question[$x] = new \NetDNS2\Question($this);
         }
 
         //
@@ -109,7 +111,7 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
         //
         for ($x = 0; $x < $this->header->ancount; ++$x) {
 
-            $o = Net_DNS2_RR::parse($this);
+            $o = \NetDNS2\RR::parse($this);
             if (!is_null($o)) {
 
                 $this->answer[] = $o;
@@ -121,7 +123,7 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
         //
         for ($x = 0; $x < $this->header->nscount; ++$x) {
 
-            $o = Net_DNS2_RR::parse($this);
+            $o = \NetDNS2\RR::parse($this);
             if (!is_null($o)) {
 
                 $this->authority[] = $o;  
@@ -133,7 +135,7 @@ class Net_DNS2_Packet_Response extends Net_DNS2_Packet
         //
         for ($x = 0; $x < $this->header->arcount; ++$x) {
 
-            $o = Net_DNS2_RR::parse($this);
+            $o = \NetDNS2\RR::parse($this);
             if (!is_null($o)) {
 
                 $this->additional[] = $o; 

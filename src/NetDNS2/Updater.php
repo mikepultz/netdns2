@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,34 +17,36 @@
  *
  */
 
+namespace NetDNS2;
+
 /**
  * The main dynamic DNS updater class.
  *
  * This class provices functions to handle all defined dynamic DNS update 
  * requests as defined by RFC 2136.
  *
- * This is separate from the Net_DNS2_Resolver class, as while the underlying
+ * This is separate from the \NetDNS2\Resolver class, as while the underlying
  * protocol is the same, the functionality is completely different.
  *
  * Generally, query (recursive) lookups are done against caching server, while
  * update requests are done against authoratative servers.
  *
  */
-class Net_DNS2_Updater extends Net_DNS2
+class Updater extends \NetDNS2\Client
 {
     /*
-     * a Net_DNS2_Packet_Request object used for the update request
+     * a \NetDNS2\Packet\Request object used for the update request
      */
     private $_packet;
 
     /**
-     * Constructor - builds a new Net_DNS2_Updater objected used for doing 
+     * Constructor - builds a new \NetDNS2\Updater objected used for doing 
      * dynamic DNS updates
      *
      * @param string $zone    the domain name to use for DNS updates
      * @param mixed  $options an array of config options or null
      *
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -55,14 +57,14 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // create the packet
         //
-        $this->_packet = new Net_DNS2_Packet_Request(
+        $this->_packet = new \NetDNS2\Packet\Request(
             strtolower(trim($zone, " \n\r\t.")), 'SOA', 'IN'
         );
 
         //
         // make sure the opcode on the packet is set to UPDATE
         //
-        $this->_packet->header->opcode = Net_DNS2_Lookups::OPCODE_UPDATE;
+        $this->_packet->header->opcode = \NetDNS2\Lookups::OPCODE_UPDATE;
     }
 
     /**
@@ -71,7 +73,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $name The name to be checked.
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access private
      *
      */
@@ -79,10 +81,10 @@ class Net_DNS2_Updater extends Net_DNS2
     {
         if (!preg_match('/' . $this->_packet->question[0]->qname . '$/', $name)) {
             
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'name provided (' . $name . ') does not match zone name (' .
                 $this->_packet->question[0]->qname . ')',
-                Net_DNS2_Lookups::E_PACKET_INVALID
+                \NetDNS2\Lookups::E_PACKET_INVALID
             );
         }
     
@@ -97,7 +99,7 @@ class Net_DNS2_Updater extends Net_DNS2
      *
      * @return     boolean
      * @access     public
-     * @see        Net_DNS2::signTSIG()
+     * @see        \NetDNS2\Client::signTSIG()
      * @deprecated function deprecated in 1.1.0
      *
      */
@@ -114,14 +116,14 @@ class Net_DNS2_Updater extends Net_DNS2
      *   class.  Any duplicate RRs will be silently ignored by the primary
      *   master.
      *
-     * @param Net_DNS2_RR $rr the Net_DNS2_RR object to be added to the zone
+     * @param \NetDNS2\RR $rr the \NetDNS2\RR object to be added to the zone
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
-    public function add(Net_DNS2_RR $rr)
+    public function add(\NetDNS2\RR $rr)
     {
         $this->_checkName($rr->name);
 
@@ -145,14 +147,14 @@ class Net_DNS2_Updater extends Net_DNS2
      *   RR addition.  If no such RRs exist, then this Update RR will be
      *   silently ignored by the primary master.
      *
-     * @param Net_DNS2_RR $rr the Net_DNS2_RR object to be deleted from the zone
+     * @param \NetDNS2\RR $rr the \NetDNS2\RR object to be deleted from the zone
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
-    public function delete(Net_DNS2_RR $rr)
+    public function delete(\NetDNS2\RR $rr)
     {
         $this->_checkName($rr->name);
 
@@ -183,7 +185,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $type the RR type to be removed from the zone
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -191,14 +193,14 @@ class Net_DNS2_Updater extends Net_DNS2
     {
         $this->_checkName($name);
 
-        $class = Net_DNS2_Lookups::$rr_types_id_to_class[
-            Net_DNS2_Lookups::$rr_types_by_name[$type]
+        $class = \NetDNS2\Lookups::$rr_types_id_to_class[
+            \NetDNS2\Lookups::$rr_types_by_name[$type]
         ];
         if (!isset($class)) {
 
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'unknown or un-supported resource record type: ' . $type,
-                Net_DNS2_Lookups::E_RR_INVALID
+                \NetDNS2\Lookups::E_RR_INVALID
             );
         }
     
@@ -233,7 +235,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $name the RR name to be removed from the zone
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -242,10 +244,10 @@ class Net_DNS2_Updater extends Net_DNS2
         $this->_checkName($name);
 
         //
-        // the Net_DNS2_RR_ANY class is just an empty stub class used for these
+        // the \NetDNS2\RR\ANY class is just an empty stub class used for these
         // cases only
         //
-        $rr = new Net_DNS2_RR_ANY;
+        $rr = new \NetDNS2\RR\ANY;
 
         $rr->name       = $name;
         $rr->ttl        = 0;
@@ -281,7 +283,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $type the RR type for the prerequisite
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -289,14 +291,14 @@ class Net_DNS2_Updater extends Net_DNS2
     {
         $this->_checkName($name);
         
-        $class = Net_DNS2_Lookups::$rr_types_id_to_class[
-            Net_DNS2_Lookups::$rr_types_by_name[$type]
+        $class = \NetDNS2\Lookups::$rr_types_id_to_class[
+            \NetDNS2\Lookups::$rr_types_by_name[$type]
         ];
         if (!isset($class)) {
 
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'unknown or un-supported resource record type: ' . $type,
-                Net_DNS2_Lookups::E_RR_INVALID
+                \NetDNS2\Lookups::E_RR_INVALID
             );
         }
     
@@ -333,14 +335,14 @@ class Net_DNS2_Updater extends Net_DNS2
      *   specified as zero (0) and is ignored when comparing RRsets for
      *   identity.
      *
-     * @param Net_DNS2_RR $rr the RR object to be used as a prerequisite
+     * @param \NetDNS2\RR $rr the RR object to be used as a prerequisite
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
-    public function checkValueExists(Net_DNS2_RR $rr)
+    public function checkValueExists(\NetDNS2\RR $rr)
     {
         $this->_checkName($rr->name);
 
@@ -374,7 +376,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $type the RR type for the prerequisite
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -382,14 +384,14 @@ class Net_DNS2_Updater extends Net_DNS2
     {
         $this->_checkName($name);
 
-        $class = Net_DNS2_Lookups::$rr_types_id_to_class[
-            Net_DNS2_Lookups::$rr_types_by_name[$type]
+        $class = \NetDNS2\Lookups::$rr_types_id_to_class[
+            \NetDNS2\Lookups::$rr_types_by_name[$type]
         ];
         if (!isset($class)) {
 
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'unknown or un-supported resource record type: ' . $type,
-                Net_DNS2_Lookups::E_RR_INVALID
+                \NetDNS2\Lookups::E_RR_INVALID
             );
         }
     
@@ -429,7 +431,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $name the RR name for the prerequisite
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -438,10 +440,10 @@ class Net_DNS2_Updater extends Net_DNS2
         $this->_checkName($name);
 
         //
-        // the Net_DNS2_RR_ANY class is just an empty stub class used for these
+        // the \NetDNS2\RR\ANY class is just an empty stub class used for these
         // cases only
         //
-        $rr = new Net_DNS2_RR_ANY;
+        $rr = new \NetDNS2\RR\ANY;
 
         $rr->name       = $name;
         $rr->ttl        = 0;
@@ -475,7 +477,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @param string $name the RR name for the prerequisite
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -484,10 +486,10 @@ class Net_DNS2_Updater extends Net_DNS2
         $this->_checkName($name);
 
         //
-        // the Net_DNS2_RR_ANY class is just an empty stub class used for these
+        // the \NetDNS2\RR\ANY class is just an empty stub class used for these
         // cases only
         //
-        $rr = new Net_DNS2_RR_ANY;
+        $rr = new \NetDNS2\RR\ANY;
 
         $rr->name       = $name;
         $rr->ttl        = 0;
@@ -509,7 +511,7 @@ class Net_DNS2_Updater extends Net_DNS2
     /**
      * returns the current internal packet object.
      *
-     * @return Net_DNS2_Packet_Request
+     * @return \NetDNS2\Packet\Request
      * @access public
      #
      */
@@ -523,8 +525,8 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->auth_signature instanceof Net_DNS2_RR_TSIG) 
-            || ($this->auth_signature instanceof Net_DNS2_RR_SIG)
+        if (   ($this->auth_signature instanceof \NetDNS2\RR\TSIG) 
+            || ($this->auth_signature instanceof \NetDNS2\RR\SIG)
         ) {
             $p->additional[] = $this->auth_signature;
         }
@@ -543,10 +545,10 @@ class Net_DNS2_Updater extends Net_DNS2
     /**
      * executes the update request with the object informaton
      *
-     * @param Net_DNS2_Packet_Response &$response ref to the response object
+     * @param \NetDNS2\Packet\Response &$response ref to the response object
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -555,13 +557,13 @@ class Net_DNS2_Updater extends Net_DNS2
         //
         // make sure we have some name servers set
         //
-        $this->checkServers(Net_DNS2::RESOLV_CONF);
+        $this->checkServers(\NetDNS2\Client::RESOLV_CONF);
 
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->auth_signature instanceof Net_DNS2_RR_TSIG) 
-            || ($this->auth_signature instanceof Net_DNS2_RR_SIG)
+        if (   ($this->auth_signature instanceof \NetDNS2\RR\TSIG) 
+            || ($this->auth_signature instanceof \NetDNS2\RR\SIG)
         ) {
             $this->_packet->additional[] = $this->auth_signature;
         }
@@ -580,9 +582,9 @@ class Net_DNS2_Updater extends Net_DNS2
         if (   ($this->_packet->header->qdcount == 0) 
             || ($this->_packet->header->nscount == 0) 
         ) {
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'empty headers- nothing to send!',
-                Net_DNS2_Lookups::E_PACKET_INVALID
+                \NetDNS2\Lookups::E_PACKET_INVALID
             );
         }
 

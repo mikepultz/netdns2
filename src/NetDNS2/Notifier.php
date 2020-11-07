@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,33 +17,35 @@
  *
  */
 
+namespace NetDNS2;
+
 /**
  * The main dynamic DNS notifier class.
  *
  * This class provices functions to handle DNS notify requests as defined by RFC 1996.
  *
- * This is separate from the Net_DNS2_Resolver class, as while the underlying
+ * This is separate from the \NetDNS2\Resolver class, as while the underlying
  * protocol is the same, the functionality is completely different.
  *
  * Generally, query (recursive) lookups are done against caching server, while
  * notify requests are done against authoratative servers.
  *
  */
-class Net_DNS2_Notifier extends Net_DNS2
+class Notifier extends \NetDNS2\Client
 {
     /*
-     * a Net_DNS2_Packet_Request object used for the notify request
+     * a \NetDNS2\Packet\Request object used for the notify request
      */
     private $_packet;
 
     /**
-     * Constructor - builds a new Net_DNS2_Notifier objected used for doing 
+     * Constructor - builds a new \NetDNS2\Notifier objected used for doing 
      * DNS notification for a changed zone
      *
      * @param string $zone    the domain name to use for DNS updates
      * @param mixed  $options an array of config options or null
      *
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -54,14 +56,14 @@ class Net_DNS2_Notifier extends Net_DNS2
         //
         // create the packet
         //
-        $this->_packet = new Net_DNS2_Packet_Request(
+        $this->_packet = new \NetDNS2\Packet\Request(
             strtolower(trim($zone, " \n\r\t.")), 'SOA', 'IN'
         );
 
         //
         // make sure the opcode on the packet is set to NOTIFY
         //
-        $this->_packet->header->opcode = Net_DNS2_Lookups::OPCODE_NOTIFY;
+        $this->_packet->header->opcode = \NetDNS2\Lookups::OPCODE_NOTIFY;
     }
 
     /**
@@ -70,7 +72,7 @@ class Net_DNS2_Notifier extends Net_DNS2
      * @param string $name The name to be checked.
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access private
      *
      */
@@ -78,10 +80,10 @@ class Net_DNS2_Notifier extends Net_DNS2
     {
         if (!preg_match('/' . $this->_packet->question[0]->qname . '$/', $name)) {
             
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'name provided (' . $name . ') does not match zone name (' .
                 $this->_packet->question[0]->qname . ')',
-                Net_DNS2_Lookups::E_PACKET_INVALID
+                \NetDNS2\Lookups::E_PACKET_INVALID
             );
         }
     
@@ -91,14 +93,14 @@ class Net_DNS2_Notifier extends Net_DNS2
     /**
      *   3.7 - Add RR to notify
      *
-     * @param Net_DNS2_RR $rr the Net_DNS2_RR object to be sent in the notify message
+     * @param \NetDNS2\RR $rr the \NetDNS2\RR object to be sent in the notify message
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
-    public function add(Net_DNS2_RR $rr)
+    public function add(\NetDNS2\RR $rr)
     {
         $this->_checkName($rr->name);
         //
@@ -118,11 +120,11 @@ class Net_DNS2_Notifier extends Net_DNS2
      *
      * @return     boolean
      * @access     public
-     * @see        Net_DNS2::signTSIG()
+     * @see        \NetDNS2\Client::signTSIG()
      * @deprecated function deprecated in 1.1.0
      *
      */
-    public function signature($keyname, $signature, $algorithm = Net_DNS2_RR_TSIG::HMAC_MD5)
+    public function signature($keyname, $signature, $algorithm = \NetDNS2\RR\TSIG::HMAC_MD5)
     {
         return $this->signTSIG($keyname, $signature, $algorithm);
     }
@@ -130,7 +132,7 @@ class Net_DNS2_Notifier extends Net_DNS2
     /**
      * returns the current internal packet object.
      *
-     * @return Net_DNS2_Packet_Request
+     * @return \NetDNS2\Packet\Request
      * @access public
      #
      */
@@ -144,8 +146,8 @@ class Net_DNS2_Notifier extends Net_DNS2
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->auth_signature instanceof Net_DNS2_RR_TSIG) 
-            || ($this->auth_signature instanceof Net_DNS2_RR_SIG)
+        if (   ($this->auth_signature instanceof \NetDNS2\RR\TSIG) 
+            || ($this->auth_signature instanceof \NetDNS2\RR\SIG)
         ) {
             $p->additional[] = $this->auth_signature;
         }
@@ -164,10 +166,10 @@ class Net_DNS2_Notifier extends Net_DNS2
     /**
      * executes the notify request
      *
-     * @param Net_DNS2_Packet_Response &$response ref to the response object
+     * @param \NetDNS2\Packet\Response &$response ref to the response object
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -176,8 +178,8 @@ class Net_DNS2_Notifier extends Net_DNS2
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->auth_signature instanceof Net_DNS2_RR_TSIG) 
-            || ($this->auth_signature instanceof Net_DNS2_RR_SIG)
+        if (   ($this->auth_signature instanceof \NetDNS2\RR\TSIG) 
+            || ($this->auth_signature instanceof \NetDNS2\RR\SIG)
         ) {
             $this->_packet->additional[] = $this->auth_signature;
         }
@@ -194,9 +196,9 @@ class Net_DNS2_Notifier extends Net_DNS2
         // make sure we have some data to send
         //
         if ($this->_packet->header->qdcount == 0) {
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'empty headers- nothing to send!',
-                Net_DNS2_Lookups::E_PACKET_INVALID
+                \NetDNS2\Lookups::E_PACKET_INVALID
             );
         }
 

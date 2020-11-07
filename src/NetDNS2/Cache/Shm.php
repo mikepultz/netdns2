@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,11 +17,13 @@
  *
  */
 
+namespace NetDNS2\Cache;
+
 /**
- * Shared Memory-based caching for the Net_DNS2_Cache class
+ * Shared Memory-based caching for the NetDNS2\Cache class
  *
  */
-class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
+class Shm extends \NetDNS2\Cache
 {
     /*
      * resource id of the shared memory cache
@@ -40,7 +42,7 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
      * @param integer $size       the size of the shared memory segment to create
      * @param string  $serializer the name of the cache serialize to use
      *
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      * @return void
      *
@@ -66,9 +68,9 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
 
             if (file_put_contents($cache_file, '') === false) {
         
-                throw new Net_DNS2_Exception(
+                throw new \NetDNS2\Exception(
                     'failed to create empty SHM file: ' . $cache_file,
-                    Net_DNS2_Lookups::E_CACHE_SHM_FILE
+                    \NetDNS2\Lookups::E_CACHE_SHM_FILE
                 );
             }
         }
@@ -79,9 +81,9 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
         $this->_cache_file_tok = ftok($cache_file, 't');
         if ($this->_cache_file_tok == -1) {
 
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'failed on ftok() file: ' . $this->_cache_file_tok,
-                Net_DNS2_Lookups::E_CACHE_SHM_FILE
+                \NetDNS2\Lookups::E_CACHE_SHM_FILE
             );
         }
 

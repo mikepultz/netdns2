@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,11 +17,13 @@
  *
  */
 
+namespace NetDNS2;
+
 /**
- * Exception handler used by Net_DNS2
+ * Exception handler used by NetDNS2
  * 
  */
-class Net_DNS2_Exception extends Exception
+class Exception extends Exception
 {
     private $_request;
     private $_response;
@@ -33,8 +35,8 @@ class Net_DNS2_Exception extends Exception
      * @param string $message  the exception message
      * @param int    $code     the exception code
      * @param object $previous the previous Exception object
-     * @param object $request  the Net_DNS2_Packet_Request object for this request
-     * @param object $response the Net_DNS2_Packet_Response object for this request
+     * @param object $request  the \NetDNS2\Packet\Request object for this request
+     * @param object $response the \NetDNS2\Packet\Response object for this request
      *
      * @access public
      *
@@ -43,8 +45,8 @@ class Net_DNS2_Exception extends Exception
         $message = '', 
         $code = 0, 
         $previous = null, 
-        Net_DNS2_Packet_Request $request = null,
-        Net_DNS2_Packet_Response $response = null
+        \NetDNS2\Packet\Request $request = null,
+        \NetDNS2\Packet\Response $response = null
     ) {
         //
         // store the request/response objects (if passed)
@@ -69,9 +71,9 @@ class Net_DNS2_Exception extends Exception
     }
 
     /**
-     * returns the Net_DNS2_Packet_Request object (if available)
+     * returns the \NetDNS2\Packet\Request object (if available)
      *
-     * @return Net_DNS2_Packet_Request object
+     * @return \NetDNS2\Packet\Request object
      * @access public
      * @since  function available since release 1.3.1
      *
@@ -82,9 +84,9 @@ class Net_DNS2_Exception extends Exception
     }
 
     /**
-     * returns the Net_DNS2_Packet_Response object (if available)
+     * returns the \NetDNS2\Packet\Response object (if available)
      *
-     * @return Net_DNS2_Packet_Response object
+     * @return \NetDNS2\Packet\Response object
      * @access public
      * @since  function available since release 1.3.1
      *

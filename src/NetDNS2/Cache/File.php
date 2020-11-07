@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,11 +17,13 @@
  *
  */
 
+namespace NetDNS2\Cache;
+
 /**
- * File-based caching for the Net_DNS2_Cache class
+ * File-based caching for the NetDNS2\Cache class
  *
  */
-class Net_DNS2_Cache_File extends Net_DNS2_Cache
+class File extends \NetDNS2\Cache
 {
     /**
      * open a cache object
@@ -30,7 +32,7 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
      * @param integer $size       the size of the shared memory segment to create
      * @param string  $serializer the name of the cache serialize to use
      *
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      * @return void
      *

@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,21 +17,23 @@
  *
  */
 
+namespace NetDNS2\Packet;
+
 /**
  * This class handles building new DNS request packets; packets used for DNS
  * queries and updates.
  *   
  */
-class Net_DNS2_Packet_Request extends Net_DNS2_Packet
+class Request extends \NetDNS2\Packet
 {
     /**
-     * Constructor - builds a new Net_DNS2_Packet_Request object
+     * Constructor - builds a new \NetDNS2\Packet\Request object
      *
      * @param string $name  the domain name for the packet
      * @param string $type  the DNS RR type for the packet
      * @param string $class the DNS class for the packet
      *
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -41,14 +43,14 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
     }
 
     /**
-     * builds a new Net_DNS2_Packet_Request object
+     * builds a new \NetDNS2\Packet\Request object
      *
      * @param string $name  the domain name for the packet
      * @param string $type  the DNS RR type for the packet
      * @param string $class the DNS class for the packet
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -57,12 +59,12 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
         //
         // generate a new header
         //
-        $this->header = new Net_DNS2_Header;
+        $this->header = new \NetDNS2\Header;
 
         //
         // add a new question
         //
-        $q = new Net_DNS2_Question();
+        $q = new \NetDNS2\Question();
 
         //
         // allow queries directly to . for the root name servers
@@ -79,9 +81,9 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
         //
         if (empty($name)) {
 
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'empty query string provided',
-                Net_DNS2_Lookups::E_PACKET_INVALID
+                \NetDNS2\Lookups::E_PACKET_INVALID
             );
         }
 
@@ -96,12 +98,12 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
         //
         // check that the type and class are valid
         //    
-        if (   (!isset(Net_DNS2_Lookups::$rr_types_by_name[$type])) 
-            || (!isset(Net_DNS2_Lookups::$classes_by_name[$class])) 
+        if (   (!isset(\NetDNS2\Lookups::$rr_types_by_name[$type])) 
+            || (!isset(\NetDNS2\Lookups::$classes_by_name[$class])) 
         ) {
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'invalid type (' . $type . ') or class (' . $class . ') specified.',
-                Net_DNS2_Lookups::E_PACKET_INVALID
+                \NetDNS2\Lookups::E_PACKET_INVALID
             );
         }
 
@@ -114,7 +116,7 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
             // there are other types of PTR requests, so if an IP adress doesn't match,
             // then just let it flow through and assume it's a hostname
             //
-            if (Net_DNS2::isIPv4($name) == true) {
+            if (\NetDNS2\Client::isIPv4($name) == true) {
 
                 //
                 // IPv4
@@ -122,12 +124,12 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
                 $name = implode('.', array_reverse(explode('.', $name)));
                 $name .= '.in-addr.arpa';
 
-            } else if (Net_DNS2::isIPv6($name) == true) {
+            } else if (\NetDNS2\Client::isIPv6($name) == true) {
 
                 //
                 // IPv6
                 //
-                $e = Net_DNS2::expandIPv6($name);
+                $e = \NetDNS2\Client::expandIPv6($name);
                 if ($e !== false) {
 
                     $name = implode(
@@ -138,9 +140,9 @@ class Net_DNS2_Packet_Request extends Net_DNS2_Packet
 
                 } else {
 
-                    throw new Net_DNS2_Exception(
+                    throw new \NetDNS2\Exception(
                         'unsupported PTR value: ' . $name,
-                        Net_DNS2_Lookups::E_PACKET_INVALID
+                        \NetDNS2\Lookups::E_PACKET_INVALID
                     );
                 }
             }

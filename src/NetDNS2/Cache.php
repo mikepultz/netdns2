@@ -8,7 +8,7 @@
  * See LICENSE for more details.  
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,11 +17,13 @@
  *
  */
 
+namespace NetDNS2;
+
 /**
  * A class to provide simple dns lookup caching.
  *
  */
-class Net_DNS2_Cache
+class Cache
 {
     /*
      * the filename of the cache file

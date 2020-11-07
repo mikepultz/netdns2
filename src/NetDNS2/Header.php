@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -16,6 +16,8 @@
  * @since     File available since Release 0.6.0
  *
  */
+
+namespace NetDNS2;
 
 /**
  * DNS Packet Header class
@@ -42,7 +44,7 @@
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
-class Net_DNS2_Header
+class Header
 {
     public $id;         // 16 bit - identifier
     public $qr;         //  1 bit - 0 = query, 1 = response
@@ -61,15 +63,15 @@ class Net_DNS2_Header
     public $arcount;    // 16 bit - rr's in the additional records section
 
     /**
-     * Constructor - builds a new Net_DNS2_Header object
+     * Constructor - builds a new NetDNS2\Header object
      *
-     * @param mixed &$packet either a Net_DNS2_Packet object or null
+     * @param mixed &$packet either a NetDNS2\Packet object or null
      *
-     * @throws Net_DNS2_Exception
+     * @throws NetDNS2\Exception
      * @access public
      *
      */
-    public function __construct(Net_DNS2_Packet &$packet = null)
+    public function __construct(\NetDNS2\Packet &$packet = null)
     {
         if (!is_null($packet)) {
 
@@ -77,8 +79,8 @@ class Net_DNS2_Header
         } else {
 
             $this->id       = $this->nextPacketId();
-            $this->qr       = Net_DNS2_Lookups::QR_QUERY;
-            $this->opcode   = Net_DNS2_Lookups::OPCODE_QUERY;
+            $this->qr       = \NetDNS2\Lookups::QR_QUERY;
+            $this->opcode   = \NetDNS2\Lookups::OPCODE_QUERY;
             $this->aa       = 0;
             $this->tc       = 0;
             $this->rd       = 1;
@@ -86,7 +88,7 @@ class Net_DNS2_Header
             $this->z        = 0;
             $this->ad       = 0;
             $this->cd       = 0;
-            $this->rcode    = Net_DNS2_Lookups::RCODE_NOERROR;
+            $this->rcode    = \NetDNS2\Lookups::RCODE_NOERROR;
             $this->qdcount  = 1;
             $this->ancount  = 0;
             $this->nscount  = 0;
@@ -103,12 +105,12 @@ class Net_DNS2_Header
      */
     public function nextPacketId()
     {
-        if (++Net_DNS2_Lookups::$next_packet_id > 65535) {
+        if (++\NetDNS2\Lookups::$next_packet_id > 65535) {
 
-            Net_DNS2_Lookups::$next_packet_id = 1;
+            \NetDNS2\Lookups::$next_packet_id = 1;
         }
 
-        return Net_DNS2_Lookups::$next_packet_id;
+        return \NetDNS2\Lookups::$next_packet_id;
     }
 
     /**
@@ -142,25 +144,25 @@ class Net_DNS2_Header
     }
 
     /**
-     * constructs a Net_DNS2_Header from a Net_DNS2_Packet object
+     * constructs a \NetDNS2\Header from a \NetDNS2\Packet object
      *
-     * @param Net_DNS2_Packet &$packet Object
+     * @param \NetDNS2\Packet &$packet Object
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
-    public function set(Net_DNS2_Packet &$packet)
+    public function set(\NetDNS2\Packet &$packet)
     {
         //
         // the header must be at least 12 bytes long.
         //
-        if ($packet->rdlength < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
+        if ($packet->rdlength < \NetDNS2\Lookups::DNS_HEADER_SIZE) {
 
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'invalid header data provided; too small',
-                Net_DNS2_Lookups::E_HEADER_INVALID
+                \NetDNS2\Lookups::E_HEADER_INVALID
             );
         }
 
@@ -198,7 +200,7 @@ class Net_DNS2_Header
         //
         // increment the internal offset
         //
-        $packet->offset += Net_DNS2_Lookups::DNS_HEADER_SIZE;
+        $packet->offset += \NetDNS2\Lookups::DNS_HEADER_SIZE;
 
         return true;
     }
@@ -206,15 +208,15 @@ class Net_DNS2_Header
     /**
      * returns a binary packed DNS Header
      *
-     * @param Net_DNS2_Packet &$packet Object
+     * @param \NetDNS2\Packet &$packet Object
      *
      * @return    string
      * @access    public
      *
      */
-    public function get(Net_DNS2_Packet &$packet)
+    public function get(\NetDNS2\Packet &$packet)
     {
-        $packet->offset += Net_DNS2_Lookups::DNS_HEADER_SIZE;
+        $packet->offset += \NetDNS2\Lookups::DNS_HEADER_SIZE;
 
         return pack('n', $this->id) . 
             chr(

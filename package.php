@@ -11,7 +11,7 @@ $pkg = new PEAR_PackageFileManager2;
 $e = $pkg->setOptions([
         
         'baseinstalldir'    => '/',
-        'packagedirectory'  => '/u/devel/net_dns/Net_DNS2/',
+        'packagedirectory'  => '/u/devel/net_dns/src/',
         'ignore'            => [
             'package.php',
             'package.xml',
@@ -32,12 +32,11 @@ $pkg->setPackage('Net_DNS2');
 $pkg->setSummary('PHP Resolver library used to communicate with a DNS server.');
 $pkg->setDescription("Provides (roughly) the same functionality as Net_DNS, but using modern PHP objects, exceptions for error handling, better sockets support.\n\nThis release is (in most cases) 2x - 10x faster than Net_DNS, as well as includes more RR's (including DNSSEC RR's), and improved sockets and streams support.");
 $pkg->setChannel('pear.php.net');
-$pkg->setAPIVersion('1.5.2');
-$pkg->setReleaseVersion('1.5.2');
+$pkg->setAPIVersion('1.6.0');
+$pkg->setReleaseVersion('1.6.0');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
 $pkg->setNotes(
-"- fixed a mistake in the autoload section of the composer.json file.\n"
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();

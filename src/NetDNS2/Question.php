@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -16,6 +16,8 @@
  * @since     File available since Release 0.6.0
  *
  */
+
+namespace NetDNS2;
 
 /**
  * This class handles parsing and constructing the question sectino of DNS
@@ -37,7 +39,7 @@
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
-class Net_DNS2_Question
+class Question
 {
     /*
      * The name of the question
@@ -64,16 +66,16 @@ class Net_DNS2_Question
     public $qclass;
 
     /**
-     * Constructor - builds a new Net_DNS2_Question object
+     * Constructor - builds a new \NetDNS2\Question object
      *
-     * @param mixed &$packet either a Net_DNS2_Packet object, or null to 
+     * @param mixed &$packet either a \NetDNS2\Packet object, or null to 
      *                       build an empty object
      *
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
-    public function __construct(Net_DNS2_Packet &$packet = null)
+    public function __construct(\NetDNS2\Packet &$packet = null)
     {
         if (!is_null($packet)) {
 
@@ -87,7 +89,7 @@ class Net_DNS2_Question
     }
 
     /**
-     * magic __toString() function to return the Net_DNS2_Question object as a string
+     * magic __toString() function to return the \NetDNS2\Question object as a string
      *
      * @return string
      * @access public
@@ -100,16 +102,16 @@ class Net_DNS2_Question
     }
 
     /**
-     * builds a new Net_DNS2_Header object from a Net_DNS2_Packet object
+     * builds a new \NetDNS2\Header object from a \NetDNS2\Packet object
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet object
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet object
      *
      * @return boolean
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
-    public function set(Net_DNS2_Packet &$packet)
+    public function set(\NetDNS2\Packet &$packet)
     {
         //
         // expand the name
@@ -117,9 +119,9 @@ class Net_DNS2_Question
         $this->qname = $packet->expand($packet, $packet->offset);
         if ($packet->rdlength < ($packet->offset + 4)) {
 
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'invalid question section: to small',
-                Net_DNS2_Lookups::E_QUESTION_INVALID
+                \NetDNS2\Lookups::E_QUESTION_INVALID
             );
         }
 
@@ -134,15 +136,15 @@ class Net_DNS2_Question
         //
         // validate it
         //
-        $type_name  = Net_DNS2_Lookups::$rr_types_by_id[$type];
-        $class_name = Net_DNS2_Lookups::$classes_by_id[$class];
+        $type_name  = \NetDNS2\Lookups::$rr_types_by_id[$type];
+        $class_name = \NetDNS2\Lookups::$classes_by_id[$class];
 
         if ( (!isset($type_name)) || (!isset($class_name)) ) {
 
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'invalid question section: invalid type (' . $type . 
                 ') or class (' . $class . ') specified.',
-                Net_DNS2_Lookups::E_QUESTION_INVALID
+                \NetDNS2\Lookups::E_QUESTION_INVALID
             );
         }
 
@@ -156,33 +158,33 @@ class Net_DNS2_Question
     }
 
     /**
-     * returns a binary packed Net_DNS2_Question object
+     * returns a binary packed \NetDNS2\Question object
      *
-     * @param Net_DNS2_Packet &$packet the Net_DNS2_Packet object this question is 
+     * @param \NetDNS2\Packet &$packet the \NetDNS2\Packet object this question is 
      *                                 part of. This needs to be passed in so that
      *                                 the compressed qname value can be packed in
      *                                 with the names of the other parts of the 
      *                                 packet.
      *
      * @return string
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
-    public function get(Net_DNS2_Packet &$packet)
+    public function get(\NetDNS2\Packet &$packet)
     {
         //
         // validate the type and class
         //
-        $type  = Net_DNS2_Lookups::$rr_types_by_name[$this->qtype];
-        $class = Net_DNS2_Lookups::$classes_by_name[$this->qclass];
+        $type  = \NetDNS2\Lookups::$rr_types_by_name[$this->qtype];
+        $class = \NetDNS2\Lookups::$classes_by_name[$this->qclass];
 
         if ( (!isset($type)) || (!isset($class)) ) {
 
-            throw new Net_DNS2_Exception(
+            throw new \NetDNS2\Exception(
                 'invalid question section: invalid type (' . $this->qtype . 
                 ') or class (' . $this->qclass . ') specified.',
-                Net_DNS2_Lookups::E_QUESTION_INVALID
+                \NetDNS2\Lookups::E_QUESTION_INVALID
             );
         }
 

@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -25,14 +25,16 @@
  *
  */
 
+namespace NetDNS2;
+
 /**
  * This is the base class that holds a standard DNS packet.
  *
- * The Net_DNS2_Packet_Request and Net_DNS2_Packet_Response classes extend this
+ * The \NetDNS2\Packet_Request and \NetDNS2\Packet_Response classes extend this
  * class.
  *
  */
-class Net_DNS2_Packet
+class Packet
 {
     /*
      * the full binary data and length for this packet
@@ -46,12 +48,12 @@ class Net_DNS2_Packet
     public $offset = 0;
 
     /*
-     * Net_DNS2_Header object with the DNS packet header
+     * \NetDNS2\Header object with the DNS packet header
      */
     public $header;
 
     /*
-     * array of Net_DNS2_Question objects
+     * array of \NetDNS2\Question objects
      *
      * used as "zone" for updates per RFC2136
      *
@@ -59,7 +61,7 @@ class Net_DNS2_Packet
     public $question = [];
 
     /*
-     * array of Net_DNS2_RR Objects for Answers
+     * array of \NetDNS2\RR Objects for Answers
      * 
      * used as "prerequisite" for updates per RFC2136
      *
@@ -67,7 +69,7 @@ class Net_DNS2_Packet
     public $answer = [];
 
     /*
-     * array of Net_DNS2_RR Objects for Authority
+     * array of \NetDNS2\RR Objects for Authority
      *
      * used as "update" for updates per RFC2136
      *
@@ -75,7 +77,7 @@ class Net_DNS2_Packet
     public $authority = [];
 
     /*
-     * array of Net_DNS2_RR Objects for Addtitional
+     * array of \NetDNS2\RR Objects for Addtitional
      */
     public $additional = [];
 
@@ -85,7 +87,7 @@ class Net_DNS2_Packet
     private $_compressed = [];
 
     /**
-     * magic __toString() method to return the Net_DNS2_Packet as a string
+     * magic __toString() method to return the \NetDNS2\Packet as a string
      *
      * @return string
      * @access public
@@ -119,7 +121,7 @@ class Net_DNS2_Packet
      * returns a full binary DNS packet
      *
      * @return string
-     * @throws Net_DNS2_Exception
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -253,7 +255,7 @@ class Net_DNS2_Packet
      * This logic was based on the Net::DNS::Packet::dn_expand() function
      * by Michanel Fuhr
      *
-     * @param Net_DNS2_Packet &$packet the DNS packet to look in for the domain name
+     * @param \NetDNS2\Packet &$packet the DNS packet to look in for the domain name
      * @param integer         &$offset the offset into the given packet object
      * @param boolean         $escape_dot_literals if we should escape periods in names
      *
@@ -261,7 +263,7 @@ class Net_DNS2_Packet
      * @access public
      *
      */
-    public static function expand(Net_DNS2_Packet &$packet, &$offset, $escape_dot_literals = false)
+    public static function expand(\NetDNS2\Packet &$packet, &$offset, $escape_dot_literals = false)
     {
         $name = '';
 
@@ -285,7 +287,7 @@ class Net_DNS2_Packet
                 $ptr = ord($packet->rdata[$offset]) << 8 | ord($packet->rdata[$offset+1]);
                 $ptr = $ptr & 0x3fff;
 
-                $name2 = Net_DNS2_Packet::expand($packet, $ptr);
+                $name2 = \NetDNS2\Packet::expand($packet, $ptr);
                 if (is_null($name2)) {
 
                     return null;
@@ -325,14 +327,14 @@ class Net_DNS2_Packet
     /**
      * parses a domain label from a DNS Packet at the given offset
      *
-     * @param Net_DNS2_Packet &$packet the DNS packet to look in for the domain name
+     * @param \NetDNS2\Packet &$packet the DNS packet to look in for the domain name
      * @param integer         &$offset the offset into the given packet object
      *
      * @return mixed either the domain name or null if it's not found.
      * @access public
      *
      */
-    public static function label(Net_DNS2_Packet &$packet, &$offset)
+    public static function label(\NetDNS2\Packet &$packet, &$offset)
     {
         $name = '';
 
@@ -361,13 +363,13 @@ class Net_DNS2_Packet
      * copies the contents of the given packet, to the local packet object. this
      * function intentionally ignores some of the packet data.
      *
-     * @param Net_DNS2_Packet $packet the DNS packet to copy the data from
+     * @param \NetDNS2\Packet $packet the DNS packet to copy the data from
      *
      * @return boolean
      * @access public
      *
      */
-    public function copy(Net_DNS2_Packet $packet)
+    public function copy(\NetDNS2\Packet $packet)
     {
         $this->header       = $packet->header;
         $this->question     = $packet->question;

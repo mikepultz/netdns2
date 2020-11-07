@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,14 +17,32 @@
  *
  */
 
+namespace NetDNS2;
+
+/*
+ * register the auto-load function
+ *
+ */
+spl_autoload_register(function($_class)
+{
+    if (strncmp($_class, 'NetDNS2', 7) == 0)
+    {
+        $file = \str_replace('\\', DIRECTORY_SEPARATOR, $_class) . '.php';
+echo "FILE=$file\n";
+        
+        require $file;
+    }
+});
+
+
 /**
  * This is the main resolver class, providing DNS query functions.
  *
  */
-class Net_DNS2_Resolver extends Net_DNS2
+class Resolver extends Client
 {
     /**
-     * Constructor - creates a new Net_DNS2_Resolver object
+     * Constructor - creates a new \NetDNS2\Resolver object
      *
      * @param mixed $options either an array with options or null
      *
@@ -43,8 +61,8 @@ class Net_DNS2_Resolver extends Net_DNS2
      * @param string $type  the name of the RR type to lookup
      * @param string $class the name of the RR class to lookup
      *
-     * @return Net_DNS2_Packet_Response object
-     * @throws Net_DNS2_Exception
+     * @return \NetDNS2\Packet\Response object
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
@@ -53,7 +71,7 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         // make sure we have some name servers set
         //
-        $this->checkServers(Net_DNS2::RESOLV_CONF);
+        $this->checkServers(\NetDNS2\Client::RESOLV_CONF);
 
         //
         // we dont' support incremental zone tranfers; so if it's requested, a full
@@ -75,13 +93,13 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         // create a new packet based on the input
         //
-        $packet = new Net_DNS2_Packet_Request($name, $type, $class);
+        $packet = new \NetDNS2\Packet\Request($name, $type, $class);
 
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->auth_signature instanceof Net_DNS2_RR_TSIG)
-            || ($this->auth_signature instanceof Net_DNS2_RR_SIG)
+        if (   ($this->auth_signature instanceof \NetDNS2\RR\TSIG)
+            || ($this->auth_signature instanceof \NetDNS2\RR\SIG)
         ) {
             $packet->additional[]       = $this->auth_signature;
             $packet->header->arcount    = count($packet->additional);
@@ -96,7 +114,7 @@ class Net_DNS2_Resolver extends Net_DNS2
             //
             // create a new OPT RR
             //
-            $opt = new Net_DNS2_RR_OPT();
+            $opt = new \NetDNS2\RR\OPT();
 
             //
             // set the DO flag, and the other values
@@ -230,24 +248,24 @@ class Net_DNS2_Resolver extends Net_DNS2
      * does an inverse query for the given RR; most DNS servers do not implement 
      * inverse queries, but they should be able to return "not implemented"
      *
-     * @param Net_DNS2_RR $rr the RR object to lookup
+     * @param \NetDNS2\RR $rr the RR object to lookup
      * 
-     * @return Net_DNS2_RR object
-     * @throws Net_DNS2_Exception
+     * @return \NetDNS2\RR object
+     * @throws \NetDNS2\Exception
      * @access public
      *
      */
-    public function iquery(Net_DNS2_RR $rr)
+    public function iquery(\NetDNS2\RR $rr)
     {
         //
         // make sure we have some name servers set
         //
-        $this->checkServers(Net_DNS2::RESOLV_CONF);
+        $this->checkServers(\NetDNS2\Client::RESOLV_CONF);
 
         //
         // create an empty packet
         //
-        $packet = new Net_DNS2_Packet_Request($rr->name, 'A', 'IN');
+        $packet = new \NetDNS2\Packet\Request($rr->name, 'A', 'IN');
 
         //
         // unset the question
@@ -258,7 +276,7 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         // set the opcode to IQUERY
         //
-        $packet->header->opcode = Net_DNS2_Lookups::OPCODE_IQUERY;
+        $packet->header->opcode = \NetDNS2\Lookups::OPCODE_IQUERY;
 
         //
         // add the given RR as the answer
@@ -269,8 +287,8 @@ class Net_DNS2_Resolver extends Net_DNS2
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->auth_signature instanceof Net_DNS2_RR_TSIG)
-            || ($this->auth_signature instanceof Net_DNS2_RR_SIG)
+        if (   ($this->auth_signature instanceof \NetDNS2\RR\TSIG)
+            || ($this->auth_signature instanceof \NetDNS2\RR\SIG)
         ) {
             $packet->additional[]       = $this->auth_signature;
             $packet->header->arcount    = count($packet->additional);

@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,28 +17,20 @@
  *
  */
 
+namespace NetDNS2\RR;
+
 /**
  * A Resource Record - RFC1035 section 3.4.1
  *
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *    |                                               |       
- *    |                                               |       
- *    |                                               |       
- *    |                    ADDRESS                    |       
- *    |                                               |       
- *    |                   (128 bit)                   |       
- *    |                                               |       
- *    |                                               |       
+ *    |                    ADDRESS                    |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
-class Net_DNS2_RR_AAAA extends Net_DNS2_RR
+class A extends \NetDNS2\RR
 {
     /*
-     * the IPv6 address in the preferred hexadecimal values of the eight 
-     * 16-bit pieces 
-     * per RFC1884
-     *
+     * The IPv4 address in quad-dotted notation
      */
     public $address;
 
@@ -65,65 +57,54 @@ class Net_DNS2_RR_AAAA extends Net_DNS2_RR
      */
     protected function rrFromString(array $rdata)
     {
-        //
-        // expand out compressed formats
-        //
         $value = array_shift($rdata);
-        if (Net_DNS2::isIPv6($value) == true) {
 
+        if (\NetDNS2\Client::isIPv4($value) == true) {
+            
             $this->address = $value;
             return true;
         }
-            
+
         return false;
     }
 
     /**
-     * parses the rdata of the Net_DNS2_Packet object
+     * parses the rdata of the \NetDNS2\Packet object
      *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
      *
      * @return boolean
      * @access protected
-     *
+     * 
      */
-    protected function rrSet(Net_DNS2_Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        //
-        // must be 8 x 16bit chunks, or 16 x 8bit
-        //
-        if ($this->rdlength == 16) {
+        if ($this->rdlength > 0) {
 
-            //
-            // PHP's inet_ntop returns IPv6 addresses in their compressed form,
-            // but we want to keep with the preferred standard, so we'll parse
-            // it manually.
-            //
-            $x = unpack('n8', $this->rdata);
-            if (count($x) == 8) {
-
-                $this->address = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', $x);
+            $this->address = inet_ntop($this->rdata);
+            if ($this->address !== false) {
+            
                 return true;
             }
         }
-        
+
         return false;
     }
 
     /**
      * returns the rdata portion of the DNS packet
-     *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
+     * 
+     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
      *                                 compressed names
      *
-     * @return mixed                   either returns a binary packed
+     * @return mixed                   either returns a binary packed 
      *                                 string or null on failure
      * @access protected
-     *
+     * 
      */
-    protected function rrGet(Net_DNS2_Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        $packet->offset += 16;
+        $packet->offset += 4;
         return inet_pton($this->address);
     }
 }

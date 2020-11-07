@@ -8,7 +8,7 @@
  * See LICENSE for more details.  
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,12 +17,14 @@
  *
  */
 
+namespace NetDNS2;
+
 /**
  * a class to handle converting RR bitmaps to arrays and back; used on NSEC
  * and NSEC3 RR's
  *
  */
-class Net_DNS2_BitMap
+class BitMap
 {
     /**
      * parses a RR bitmap field defined in RFC3845, into an array of RR names.
@@ -76,9 +78,9 @@ class Net_DNS2_BitMap
                 
                     $type = $x['window'] * 256 + $i;
 
-                    if (isset(Net_DNS2_Lookups::$rr_types_by_id[$type])) {
+                    if (isset(\NetDNS2\Lookups::$rr_types_by_id[$type])) {
 
-                        $output[] = Net_DNS2_Lookups::$rr_types_by_id[$type];
+                        $output[] = \NetDNS2\Lookups::$rr_types_by_id[$type];
                     } else {
 
                         $output[] = 'TYPE' . $type;
@@ -120,14 +122,14 @@ class Net_DNS2_BitMap
             //
             // get the type id for the RR
             //
-            $type = @Net_DNS2_Lookups::$rr_types_by_name[$rr];
+            $type = @\NetDNS2\Lookups::$rr_types_by_name[$rr];
             if (isset($type)) {
 
                 //
                 // skip meta types or qtypes
                 //  
-                if ( (isset(Net_DNS2_Lookups::$rr_qtypes_by_id[$type]))
-                    || (isset(Net_DNS2_Lookups::$rr_metatypes_by_id[$type]))
+                if ( (isset(\NetDNS2\Lookups::$rr_qtypes_by_id[$type]))
+                    || (isset(\NetDNS2\Lookups::$rr_metatypes_by_id[$type]))
                 ) {
                     continue;
                 }

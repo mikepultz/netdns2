@@ -8,7 +8,7 @@
  * See LICENSE for more details.
  *
  * @category  Networking
- * @package   Net_DNS2
+ * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -17,29 +17,31 @@
  *
  */
 
+namespace NetDNS2;
+
 //
 // initalize the packet id value
 //
-Net_DNS2_Lookups::$next_packet_id   = mt_rand(0, 65535);
+\NetDNS2\Lookups::$next_packet_id   = mt_rand(0, 65535);
 
 //
 // build the reverse lookup tables; this is just so we don't have to
 // have duplicate static content laying around.
 //
-Net_DNS2_Lookups::$rr_types_by_id       = array_flip(Net_DNS2_Lookups::$rr_types_by_name);
-Net_DNS2_Lookups::$classes_by_id        = array_flip(Net_DNS2_Lookups::$classes_by_name);
-Net_DNS2_Lookups::$rr_types_class_to_id = array_flip(Net_DNS2_Lookups::$rr_types_id_to_class);
-Net_DNS2_Lookups::$algorithm_name_to_id = array_flip(Net_DNS2_Lookups::$algorithm_id_to_name);
-Net_DNS2_Lookups::$digest_name_to_id    = array_flip(Net_DNS2_Lookups::$digest_id_to_name);
-Net_DNS2_Lookups::$rr_qtypes_by_id      = array_flip(Net_DNS2_Lookups::$rr_qtypes_by_name);
-Net_DNS2_Lookups::$rr_metatypes_by_id   = array_flip(Net_DNS2_Lookups::$rr_metatypes_by_name);
-Net_DNS2_Lookups::$protocol_by_id       = array_flip(Net_DNS2_Lookups::$protocol_by_name);
+\NetDNS2\Lookups::$rr_types_by_id       = array_flip(\NetDNS2\Lookups::$rr_types_by_name);
+\NetDNS2\Lookups::$classes_by_id        = array_flip(\NetDNS2\Lookups::$classes_by_name);
+\NetDNS2\Lookups::$rr_types_class_to_id = array_flip(\NetDNS2\Lookups::$rr_types_id_to_class);
+\NetDNS2\Lookups::$algorithm_name_to_id = array_flip(\NetDNS2\Lookups::$algorithm_id_to_name);
+\NetDNS2\Lookups::$digest_name_to_id    = array_flip(\NetDNS2\Lookups::$digest_id_to_name);
+\NetDNS2\Lookups::$rr_qtypes_by_id      = array_flip(\NetDNS2\Lookups::$rr_qtypes_by_name);
+\NetDNS2\Lookups::$rr_metatypes_by_id   = array_flip(\NetDNS2\Lookups::$rr_metatypes_by_name);
+\NetDNS2\Lookups::$protocol_by_id       = array_flip(\NetDNS2\Lookups::$protocol_by_name);
 
 /**
- * This class provides simple lookups used througout the Net_DNS2 code
+ * This class provides simple lookups used througout the NetDNS2 code
  * 
  */
-class Net_DNS2_Lookups
+class Lookups
 {
     /*
      * size (in bytes) of a header in a standard DNS packet
@@ -351,75 +353,75 @@ class Net_DNS2_Lookups
     public static $rr_types_class_to_id = [];
     public static $rr_types_id_to_class = [
 
-        1           => 'Net_DNS2_RR_A',
-        2           => 'Net_DNS2_RR_NS',
-        5           => 'Net_DNS2_RR_CNAME',
-        6           => 'Net_DNS2_RR_SOA',
-        11          => 'Net_DNS2_RR_WKS',
-        12          => 'Net_DNS2_RR_PTR',
-        13          => 'Net_DNS2_RR_HINFO',
-        15          => 'Net_DNS2_RR_MX',
-        16          => 'Net_DNS2_RR_TXT',
-        17          => 'Net_DNS2_RR_RP',
-        18          => 'Net_DNS2_RR_AFSDB',
-        19          => 'Net_DNS2_RR_X25',
-        20          => 'Net_DNS2_RR_ISDN',
-        21          => 'Net_DNS2_RR_RT',
-        22          => 'Net_DNS2_RR_NSAP',
-        24          => 'Net_DNS2_RR_SIG',
-        25          => 'Net_DNS2_RR_KEY',
-        26          => 'Net_DNS2_RR_PX',
-        28          => 'Net_DNS2_RR_AAAA',
-        29          => 'Net_DNS2_RR_LOC',
-        31          => 'Net_DNS2_RR_EID',
-        32          => 'Net_DNS2_RR_NIMLOC',
-        33          => 'Net_DNS2_RR_SRV',
-        34          => 'Net_DNS2_RR_ATMA',
-        35          => 'Net_DNS2_RR_NAPTR',
-        36          => 'Net_DNS2_RR_KX',
-        37          => 'Net_DNS2_RR_CERT',
-        39          => 'Net_DNS2_RR_DNAME',
-        41          => 'Net_DNS2_RR_OPT',
-        42          => 'Net_DNS2_RR_APL',
-        43          => 'Net_DNS2_RR_DS',
-        44          => 'Net_DNS2_RR_SSHFP',
-        45          => 'Net_DNS2_RR_IPSECKEY',
-        46          => 'Net_DNS2_RR_RRSIG',
-        47          => 'Net_DNS2_RR_NSEC',
-        48          => 'Net_DNS2_RR_DNSKEY',
-        49          => 'Net_DNS2_RR_DHCID',
-        50          => 'Net_DNS2_RR_NSEC3',
-        51          => 'Net_DNS2_RR_NSEC3PARAM',
-        52          => 'Net_DNS2_RR_TLSA',
-        53          => 'Net_DNS2_RR_SMIMEA',
-        55          => 'Net_DNS2_RR_HIP',
-        58          => 'Net_DNS2_RR_TALINK',
-        59          => 'Net_DNS2_RR_CDS',
-        60          => 'Net_DNS2_RR_CDNSKEY',
-        61          => 'Net_DNS2_RR_OPENPGPKEY',
-        62          => 'Net_DNS2_RR_CSYNC',
-        99          => 'Net_DNS2_RR_SPF',
-        104         => 'Net_DNS2_RR_NID',
-        105         => 'Net_DNS2_RR_L32',
-        106         => 'Net_DNS2_RR_L64',
-        107         => 'Net_DNS2_RR_LP',
-        108         => 'Net_DNS2_RR_EUI48',
-        109         => 'Net_DNS2_RR_EUI64',
+        1           => '\NetDNS2\RR\A',
+        2           => '\NetDNS2\RR\NS',
+        5           => '\NetDNS2\RR\CNAME',
+        6           => '\NetDNS2\RR\SOA',
+        11          => '\NetDNS2\RR\WKS',
+        12          => '\NetDNS2\RR\PTR',
+        13          => '\NetDNS2\RR\HINFO',
+        15          => '\NetDNS2\RR\MX',
+        16          => '\NetDNS2\RR\TXT',
+        17          => '\NetDNS2\RR\RP',
+        18          => '\NetDNS2\RR\AFSDB',
+        19          => '\NetDNS2\RR\X25',
+        20          => '\NetDNS2\RR\ISDN',
+        21          => '\NetDNS2\RR\RT',
+        22          => '\NetDNS2\RR\NSAP',
+        24          => '\NetDNS2\RR\SIG',
+        25          => '\NetDNS2\RR\KEY',
+        26          => '\NetDNS2\RR\PX',
+        28          => '\NetDNS2\RR\AAAA',
+        29          => '\NetDNS2\RR\LOC',
+        31          => '\NetDNS2\RR\EID',
+        32          => '\NetDNS2\RR\NIMLOC',
+        33          => '\NetDNS2\RR\SRV',
+        34          => '\NetDNS2\RR\ATMA',
+        35          => '\NetDNS2\RR\NAPTR',
+        36          => '\NetDNS2\RR\KX',
+        37          => '\NetDNS2\RR\CERT',
+        39          => '\NetDNS2\RR\DNAME',
+        41          => '\NetDNS2\RR\OPT',
+        42          => '\NetDNS2\RR\APL',
+        43          => '\NetDNS2\RR\DS',
+        44          => '\NetDNS2\RR\SSHFP',
+        45          => '\NetDNS2\RR\IPSECKEY',
+        46          => '\NetDNS2\RR\RRSIG',
+        47          => '\NetDNS2\RR\NSEC',
+        48          => '\NetDNS2\RR\DNSKEY',
+        49          => '\NetDNS2\RR\DHCID',
+        50          => '\NetDNS2\RR\NSEC3',
+        51          => '\NetDNS2\RR\NSEC3PARAM',
+        52          => '\NetDNS2\RR\TLSA',
+        53          => '\NetDNS2\RR\SMIMEA',
+        55          => '\NetDNS2\RR\HIP',
+        58          => '\NetDNS2\RR\TALINK',
+        59          => '\NetDNS2\RR\CDS',
+        60          => '\NetDNS2\RR\CDNSKEY',
+        61          => '\NetDNS2\RR\OPENPGPKEY',
+        62          => '\NetDNS2\RR\CSYNC',
+        99          => '\NetDNS2\RR\SPF',
+        104         => '\NetDNS2\RR\NID',
+        105         => '\NetDNS2\RR\L32',
+        106         => '\NetDNS2\RR\L64',
+        107         => '\NetDNS2\RR\LP',
+        108         => '\NetDNS2\RR\EUI48',
+        109         => '\NetDNS2\RR\EUI64',
 
-        249         => 'Net_DNS2_RR_TKEY',
-        250         => 'Net_DNS2_RR_TSIG',
+        249         => '\NetDNS2\RR\TKEY',
+        250         => '\NetDNS2\RR\TSIG',
 
     //    251            - IXFR - handled as a full zone transfer (252)
     //    252            - AXFR - handled as a function call
 
-        255         => 'Net_DNS2_RR_ANY',
-        256         => 'Net_DNS2_RR_URI',
-        257         => 'Net_DNS2_RR_CAA',
-        258         => 'Net_DNS2_RR_AVC',
-        260         => 'Net_DNS2_RR_AMTRELAY',
-        32768       => 'Net_DNS2_RR_TA',
-        32769       => 'Net_DNS2_RR_DLV',
-        65534       => 'Net_DNS2_RR_TYPE65534'
+        255         => '\NetDNS2\RR\ANY',
+        256         => '\NetDNS2\RR\URI',
+        257         => '\NetDNS2\RR\CAA',
+        258         => '\NetDNS2\RR\AVC',
+        260         => '\NetDNS2\RR\AMTRELAY',
+        32768       => '\NetDNS2\RR\TA',
+        32769       => '\NetDNS2\RR\DLV',
+        65534       => '\NetDNS2\RR\TYPE65534'
     ];
 
     /*
