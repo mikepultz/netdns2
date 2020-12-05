@@ -143,7 +143,7 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
             
             if (filesize($this->cache_file) > 0) {
                 $data = @fread($fp, filesize($this->cache_file));
-            ]
+            }
             
             if ( ($data !== false) && (strlen($data) > 0) ) {
 
