@@ -57,8 +57,7 @@ class CAA extends \NetDNS2\RR
      */
     protected function rrToString()
     {
-        return $this->flags . ' ' . $this->tag . ' "' . 
-            trim($this->cleanString($this->value), '"') . '"';
+        return $this->flags . ' ' . $this->tag . ' "' . trim($this->cleanString($this->value), '"') . '"';
     }
 
     /**
@@ -91,8 +90,8 @@ class CAA extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-            
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the flags and tag length
             //
@@ -125,8 +124,8 @@ class CAA extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->value) > 0) {
-
+        if (strlen($this->value) > 0)
+        {
             $data  = chr($this->flags);
             $data .= chr(strlen($this->tag)) . $this->tag . $this->value;
 

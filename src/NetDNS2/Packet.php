@@ -101,7 +101,7 @@ class Packet
         {
             $output .= $x->__toString() . "\n";
         }
-        foreach ($this->answer as $x)
+        foreach($this->answer as $x)
         {
             $output .= $x->__toString() . "\n";
         }
@@ -109,7 +109,7 @@ class Packet
         {
             $output .= $x->__toString() . "\n";
         }
-        foreach ($this->additional as $x)
+        foreach($this->additional as $x)
         {
             $output .= $x->__toString() . "\n";
         }

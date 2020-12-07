@@ -131,8 +131,8 @@ class SOA extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // parse the 
             //
@@ -144,10 +144,7 @@ class SOA extends \NetDNS2\RR
             //
             // get the SOA values
             //
-            $x = unpack(
-                '@' . $offset . '/Nserial/Nrefresh/Nretry/Nexpire/Nminimum/', 
-                $packet->rdata
-            );
+            $x = unpack('@' . $offset . '/Nserial/Nrefresh/Nretry/Nexpire/Nminimum/', $packet->rdata);
 
             $this->serial   = \NetDNS2\Client::expandUint32($x['serial']);
             $this->refresh  = \NetDNS2\Client::expandUint32($x['refresh']);
@@ -174,15 +171,11 @@ class SOA extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->mname) > 0) {
-    
+        if (strlen($this->mname) > 0)
+        {
             $data = $packet->compress($this->mname, $packet->offset);
             $data .= $packet->compress($this->rname, $packet->offset);
-
-            $data .= pack(
-                'N5', $this->serial, $this->refresh, $this->retry, 
-                $this->expire, $this->minimum
-            );
+            $data .= pack('N5', $this->serial, $this->refresh, $this->retry, $this->expire, $this->minimum);
 
             $packet->offset += 20;
 

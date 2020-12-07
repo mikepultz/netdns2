@@ -74,7 +74,8 @@ class BitMap
             }
 
             $blen = strlen($bitstr);
-            for ($i=0; $i<$blen; $i++)
+
+            for($i=0; $i<$blen; $i++)
             {
                 if ($bitstr[$i] == '1')
                 {
@@ -171,7 +172,7 @@ class BitMap
         {
             $bitstr = '';
 
-            for ($i=0; $i<$bm[$window]['length'] * 8; $i++)
+            for($i=0; $i<$bm[$window]['length'] * 8; $i++)
             {
                 if (isset($bm[$window][$i]))
                 {

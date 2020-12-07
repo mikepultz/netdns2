@@ -82,8 +82,8 @@ class TALINK extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             $offset         = $packet->offset;
 
             $this->previous = \NetDNS2\Packet::label($packet, $offset);
@@ -108,10 +108,9 @@ class TALINK extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if ( (strlen($this->previous) > 0) || (strlen($this->next) > 0) ) {
-
-            $data = chr(strlen($this->previous)) . $this->previous . 
-                chr(strlen($this->next)) . $this->next;
+        if ( (strlen($this->previous) > 0) || (strlen($this->next) > 0) )
+        {
+            $data = chr(strlen($this->previous)) . $this->previous . chr(strlen($this->next)) . $this->next;
 
             $packet->offset += strlen($data);
 

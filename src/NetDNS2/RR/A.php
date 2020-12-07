@@ -59,8 +59,8 @@ class A extends \NetDNS2\RR
     {
         $value = array_shift($rdata);
 
-        if (\NetDNS2\Client::isIPv4($value) == true) {
-            
+        if (\NetDNS2\Client::isIPv4($value) == true)
+        {
             $this->address = $value;
             return true;
         }
@@ -79,11 +79,11 @@ class A extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             $this->address = inet_ntop($this->rdata);
-            if ($this->address !== false) {
-            
+            if ($this->address !== false)
+            {
                 return true;
             }
         }

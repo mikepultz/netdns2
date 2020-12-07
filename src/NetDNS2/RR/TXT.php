@@ -43,14 +43,15 @@ class TXT extends \NetDNS2\RR
      */
     protected function rrToString()
     {
-        if (count($this->text) == 0) {
+        if (count($this->text) == 0)
+        {
             return '""';
         }
 
         $data = '';
 
-        foreach ($this->text as $t) {
-
+        foreach($this->text as $t)
+        {
             $data .= $this->formatString($t) . ' ';
         }
 
@@ -69,8 +70,9 @@ class TXT extends \NetDNS2\RR
     protected function rrFromString(array $rdata)
     {
         $data = $this->buildString($rdata);
-        if (count($data) > 0) {
 
+        if (count($data) > 0)
+        {
             $this->text = $data;
         }
 
@@ -88,13 +90,13 @@ class TXT extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-            
+        if ($this->rdlength > 0)
+        {
             $length = $packet->offset + $this->rdlength;
             $offset = $packet->offset;
 
-            while ($length > $offset) {
-
+            while($length > $offset)
+            {
                 $this->text[] = \NetDNS2\Packet::label($packet, $offset);
             }
 
@@ -119,8 +121,8 @@ class TXT extends \NetDNS2\RR
     {
         $data = null;
 
-        foreach ($this->text as $t) {
-
+        foreach($this->text as $t)
+        {
             $data .= chr(strlen($t)) . $t;
         }
 

@@ -72,8 +72,8 @@ class AAAA extends \NetDNS2\RR
         //
         $value = array_shift($rdata);
 
-        if (\NetDNS2\Client::isIPv6($value) == true) {
-
+        if (\NetDNS2\Client::isIPv6($value) == true)
+        {
             $this->address = $value;
             return true;
         }
@@ -95,16 +95,16 @@ class AAAA extends \NetDNS2\RR
         //
         // must be 8 x 16bit chunks, or 16 x 8bit
         //
-        if ($this->rdlength == 16) {
-
+        if ($this->rdlength == 16)
+        {
             //
             // PHP's inet_ntop returns IPv6 addresses in their compressed form,
             // but we want to keep with the preferred standard, so we'll parse
             // it manually.
             //
             $x = unpack('n8', $this->rdata);
-            if (count($x) == 8) {
-
+            if (count($x) == 8)
+            {
                 $this->address = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', $x);
                 return true;
             }

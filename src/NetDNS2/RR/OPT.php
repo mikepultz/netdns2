@@ -101,8 +101,8 @@ class OPT extends \NetDNS2\RR
         //
         // everthing else gets passed through to the parent.
         //
-        if ( (!is_null($packet)) && (!is_null($rr)) ) {
-
+        if ( (is_null($packet) == false) && (is_null($rr) == false) )
+        {
             parent::__construct($packet, $rr);
         }
     }
@@ -172,8 +172,8 @@ class OPT extends \NetDNS2\RR
         //
         // parse the data, if there is any
         //
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the code and length
             //
@@ -205,10 +205,7 @@ class OPT extends \NetDNS2\RR
         //
         // build the TTL value based on the local values
         //
-        $ttl = unpack(
-            'N', 
-            pack('CCCC', $this->extended_rcode, $this->version, ($this->do << 7), 0)
-        );
+        $ttl = unpack('N', pack('CCCC', $this->extended_rcode, $this->version, ($this->do << 7), 0));
 
         $this->ttl = $ttl[1];
 
@@ -231,8 +228,8 @@ class OPT extends \NetDNS2\RR
         //
         // if there is an option code, then pack that data too
         //
-        if ($this->option_code > 0) {
-
+        if ($this->option_code > 0)
+        {
             $data = pack('nn', $this->option_code, $this->option_length) . $this->option_data;
 
             $packet->offset += strlen($data);

@@ -65,8 +65,8 @@ class HINFO extends \NetDNS2\RR
     protected function rrFromString(array $rdata)
     {
         $data = $this->buildString($rdata);
-        if (count($data) == 2) {
-
+        if (count($data) == 2)
+        {
             $this->cpu  = trim($data[0], '"');
             $this->os   = trim($data[1], '"');
 
@@ -87,8 +87,8 @@ class HINFO extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             $offset = $packet->offset;
     
             $this->cpu  = \NetDNS2\Packet::label($packet, $offset);
@@ -113,8 +113,8 @@ class HINFO extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->cpu) > 0) {
-
+        if (strlen($this->cpu) > 0)
+        {
             $data = pack('Ca*Ca*', strlen($this->cpu), $this->cpu, strlen($this->os), $this->os);
 
             $packet->offset += strlen($data);

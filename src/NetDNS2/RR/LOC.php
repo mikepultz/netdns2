@@ -100,8 +100,8 @@ class LOC extends \NetDNS2\RR
      */
     protected function rrToString()
     {
-        if ($this->version == 0) {
-
+        if ($this->version == 0)
+        {
             return $this->_d2Dms($this->latitude, 'LAT') . ' ' . 
                 $this->_d2Dms($this->longitude, 'LNG') . ' ' . 
                 sprintf('%.2fm', $this->altitude) . ' ' .
@@ -131,14 +131,10 @@ class LOC extends \NetDNS2\RR
         //      [siz["m"] [hp["m"] [vp["m"]]]]
         //
         $res = preg_match(
-            '/^(\d+) \s+((\d+) \s+)?(([\d.]+) \s+)?(N|S) \s+(\d+) ' .
-            '\s+((\d+) \s+)?(([\d.]+) \s+)?(E|W) \s+(-?[\d.]+) m?(\s+ ' .
-            '([\d.]+) m?)?(\s+ ([\d.]+) m?)?(\s+ ([\d.]+) m?)?/ix', 
-            implode(' ', $rdata), $x
-        );
 
-        if ($res) {
-
+        if (preg_match('/^(\d+) \s+((\d+) \s+)?(([\d.]+) \s+)?(N|S) \s+(\d+) ' .
+            '\s+((\d+) \s+)?(([\d.]+) \s+)?(E|W) \s+(-?[\d.]+) m?(\s+ ([\d.]+) m?)?(\s+ ([\d.]+) m?)?(\s+ ([\d.]+) m?)?/ix', implode(' ', $rdata), $x) == 1)
+        {
             //
             // latitude
             //
@@ -186,22 +182,19 @@ class LOC extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack all the values
             //
-            $x = unpack(
-                'Cver/Csize/Choriz_pre/Cvert_pre/Nlatitude/Nlongitude/Naltitude', 
-                $this->rdata
-            );
+            $x = unpack('Cver/Csize/Choriz_pre/Cvert_pre/Nlatitude/Nlongitude/Naltitude', $this->rdata);
 
             //
             // version must be 0 per RFC 1876 section 2
             //
             $this->version = $x['ver'];
-            if ($this->version == 0) {
-
+            if ($this->version == 0)
+            {
                 $this->size         = $this->_precsizeNtoA($x['size']);
                 $this->horiz_pre    = $this->_precsizeNtoA($x['horiz_pre']);
                 $this->vert_pre     = $this->_precsizeNtoA($x['vert_pre']);
@@ -209,24 +202,20 @@ class LOC extends \NetDNS2\RR
                 //
                 // convert the latitude and longitude to degress in decimal
                 //
-                if ($x['latitude'] < 0) {
-
-                    $this->latitude = ($x['latitude'] + 
-                        self::REFERENCE_LATLON) / self::CONV_DEG;
-                } else {
-
-                    $this->latitude = ($x['latitude'] - 
-                        self::REFERENCE_LATLON) / self::CONV_DEG;
+                if ($x['latitude'] < 0)
+                {
+                    $this->latitude = ($x['latitude'] + self::REFERENCE_LATLON) / self::CONV_DEG;
+                } else
+                {
+                    $this->latitude = ($x['latitude'] - self::REFERENCE_LATLON) / self::CONV_DEG;
                 }
 
-                if ($x['longitude'] < 0) {
- 
-                    $this->longitude = ($x['longitude'] + 
-                        self::REFERENCE_LATLON) / self::CONV_DEG;
-                } else {
-
-                    $this->longitude = ($x['longitude'] - 
-                        self::REFERENCE_LATLON) / self::CONV_DEG;
+                if ($x['longitude'] < 0)
+                {
+                    $this->longitude = ($x['longitude'] + self::REFERENCE_LATLON) / self::CONV_DEG;
+                } else
+                {
+                    $this->longitude = ($x['longitude'] - self::REFERENCE_LATLON) / self::CONV_DEG;
                 }
 
                 //
@@ -236,8 +225,8 @@ class LOC extends \NetDNS2\RR
 
                 return true;
 
-            } else {
-
+            } else
+            {
                 return false;
             }
 
@@ -260,31 +249,29 @@ class LOC extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if ($this->version == 0) {
-
+        if ($this->version == 0)
+        {
             $lat = 0;
             $lng = 0;
 
-            if ($this->latitude < 0) {
-
+            if ($this->latitude < 0)
+            {
                 $lat = ($this->latitude * self::CONV_DEG) - self::REFERENCE_LATLON;
-            } else {
-
+            } else
+            {
                 $lat = ($this->latitude * self::CONV_DEG) + self::REFERENCE_LATLON;
             }
-
-            if ($this->longitude < 0) {
-
+            if ($this->longitude < 0)
+            {
                 $lng = ($this->longitude * self::CONV_DEG) - self::REFERENCE_LATLON;
-            } else {
-
+            } else
+            {
                 $lng = ($this->longitude * self::CONV_DEG) + self::REFERENCE_LATLON;
             }
 
             $packet->offset += 16;
 
-            return pack(
-                'CCCCNNN', 
+            return pack('CCCCNNN', 
                 $this->version,
                 $this->_precsizeAtoN($this->size),
                 $this->_precsizeAtoN($this->horiz_pre),
@@ -328,8 +315,8 @@ class LOC extends \NetDNS2\RR
     private function _precsizeAtoN($prec)
     {
         $exponent = 0;
-        while ($prec >= 10) {
-
+        while($prec >= 10)
+        {
             $prec /= 10;
             ++$exponent;
         }
@@ -376,9 +363,11 @@ class LOC extends \NetDNS2\RR
         $msec = 0;
         $hem = '';
 
-        if ($latlng == 'LAT') {
+        if ($latlng == 'LAT')
+        {
             $hem = ($data > 0) ? 'N' : 'S';
-        } else {
+        } else
+        {
             $hem = ($data > 0) ? 'E' : 'W';
         }
 

@@ -85,8 +85,8 @@ class KX extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-   
+        if ($this->rdlength > 0)
+        {
             //
             // parse the preference
             //
@@ -118,10 +118,9 @@ class KX extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->exchange) > 0) {
-     
-            $data = pack('nC', $this->preference, strlen($this->exchange)) . 
-                $this->exchange;
+        if (strlen($this->exchange) > 0)
+        {
+            $data = pack('nC', $this->preference, strlen($this->exchange)) . $this->exchange;
 
             $packet->offset += strlen($data);
 

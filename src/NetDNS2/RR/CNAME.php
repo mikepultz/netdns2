@@ -73,8 +73,8 @@ class CNAME extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             $offset = $packet->offset;
             $this->cname = \NetDNS2\Packet::expand($packet, $offset);
 
@@ -97,8 +97,8 @@ class CNAME extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->cname) > 0) {
-
+        if (strlen($this->cname) > 0)
+        {
             return $packet->compress($this->cname, $packet->offset);
         }
 

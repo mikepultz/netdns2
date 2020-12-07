@@ -50,8 +50,7 @@ class ISDN extends \NetDNS2\RR
      */
     protected function rrToString()
     {
-        return $this->formatString($this->isdnaddress) . ' ' . 
-            $this->formatString($this->sa);
+        return $this->formatString($this->isdnaddress) . ' ' . $this->formatString($this->sa);
     }
 
     /**
@@ -66,11 +65,11 @@ class ISDN extends \NetDNS2\RR
     protected function rrFromString(array $rdata)
     {
         $data = $this->buildString($rdata);
-        if (count($data) >= 1) {
-
+        if (count($data) >= 1)
+        {
             $this->isdnaddress = $data[0];
-            if (isset($data[1])) {
-                
+            if (isset($data[1]) == true)
+            {
                 $this->sa = $data[1];
             }
 
@@ -91,18 +90,18 @@ class ISDN extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             $this->isdnaddress = \NetDNS2\Packet::label($packet, $packet->offset);
 
             //
             // look for a SA (sub address) - it's optional
             //
-            if ( (strlen($this->isdnaddress) + 1) < $this->rdlength) {
-
+            if ( (strlen($this->isdnaddress) + 1) < $this->rdlength)
+            {
                 $this->sa = \NetDNS2\Packet::label($packet, $packet->offset);
-            } else {
-            
+            } else
+            {
                 $this->sa = '';
             }
 
@@ -125,11 +124,11 @@ class ISDN extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->isdnaddress) > 0) {
-
+        if (strlen($this->isdnaddress) > 0)
+        {
             $data = chr(strlen($this->isdnaddress)) . $this->isdnaddress;
-            if (!empty($this->sa)) {
-
+            if (empty($this->sa) == false)
+            {
                 $data .= chr(strlen($this->sa));
                 $data .= $this->sa;
             }

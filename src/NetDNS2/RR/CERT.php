@@ -114,8 +114,7 @@ class CERT extends \NetDNS2\RR
      */
     protected function rrToString()
     {
-        return $this->format . ' ' . $this->keytag . ' ' . $this->algorithm . 
-            ' ' . base64_encode($this->certificate);
+        return $this->format . ' ' . $this->keytag . ' ' . $this->algorithm . ' ' . base64_encode($this->certificate);
     }
 
     /**
@@ -133,19 +132,22 @@ class CERT extends \NetDNS2\RR
         // load and check the format; can be an int, or a mnemonic symbol
         //
         $this->format = array_shift($rdata);
-        if (!is_numeric($this->format)) {
 
+        if (is_numeric($this->format) == false)
+        {
             $mnemonic = strtoupper(trim($this->format));
-            if (!isset($this->cert_format_name_to_id[$mnemonic])) {
 
+            if (isset($this->cert_format_name_to_id[$mnemonic]) == false)
+            {
                 return false;
             }
 
             $this->format = $this->cert_format_name_to_id[$mnemonic];
-        } else {
 
-            if (!isset($this->cert_format_id_to_name[$this->format])) {
-
+        } else
+        {
+            if (isset($this->cert_format_id_to_name[$this->format]) == false)
+            {
                 return false;
             }
         }
@@ -156,20 +158,22 @@ class CERT extends \NetDNS2\RR
         // parse and check the algorithm; can be an int, or a mnemonic symbol
         //
         $this->algorithm = array_shift($rdata);
-        if (!is_numeric($this->algorithm)) {
 
+        if (is_numeric($this->algorithm) == false)
+        {
             $mnemonic = strtoupper(trim($this->algorithm));
-            if (!isset(\NetDNS2\Lookups::$algorithm_name_to_id[$mnemonic])) {
 
+            if (isset(\NetDNS2\Lookups::$algorithm_name_to_id[$mnemonic]) == false)
+            {
                 return false;
             }
 
-            $this->algorithm = \NetDNS2\Lookups::$algorithm_name_to_id[
-                $mnemonic
-            ];
-        } else {
+            $this->algorithm = \NetDNS2\Lookups::$algorithm_name_to_id[$mnemonic];
 
-            if (!isset(\NetDNS2\Lookups::$algorithm_id_to_name[$this->algorithm])) {
+        } else
+        {
+            if (isset(\NetDNS2\Lookups::$algorithm_id_to_name[$this->algorithm]) == false)
+            {
                 return false;
             }
         }
@@ -196,8 +200,8 @@ class CERT extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the format, keytag and algorithm
             //
@@ -231,8 +235,8 @@ class CERT extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->certificate) > 0) {
-
+        if (strlen($this->certificate) > 0)
+        {
             $data = pack('nnC', $this->format, $this->keytag, $this->algorithm) . $this->certificate;
 
             $packet->offset += strlen($data);

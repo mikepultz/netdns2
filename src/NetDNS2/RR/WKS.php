@@ -61,7 +61,8 @@ class WKS extends \NetDNS2\RR
     {
         $data = $this->address . ' ' . $this->protocol;
 
-        foreach ($this->bitmap as $port) {
+        foreach($this->bitmap as $port)
+        {
             $data .= ' ' . $port;
         }
 
@@ -97,8 +98,8 @@ class WKS extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // get the address and protocol value
             //
@@ -111,12 +112,14 @@ class WKS extends \NetDNS2\RR
             // unpack the port list bitmap
             //
             $port = 0;
-            foreach (unpack('@5/C*', $this->rdata) as $set) {
-
+            foreach(unpack('@5/C*', $this->rdata) as $set)
+            {
                 $s = sprintf('%08b', $set);
 
-                for ($i=0; $i<8; $i++, $port++) {
-                    if ($s[$i] == '1') {
+                for($i=0; $i<8; $i++, $port++)
+                {
+                    if ($s[$i] == '1')
+                    {
                         $this->bitmap[] = $port;
                     }
                 }
@@ -141,22 +144,26 @@ class WKS extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->address) > 0) {
-
+        if (strlen($this->address) > 0)
+        {
             $data = pack('NC', ip2long($this->address), $this->protocol);
 
             $ports = [];
-
             $n = 0;
-            foreach ($this->bitmap as $port) {
+
+            foreach($this->bitmap as $port)
+            {
                 $ports[$port] = 1;
 
-                if ($port > $n) {
+                if ($port > $n)
+                {
                     $n = $port;
                 }
             }
-            for ($i=0; $i<ceil($n/8)*8; $i++) {
-                if (!isset($ports[$i])) {
+            for($i=0; $i<ceil($n/8)*8; $i++)
+            {
+                if (!isset($ports[$i]))
+                {
                     $ports[$i] = 0;
                 }
             }
@@ -166,13 +173,13 @@ class WKS extends \NetDNS2\RR
             $string = '';
             $n = 0;
 
-            foreach ($ports as $s) {
-
+            foreach($ports as $s)
+            {
                 $string .= $s;
                 $n++;
 
-                if ($n == 8) {
-
+                if ($n == 8)
+                {
                     $data .= chr(bindec($string));
                     $string = '';
                     $n = 0;

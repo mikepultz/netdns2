@@ -91,11 +91,11 @@ class NSEC3 extends \NetDNS2\RR
         // per RFC5155, the salt_length value isn't displayed, and if the salt
         // is empty, the salt is displayed as '-'
         //
-        if ($this->salt_length > 0) {
-  
+        if ($this->salt_length > 0)
+        {
             $out .= $this->salt;
-        } else {     
- 
+        } else
+        {
             $out .= '-';
         }
 
@@ -107,8 +107,8 @@ class NSEC3 extends \NetDNS2\RR
         //
         // show the RR's
         //
-        foreach ($this->type_bit_maps as $rr) {
-    
+        foreach($this->type_bit_maps as $rr)
+        {
             $out .= ' ' . strtoupper($rr);
         }
 
@@ -134,12 +134,13 @@ class NSEC3 extends \NetDNS2\RR
         // an empty salt is represented as '-' per RFC5155 section 3.3
         //
         $salt = array_shift($rdata);
-        if ($salt == '-') {
 
+        if ($salt == '-')
+        {
             $this->salt_length = 0;
             $this->salt = '';
-        } else {
-    
+        } else
+        {
             $this->salt_length = strlen(pack('H*', $salt));
             $this->salt = strtoupper($salt);
         }
@@ -163,8 +164,8 @@ class NSEC3 extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-        
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the first values
             //
@@ -177,8 +178,8 @@ class NSEC3 extends \NetDNS2\RR
 
             $offset = 5;
 
-            if ($this->salt_length > 0) {
- 
+            if ($this->salt_length > 0)
+            {
                 $x = unpack('H*', substr($this->rdata, $offset, $this->salt_length));
                 $this->salt = strtoupper($x[1]);
                 $offset += $this->salt_length;
@@ -194,20 +195,17 @@ class NSEC3 extends \NetDNS2\RR
             // copy out the hash
             //
             $this->hash_length  = $x['hash_length'];
-            if ($this->hash_length > 0) {
 
-                $this->hashed_owner_name = base64_encode(
-                    substr($this->rdata, $offset, $this->hash_length)
-                );
+            if ($this->hash_length > 0)
+            {
+                $this->hashed_owner_name = base64_encode(substr($this->rdata, $offset, $this->hash_length));
                 $offset += $this->hash_length;
             }
 
             //
             // parse out the RR bitmap
             //
-            $this->type_bit_maps = \NetDNS2\BitMap::bitMapToArray(
-                substr($this->rdata, $offset)
-            );
+            $this->type_bit_maps = \NetDNS2\BitMap::bitMapToArray(substr($this->rdata, $offset));
 
             return true;
         }
@@ -237,18 +235,15 @@ class NSEC3 extends \NetDNS2\RR
         //
         // pack the algorithm, flags, iterations and salt length
         //
-        $data = pack(
-            'CCnC',
-            $this->algorithm, $this->flags, $this->iterations, $this->salt_length
-        );
+        $data = pack('CCnC', $this->algorithm, $this->flags, $this->iterations, $this->salt_length);
         $data .= $salt;
 
         //
         // add the hash length and hash
         //
         $data .= chr($this->hash_length);
-        if ($this->hash_length > 0) {
-
+        if ($this->hash_length > 0)
+        {
             $data .= base64_decode($this->hashed_owner_name);
         }
 

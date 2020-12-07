@@ -77,11 +77,11 @@ class Question
      */
     public function __construct(\NetDNS2\Packet &$packet = null)
     {
-        if (!is_null($packet)) {
-
+        if (is_null($packet) == false)
+        {
             $this->set($packet);
-        } else {
-
+        } else
+        {
             $this->qname    = '';
             $this->qtype    = 'A';
             $this->qclass   = 'IN';
@@ -97,8 +97,7 @@ class Question
      */
     public function __toString()
     {
-        return ";;\n;; Question:\n;;\t " . $this->qname . '. ' . 
-            $this->qtype . ' ' . $this->qclass . "\n";
+        return ";;\n;; Question:\n;;\t " . $this->qname . '. ' . $this->qtype . ' ' . $this->qclass . "\n";
     }
 
     /**

@@ -58,8 +58,9 @@ class X25 extends \NetDNS2\RR
     protected function rrFromString(array $rdata)
     {
         $data = $this->buildString($rdata);
-        if (count($data) == 1) {
 
+        if (count($data) == 1)
+        {
             $this->psdnaddress = $data[0];
             return true;
         }
@@ -78,8 +79,8 @@ class X25 extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             $this->psdnaddress = \NetDNS2\Packet::label($packet, $packet->offset);
             return true;
         }
@@ -100,8 +101,8 @@ class X25 extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->psdnaddress) > 0) {
-
+        if (strlen($this->psdnaddress) > 0)
+        {
             $data = chr(strlen($this->psdnaddress)) . $this->psdnaddress;
             
             $packet->offset += strlen($data);

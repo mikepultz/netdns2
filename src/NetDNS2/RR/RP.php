@@ -83,8 +83,8 @@ class RP extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             $offset             = $packet->offset;
 
             $this->mboxdname    = \NetDNS2\Packet::expand($packet, $offset, true);
@@ -109,10 +109,9 @@ class RP extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->mboxdname) > 0) {
-
-            return $packet->compress($this->mboxdname, $packet->offset) .
-                $packet->compress($this->txtdname, $packet->offset);
+        if (strlen($this->mboxdname) > 0)
+        {
+            return $packet->compress($this->mboxdname, $packet->offset) . $packet->compress($this->txtdname, $packet->offset);
         }
 
         return null;

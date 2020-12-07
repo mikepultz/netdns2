@@ -76,8 +76,8 @@ class OPENPGPKEY extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             $this->key = base64_encode(substr($this->rdata, 0, $this->rdlength));
 
             return true;
@@ -99,8 +99,8 @@ class OPENPGPKEY extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->key) > 0) {
-
+        if (strlen($this->key) > 0)
+        {
             $data = base64_decode($this->key);
 
             $packet->offset += strlen($data);

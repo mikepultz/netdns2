@@ -53,8 +53,8 @@ class NSEC extends \NetDNS2\RR
     {
         $data = $this->cleanString($this->next_domain_name) . '.';
 
-        foreach ($this->type_bit_maps as $rr) {
-
+        foreach($this->type_bit_maps as $rr)
+        {
             $data .= ' ' . $rr;
         }
 
@@ -89,8 +89,8 @@ class NSEC extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // expand the next domain name
             //
@@ -100,9 +100,7 @@ class NSEC extends \NetDNS2\RR
             //
             // parse out the RR's from the bitmap
             //
-            $this->type_bit_maps = \NetDNS2\BitMap::bitMapToArray(
-                substr($this->rdata, $offset - $packet->offset)
-            );
+            $this->type_bit_maps = \NetDNS2\BitMap::bitMapToArray(substr($this->rdata, $offset - $packet->offset));
 
             return true;
         }
@@ -123,8 +121,8 @@ class NSEC extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->next_domain_name) > 0) {
-
+        if (strlen($this->next_domain_name) > 0)
+        {
             $data = $packet->compress($this->next_domain_name, $packet->offset);
             $bitmap = \NetDNS2\BitMap::arrayToBitMap($this->type_bit_maps);
     

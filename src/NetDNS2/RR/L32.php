@@ -82,8 +82,8 @@ class L32 extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the values
             //
@@ -116,8 +116,8 @@ class L32 extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->locator32) > 0) {
-
+        if (strlen($this->locator32) > 0)
+        {
             //
             // break out the locator value
             //

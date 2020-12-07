@@ -73,9 +73,9 @@ class TYPE65534 extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
+        if ($this->rdlength > 0)
+        {
             $this->private_data  = $this->rdata;
-
             return true;
         }
 
@@ -95,8 +95,8 @@ class TYPE65534 extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->private_data) > 0) {
-
+        if (strlen($this->private_data) > 0)
+        {
             $data = $this->private_data;
 
             $packet->offset += strlen($data);

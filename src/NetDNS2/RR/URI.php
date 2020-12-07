@@ -93,8 +93,8 @@ class URI extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-            
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the priority and weight
             //
@@ -123,8 +123,8 @@ class URI extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->target) > 0) {
-
+        if (strlen($this->target) > 0)
+        {
             $data = pack('nna*', $this->priority, $this->weight, $this->target);
 
             $packet->offset += strlen($data);

@@ -87,11 +87,10 @@ class HIP extends \NetDNS2\RR
      */
     protected function rrToString()
     {
-        $out = $this->pk_algorithm . ' ' . 
-            $this->hit . ' ' . $this->public_key . ' ';
+        $out = $this->pk_algorithm . ' ' . $this->hit . ' ' . $this->public_key . ' ';
 
-        foreach ($this->rendezvous_servers as $index => $server) {
-        
+        foreach($this->rendezvous_servers as $index => $server)
+        {
             $out .= $server . '. ';
         }
 
@@ -117,8 +116,8 @@ class HIP extends \NetDNS2\RR
         // anything left on the array, must be one or more rendezevous servers. add
         // them and strip off the trailing dot
         //
-        if (count($rdata) > 0) {
-
+        if (count($rdata) > 0)
+        {
             $this->rendezvous_servers = preg_replace('/\.$/', '', $rdata);
         }
 
@@ -142,8 +141,8 @@ class HIP extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the algorithm and length values
             //
@@ -166,9 +165,7 @@ class HIP extends \NetDNS2\RR
             //
             // copy out the public key
             //
-            $this->public_key = base64_encode(
-                substr($this->rdata, $offset, $this->pk_length)
-            );
+            $this->public_key = base64_encode(substr($this->rdata, $offset, $this->pk_length));
             $offset += $this->pk_length;
 
             //
@@ -176,11 +173,9 @@ class HIP extends \NetDNS2\RR
             //
             $offset = $packet->offset + $offset;
 
-            while ( ($offset - $packet->offset) < $this->rdlength) {
-
-                $this->rendezvous_servers[] = \NetDNS2\Packet::expand(
-                    $packet, $offset
-                );
+            while( ($offset - $packet->offset) < $this->rdlength)
+            {
+                $this->rendezvous_servers[] = \NetDNS2\Packet::expand($packet, $offset);
             }
 
             return true;
@@ -202,18 +197,12 @@ class HIP extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if ( (strlen($this->hit) > 0) && (strlen($this->public_key) > 0) ) {
-
+        if ( (strlen($this->hit) > 0) && (strlen($this->public_key) > 0) )
+        {
             //
             // pack the length, algorithm and HIT values
             //
-            $data = pack(
-                'CCnH*', 
-                $this->hit_length, 
-                $this->pk_algorithm, 
-                $this->pk_length,
-                $this->hit                
-            );
+            $data = pack('CCnH*', $this->hit_length, $this->pk_algorithm, $this->pk_length, $this->hit);
             
             //
             // add the public key
@@ -228,8 +217,8 @@ class HIP extends \NetDNS2\RR
             //
             // add each rendezvous server
             //
-            foreach ($this->rendezvous_servers as $index => $server) {
-
+            foreach($this->rendezvous_servers as $index => $server)
+            {
                 $data .= $packet->compress($server, $packet->offset);
             }
 

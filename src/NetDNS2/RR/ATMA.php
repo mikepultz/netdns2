@@ -70,18 +70,18 @@ class ATMA extends \NetDNS2\RR
     {
         $value = array_shift($rdata);
 
-        if (ctype_xdigit($value) == true) {
-            
+        if (ctype_xdigit($value) == true)
+        {
             $this->format   = 0;
             $this->address  = $value;
 
-        } else if (is_numeric($value) == true) {
-
+        } else if (is_numeric($value) == true)
+        {
             $this->format   = 1;
             $this->address  = $value;
 
-        } else {
-
+        } else
+        {
             return false;
         }
 
@@ -99,8 +99,8 @@ class ATMA extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the format
             //
@@ -108,18 +108,18 @@ class ATMA extends \NetDNS2\RR
 
             $this->format = $x['format'];
 
-            if ($this->format == 0) {
-
+            if ($this->format == 0)
+            {
                 $a = unpack('@1/H*address', $this->rdata);
 
                 $this->address = $a['address'];
 
-            } else if ($this->format == 1) {
-
+            } else if ($this->format == 1)
+            {
                 $this->address = substr($this->rdata, 1, $this->rdlength - 1);
 
-            } else {
-
+            } else
+            {
                 return false;
             }
 
@@ -144,16 +144,16 @@ class ATMA extends \NetDNS2\RR
     {
         $data = chr($this->format);
 
-        if ($this->format == 0) {
-
+        if ($this->format == 0)
+        {
             $data .= pack('H*', $this->address);
 
-        } else if ($this->format == 1) {
-
+        } else if ($this->format == 1)
+        {
             $data .= $this->address;
 
-        } else {
-
+        } else
+        {
             return null;
         }
 

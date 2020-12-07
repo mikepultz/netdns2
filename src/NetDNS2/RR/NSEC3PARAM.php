@@ -74,11 +74,11 @@ class NSEC3PARAM extends \NetDNS2\RR
         // per RFC5155, the salt_length value isn't displayed, and if the salt 
         // is empty, the salt is displayed as "-"
         //        
-        if ($this->salt_length > 0) {
-
+        if ($this->salt_length > 0)
+        {
             $out .= $this->salt;
-        } else {
-            
+        } else
+        {
             $out .= '-';
         }
     
@@ -101,12 +101,12 @@ class NSEC3PARAM extends \NetDNS2\RR
         $this->iterations   = array_shift($rdata);
 
         $salt = array_shift($rdata);
-        if ($salt == '-') {
-
+        if ($salt == '-')
+        {
             $this->salt_length = 0;
             $this->salt = '';
-        } else {
-
+        } else
+        {
             $this->salt_length = strlen(pack('H*', $salt));
             $this->salt = strtoupper($salt);
         }
@@ -125,8 +125,8 @@ class NSEC3PARAM extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             $x = unpack('Calgorithm/Cflags/niterations/Csalt_length', $this->rdata);
 
             $this->algorithm    = $x['algorithm'];
@@ -134,8 +134,8 @@ class NSEC3PARAM extends \NetDNS2\RR
             $this->iterations   = $x['iterations'];
             $this->salt_length  = $x['salt_length'];
 
-            if ($this->salt_length > 0) {
-
+            if ($this->salt_length > 0)
+            {
                 $x = unpack('H*', substr($this->rdata, 5, $this->salt_length));
                 $this->salt = strtoupper($x[1]);
             }
@@ -162,10 +162,7 @@ class NSEC3PARAM extends \NetDNS2\RR
         $salt = pack('H*', $this->salt);
         $this->salt_length = strlen($salt);
 
-        $data = pack(
-            'CCnC', 
-            $this->algorithm, $this->flags, $this->iterations, $this->salt_length
-        ) . $salt;
+        $data = pack('CCnC', $this->algorithm, $this->flags, $this->iterations, $this->salt_length) . $salt;
 
         $packet->offset += strlen($data);
 

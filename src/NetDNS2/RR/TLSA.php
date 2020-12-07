@@ -97,8 +97,8 @@ class TLSA extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the format, keytag and algorithm
             //
@@ -132,11 +132,9 @@ class TLSA extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->certificate) > 0) {
-
-            $data = pack(
-                'CCC', $this->cert_usage, $this->selector, $this->matching_type
-            ) . $this->certificate;
+        if (strlen($this->certificate) > 0)
+        {
+            $data = pack('CCC', $this->cert_usage, $this->selector, $this->matching_type) . $this->certificate;
 
             $packet->offset += strlen($data);
 

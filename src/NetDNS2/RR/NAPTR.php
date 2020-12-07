@@ -104,8 +104,9 @@ class NAPTR extends \NetDNS2\RR
         $this->preference   = array_shift($rdata);
 
         $data = $this->buildString($rdata);
-        if (count($data) == 4) {
 
+        if (count($data) == 4)
+        {
             $this->flags        = $data[0];
             $this->services     = $data[1];
             $this->regexp       = $data[2];
@@ -128,8 +129,8 @@ class NAPTR extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-            
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the order and preference
             //
@@ -165,8 +166,8 @@ class NAPTR extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if ( (isset($this->order)) && (strlen($this->services) > 0) ) {
-            
+        if ( (isset($this->order) == true) && (strlen($this->services) > 0) )
+        {
             $data = pack('nn', $this->order, $this->preference);
 
             $data .= chr(strlen($this->flags)) . $this->flags;

@@ -63,8 +63,8 @@ class CSYNC extends \NetDNS2\RR
         //
         // show the RR's
         //
-        foreach ($this->type_bit_maps as $rr) {
-
+        foreach($this->type_bit_maps as $rr)
+        {
             $out .= ' ' . strtoupper($rr);
         }
 
@@ -101,8 +101,8 @@ class CSYNC extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the serial and flags values
             //
@@ -114,9 +114,7 @@ class CSYNC extends \NetDNS2\RR
             //
             // parse out the RR bitmap                 
             //
-            $this->type_bit_maps = \NetDNS2\BitMap::bitMapToArray(
-                substr($this->rdata, 6)
-            );
+            $this->type_bit_maps = \NetDNS2\BitMap::bitMapToArray(substr($this->rdata, 6));
 
             return true;
         }

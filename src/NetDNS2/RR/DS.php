@@ -96,8 +96,8 @@ class DS extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the keytag, algorithm and digesttype
             //
@@ -127,8 +127,8 @@ class DS extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->digest) > 0) {
-
+        if (strlen($this->digest) > 0)
+        {
             $data = pack('nCCH*', $this->keytag, $this->algorithm, $this->digesttype, $this->digest);
 
             $packet->offset += strlen($data);

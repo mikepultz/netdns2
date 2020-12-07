@@ -63,8 +63,7 @@ class DNSKEY extends \NetDNS2\RR
      */
     protected function rrToString()
     {
-        return $this->flags . ' ' . $this->protocol . ' ' . 
-            $this->algorithm . ' ' . $this->key;
+        return $this->flags . ' ' . $this->protocol . ' ' . $this->algorithm . ' ' . $this->key;
     }
 
     /**
@@ -97,8 +96,8 @@ class DNSKEY extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the flags, protocol and algorithm
             //
@@ -137,8 +136,8 @@ class DNSKEY extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->key) > 0) {
-
+        if (strlen($this->key) > 0)
+        {
             $data = pack('nCC', $this->flags, $this->protocol, $this->algorithm);
             $data .= base64_decode($this->key);
 

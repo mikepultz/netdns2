@@ -93,8 +93,8 @@ class NSAP extends \NetDNS2\RR
         //
         // make sure the afi value is 47
         //
-        if ($x['afi'] == '47') {
-
+        if ($x['afi'] == '47')
+        {
             $this->afi  = '0x' . $x['afi'];
             $this->idi  = $x['idi'];
             $this->dfi  = $x['dfi'];
@@ -122,8 +122,8 @@ class NSAP extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength == 20) {
-
+        if ($this->rdlength == 20)
+        {
             //
             // get the AFI value
             //
@@ -132,27 +132,21 @@ class NSAP extends \NetDNS2\RR
             //
             // we only support AFI 47- there arent' any others defined.
             //
-            if ($this->afi == '47') {
-
+            if ($this->afi == '47')
+            {
                 //
                 // unpack the rest of the values
                 //
-                $x = unpack(
-                    'Cafi/nidi/Cdfi/C3aa/nrsvd/nrd/narea/Nidh/nidl/Csel', 
-                    $this->rdata
-                );
+                $x = unpack('Cafi/nidi/Cdfi/C3aa/nrsvd/nrd/narea/Nidh/nidl/Csel', $this->rdata);
 
                 $this->afi  = sprintf('0x%02x', $x['afi']);
                 $this->idi  = sprintf('%04x', $x['idi']);
                 $this->dfi  = sprintf('%02x', $x['dfi']);
-                $this->aa   = sprintf(
-                    '%06x', $x['aa1'] << 16 | $x['aa2'] << 8 | $x['aa3']
-                );
+                $this->aa   = sprintf('%06x', $x['aa1'] << 16 | $x['aa2'] << 8 | $x['aa3']);
                 $this->rsvd = sprintf('%04x', $x['rsvd']);
                 $this->rd   = sprintf('%04x', $x['rd']);
                 $this->area = sprintf('%04x', $x['area']);
-                $this->id   = sprintf('%08x', $x['idh']) . 
-                    sprintf('%04x', $x['idl']);
+                $this->id   = sprintf('%08x', $x['idh']) . sprintf('%04x', $x['idl']);
                 $this->sel  = sprintf('%02x', $x['sel']);
 
                 return true;
@@ -175,8 +169,8 @@ class NSAP extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if ($this->afi == '0x47') {
-
+        if ($this->afi == '0x47')
+        {
             //
             // build the aa field
             //
@@ -188,8 +182,7 @@ class NSAP extends \NetDNS2\RR
             $id = unpack('A8a/A4b', $this->id);
 
             //
-            $data = pack(
-                'CnCCCCnnnNnC', 
+            $data = pack('CnCCCCnnnNnC', 
                 hexdec($this->afi), 
                 hexdec($this->idi),
                 hexdec($this->dfi),
@@ -204,8 +197,8 @@ class NSAP extends \NetDNS2\RR
                 hexdec($this->sel)
             );
 
-            if (strlen($data) == 20) {
-                
+            if (strlen($data) == 20)
+            {
                 $packet->offset += 20;
                 return $data;
             }

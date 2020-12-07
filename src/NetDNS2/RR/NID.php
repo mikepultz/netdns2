@@ -84,8 +84,8 @@ class NID extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-        
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the values
             //
@@ -96,10 +96,8 @@ class NID extends \NetDNS2\RR
             //
             // build the node id
             //
-            $this->nodeid = dechex($x['nodeid1']) . ':' . 
-                dechex($x['nodeid2']) . ':' .
-                dechex($x['nodeid3']) . ':' . 
-                dechex($x['nodeid4']);
+            $this->nodeid = dechex($x['nodeid1']) . ':' . dechex($x['nodeid2']) . ':' .
+                dechex($x['nodeid3']) . ':' . dechex($x['nodeid4']);
 
             return true;
         }
@@ -120,8 +118,8 @@ class NID extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->nodeid) > 0) {
-
+        if (strlen($this->nodeid) > 0)
+        {
             //
             // break out the node id
             //
@@ -130,10 +128,7 @@ class NID extends \NetDNS2\RR
             //
             // pack the data
             //
-            return pack(
-                'n5', $this->preference, hexdec($n[0]), hexdec($n[1]), 
-                hexdec($n[2]), hexdec($n[3])
-            );
+            return pack('n5', $this->preference, hexdec($n[0]), hexdec($n[1]), hexdec($n[2]), hexdec($n[3]));
         }
 
         return null;

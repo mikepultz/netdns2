@@ -136,8 +136,8 @@ class TSIG extends \NetDNS2\RR
             base64_encode($this->mac) . ' ' . $this->original_id . ' ' . 
             $this->error . ' '. $this->other_length;
 
-        if ($this->other_length > 0) {
-
+        if ($this->other_length > 0)
+        {
             $out .= ' ' . $this->other_data;
         }
 
@@ -195,8 +195,8 @@ class TSIG extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // expand the algorithm
             //
@@ -207,10 +207,7 @@ class TSIG extends \NetDNS2\RR
             //
             // unpack time, fudge and mac_size
             //
-            $x = unpack(
-                '@' . $offset . '/ntime_high/Ntime_low/nfudge/nmac_size', 
-                $this->rdata
-            );
+            $x = unpack('@' . $offset . '/ntime_high/Ntime_low/nfudge/nmac_size', $this->rdata);
 
             $this->time_signed  = \NetDNS2\Client::expandUint32($x['time_low']);
             $this->fudge        = $x['fudge'];
@@ -221,8 +218,8 @@ class TSIG extends \NetDNS2\RR
             //
             // copy out the mac
             //
-            if ($this->mac_size > 0) {
-            
+            if ($this->mac_size > 0)
+            {
                 $this->mac = substr($this->rdata, $offset, $this->mac_size);
                 $offset += $this->mac_size;
             }
@@ -230,10 +227,7 @@ class TSIG extends \NetDNS2\RR
             //
             // unpack the original id, error, and other_length values
             //
-            $x = unpack(
-                '@' . $offset . '/noriginal_id/nerror/nother_length', 
-                $this->rdata
-            );
+            $x = unpack('@' . $offset . '/noriginal_id/nerror/nother_length', $this->rdata);
         
             $this->original_id  = $x['original_id'];
             $this->error        = $x['error'];
@@ -246,20 +240,17 @@ class TSIG extends \NetDNS2\RR
             // The other length should be 6, and the other data field includes the
             // servers current time - per RFC 2845 section 4.5.2
             //
-            if ($this->error == \NetDNS2\Lookups::RCODE_BADTIME) {
-
-                if ($this->other_length != 6) {
-
+            if ($this->error == \NetDNS2\Lookups::RCODE_BADTIME)
+            {
+                if ($this->other_length != 6)
+                {
                     return false;
                 }
 
                 //
                 // other data is a 48bit timestamp
                 //
-                $x = unpack(
-                    'nhigh/nlow', 
-                    substr($this->rdata, $offset + 6, $this->other_length)
-                );
+                $x = unpack('nhigh/nlow', substr($this->rdata, $offset + 6, $this->other_length));
                 $this->other_data = $x['low'];
             }
 
@@ -282,8 +273,8 @@ class TSIG extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->key) > 0) {
-
+        if (strlen($this->key) > 0)
+        {
             //
             // create a new packet for the signature-
             //
@@ -313,9 +304,7 @@ class TSIG extends \NetDNS2\RR
             //
             // add the class and TTL
             //
-            $sig_data .= pack(
-                'nN', \NetDNS2\Lookups::$classes_by_name[$this->class], $this->ttl
-            );
+            $sig_data .= pack('nN', \NetDNS2\Lookups::$classes_by_name[$this->class], $this->ttl);
 
             //
             // add the algorithm name without compression
@@ -325,21 +314,17 @@ class TSIG extends \NetDNS2\RR
             //
             // add the rest of the values
             //
-            $sig_data .= pack(
-                'nNnnn', 0, $this->time_signed, $this->fudge, 
-                $this->error, $this->other_length
-            );
-            if ($this->other_length > 0) {
+            $sig_data .= pack('nNnnn', 0, $this->time_signed, $this->fudge, $this->error, $this->other_length);
 
+            if ($this->other_length > 0)
+            {
                 $sig_data .= pack('nN', 0, $this->other_data);
             }
 
             //
             // sign the data
             //
-            $this->mac = $this->_signHMAC(
-                $sig_data, base64_decode($this->key), $this->algorithm
-            );
+            $this->mac = $this->_signHMAC($sig_data, base64_decode($this->key), $this->algorithm);
             $this->mac_size = strlen($this->mac);
 
             //
@@ -350,23 +335,22 @@ class TSIG extends \NetDNS2\RR
             //
             // pack the time, fudge and mac size
             //
-            $data .= pack(
-                'nNnn', 0, $this->time_signed, $this->fudge, $this->mac_size
-            );
+            $data .= pack('nNnn', 0, $this->time_signed, $this->fudge, $this->mac_size);
             $data .= $this->mac;
 
             //
             // check the error and other_length
             //
-            if ($this->error == \NetDNS2\Lookups::RCODE_BADTIME) {
-
+            if ($this->error == \NetDNS2\Lookups::RCODE_BADTIME)
+            {
                 $this->other_length = strlen($this->other_data);
-                if ($this->other_length != 6) {
-
+                if ($this->other_length != 6)
+                {
                     return null;
                 }
-            } else {
 
+            } else
+            {
                 $this->other_length = 0;
                 $this->other_data = '';
             }
@@ -374,11 +358,9 @@ class TSIG extends \NetDNS2\RR
             //
             // pack the id, error and other_length
             //
-            $data .= pack(
-                'nnn', $packet->header->id, $this->error, $this->other_length
-            );
-            if ($this->other_length > 0) {
-
+            $data .= pack('nnn', $packet->header->id, $this->error, $this->other_length);
+            if ($this->other_length > 0)
+            {
                 $data .= pack('nN', 0, $this->other_data);
             }
 
@@ -408,14 +390,11 @@ class TSIG extends \NetDNS2\RR
         // use the hash extension; this is included by default in >= 5.1.2 which
         // is our dependent version anyway- so it's easy to switch to it.
         //
-        if (extension_loaded('hash')) {
-
-            if (!isset(self::$hash_algorithms[$algorithm])) {
-
-                throw new \NetDNS2\Exception(
-                    'invalid or unsupported algorithm',
-                    \NetDNS2\Lookups::E_PARSE_ERROR
-                );
+        if (extension_loaded('hash') == true)
+        {
+            if (isset(self::$hash_algorithms[$algorithm]) == false)
+            {
+                throw new \NetDNS2\Exception('invalid or unsupported algorithm', \NetDNS2\Lookups::E_PARSE_ERROR);
             }
 
             return hash_hmac(self::$hash_algorithms[$algorithm], $data, $key, true);
@@ -425,34 +404,29 @@ class TSIG extends \NetDNS2\RR
         // if the hash extension isn't loaded, and they selected something other
         // than MD5, throw an exception
         //
-        if ($algorithm != self::HMAC_MD5) {
-
-            throw new \NetDNS2\Exception(
-                'only HMAC-MD5 supported. please install the php-extension ' .
-                '"hash" in order to use the sha-family',
-                \NetDNS2\Lookups::E_PARSE_ERROR
-            );
+        if ($algorithm != self::HMAC_MD5)
+        {
+            throw new \NetDNS2\Exception('only HMAC-MD5 supported. please install the php-extension "hash" in order to use the sha-family',
+                \NetDNS2\Lookups::E_PARSE_ERROR);
         }
 
         //
         // otherwise, do it ourselves
         //
-        if (is_null($key)) {
-
+        if (is_null($key) == true)
+        {
             return pack('H*', md5($data));
         }
 
         $key = str_pad($key, 64, chr(0x00));
-        if (strlen($key) > 64) {
-    
+        if (strlen($key) > 64)
+        {
             $key = pack('H*', md5($key));
         }
 
         $k_ipad = $key ^ str_repeat(chr(0x36), 64);
         $k_opad = $key ^ str_repeat(chr(0x5c), 64);
 
-        return $this->_signHMAC(
-            $k_opad . pack('H*', md5($k_ipad . $data)), null, $algorithm
-        );
+        return $this->_signHMAC($k_opad . pack('H*', md5($k_ipad . $data)), null, $algorithm);
     }
 }

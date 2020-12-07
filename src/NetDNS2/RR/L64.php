@@ -84,8 +84,8 @@ class L64 extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
- 
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the values
             //
@@ -96,10 +96,8 @@ class L64 extends \NetDNS2\RR
             //
             // build the locator64
             //
-            $this->locator64 = dechex($x['locator1']) . ':' . 
-                dechex($x['locator2']) . ':' .
-                dechex($x['locator3']) . ':' . 
-                dechex($x['locator4']);
+            $this->locator64 = dechex($x['locator1']) . ':' . dechex($x['locator2']) . ':' .
+                dechex($x['locator3']) . ':' . dechex($x['locator4']);
       
             return true;
         }
@@ -120,8 +118,8 @@ class L64 extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->locator64) > 0) {
-      
+        if (strlen($this->locator64) > 0)
+        {
             //
             // break out the locator64
             //
@@ -130,10 +128,7 @@ class L64 extends \NetDNS2\RR
             //
             // pack the data
             //
-            return pack(
-                'n5', $this->preference, hexdec($n[0]), hexdec($n[1]),
-                hexdec($n[2]), hexdec($n[3])
-            );
+            return pack('n5', $this->preference, hexdec($n[0]), hexdec($n[1]), hexdec($n[2]), hexdec($n[3]));
         }
 
         return null;

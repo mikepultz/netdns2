@@ -101,20 +101,17 @@ class SSHFP extends \NetDNS2\RR
         //
         // There are only two algorithm's defined 
         //
-        if ( ($algorithm != self::SSHFP_ALGORITHM_RSA) 
-            && ($algorithm != self::SSHFP_ALGORITHM_DSS) 
-            && ($algorithm != self::SSHFP_ALGORITHM_ECDSA) 
-            && ($algorithm != self::SSHFP_ALGORITHM_ED25519)
-        ) {
+        if ( ($algorithm != self::SSHFP_ALGORITHM_RSA) && ($algorithm != self::SSHFP_ALGORITHM_DSS) && 
+            ($algorithm != self::SSHFP_ALGORITHM_ECDSA) && ($algorithm != self::SSHFP_ALGORITHM_ED25519) )
+        {
             return false;
         }
 
         //
         // there are only two fingerprints defined
         //
-        if ( ($fp_type != self::SSHFP_FPTYPE_SHA1)
-            && ($fp_type != self::SSHFP_FPTYPE_SHA256) 
-        ) {
+        if ( ($fp_type != self::SSHFP_FPTYPE_SHA1) && ($fp_type != self::SSHFP_FPTYPE_SHA256) )
+        {
             return false;
         }
 
@@ -136,8 +133,8 @@ class SSHFP extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the algorithm and finger print type
             //
@@ -149,20 +146,17 @@ class SSHFP extends \NetDNS2\RR
             //
             // There are only three algorithm's defined 
             //
-            if ( ($this->algorithm != self::SSHFP_ALGORITHM_RSA) 
-                && ($this->algorithm != self::SSHFP_ALGORITHM_DSS)
-                && ($this->algorithm != self::SSHFP_ALGORITHM_ECDSA)
-                && ($this->algorithm != self::SSHFP_ALGORITHM_ED25519)
-            ) {
+            if ( ($this->algorithm != self::SSHFP_ALGORITHM_RSA) && ($this->algorithm != self::SSHFP_ALGORITHM_DSS) && 
+                ($this->algorithm != self::SSHFP_ALGORITHM_ECDSA) && ($this->algorithm != self::SSHFP_ALGORITHM_ED25519) )
+            {
                 return false;
             }
 
             //
             // there are only two fingerprints defined
             //
-            if ( ($this->fp_type != self::SSHFP_FPTYPE_SHA1)
-                && ($this->fp_type != self::SSHFP_FPTYPE_SHA256)
-            ) {
+            if ( ($this->fp_type != self::SSHFP_FPTYPE_SHA1) && ($this->fp_type != self::SSHFP_FPTYPE_SHA256) )
+            {
                 return false;
             }
             
@@ -191,11 +185,9 @@ class SSHFP extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->fingerprint) > 0) {
-
-            $data = pack(
-                'CCH*', $this->algorithm, $this->fp_type, $this->fingerprint
-            );
+        if (strlen($this->fingerprint) > 0)
+        {
+            $data = pack('CCH*', $this->algorithm, $this->fp_type, $this->fingerprint);
 
             $packet->offset += strlen($data);
 

@@ -59,8 +59,7 @@ class PX extends \NetDNS2\RR
      */
     protected function rrToString()
     {
-        return $this->preference . ' ' . $this->cleanString($this->map822) . '. ' . 
-            $this->cleanString($this->mapx400) . '.';
+        return $this->preference . ' ' . $this->cleanString($this->map822) . '. ' . $this->cleanString($this->mapx400) . '.';
     }
 
     /**
@@ -92,8 +91,8 @@ class PX extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // parse the preference
             //
@@ -124,8 +123,8 @@ class PX extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->map822) > 0) {
-            
+        if (strlen($this->map822) > 0)
+        {
             $data = pack('n', $this->preference);
             $packet->offset += 2;
 

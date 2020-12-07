@@ -90,11 +90,12 @@ class TKEY extends \NetDNS2\RR
     protected function rrToString()
     {
         $out = $this->cleanString($this->algorithm) . '. ' . $this->mode;
-        if ($this->key_size > 0) {
 
+        if ($this->key_size > 0)
+        {
             $out .= ' ' . trim($this->key_data, '.') . '.';
-        } else {
-
+        } else
+        {
             $out .= ' .';
         }
 
@@ -143,8 +144,8 @@ class TKEY extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-        
+        if ($this->rdlength > 0)
+        {
             //
             // expand the algorithm
             //
@@ -154,10 +155,7 @@ class TKEY extends \NetDNS2\RR
             //
             // unpack inception, expiration, mode, error and key size
             //
-            $x = unpack(
-                '@' . $offset . '/Ninception/Nexpiration/nmode/nerror/nkey_size', 
-                $packet->rdata
-            );
+            $x = unpack('@' . $offset . '/Ninception/Nexpiration/nmode/nerror/nkey_size', $packet->rdata);
 
             $this->inception    = \NetDNS2\Client::expandUint32($x['inception']);
             $this->expiration   = \NetDNS2\Client::expandUint32($x['expiration']);
@@ -170,8 +168,8 @@ class TKEY extends \NetDNS2\RR
             //
             // if key_size > 0, then copy out the key
             //
-            if ($this->key_size > 0) {
-
+            if ($this->key_size > 0)
+            {
                 $this->key_data = substr($packet->rdata, $offset, $this->key_size);
                 $offset += $this->key_size;
             }
@@ -187,11 +185,9 @@ class TKEY extends \NetDNS2\RR
             //
             // if other_size > 0, then copy out the data
             //
-            if ($this->other_size > 0) {
-
-                $this->other_data = substr(
-                    $packet->rdata, $offset, $this->other_size
-                );
+            if ($this->other_size > 0)
+            {
+                $this->other_data = substr($packet->rdata, $offset, $this->other_size);
             }
 
             return true;
@@ -213,8 +209,8 @@ class TKEY extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->algorithm) > 0) {
-
+        if (strlen($this->algorithm) > 0)
+        {
             //
             // make sure the size values are correct
             //
@@ -229,16 +225,13 @@ class TKEY extends \NetDNS2\RR
             //
             // pack in the inception, expiration, mode, error and key size
             //
-            $data .= pack(
-                'NNnnn', $this->inception, $this->expiration, 
-                $this->mode, 0, $this->key_size
-            );
+            $data .= pack('NNnnn', $this->inception, $this->expiration, $this->mode, 0, $this->key_size);
 
             //
             // if the key_size > 0, then add the key
             //
-            if ($this->key_size > 0) {
-            
+            if ($this->key_size > 0)
+            {
                 $data .= $this->key_data;
             }
 
@@ -246,8 +239,9 @@ class TKEY extends \NetDNS2\RR
             // pack in the other size
             //
             $data .= pack('n', $this->other_size);
-            if ($this->other_size > 0) {
 
+            if ($this->other_size > 0)
+            {
                 $data .= $this->other_data;
             }
 

@@ -82,8 +82,8 @@ class MX extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // parse the preference
             //
@@ -115,8 +115,8 @@ class MX extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->exchange) > 0) {
-
+        if (strlen($this->exchange) > 0)
+        {
             $data = pack('n', $this->preference);
             $packet->offset += 2;
 

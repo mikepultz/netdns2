@@ -68,16 +68,18 @@ class EUI48 extends \NetDNS2\RR
         // separated by hyphens.
         //
         $a = explode('-', $value);
-        if (count($a) != 6) {
-
+        if (count($a) != 6)
+        {
             return false;
         }
 
         //
         // make sure they're all hex values
         //
-        foreach ($a as $i) {
-            if (ctype_xdigit($i) == false) {
+        foreach($a as $i)
+        {
+            if (ctype_xdigit($i) == false)
+            {
                 return false;
             }
         }
@@ -101,11 +103,11 @@ class EUI48 extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             $x = unpack('C6', $this->rdata);
-            if (count($x) == 6) {
-            
+            if (count($x) == 6)
+            {
                 $this->address = vsprintf('%02x-%02x-%02x-%02x-%02x-%02x', $x);
                 return true;
             }
@@ -130,8 +132,8 @@ class EUI48 extends \NetDNS2\RR
         $data = '';
 
         $a = explode('-', $this->address);
-        foreach ($a as $b) {
-
+        foreach($a as $b)
+        {
             $data .= chr(hexdec($b));
         }
 

@@ -105,41 +105,45 @@ class AMTRELAY extends \NetDNS2\RR
         // if there's anything else other than 0 in the discovery value, then force it to one, so
         // that it effectively is either "true" or "false".
         //
-        if ($this->discovery != 0) {
+        if ($this->discovery != 0)
+        {
             $this->discovery = 1;
         }
 
         //
         // validate the type & relay values
         //
-        switch($this->relay_type) {
-        case self::AMTRELAY_TYPE_NONE:
-            $this->relay = '';
-            break;
-
-        case self::AMTRELAY_TYPE_IPV4:
-            if (\NetDNS2\Client::isIPv4($this->relay) == false) {
-                return false;
+        switch($this->relay_type)
+        {
+            case self::AMTRELAY_TYPE_NONE:
+            {
+                $this->relay = '';
             }
             break;
-
-        case self::AMTRELAY_TYPE_IPV6:
-            if (\NetDNS2\Client::isIPv6($this->relay) == false) {
-                return false;
+            case self::AMTRELAY_TYPE_IPV4:
+            {
+                if (\NetDNS2\Client::isIPv4($this->relay) == false)
+                {
+                    return false;
+                }
             }
             break;
-
-        case self::AMTRELAY_TYPE_DOMAIN:
-            ; // do nothing
+            case self::AMTRELAY_TYPE_IPV6:
+            {
+                if (\NetDNS2\Client::isIPv6($this->relay) == false)
+                {
+                    return false;
+                }
+            }
+            break;
+            case self::AMTRELAY_TYPE_DOMAIN:
+                ; // do nothing
             break;
 
-        default:
-
-            //
-            // invalid type value
-            //
-            return false;
-
+            default:
+            {
+                return false;
+            }
         }
 
         return true;
@@ -156,8 +160,8 @@ class AMTRELAY extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // parse off the first two octets
             //
@@ -172,41 +176,44 @@ class AMTRELAY extends \NetDNS2\RR
             //
             // parse the relay value based on the type
             //
-            switch($this->relay_type) {
-            case self::AMTRELAY_TYPE_NONE:
-                $this->relay = '';
+            switch($this->relay_type)
+            {
+                case self::AMTRELAY_TYPE_NONE:
+                {
+                    $this->relay = '';
+                }
                 break;
-
-            case self::AMTRELAY_TYPE_IPV4:
-                $this->relay = inet_ntop(substr($this->rdata, $offset, 4));
+                case self::AMTRELAY_TYPE_IPV4:
+                {
+                    $this->relay = inet_ntop(substr($this->rdata, $offset, 4));
+                }
                 break;
-
-            case self::AMTRELAY_TYPE_IPV6:
-
-                //
-                // PHP's inet_ntop returns IPv6 addresses in their compressed form, but we want to keep 
-                // with the preferred standard, so we'll parse it manually.
-                //
-                $ip = unpack('n8', substr($this->rdata, $offset, 16));
-                if (count($ip) == 8) {
-                    $this->relay = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', $ip);
-                } else
+                case self::AMTRELAY_TYPE_IPV6:
+                {
+                    //
+                    // PHP's inet_ntop returns IPv6 addresses in their compressed form, but we want to keep 
+                    // with the preferred standard, so we'll parse it manually.
+                    //
+                    $ip = unpack('n8', substr($this->rdata, $offset, 16));
+                    if (count($ip) == 8)
+                    {
+                        $this->relay = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', $ip);
+                    } else
+                    {
+                        return false;
+                    }
+                }
+                break;
+                case self::AMTRELAY_TYPE_DOMAIN:
+                {
+                    $doffset = $packet->offset + $offset;
+                    $this->relay = \NetDNS2\Packet::label($packet, $doffset);
+                }
+                break;
+                default:
                 {
                     return false;
                 }
-                break;
-
-            case self::AMTRELAY_TYPE_DOMAIN:
-                $doffset = $packet->offset + $offset;
-                $this->relay = \NetDNS2\Packet::label($packet, $doffset);
-
-                break;
-
-            default:
-                //
-                // invalid type value
-                //
-                return false;
             }
 
             return true;
@@ -236,22 +243,26 @@ class AMTRELAY extends \NetDNS2\RR
         //
         // add the relay data based on the type
         //
-        switch($this->relay_type) {
-        case self::AMTRELAY_TYPE_NONE:
-            ; // add nothing
+        switch($this->relay_type)
+        {
+            case self::AMTRELAY_TYPE_NONE:
+                ; // add nothing
             break;
-
-        case self::AMTRELAY_TYPE_IPV4:
-        case self::AMTRELAY_TYPE_IPV6:
-            $data .= inet_pton($this->relay);
+            case self::AMTRELAY_TYPE_IPV4:
+            case self::AMTRELAY_TYPE_IPV6:
+            {
+                $data .= inet_pton($this->relay);
+            }
             break;
-
-        case self::AMTRELAY_TYPE_DOMAIN:
-            $data .= pack('Ca*', strlen($this->relay), $this->relay);
+            case self::AMTRELAY_TYPE_DOMAIN:
+            {
+                $data .= pack('Ca*', strlen($this->relay), $this->relay);
+            }
             break;
-
-        default:
-            return null;
+            default:
+            {
+                return null;
+            }
         }
 
         $packet->offset += strlen($data);

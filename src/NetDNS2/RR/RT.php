@@ -51,8 +51,7 @@ class RT extends \NetDNS2\RR
      */
     protected function rrToString()
     {
-        return $this->preference . ' ' . 
-            $this->cleanString($this->intermediatehost) . '.';
+        return $this->preference . ' ' . $this->cleanString($this->intermediatehost) . '.';
     }
 
     /**
@@ -83,8 +82,8 @@ class RT extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the preference
             //
@@ -114,8 +113,8 @@ class RT extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->intermediatehost) > 0) {
-
+        if (strlen($this->intermediatehost) > 0)
+        {
             $data = pack('n', $this->preference);
             $packet->offset += 2;
 

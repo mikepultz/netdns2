@@ -99,8 +99,8 @@ class SRV extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-            
+        if ($this->rdlength > 0)
+        {
             //
             // unpack the priority, weight and port
             //
@@ -132,8 +132,8 @@ class SRV extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->target) > 0) {
-
+        if (strlen($this->target) > 0)
+        {
             $data = pack('nnn', $this->priority, $this->weight, $this->port);
             $packet->offset += 6;
 
