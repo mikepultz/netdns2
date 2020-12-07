@@ -69,7 +69,8 @@ class Request extends \NetDNS2\Packet
         //
         // allow queries directly to . for the root name servers
         //
-        if ($name != '.') {
+        if ($name != '.')
+        {
             $name = trim(strtolower($name), " \t\n\r\0\x0B.");
         }
 
@@ -79,71 +80,56 @@ class Request extends \NetDNS2\Packet
         //
         // check that the input string has some data in it
         //
-        if (empty($name)) {
-
-            throw new \NetDNS2\Exception(
-                'empty query string provided',
-                \NetDNS2\Lookups::E_PACKET_INVALID
-            );
+        if (empty($name) == true)
+        {
+            throw new \NetDNS2\Exception('empty query string provided', \NetDNS2\Lookups::E_PACKET_INVALID);
         }
 
         //
         // if the type is "*", rename it to "ANY"- both are acceptable.
         //
-        if ($type == '*') {
-
+        if ($type == '*')
+        {
             $type = 'ANY';
         }
 
         //
         // check that the type and class are valid
         //    
-        if (   (!isset(\NetDNS2\Lookups::$rr_types_by_name[$type])) 
-            || (!isset(\NetDNS2\Lookups::$classes_by_name[$class])) 
-        ) {
-            throw new \NetDNS2\Exception(
-                'invalid type (' . $type . ') or class (' . $class . ') specified.',
-                \NetDNS2\Lookups::E_PACKET_INVALID
-            );
+        if ( (isset(\NetDNS2\Lookups::$rr_types_by_name[$type]) == false) || (isset(\NetDNS2\Lookups::$classes_by_name[$class]) == false) )
+        {
+            throw new \NetDNS2\Exception('invalid type (' . $type . ') or class (' . $class . ') specified.', \NetDNS2\Lookups::E_PACKET_INVALID);
         }
 
-        if ($type == 'PTR') {
-
+        if ($type == 'PTR')
+        {
             //
-            // if it's a PTR request for an IP address, then make sure we tack on
-            // the arpa domain.
+            // if it's a PTR request for an IP address, then make sure we tack on the arpa domain.
             //
-            // there are other types of PTR requests, so if an IP adress doesn't match,
-            // then just let it flow through and assume it's a hostname
+            // there are other types of PTR requests, so if an IP adress doesn't match, then just let it 
+            // flow through and assume it's a hostname
             //
-            if (\NetDNS2\Client::isIPv4($name) == true) {
-
-                //
-                // IPv4
-                //
+            // IPv4
+            //
+            if (\NetDNS2\Client::isIPv4($name) == true)
+            {
                 $name = implode('.', array_reverse(explode('.', $name)));
                 $name .= '.in-addr.arpa';
 
-            } else if (\NetDNS2\Client::isIPv6($name) == true) {
-
-                //
-                // IPv6
-                //
+            //
+            // IPv6
+            //
+            } else if (\NetDNS2\Client::isIPv6($name) == true)
+            {
                 $e = \NetDNS2\Client::expandIPv6($name);
-                if ($e !== false) {
-
-                    $name = implode(
-                        '.', array_reverse(str_split(str_replace(':', '', $e)))
-                    );
-
+                if ($e !== false)
+                {
+                    $name = implode('.', array_reverse(str_split(str_replace(':', '', $e))));
                     $name .= '.ip6.arpa';
 
-                } else {
-
-                    throw new \NetDNS2\Exception(
-                        'unsupported PTR value: ' . $name,
-                        \NetDNS2\Lookups::E_PACKET_INVALID
-                    );
+                } else
+                {
+                    throw new \NetDNS2\Exception('unsupported PTR value: ' . $name, \NetDNS2\Lookups::E_PACKET_INVALID);
                 }
             }
         }

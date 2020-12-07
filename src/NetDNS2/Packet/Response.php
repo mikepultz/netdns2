@@ -93,27 +93,28 @@ class Response extends \NetDNS2\Packet
         // null or not, since the \NetDNS2\Header() constructor will throw an 
         // exception if the packet is invalid.
         //
-        if ($this->header->tc == 1) {
-
+        if ($this->header->tc == 1)
+        {
             return false;
         }
 
         //
         // parse the questions
         //
-        for ($x = 0; $x < $this->header->qdcount; ++$x) {
-
+        for($x = 0; $x < $this->header->qdcount; ++$x)
+        {
             $this->question[$x] = new \NetDNS2\Question($this);
         }
 
         //
         // parse the answers
         //
-        for ($x = 0; $x < $this->header->ancount; ++$x) {
-
+        for($x = 0; $x < $this->header->ancount; ++$x)
+        {
             $o = \NetDNS2\RR::parse($this);
-            if (!is_null($o)) {
 
+            if (is_null($o) == false)
+            {
                 $this->answer[] = $o;
             }
         } 
@@ -121,11 +122,12 @@ class Response extends \NetDNS2\Packet
         //
         // parse the authority section
         //
-        for ($x = 0; $x < $this->header->nscount; ++$x) {
-
+        for($x = 0; $x < $this->header->nscount; ++$x)
+        {
             $o = \NetDNS2\RR::parse($this);
-            if (!is_null($o)) {
 
+            if (is_null($o) == false)
+            {
                 $this->authority[] = $o;  
             }
         }
@@ -133,11 +135,12 @@ class Response extends \NetDNS2\Packet
         //
         // parse the additional section
         //
-        for ($x = 0; $x < $this->header->arcount; ++$x) {
-
+        for($x = 0; $x < $this->header->arcount; ++$x)
+        {
             $o = \NetDNS2\RR::parse($this);
-            if (!is_null($o)) {
 
+            if (is_null($o) == false)
+            {
                 $this->additional[] = $o; 
             }
         }

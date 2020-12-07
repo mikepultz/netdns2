@@ -25,7 +25,8 @@ use \NetDNS2\Tests\DNSSECTest;
 
 error_reporting(E_ALL | E_STRICT);
 
-if (!defined('PHPUNIT_MAIN_METHOD')) {
+if (defined('PHPUNIT_MAIN_METHOD') == false)
+{
     define('PHPUNIT_MAIN_METHOD', '\NetDNS2\Tests\AllTests::main');
 }
 
@@ -72,6 +73,7 @@ class AllTests
     }
 }
 
-if (PHPUNIT_MAIN_METHOD == '\NetDNS2\Tests\AllTests::main') {
+if (PHPUNIT_MAIN_METHOD == '\NetDNS2\Tests\AllTests::main')
+{
     \NetDNS2\Tests\AllTests::main();
 }

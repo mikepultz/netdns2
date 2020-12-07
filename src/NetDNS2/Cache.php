@@ -76,17 +76,18 @@ class Cache
      */
     public function get($key)
     {
-        if (isset($this->cache_data[$key])) {
-
-            if ($this->cache_serializer == 'json') {
+        if (isset($this->cache_data[$key]) == true)
+        {
+            if ($this->cache_serializer == 'json')
+            {
                 return json_decode($this->cache_data[$key]['object']);
-            } else {
+            } else
+            {
                 return unserialize($this->cache_data[$key]['object']);
             }
-        } else {
-
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -101,12 +102,15 @@ class Cache
      */
     public function put($key, $data)
     {
+        //
+        // default time to live
+        //
         $ttl = 86400 * 365;
 
         //
         // clear the rdata values
         //
-        $data->rdata = '';
+        $data->rdata    = '';
         $data->rdlength = 0;
 
         //
@@ -119,30 +123,23 @@ class Cache
         // cache, so we can look at their individual TTL's on each run- we only
         // unserialize the actual RR object when it's get() from the cache.
         //
-        foreach ($data->answer as $index => $rr) {
-                    
-            if ($rr->ttl < $ttl) {
+        foreach($data->answer as $index => $rr)
+        {
+            if ($rr->ttl < $ttl)
+            {
                 $ttl = $rr->ttl;
             }
 
             $rr->rdata = '';
             $rr->rdlength = 0;
         }
-        foreach ($data->authority as $index => $rr) {
-                    
-            if ($rr->ttl < $ttl) {
-                $ttl = $rr->ttl;
-            }
-
+        foreach($data->authority as $index => $rr)
+        {
             $rr->rdata = '';
             $rr->rdlength = 0;
         }
-        foreach ($data->additional as $index => $rr) {
-                    
-            if ($rr->ttl < $ttl) {
-                $ttl = $rr->ttl;
-            }
-
+        foreach($data->additional as $index => $rr)
+        {
             $rr->rdata = '';
             $rr->rdlength = 0;
         }
@@ -153,11 +150,15 @@ class Cache
             'ttl'           => $ttl
         ];
 
-        if ($this->cache_serializer == 'json') {
+        if ($this->cache_serializer == 'json')
+        {
             $this->cache_data[$key]['object'] = json_encode($data);
-        } else {
+        } else
+        {
             $this->cache_data[$key]['object'] = serialize($data);
         }
+
+        return;
     }
 
     /**
@@ -169,28 +170,30 @@ class Cache
      */
     protected function clean()
     {
-        if (count($this->cache_data) > 0) {
-
+        if (count($this->cache_data) > 0)
+        {
             //
             // go through each entry and adjust their TTL, and remove entries that 
             // have expired
             //
             $now = time();
 
-            foreach ($this->cache_data as $key => $data) {
-
+            foreach($this->cache_data as $key => $data)
+            {
                 $diff = $now - $data['cache_date'];
 
-                if ($data['ttl'] <= $diff) {
-
+                if ($data['ttl'] <= $diff)
+                {
                     unset($this->cache_data[$key]);
-                } else {
-
+                } else
+                {
                     $this->cache_data[$key]['ttl'] -= $diff;
                     $this->cache_data[$key]['cache_date'] = $now;
                 }
             }
         }
+
+        return;
     }
 
     /**
@@ -202,14 +205,16 @@ class Cache
      */
     protected function resize()
     {
-        if (count($this->cache_data) > 0) {
-        
+        if (count($this->cache_data) > 0)
+        {
             //
             // serialize the cache data
             //
-            if ($this->cache_serializer == 'json') {
+            if ($this->cache_serializer == 'json')
+            {
                 $cache = json_encode($this->cache_data);
-            } else {
+            } else
+            {
                 $cache = serialize($this->cache_data);
             }
 
@@ -217,10 +222,10 @@ class Cache
             // only do this part if the size allocated to the cache storage
             // is smaller than the actual cache data
             //
-            if (strlen($cache) > $this->cache_size) {
-
-                while (strlen($cache) > $this->cache_size) {
-
+            if (strlen($cache) > $this->cache_size)
+            {
+                while(strlen($cache) > $this->cache_size)
+                {
                     //
                     // go through the data, and remove the entries closed to
                     // their expiration date.
@@ -228,10 +233,10 @@ class Cache
                     $smallest_ttl = time();
                     $smallest_key = null;
 
-                    foreach ($this->cache_data as $key => $data) {
-
-                        if ($data['ttl'] < $smallest_ttl) {
-
+                    foreach($this->cache_data as $key => $data)
+                    {
+                        if ($data['ttl'] < $smallest_ttl)
+                        {
                             $smallest_ttl = $data['ttl'];
                             $smallest_key = $key;
                         }
@@ -245,17 +250,21 @@ class Cache
                     //
                     // re-serialize
                     //
-                    if ($this->cache_serializer == 'json') {
+                    if ($this->cache_serializer == 'json')
+                    {
                         $cache = json_encode($this->cache_data);
-                    } else {
+                    } else
+                    {
                         $cache = serialize($this->cache_data);
                     }
                 }
             }
 
-            if ( ($cache == 'a:0:{}') || ($cache == '{}') ) {
+            if ( ($cache == 'a:0:{}') || ($cache == '{}') )
+            {
                 return null;
-            } else {
+            } else
+            {
                 return $cache;
             }
         }

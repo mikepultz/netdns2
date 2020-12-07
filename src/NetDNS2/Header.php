@@ -73,11 +73,11 @@ class Header
      */
     public function __construct(\NetDNS2\Packet &$packet = null)
     {
-        if (!is_null($packet)) {
-
+        if (is_null($packet) == false)
+        {
             $this->set($packet);
-        } else {
-
+        } else
+        {
             $this->id       = $this->nextPacketId();
             $this->qr       = \NetDNS2\Lookups::QR_QUERY;
             $this->opcode   = \NetDNS2\Lookups::OPCODE_QUERY;
@@ -105,8 +105,8 @@ class Header
      */
     public function nextPacketId()
     {
-        if (++\NetDNS2\Lookups::$next_packet_id > 65535) {
-
+        if (++\NetDNS2\Lookups::$next_packet_id > 65535)
+        {
             \NetDNS2\Lookups::$next_packet_id = 1;
         }
 
@@ -158,12 +158,9 @@ class Header
         //
         // the header must be at least 12 bytes long.
         //
-        if ($packet->rdlength < \NetDNS2\Lookups::DNS_HEADER_SIZE) {
-
-            throw new \NetDNS2\Exception(
-                'invalid header data provided; too small',
-                \NetDNS2\Lookups::E_HEADER_INVALID
-            );
+        if ($packet->rdlength < \NetDNS2\Lookups::DNS_HEADER_SIZE)
+        {
+            throw new \NetDNS2\Exception('invalid header data provided; too small', \NetDNS2\Lookups::E_HEADER_INVALID);
         }
 
         $offset = 0;
@@ -171,8 +168,7 @@ class Header
         //
         // parse the values
         //
-        $this->id       = ord($packet->rdata[$offset]) << 8 | 
-            ord($packet->rdata[++$offset]);
+        $this->id       = ord($packet->rdata[$offset]) << 8 | ord($packet->rdata[++$offset]);
 
         ++$offset;
         $this->qr       = (ord($packet->rdata[$offset]) >> 7) & 0x1;
@@ -188,14 +184,10 @@ class Header
         $this->cd       = (ord($packet->rdata[$offset]) >> 4) & 0x1;
         $this->rcode    = ord($packet->rdata[$offset]) & 0xf;
             
-        $this->qdcount  = ord($packet->rdata[++$offset]) << 8 | 
-            ord($packet->rdata[++$offset]);
-        $this->ancount  = ord($packet->rdata[++$offset]) << 8 | 
-            ord($packet->rdata[++$offset]);
-        $this->nscount  = ord($packet->rdata[++$offset]) << 8 | 
-            ord($packet->rdata[++$offset]);
-        $this->arcount  = ord($packet->rdata[++$offset]) << 8 | 
-            ord($packet->rdata[++$offset]);
+        $this->qdcount  = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
+        $this->ancount  = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
+        $this->nscount  = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
+        $this->arcount  = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
 
         //
         // increment the internal offset
@@ -219,13 +211,8 @@ class Header
         $packet->offset += \NetDNS2\Lookups::DNS_HEADER_SIZE;
 
         return pack('n', $this->id) . 
-            chr(
-                ($this->qr << 7) | ($this->opcode << 3) | 
-                ($this->aa << 2) | ($this->tc << 1) | ($this->rd)
-            ) .
-            chr(
-                ($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode
-            ) .
+            chr(($this->qr << 7) | ($this->opcode << 3) | ($this->aa << 2) | ($this->tc << 1) | ($this->rd)) .
+            chr(($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode) .
             pack('n4', $this->qdcount, $this->ancount, $this->nscount, $this->arcount);
     }
 }

@@ -22,10 +22,12 @@ namespace NetDNS2;
 /*
  * check to see if the socket defines exist; if they don't, then define them
  */
-if (defined('SOCK_STREAM') == false) {
+if (defined('SOCK_STREAM') == false)
+{
     define('SOCK_STREAM', 1);
 }
-if (defined('SOCK_DGRAM') == false) {
+if (defined('SOCK_DGRAM') == false)
+{
     define('SOCK_DGRAM', 2);
 }
 
@@ -131,11 +133,11 @@ class Socket
         //
         // bind to a local IP/port if it's set
         //
-        if (strlen($this->local_host) > 0) {
-
+        if (strlen($this->local_host) > 0)
+        {
             $opts['socket']['bindto'] = $this->local_host;
-            if ($this->local_port > 0) {
-
+            if ($this->local_port > 0)
+            {
                 $opts['socket']['bindto'] .= ':' . $this->local_port;
             }
         }
@@ -150,63 +152,65 @@ class Socket
         //
         $errno;
         $errstr;
+        $urn = '';
 
-        switch($this->type) {
-        case \NetDNS2\Socket::SOCK_STREAM:
+        switch($this->type)
+        {
+            //
+            // TCP socket
+            //
+            case \NetDNS2\Socket::SOCK_STREAM:
+            {
+                if (\NetDNS2\Client::isIPv4($this->host) == true)
+                {
+                    $urn = 'tcp://' . $this->host . ':' . $this->port;
 
-            if (\NetDNS2\Client::isIPv4($this->host) == true) {
+                } else if (\NetDNS2\Client::isIPv6($this->host) == true)
+                {
+                    $urn = 'tcp://[' . $this->host . ']:' . $this->port;
 
-                $this->sock = @stream_socket_client(
-                    'tcp://' . $this->host . ':' . $this->port, 
-                    $errno, $errstr, $this->timeout, 
-                    STREAM_CLIENT_CONNECT, $this->context
-                );
-            } else if (\NetDNS2\Client::isIPv6($this->host) == true) {
-
-                $this->sock = @stream_socket_client(
-                    'tcp://[' . $this->host . ']:' . $this->port, 
-                    $errno, $errstr, $this->timeout, 
-                    STREAM_CLIENT_CONNECT, $this->context
-                );
-            } else {
-
-                $this->last_error = 'invalid address type: ' . $this->host;
-                return false;
+                } else
+                {
+                    $this->last_error = 'invalid address type: ' . $this->host;
+                    return false;
+                }
             }
-
             break;
         
-        case \NetDNS2\Socket::SOCK_DGRAM:
+            //
+            // UDP socket
+            //
+            case \NetDNS2\Socket::SOCK_DGRAM:
+            {
+                if (\NetDNS2\Client::isIPv4($this->host) == true)
+                {
+                    $urn = 'udp://' . $this->host . ':' . $this->port;
 
-            if (\NetDNS2\Client::isIPv4($this->host) == true) {
+                } else if (\NetDNS2\Client::isIPv6($this->host) == true)
+                {
+                    $urn = 'udp://[' . $this->host . ']:' . $this->port;
 
-                $this->sock = @stream_socket_client(
-                    'udp://' . $this->host . ':' . $this->port, 
-                    $errno, $errstr, $this->timeout, 
-                    STREAM_CLIENT_CONNECT, $this->context
-                );
-            } else if (\NetDNS2\Client::isIPv6($this->host) == true) {
-
-                $this->sock = @stream_socket_client(
-                    'udp://[' . $this->host . ']:' . $this->port, 
-                    $errno, $errstr, $this->timeout, 
-                    STREAM_CLIENT_CONNECT, $this->context
-                );
-            } else {
-
-                $this->last_error = 'invalid address type: ' . $this->host;
-                return false;
+                } else
+                {
+                    $this->last_error = 'invalid address type: ' . $this->host;
+                    return false;
+                }
             }
-
             break;
             
-        default:
-            $this->last_error = 'Invalid socket type: ' . $this->type;
-            return false;
+            default:
+            {
+                $this->last_error = 'Invalid socket type: ' . $this->type;
+                return false;
+            }
         }
 
-        if ($this->sock === false) {
-
+        //
+        // create the socket
+        //
+        $this->sock = @stream_socket_client($urn, $errno, $errstr, $this->timeout, STREAM_CLIENT_CONNECT, $this->context);
+        if ($this->sock === false)
+        {
             $this->last_error = $errstr;
             return false;
         }
@@ -229,10 +233,11 @@ class Socket
      */
     public function close()
     {
-        if (is_resource($this->sock) === true) {
-
+        if (is_resource($this->sock) === true)
+        {
             @fclose($this->sock);
         }
+
         return true;
     }
 
@@ -248,8 +253,9 @@ class Socket
     public function write($data)
     {
         $length = strlen($data);
-        if ($length == 0) {
 
+        if ($length == 0)
+        {
             $this->last_error = 'empty data on write()';
             return false;
         }
@@ -267,13 +273,13 @@ class Socket
         // select on write
         //
         $result = stream_select($read, $write, $except, $this->timeout);
-        if ($result === false) {
-
+        if ($result === false)
+        {
             $this->last_error = 'failed on write select()';
             return false;
 
-        } else if ($result == 0) {
-
+        } else if ($result == 0)
+        {
             $this->last_error = 'timeout on write select()';
             return false;
         }
@@ -282,12 +288,12 @@ class Socket
         // if it's a TCP socket, then we need to packet and send the length of the
         // data as the first 16bit of data.
         //        
-        if ($this->type == \NetDNS2\Socket::SOCK_STREAM) {
-
+        if ($this->type == \NetDNS2\Socket::SOCK_STREAM)
+        {
             $s = chr($length >> 8) . chr($length);
 
-            if (@fwrite($this->sock, $s) === false) {
-
+            if (@fwrite($this->sock, $s) === false)
+            {
                 $this->last_error = 'failed to fwrite() 16bit length';
                 return false;
             }
@@ -297,8 +303,8 @@ class Socket
         // write the data to the socket
         //
         $size = @fwrite($this->sock, $data);
-        if ( ($size === false) || ($size != $length) ) {
-        
+        if ( ($size === false) || ($size != $length) )
+        {
             $this->last_error = 'failed to fwrite() packet';
             return false;
         }
@@ -336,13 +342,13 @@ class Socket
         // select on read
         //
         $result = stream_select($read, $write, $except, $this->timeout);
-        if ($result === false) {
-
+        if ($result === false)
+        {
             $this->last_error = 'error on read select()';
             return false;
 
-        } else if ($result == 0) {
-
+        } else if ($result == 0)
+        {
             $this->last_error = 'timeout on read select()';
             return false;
         }
@@ -355,10 +361,10 @@ class Socket
         // packet- we need to read that off first, then use that value for the    
         // packet read.
         //
-        if ($this->type == \NetDNS2\Socket::SOCK_STREAM) {
-    
-            if (($data = fread($this->sock, 2)) === false) {
-                
+        if ($this->type == \NetDNS2\Socket::SOCK_STREAM)
+        {
+            if (($data = fread($this->sock, 2)) === false)
+            {
                 $this->last_error = 'failed on fread() for data length';
                 return false;
             }
@@ -369,8 +375,8 @@ class Socket
             }
 
             $length = ord($data[0]) << 8 | ord($data[1]);
-            if ($length < \NetDNS2\Lookups::DNS_HEADER_SIZE) {
-
+            if ($length < \NetDNS2\Lookups::DNS_HEADER_SIZE)
+            {
                 return false;
             }
         }
@@ -396,19 +402,19 @@ class Socket
         //
         // the sockets library works much better.
         //
-        if ($this->type == \NetDNS2\Socket::SOCK_STREAM) {
-
+        if ($this->type == \NetDNS2\Socket::SOCK_STREAM)
+        {
             $chunk = '';
             $chunk_size = $length;
 
             //
             // loop so we make sure we read all the data
             //
-            while (1) {
-
+            while(1)
+            {
                 $chunk = fread($this->sock, $chunk_size);
-                if ($chunk === false) {
-            
+                if ($chunk === false)
+                {
                     $this->last_error = 'failed on fread() for data';
                     return false;
                 }
@@ -416,20 +422,21 @@ class Socket
                 $data .= $chunk;
                 $chunk_size -= strlen($chunk);
 
-                if (strlen($data) >= $length) {
+                if (strlen($data) >= $length)
+                {
                     break;
                 }
             }
 
-        } else {
-
+        } else
+        {
             //
             // if it's UDP, it's a single fixed-size frame, and the streams library
             // doesn't seem to have a problem reading it.
             //
             $data = fread($this->sock, $length);
-            if ($length === false) {
-            
+            if ($length === false)
+            {
                 $this->last_error = 'failed on fread() for data';
                 return false;
             }

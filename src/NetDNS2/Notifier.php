@@ -56,9 +56,7 @@ class Notifier extends \NetDNS2\Client
         //
         // create the packet
         //
-        $this->_packet = new \NetDNS2\Packet\Request(
-            strtolower(trim($zone, " \n\r\t.")), 'SOA', 'IN'
-        );
+        $this->_packet = new \NetDNS2\Packet\Request(strtolower(trim($zone, " \n\r\t.")), 'SOA', 'IN');
 
         //
         // make sure the opcode on the packet is set to NOTIFY
@@ -78,13 +76,10 @@ class Notifier extends \NetDNS2\Client
      */
     private function _checkName($name)
     {
-        if (!preg_match('/' . $this->_packet->question[0]->qname . '$/', $name)) {
-            
-            throw new \NetDNS2\Exception(
-                'name provided (' . $name . ') does not match zone name (' .
-                $this->_packet->question[0]->qname . ')',
-                \NetDNS2\Lookups::E_PACKET_INVALID
-            );
+        if (preg_match('/' . $this->_packet->question[0]->qname . '$/', $name) !== 1)
+        {
+            throw new \NetDNS2\Exception('name provided (' . $name . ') does not match zone name (' . $this->_packet->question[0]->qname . ')',
+                \NetDNS2\Lookups::E_PACKET_INVALID);
         }
     
         return true;
@@ -103,12 +98,15 @@ class Notifier extends \NetDNS2\Client
     public function add(\NetDNS2\RR $rr)
     {
         $this->_checkName($rr->name);
+
         //
         // add the RR to the "notify" section
         //
-        if (!in_array($rr, $this->_packet->answer)) {
+        if (in_array($rr, $this->_packet->answer) == false)
+        {
             $this->_packet->answer[] = $rr;
         }
+
         return true;
     }
 
@@ -146,9 +144,8 @@ class Notifier extends \NetDNS2\Client
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->auth_signature instanceof \NetDNS2\RR\TSIG) 
-            || ($this->auth_signature instanceof \NetDNS2\RR\SIG)
-        ) {
+        if ( ($this->auth_signature instanceof \NetDNS2\RR\TSIG) || ($this->auth_signature instanceof \NetDNS2\RR\SIG) )
+        {
             $p->additional[] = $this->auth_signature;
         }
 
@@ -178,9 +175,8 @@ class Notifier extends \NetDNS2\Client
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->auth_signature instanceof \NetDNS2\RR\TSIG) 
-            || ($this->auth_signature instanceof \NetDNS2\RR\SIG)
-        ) {
+        if ( ($this->auth_signature instanceof \NetDNS2\RR\TSIG) || ($this->auth_signature instanceof \NetDNS2\RR\SIG) )
+        {
             $this->_packet->additional[] = $this->auth_signature;
         }
 
@@ -195,11 +191,9 @@ class Notifier extends \NetDNS2\Client
         //
         // make sure we have some data to send
         //
-        if ($this->_packet->header->qdcount == 0) {
-            throw new \NetDNS2\Exception(
-                'empty headers- nothing to send!',
-                \NetDNS2\Lookups::E_PACKET_INVALID
-            );
+        if ($this->_packet->header->qdcount == 0)
+        {
+            throw new \NetDNS2\Exception('empty headers- nothing to send!', \NetDNS2\Lookups::E_PACKET_INVALID);
         }
 
         //

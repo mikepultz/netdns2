@@ -41,13 +41,9 @@ class Exception extends \Exception
      * @access public
      *
      */
-    public function __construct(
-        $message = '', 
-        $code = 0, 
-        $previous = null, 
-        \NetDNS2\Packet\Request $request = null,
-        \NetDNS2\Packet\Response $response = null
-    ) {
+    public function __construct($message = '', $code = 0, $previous = null, 
+        \NetDNS2\Packet\Request $request = null, \NetDNS2\Packet\Response $response = null)
+    {
         //
         // store the request/response objects (if passed)
         //
@@ -61,11 +57,11 @@ class Exception extends \Exception
         //
         //      https://code.google.com/p/netdns2/issues/detail?id=25
         //
-        if (version_compare(PHP_VERSION, '5.3.0', '>=') == true) {
-
+        if (version_compare(PHP_VERSION, '5.3.0', '>=') == true)
+        {
             parent::__construct($message, $code, $previous);
-        } else {
-
+        } else
+        {
             parent::__construct($message, $code);
         }
     }

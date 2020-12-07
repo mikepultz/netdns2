@@ -227,53 +227,52 @@ class Client
         //
         // load any options that were provided
         //
-        if (!empty($options)) {
-
-            foreach ($options as $key => $value) {
-
-                if ($key == 'nameservers') {
-
+        if (empty($options) == false)
+        {
+            foreach($options as $key => $value)
+            {
+                if ($key == 'nameservers')
+                {
                     $this->setServers($value);
-                } else {
-
+                } else
+                {
                     $this->$key = $value;
                 }
             }
         }
 
         //
-        // if we're set to use the local shared memory cache, then
-        // make sure it's been initialized
+        // if we're set to use the local shared memory cache, then make sure it's been initialized
         //
-        switch($this->cache_type) {
-        case 'shared':
-            if (extension_loaded('shmop')) {
-
-                $this->cache = new \NetDNS2\Cache\Shm;
-                $this->use_cache = true;
-            } else {
-
-                throw new \NetDNS2\Exception(
-                    'shmop library is not available for cache',
-                    \NetDNS2\Lookups::E_CACHE_SHM_UNAVAIL
-                );
+        switch($this->cache_type)
+        {
+            case 'shared':
+            {
+                if (extension_loaded('shmop') == true)
+                {
+                    $this->cache = new \NetDNS2\Cache\Shm;
+                    $this->use_cache = true;
+                } else
+                {
+                    throw new \NetDNS2\Exception('shmop library is not available for cache', \NetDNS2\Lookups::E_CACHE_SHM_UNAVAIL);
+                }
             }
             break;
-        case 'file':
-
-            $this->cache = new \NetDNS2\Cache\File;
-            $this->use_cache = true;
-
+            case 'file':
+            {
+                $this->cache = new \NetDNS2\Cache\File;
+                $this->use_cache = true;
+            }
             break;  
-        case 'none':
-            $this->use_cache = false;
+            case 'none':
+            {
+                $this->use_cache = false;
+            }
             break;
-        default:
-
-            throw new \NetDNS2\Exception(
-                'un-supported cache type: ' . $this->cache_type,
-                \NetDNS2\Lookups::E_CACHE_UNSUPPORTED
-            );
+            default:
+            {
+                throw new \NetDNS2\Exception('un-supported cache type: ' . $this->cache_type, \NetDNS2\Lookups::E_CACHE_UNSUPPORTED);
+            }
         }
     }
 
@@ -295,12 +294,12 @@ class Client
         //
         // otherwise, see if it's a path to a resolv.conf file and if so, load it
         //
-        if (is_array($nameservers)) {
-
+        if (is_array($nameservers) == true)
+        {
             $this->nameservers = $nameservers;
 
-        } else {
-
+        } else
+        {
             //
             // temporary list of name servers; do it this way rather than just 
             // resetting the local nameservers value, just incase an exception 
@@ -312,36 +311,33 @@ class Client
             //
             // check to see if the file is readable
             //
-            if (is_readable($nameservers) === true) {
-    
+            if (is_readable($nameservers) === true)
+            {
                 $data = file_get_contents($nameservers);
-                if ($data === false) {
-                    throw new \NetDNS2\Exception(
-                        'failed to read contents of file: ' . $nameservers,
-                        \NetDNS2\Lookups::E_NS_INVALID_FILE
-                    );
+                if ($data === false)
+                {
+                    throw new \NetDNS2\Exception('failed to read contents of file: ' . $nameservers, \NetDNS2\Lookups::E_NS_INVALID_FILE);
                 }
 
                 $lines = explode("\n", $data);
 
-                foreach ($lines as $line) {
-                    
+                foreach($lines as $line)
+                {
                     $line = trim($line);
 
                     //
                     // ignore empty lines, and lines that are commented out
                     //
-                    if ( (strlen($line) == 0) 
-                        || ($line[0] == '#') 
-                        || ($line[0] == ';')
-                    ) {
+                    if ( (strlen($line) == 0) || ($line[0] == '#') || ($line[0] == ';') )
+                    {
                         continue;
                     }
 
                     //
                     // ignore lines with no spaces in them.
                     //
-                    if (strpos($line, ' ') === false) {
+                    if (strpos($line, ' ') === false)
+                    {
                         continue;
                     }
 
@@ -350,40 +346,39 @@ class Client
                     $key    = trim(strtolower($key));
                     $value  = trim(strtolower($value));
 
-                    switch($key) {
-                    case 'nameserver':
-
+                    switch($key)
+                    {
                         //
                         // nameserver can be a IPv4 or IPv6 address
                         //
-                        if ( (self::isIPv4($value) == true) 
-                            || (self::isIPv6($value) == true)
-                        ) {
-
-                            $ns[] = $value;
-                        } else {
-
-                            throw new \NetDNS2\Exception(
-                                'invalid nameserver entry: ' . $value,
-                                \NetDNS2\Lookups::E_NS_INVALID_ENTRY
-                            );
+                        case 'nameserver':
+                        {
+                            if ( (self::isIPv4($value) == true) || (self::isIPv6($value) == true) )
+                            {
+                                $ns[] = $value;
+                            } else
+                            {
+                                throw new \NetDNS2\Exception('invalid nameserver entry: ' . $value, \NetDNS2\Lookups::E_NS_INVALID_ENTRY);
+                            }
                         }
                         break;
-
-                    case 'domain':
-                        $this->domain = $value;
+                        case 'domain':
+                        {
+                            $this->domain = $value;
+                        }
                         break;
-
-                    case 'search':
-                        $this->search_list = preg_split('/\s+/', $value);
+                        case 'search':
+                        {
+                            $this->search_list = preg_split('/\s+/', $value);
+                        }
                         break;
-
-                    case 'options':
-                        $this->parseOptions($value);
+                        case 'options':
+                        {
+                            $this->parseOptions($value);
+                        }
                         break;
-
-                    default:
-                        ;
+                        default:
+                            ;
                     }
                 }
 
@@ -391,23 +386,21 @@ class Client
                 // if we don't have a domain, but we have a search list, then
                 // take the first entry on the search list as the domain
                 //
-                if ( (strlen($this->domain) == 0) 
-                    && (count($this->search_list) > 0) 
-                ) {
+                if ( (strlen($this->domain) == 0) && (count($this->search_list) > 0) )
+                {
                     $this->domain = $this->search_list[0];
                 }
 
-            } else {
-                throw new \NetDNS2\Exception(
-                    'resolver file file provided is not readable: ' . $nameservers,
-                    \NetDNS2\Lookups::E_NS_INVALID_FILE
-                );
+            } else
+            {
+                throw new \NetDNS2\Exception('resolver file file provided is not readable: ' . $nameservers, \NetDNS2\Lookups::E_NS_INVALID_FILE);
             }
 
             //
             // store the name servers locally
             //
-            if (count($ns) > 0) {
+            if (count($ns) > 0)
+            {
                 $this->nameservers = $ns;
             }
         }
@@ -470,32 +463,32 @@ class Client
         // if overrides are disabled (the default), or the options list is empty for some
         // reason, then we don't need to do any of this work.
         //
-        if ( ($this->use_resolv_options == false) || (strlen($value) == 0) ) {
-
+        if ( ($this->use_resolv_options == false) || (strlen($value) == 0) )
+        {
             return true;
         }
 
         $options = preg_split('/\s+/', strtolower($value));
 
-        foreach ($options as $option) {
-
+        foreach($options as $option)
+        {
             //
             // override the timeout value from the resolv.conf file.
             //
-            if ( (strncmp($option, 'timeout', 7) == 0) && (strpos($option, ':') !== false) ) {
-
+            if ( (strncmp($option, 'timeout', 7) == 0) && (strpos($option, ':') !== false) )
+            {
                 list($key, $val) = explode(':', $option);
 
-                if ( ($val > 0) && ($val <= 30) ) {
-
+                if ( ($val > 0) && ($val <= 30) )
+                {
                     $this->timeout = $val;
                 }
 
             //
             // the rotate option just enabled the ns_random option
             //
-            } else if (strncmp($option, 'rotate', 6) == 0) {
-
+            } else if (strncmp($option, 'rotate', 6) == 0)
+            {
                 $this->ns_random = true;
             }
         }
@@ -515,18 +508,15 @@ class Client
      */
     protected function checkServers($default = null)
     {
-        if (empty($this->nameservers)) {
-
-            if (isset($default)) {
-
+        if (empty($this->nameservers) == true)
+        {
+            if (isset($default) == true)
+            {
                 $this->setServers($default);
-            } else {
-
-                throw new \NetDNS2\Exception(
-                    'empty name servers list; you must provide a list of name '.
-                    'servers, or the path to a resolv.conf file.',
-                    \NetDNS2\Lookups::E_NS_INVALID_ENTRY
-                );
+            } else
+            {
+                throw new \NetDNS2\Exception('empty name servers list; you must provide a list of name servers, or the path to a resolv.conf file.',
+                    \NetDNS2\Lookups::E_NS_INVALID_ENTRY);
             }
         }
     
@@ -545,28 +535,23 @@ class Client
      * @since  function available since release 1.1.0
      *
      */
-    public function signTSIG(
-        $keyname, $signature = '', $algorithm = \NetDNS2\RR\TSIG::HMAC_MD5
-    ) {
+    public function signTSIG($keyname, $signature = '', $algorithm = \NetDNS2\RR\TSIG::HMAC_MD5)
+    {
         //
         // if the TSIG was pre-created and passed in, then we can just used 
         // it as provided.
         //
-        if ($keyname instanceof \NetDNS2\RR\TSIG) {
-
+        if ($keyname instanceof \NetDNS2\RR\TSIG)
+        {
             $this->auth_signature = $keyname;
-
-        } else {
-
+        } else
+        {
             //
             // otherwise create the TSIG RR, but don't add it just yet; TSIG needs 
             // to be added as the last additional entry- so we'll add it just 
             // before we send.
             //
-            $this->auth_signature = \NetDNS2\RR::fromString(
-                strtolower(trim($keyname)) .
-                ' TSIG '. $signature
-            );
+            $this->auth_signature = \NetDNS2\RR::fromString(strtolower(trim($keyname)) . ' TSIG '. $signature);
 
             //
             // set the algorithm to use
@@ -593,23 +578,19 @@ class Client
         //
         // check for OpenSSL
         //
-        if (extension_loaded('openssl') === false) {
-            
-            throw new \NetDNS2\Exception(
-                'the OpenSSL extension is required to use SIG(0).',
-                \NetDNS2\Lookups::E_OPENSSL_UNAVAIL
-            );
+        if (extension_loaded('openssl') === false)
+        {
+            throw new \NetDNS2\Exception('the OpenSSL extension is required to use SIG(0).', \NetDNS2\Lookups::E_OPENSSL_UNAVAIL);
         }
 
         //
         // if the SIG was pre-created, then use it as-is
         //
-        if ($filename instanceof \NetDNS2\RR\SIG) {
-
+        if ($filename instanceof \NetDNS2\RR\SIG)
+        {
             $this->auth_signature = $filename;
-
-        } else {
-        
+        } else
+        {
             //
             // otherwise, it's filename which needs to be parsed and processed.
             //
@@ -658,18 +639,18 @@ class Client
         //
         // only RSA algorithms are supported for SIG(0)
         //
-        switch($this->auth_signature->algorithm) {
-        case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSAMD5:
-        case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA1:
-        case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA256:
-        case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA512:
-        case \NetDNS2\Lookups::DNSSEC_ALGORITHM_DSA:
-            break;
-        default:
-            throw new \NetDNS2\Exception(
-                'only asymmetric algorithms work with SIG(0)!',
-                \NetDNS2\Lookups::E_OPENSSL_INV_ALGO
-            );
+        switch($this->auth_signature->algorithm)
+        {
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSAMD5:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA1:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA256:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA512:
+            case \NetDNS2\Lookups::DNSSEC_ALGORITHM_DSA:
+                break;
+            default:
+            {
+                throw new \NetDNS2\Exception('only asymmetric algorithms work with SIG(0)!', \NetDNS2\Lookups::E_OPENSSL_INV_ALGO);
+            }
         }
 
         return true;
@@ -686,10 +667,13 @@ class Client
      */
     public function cacheable($_type)
     {
-        switch($_type) {
-        case 'AXFR':
-        case 'OPT':
-            return false;
+        switch($_type)
+        {
+            case 'AXFR':
+            case 'OPT':
+            {
+                return false;
+            }
         }
 
         return true;   
@@ -715,9 +699,11 @@ class Client
      */
     public static function expandUint32($_int)
     {
-        if ( ($_int < 0) && (PHP_INT_MAX == 2147483647) ) {
+        if ( ($_int < 0) && (PHP_INT_MAX == 2147483647) )
+        {
             return sprintf('%u', $_int);
-        } else {
+        } else
+        {
             return $_int;
         }
     }
@@ -736,24 +722,28 @@ class Client
         //
         // use filter_var() if it's available; it's faster than preg
         //
-        if (extension_loaded('filter') == true) {
-
-            if (filter_var($_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == false) {
+        if (extension_loaded('filter') == true)
+        {
+            if (filter_var($_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == false)
+            {
                 return false;
             }
-        } else {
 
+        } else
+        {
             //
             // do the main check here;
             //
-            if (inet_pton($_address) === false) {
+            if (inet_pton($_address) === false)
+            {
                 return false;
             }
 
             //
             // then make sure we're not a IPv6 address
             //
-            if (preg_match('/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $_address) == 0) {
+            if (preg_match('/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $_address) == 0)
+            {
                 return false;
             }
         }
@@ -775,23 +765,28 @@ class Client
         //
         // use filter_var() if it's available; it's faster than preg
         //
-        if (extension_loaded('filter') == true) {
-            if (filter_var($_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == false) {
+        if (extension_loaded('filter') == true)
+        {
+            if (filter_var($_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == false)
+            {
                 return false;
             }
-        } else {
 
+        } else
+        {
             //
             // do the main check here
             //
-            if (inet_pton($_address) === false) {
+            if (inet_pton($_address) === false)
+            {
                 return false;
             }
 
             //
             // then make sure it doesn't match a IPv4 address
             //
-            if (preg_match('/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $_address) == 1) {
+            if (preg_match('/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/', $_address) == 1)
+            {
                 return false;
             }
         }
@@ -833,14 +828,9 @@ class Client
         // get the data from the packet
         //
         $data = $request->get();
-        if (strlen($data) < \NetDNS2\Lookups::DNS_HEADER_SIZE) {
-
-            throw new \NetDNS2\Exception(
-                'invalid or empty packet for sending!',
-                \NetDNS2\Lookups::E_PACKET_INVALID,
-                null,
-                $request
-            );
+        if (strlen($data) < \NetDNS2\Lookups::DNS_HEADER_SIZE)
+        {
+            throw new \NetDNS2\Exception('invalid or empty packet for sending!', \NetDNS2\Lookups::E_PACKET_INVALID, null, $request);
         }
 
         reset($this->nameservers);
@@ -848,8 +838,8 @@ class Client
         //
         // randomize the name server list if it's asked for
         //
-        if ($this->ns_random == true) {
-
+        if ($this->ns_random == true)
+        {
             shuffle($this->nameservers);
         }
 
@@ -859,25 +849,22 @@ class Client
         $response = null;
         $ns = '';
 
-        while (1) {
-
+        while(1)
+        {
             //
             // grab the next DNS server
             //
             $ns = current($this->nameservers);
             next($this->nameservers);
 
-            if ($ns === false) {
-
-                if (is_null($this->last_exception) == false) {
-
+            if ($ns === false)
+            {
+                if (is_null($this->last_exception) == false)
+                {
                     throw $this->last_exception;
-                } else {
-
-                    throw new \NetDNS2\Exception(
-                        'every name server provided has failed',
-                        \NetDNS2\Lookups::E_NS_FAILED
-                    );
+                } else
+                {
+                    throw new \NetDNS2\Exception('every name server provided has failed', \NetDNS2\Lookups::E_NS_FAILED);
                 }
             }
 
@@ -892,14 +879,14 @@ class Client
                 $max_udp_size = $this->dnssec_payload_size;
             }
 
-            if ( ($use_tcp == true) || (strlen($data) > $max_udp_size) ) {
-
+            if ( ($use_tcp == true) || (strlen($data) > $max_udp_size) )
+            {
                 try
                 {
                     $response = $this->sendTCPRequest($ns, $data, ($request->question[0]->qtype == 'AXFR') ? true : false);
 
-                } catch(\NetDNS2\Exception $e) {
-
+                } catch(\NetDNS2\Exception $e)
+                {
                     $this->last_exception = $e;
                     $this->last_exception_list[$ns] = $e;
 
@@ -909,8 +896,8 @@ class Client
             //
             // otherwise, send it using UDP
             //
-            } else {
-
+            } else
+            {
                 try
                 {
                     $response = $this->sendUDPRequest($ns, $data);
@@ -919,13 +906,13 @@ class Client
                     // check the packet header for a trucated bit; if it was truncated,
                     // then re-send the request as TCP.
                     //
-                    if ($response->header->tc == 1) {
-
+                    if ($response->header->tc == 1)
+                    {
                         $response = $this->sendTCPRequest($ns, $data);
                     }
 
-                } catch(\NetDNS2\Exception $e) {
-
+                } catch(\NetDNS2\Exception $e)
+                {
                     $this->last_exception = $e;
                     $this->last_exception_list[$ns] = $e;
 
@@ -936,16 +923,10 @@ class Client
             //
             // make sure header id's match between the request and response
             //
-            if ($request->header->id != $response->header->id) {
-
-                $this->last_exception = new \NetDNS2\Exception(
-
-                    'invalid header: the request and response id do not match.',
-                    \NetDNS2\Lookups::E_HEADER_INVALID,
-                    null,
-                    $request,
-                    $response
-                );
+            if ($request->header->id != $response->header->id)
+            {
+                $this->last_exception = new \NetDNS2\Exception('invalid header: the request and response id do not match.',
+                    \NetDNS2\Lookups::E_HEADER_INVALID, null, $request, $response);
 
                 $this->last_exception_list[$ns] = $this->last_exception;
                 continue;
@@ -956,16 +937,10 @@ class Client
             // 
             // 0 = query, 1 = response
             //
-            if ($response->header->qr != \NetDNS2\Lookups::QR_RESPONSE) {
-            
-                $this->last_exception = new \NetDNS2\Exception(
-
-                    'invalid header: the response provided is not a response packet.',
-                    \NetDNS2\Lookups::E_HEADER_INVALID,
-                    null,
-                    $request,
-                    $response
-                );
+            if ($response->header->qr != \NetDNS2\Lookups::QR_RESPONSE)
+            {
+                $this->last_exception = new \NetDNS2\Exception('invalid header: the response provided is not a response packet.',
+                    \NetDNS2\Lookups::E_HEADER_INVALID, null, $request, $response);
 
                 $this->last_exception_list[$ns] = $this->last_exception;
                 continue;
@@ -974,17 +949,10 @@ class Client
             //
             // make sure the response code in the header is ok
             //
-            if ($response->header->rcode != \NetDNS2\Lookups::RCODE_NOERROR) {
-            
-                $this->last_exception = new \NetDNS2\Exception(
-                
-                    'DNS request failed: ' . 
-                    \NetDNS2\Lookups::$result_code_messages[$response->header->rcode],
-                    $response->header->rcode,
-                    null,
-                    $request,
-                    $response
-                );
+            if ($response->header->rcode != \NetDNS2\Lookups::RCODE_NOERROR)
+            {
+                $this->last_exception = new \NetDNS2\Exception('DNS request failed: ' . \NetDNS2\Lookups::$result_code_messages[$response->header->rcode], 
+                    $response->header->rcode, null, $request, $response);
 
                 $this->last_exception_list[$ns] = $this->last_exception;
                 continue;
@@ -1053,32 +1021,27 @@ class Client
         // see if we already have an open socket from a previous request; if so, try to use
         // that instead of opening a new one.
         //
-        if ( (!isset($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]))
-            || (!($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns] instanceof \NetDNS2\Socket))
-        ) {
-
+        if ( (isset($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]) == false) || 
+            (!$this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns] instanceof \NetDNS2\Socket) )
+        {
             //
             // create the socket object
             //
-            $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns] = new \NetDNS2\Socket(
-                \NetDNS2\Socket::SOCK_STREAM, $_ns, $this->dns_port, $this->timeout
-            );
+            $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns] = new \NetDNS2\Socket(\NetDNS2\Socket::SOCK_STREAM, $_ns, $this->dns_port, $this->timeout);
 
             //
             // if a local IP address / port is set, then add it
             //
-            if (strlen($this->local_host) > 0) {
-
-                $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->bindAddress(
-                    $this->local_host, $this->local_port
-                );
+            if (strlen($this->local_host) > 0)
+            {
+                $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->bindAddress($this->local_host, $this->local_port);
             }
 
             //
             // open the socket
             //
-            if ($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->open() === false) {
-
+            if ($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->open() === false)
+            {
                 $this->generateError(\NetDNS2\Socket::SOCK_STREAM, $_ns, \NetDNS2\Lookups::E_NS_SOCKET_FAILED);
             }
         }
@@ -1087,35 +1050,35 @@ class Client
         // write the data to the socket; if it fails, continue on
         // the while loop
         //
-        if ($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->write($_data) === false) {
-
+        if ($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->write($_data) === false)
+        {
             $this->generateError(\NetDNS2\Socket::SOCK_STREAM, $_ns, \NetDNS2\Lookups::E_NS_SOCKET_FAILED);
         }
 
         //
         // read the content, using select to wait for a response
         //
-        $size = 0;
-        $result = null;
-        $response = null;
+        $size       = 0;
+        $result     = null;
+        $response   = null;
 
         //
         // handle zone transfer requests differently than other requests.
         //
-        if ($_axfr == true) {
-
+        if ($_axfr == true)
+        {
             $soa_count = 0;
 
-            while (1) {
-
+            while(1)
+            {
                 //
                 // read the data off the socket
                 //
                 $result = $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->read($size, 
                     ($this->dnssec == true) ? $this->dnssec_payload_size : \NetDNS2\Lookups::DNS_MAX_UDP_SIZE);
 
-                if ( ($result === false) || ($size < \NetDNS2\Lookups::DNS_HEADER_SIZE) ) {
-
+                if ( ($result === false) || ($size < \NetDNS2\Lookups::DNS_HEADER_SIZE) )
+                {
                     //
                     // if we get an error, then keeping this socket around for a future request, could cause
                     // an error- for example, https://github.com/mikepultz/netdns2/issues/61
@@ -1138,8 +1101,8 @@ class Client
                 // go through it to see if there are two SOA records
                 // (indicating that it's the only packet)
                 //
-                if (is_null($response) == true) {
-
+                if (is_null($response) == true)
+                {
                     $response = clone $chunk;
 
                     //
@@ -1147,19 +1110,21 @@ class Client
                     // failed, then we don't need to do anything else at this
                     // point, and we should just break out.                 
                     //
-                    if ($response->header->rcode != \NetDNS2\Lookups::RCODE_NOERROR) {
+                    if ($response->header->rcode != \NetDNS2\Lookups::RCODE_NOERROR)
+                    {
                         break;
                     }
 
                     //   
                     // go through each answer
                     //
-                    foreach ($response->answer as $index => $rr) {
-
+                    foreach($response->answer as $index => $rr)
+                    {
                         //
                         // count the SOA records
                         //
-                        if ($rr->type == 'SOA') {
+                        if ($rr->type == 'SOA')
+                        {
                             $soa_count++;
                         }
                     }
@@ -1169,23 +1134,26 @@ class Client
                     // otherwise continue out so we read the rest of the 
                     // packets off the socket
                     //
-                    if ($soa_count >= 2) {
+                    if ($soa_count >= 2)
+                    {
                         break;
-                    } else {
+                    } else
+                    {
                         continue;
                     }
 
-                } else {
-
+                } else
+                {
                     //
                     // go through all these answers, and look for SOA records
                     //
-                    foreach ($chunk->answer as $index => $rr) {
-
+                    foreach($chunk->answer as $index => $rr)
+                    {
                         //
                         // count the number of SOA records we find
                         //
-                        if ($rr->type == 'SOA') {
+                        if ($rr->type == 'SOA')
+                        {
                             $soa_count++;           
                         }
 
@@ -1198,7 +1166,8 @@ class Client
                     //
                     // if we've found the second SOA record, we're done
                     //
-                    if ($soa_count >= 2) {
+                    if ($soa_count >= 2)
+                    {
                         break;
                     }
                 }
@@ -1207,13 +1176,13 @@ class Client
         //
         // everything other than a AXFR
         //
-        } else {
-
+        } else
+        {
             $result = $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->read($size, 
                 ($this->dnssec == true) ? $this->dnssec_payload_size : \NetDNS2\Lookups::DNS_MAX_UDP_SIZE);
 
-            if ( ($result === false) || ($size < \NetDNS2\Lookups::DNS_HEADER_SIZE) ) {
-
+            if ( ($result === false) || ($size < \NetDNS2\Lookups::DNS_HEADER_SIZE) )
+            {
                 $this->generateError(\NetDNS2\Socket::SOCK_STREAM, $_ns, \NetDNS2\Lookups::E_NS_SOCKET_FAILED);
             }
 
@@ -1263,32 +1232,27 @@ class Client
         // see if we already have an open socket from a previous request; if so, try to use
         // that instead of opening a new one.
         //
-        if ( (!isset($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]))
-            || (!($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns] instanceof \NetDNS2\Socket))
-        ) {
-
+        if ( (isset($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]) == false) || 
+            (!$this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns] instanceof \NetDNS2\Socket) )
+        {
             //
             // create the socket object
             //
-            $this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns] = new \NetDNS2\Socket(
-                \NetDNS2\Socket::SOCK_DGRAM, $_ns, $this->dns_port, $this->timeout
-            );
+            $this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns] = new \NetDNS2\Socket(\NetDNS2\Socket::SOCK_DGRAM, $_ns, $this->dns_port, $this->timeout);
 
             //
             // if a local IP address / port is set, then add it
             //
-            if (strlen($this->local_host) > 0) {
-
-                $this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]->bindAddress(
-                    $this->local_host, $this->local_port
-                );
+            if (strlen($this->local_host) > 0)
+            {
+                $this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]->bindAddress($this->local_host, $this->local_port);
             }
 
             //
             // open the socket
             //
-            if ($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]->open() === false) {
-
+            if ($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]->open() === false)
+            {
                 $this->generateError(\NetDNS2\Socket::SOCK_DGRAM, $_ns, \NetDNS2\Lookups::E_NS_SOCKET_FAILED);
             }
         }
@@ -1296,8 +1260,8 @@ class Client
         //
         // write the data to the socket
         //
-        if ($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]->write($_data) === false) {
-
+        if ($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]->write($_data) === false)
+        {
             $this->generateError(\NetDNS2\Socket::SOCK_DGRAM, $_ns, \NetDNS2\Lookups::E_NS_SOCKET_FAILED);
         }
 
@@ -1309,8 +1273,8 @@ class Client
         $result = $this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]->read($size, 
             ($this->dnssec == true) ? $this->dnssec_payload_size : \NetDNS2\Lookups::DNS_MAX_UDP_SIZE);
 
-        if (( $result === false) || ($size < \NetDNS2\Lookups::DNS_HEADER_SIZE)) {
-
+        if (( $result === false) || ($size < \NetDNS2\Lookups::DNS_HEADER_SIZE))
+        {
             $this->generateError(\NetDNS2\Socket::SOCK_DGRAM, $_ns, \NetDNS2\Lookups::E_NS_SOCKET_FAILED);
         }
 

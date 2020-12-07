@@ -8,8 +8,8 @@ require_once 'PEAR/PackageFileManager2.php';
 
 $pkg = new PEAR_PackageFileManager2;
 
-$e = $pkg->setOptions([
-        
+$e = $pkg->setOptions(
+[
         'baseinstalldir'    => '/',
         'packagedirectory'  => '/u/devel/net_dns/src/',
         'ignore'            => [

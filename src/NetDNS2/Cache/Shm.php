@@ -64,14 +64,11 @@ class Shm extends \NetDNS2\Cache
         //
         // make sure the file exists first
         //
-        if (!file_exists($cache_file)) {
-
-            if (file_put_contents($cache_file, '') === false) {
-        
-                throw new \NetDNS2\Exception(
-                    'failed to create empty SHM file: ' . $cache_file,
-                    \NetDNS2\Lookups::E_CACHE_SHM_FILE
-                );
+        if (file_exists($cache_file) == false)
+        {
+            if (file_put_contents($cache_file, '') === false)
+            {
+                throw new \NetDNS2\Exception('failed to create empty SHM file: ' . $cache_file, \NetDNS2\Lookups::E_CACHE_SHM_FILE);
             }
         }
 
@@ -79,12 +76,9 @@ class Shm extends \NetDNS2\Cache
         // convert the filename to a IPC key
         //
         $this->_cache_file_tok = ftok($cache_file, 't');
-        if ($this->_cache_file_tok == -1) {
-
-            throw new \NetDNS2\Exception(
-                'failed on ftok() file: ' . $this->_cache_file_tok,
-                \NetDNS2\Lookups::E_CACHE_SHM_FILE
-            );
+        if ($this->_cache_file_tok == -1)
+        {
+            throw new \NetDNS2\Exception('failed on ftok() file: ' . $this->_cache_file_tok, \NetDNS2\Lookups::E_CACHE_SHM_FILE);
         }
 
         //
@@ -92,39 +86,40 @@ class Shm extends \NetDNS2\Cache
         // cache, and nothing to do.
         //
         $this->_cache_id = @shmop_open($this->_cache_file_tok, 'w', 0, 0);
-        if ($this->_cache_id !== false) {
 
+        if ($this->_cache_id !== false)
+        {
             //
             // this returns the size allocated, and not the size used, but it's
             // still a good check to make sure there's space allocated.
             //
             $allocated = shmop_size($this->_cache_id);
-            if ($allocated > 0) {
-            
+            if ($allocated > 0)
+            {
                 //
                 // read the data from the shared memory segment
                 //
                 $data = trim(shmop_read($this->_cache_id, 0, $allocated));
-                if ( ($data !== false) && (strlen($data) > 0) ) {
-
+                if ( ($data !== false) && (strlen($data) > 0) )
+                {
                     //
                     // unserialize and store the data
                     //
                     $decoded = null;
 
-                    if ($this->cache_serializer == 'json') {
-
+                    if ($this->cache_serializer == 'json')
+                    {
                         $decoded = json_decode($data, true);
-                    } else {
-
+                    } else
+                    {
                         $decoded = unserialize($data);
                     }
 
-                    if (is_array($decoded) == true) {
-
+                    if (is_array($decoded) == true)
+                    {
                         $this->cache_data = $decoded;
-                    } else {
-
+                    } else
+                    {
                         $this->cache_data = [];
                     }
 
@@ -153,13 +148,14 @@ class Shm extends \NetDNS2\Cache
         //
         // if there's no cache file set, then there's nothing to do
         //
-        if (strlen($this->cache_file) == 0) {
+        if (strlen($this->cache_file) == 0)
+        {
             return;
         }
 
         $fp = fopen($this->cache_file, 'r');
-        if ($fp !== false) {
-
+        if ($fp !== false)
+        {
             //
             // lock the file
             //
@@ -168,23 +164,19 @@ class Shm extends \NetDNS2\Cache
             //
             // check to see if we have an open shm segment
             //
-            if ($this->_cache_id === false) {
-
+            if ($this->_cache_id === false) 
+            {
                 //
                 // try opening it again, incase it was created by another
                 // process in the mean time
                 //
-                $this->_cache_id = @shmop_open(
-                    $this->_cache_file_tok, 'w', 0, 0
-                );
-                if ($this->_cache_id === false) {
-
+                $this->_cache_id = @shmop_open($this->_cache_file_tok, 'w', 0, 0);
+                if ($this->_cache_id === false)
+                {
                     //
                     // otherwise, create it.
                     //
-                    $this->_cache_id = @shmop_open(
-                        $this->_cache_file_tok, 'c', 0, $this->cache_size
-                    );
+                    $this->_cache_id = @shmop_open($this->_cache_file_tok, 'c', 0, $this->cache_size);
                 }
             }
 
@@ -201,8 +193,8 @@ class Shm extends \NetDNS2\Cache
             //
             // if there was some data
             //    
-            if ( ($data !== false) && (strlen($data) > 0) ) {
-
+            if ( ($data !== false) && (strlen($data) > 0) )
+            {
                 //
                 // unserialize and store the data
                 //
@@ -210,16 +202,16 @@ class Shm extends \NetDNS2\Cache
 
                 $decoded = null;
   
-                if ($this->cache_serializer == 'json') {
-                
+                if ($this->cache_serializer == 'json')
+                {
                     $decoded = json_decode($data, true);
-                } else {
-                        
+                } else
+                {
                     $decoded = unserialize($data);
                 }   
                          
-                if (is_array($decoded) == true) {
-                
+                if (is_array($decoded) == true)
+                {
                     $this->cache_data = array_merge($c, $decoded);
                 }
             }
@@ -238,15 +230,14 @@ class Shm extends \NetDNS2\Cache
             // clean up and write the data
             //
             $data = $this->resize();
-            if (!is_null($data)) {
-
+            if (is_null($data) == false)
+            {
                 //
                 // re-create segment
                 //
-                $this->_cache_id = @shmop_open(
-                    $this->_cache_file_tok, 'c', 0644, $this->cache_size
-                );
-                if ($this->_cache_id === false) {
+                $this->_cache_id = @shmop_open($this->_cache_file_tok, 'c', 0644, $this->cache_size);
+                if ($this->_cache_id === false)
+                {
                     return;
                 }
 
@@ -256,7 +247,12 @@ class Shm extends \NetDNS2\Cache
             //
             // close the segment
             //
-            shmop_close($this->_cache_id);
+            // shmop_close() is deprecated in v8.0.0
+            //
+            if (version_compare(PHP_VERSION, '8.0.0', '<') == true)
+            {
+                shmop_close($this->_cache_id);
+            }
 
             //
             // unlock

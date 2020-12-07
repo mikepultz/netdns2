@@ -42,14 +42,14 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         //
         // add a A record to the authority section, like an update request
         //
-        $request->authority[] = \NetDNS2\RR::fromString('test.example.com A 10.10.10.10');
-        $request->header->nscount = 1;
+        $request->authority[]       = \NetDNS2\RR::fromString('test.example.com A 10.10.10.10');
+        $request->header->nscount   = 1;
 
         //
         // add the TSIG as additional
         //
-        $request->additional[] = \NetDNS2\RR::fromString('mykey TSIG Zm9vYmFy');
-        $request->header->arcount = 1;
+        $request->additional[]      = \NetDNS2\RR::fromString('mykey TSIG Zm9vYmFy');
+        $request->header->arcount   = 1;
 
         $line = $request->additional[0]->name . '. ' . $request->additional[0]->ttl . ' ' .
         $request->additional[0]->class . ' ' . $request->additional[0]->type . ' ' .
@@ -145,8 +145,8 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             'DLV'           => 'example.com. 300 IN DLV 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
         ];
 
-        foreach ($rrs as $rr => $line) {
-
+        foreach($rrs as $rr => $line)
+        {
             $class_name = '\NetDNS2\RR\\' . $rr;
 
             //
@@ -229,8 +229,8 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         //
         // add each RR to the same object, so we can build a build compressed name list
         //
-        foreach ($rrs as $rr => $line) {
-
+        foreach($rrs as $rr => $line)
+        {
             $class_name = '\NetDNS2\RR\\' . $rr;
 
             //
@@ -274,8 +274,8 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         //
         $response_authority = $response->authority;
 
-        foreach ($response_authority as $id => $object) {
-
+        foreach($response_authority as $id => $object)
+        {
             $response_authority[$id]->rdlength = '';
             $response_authority[$id]->rdata = '';
         }

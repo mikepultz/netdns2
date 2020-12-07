@@ -46,16 +46,23 @@ class File extends \NetDNS2\Cache
         //
         // check that the file exists first
         //
-        if ( ($this->cache_opened == false) 
-            && (file_exists($this->cache_file) == true) 
-            && (filesize($this->cache_file) > 0)
-        ) {
+        if ( ($this->cache_opened == false) && (file_exists($this->cache_file) == true) )
+        {
+            //
+            // check the file size
+            //
+            $file_size = filesize($this->cache_file);
+            if ( ($file_size === false) || ($file_size <= 0) )
+            {
+                return;
+            }
+
             //
             // open the file for reading
             //
             $fp = @fopen($this->cache_file, 'r');
-            if ($fp !== false) {
-                
+            if ($fp !== false)
+            {
                 //
                 // lock the file just in case
                 //
@@ -64,23 +71,23 @@ class File extends \NetDNS2\Cache
                 //
                 // read the file contents
                 //
-                $data = fread($fp, filesize($this->cache_file));
+                $data = fread($fp, $file_size);
 
                 $decoded = null;
                     
-                if ($this->cache_serializer == 'json') {
-
+                if ($this->cache_serializer == 'json')
+                {
                     $decoded = json_decode($data, true);         
-                } else {
-
+                } else
+                {
                     $decoded = unserialize($data);                
                 }
 
-                if (is_array($decoded) == true) {
-
+                if (is_array($decoded) == true)
+                {
                     $this->cache_data = $decoded;
-                } else {
-
+                } else
+                {
                     $this->cache_data = [];
                 }
 
@@ -105,6 +112,8 @@ class File extends \NetDNS2\Cache
                 $this->cache_opened = true;
             }
         }
+
+        return;
     }
 
     /**
@@ -118,7 +127,8 @@ class File extends \NetDNS2\Cache
         //
         // if there's no cache file set, then there's nothing to do
         //
-        if (strlen($this->cache_file) == 0) {
+        if (strlen($this->cache_file) == 0)
+        {
             return;
         }
 
@@ -126,8 +136,8 @@ class File extends \NetDNS2\Cache
         // open the file for reading/writing
         //
         $fp = fopen($this->cache_file, 'a+');
-        if ($fp !== false) {
-                
+        if ($fp !== false)
+        {
             //
             // lock the file just in case
             //
@@ -139,29 +149,39 @@ class File extends \NetDNS2\Cache
             fseek($fp, 0, SEEK_SET);
 
             //
-            // read the file contents
+            // get the file size first; in PHP 8.0 fread() was changed to throw an exception if you try
+            // and read 0 bytes from a file.
             //
-            $data = @fread($fp, filesize($this->cache_file));
-            if ( ($data !== false) && (strlen($data) > 0) ) {
+            $file_size = @filesize($this->cache_file);
 
+            if ( ($file_size !== false) && ($file_size > 0) )
+            {
                 //
-                // unserialize and store the data
+                // read the file contents
                 //
-                $c = $this->cache_data;
+                $data = @fread($fp, $file_size);
 
-                $decoded = null;
+                if ( ($data !== false) && (strlen($data) > 0) )
+                {
+                    //
+                    // unserialize and store the data
+                    //
+                    $c = $this->cache_data;
 
-                if ($this->cache_serializer == 'json') {
+                    $decoded = null;
 
-                    $decoded = json_decode($data, true);
-                } else {
-
-                    $decoded = unserialize($data);
-                }
+                    if ($this->cache_serializer == 'json')
+                    {
+                        $decoded = json_decode($data, true);
+                    } else
+                    {
+                        $decoded = unserialize($data);
+                    }
                 
-                if (is_array($decoded) == true) {
-
-                    $this->cache_data = array_merge($c, $decoded);
+                    if (is_array($decoded) == true)
+                    {
+                        $this->cache_data = array_merge($c, $decoded);
+                    }
                 }
             }
 
@@ -179,8 +199,8 @@ class File extends \NetDNS2\Cache
             // resize the data
             //
             $data = $this->resize();
-            if (!is_null($data)) {
-
+            if (is_null($data) == false)
+            {
                 //
                 // write the file contents
                 //

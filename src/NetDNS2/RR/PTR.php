@@ -72,8 +72,8 @@ class PTR extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             $offset = $packet->offset;
             $this->ptrdname = \NetDNS2\Packet::expand($packet, $offset);
 
@@ -96,8 +96,8 @@ class PTR extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$packet)
     {
-        if (strlen($this->ptrdname) > 0) {
-
+        if (strlen($this->ptrdname) > 0)
+        {
             return $packet->compress($this->ptrdname, $packet->offset);
         }
 

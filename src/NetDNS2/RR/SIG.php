@@ -155,8 +155,8 @@ class SIG extends \NetDNS2\RR
         $this->keytag       = array_shift($rdata);
         $this->signname     = $this->cleanString(array_shift($rdata));
 
-        foreach ($rdata as $line) {
-
+        foreach($rdata as $line)
+        {
             $this->signature .= $line;
         }
 
@@ -176,15 +176,12 @@ class SIG extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$packet)
     {
-        if ($this->rdlength > 0) {
-
+        if ($this->rdlength > 0)
+        {
             //
             // unpack 
             //
-            $x = unpack(
-                'ntc/Calgorithm/Clabels/Norigttl/Nsigexp/Nsigincep/nkeytag', 
-                $this->rdata
-            );
+            $x = unpack('ntc/Calgorithm/Clabels/Norigttl/Nsigexp/Nsigincep/nkeytag', $this->rdata);
 
             $this->typecovered  = \NetDNS2\Lookups::$rr_types_by_id[$x['tc']];
             $this->algorithm    = $x['algorithm'];
@@ -208,12 +205,8 @@ class SIG extends \NetDNS2\RR
             $offset             = $packet->offset + 18;
             $sigoffset          = $offset;
 
-            $this->signname     = strtolower(
-                \NetDNS2\Packet::expand($packet, $sigoffset)
-            );
-            $this->signature    = base64_encode(
-                substr($this->rdata, 18 + ($sigoffset - $offset))
-            );
+            $this->signname     = strtolower(\NetDNS2\Packet::expand($packet, $sigoffset));
+            $this->signature    = base64_encode(substr($this->rdata, 18 + ($sigoffset - $offset)));
 
             return true;
         }
@@ -237,12 +230,8 @@ class SIG extends \NetDNS2\RR
         //
         // parse the values out of the dates
         //
-        preg_match(
-            '/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigexp, $e
-        );
-        preg_match(
-            '/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigincep, $i
-        );
+        preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigexp, $e);
+        preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigincep, $i);
 
         //
         // pack the value

@@ -97,20 +97,20 @@ class Packet
     {
         $output = $this->header->__toString();
 
-        foreach ($this->question as $x) {
-
+        foreach($this->question as $x)
+        {
             $output .= $x->__toString() . "\n";
         }
-        foreach ($this->answer as $x) {
-
+        foreach ($this->answer as $x)
+        {
             $output .= $x->__toString() . "\n";
         }
-        foreach ($this->authority as $x) {
-
+        foreach($this->authority as $x)
+        {
             $output .= $x->__toString() . "\n";
         }
-        foreach ($this->additional as $x) {
-
+        foreach ($this->additional as $x)
+        {
             $output .= $x->__toString() . "\n";
         }
 
@@ -129,20 +129,20 @@ class Packet
     {
         $data = $this->header->get($this);
 
-        foreach ($this->question as $x) {
-
+        foreach($this->question as $x) 
+        {
             $data .= $x->get($this);
         }
-        foreach ($this->answer as $x) {
-
+        foreach($this->answer as $x)
+        {
             $data .= $x->get($this);
         }
-        foreach ($this->authority as $x) {
-
+        foreach($this->authority as $x)
+        {
             $data .= $x->get($this);
         }
-        foreach ($this->additional as $x) {
-
+        foreach($this->additional as $x)
+        {
             $data .= $x->get($this);
         }
 
@@ -173,12 +173,12 @@ class Packet
         $names      = str_replace('\.', '.', preg_split('/(?<!\\\)\./', $name));
         $compname   = '';
 
-        while (!empty($names)) {
-
+        while(empty($names) == false)
+        {
             $dname = join('.', $names);
 
-            if (isset($this->_compressed[$dname])) {
-
+            if (isset($this->_compressed[$dname]) == true)
+            {
                 $compname .= pack('n', 0xc000 | $this->_compressed[$dname]);
                 $offset += 2;
 
@@ -190,15 +190,16 @@ class Packet
             $first = array_shift($names);
 
             $length = strlen($first);
-            if ($length <= 0) {
+            if ($length <= 0)
+            {
                 continue;
             }
         
             //
             // truncate see RFC1035 2.3.1
             //
-            if ($length > 63) {
-
+            if ($length > 63)
+            {
                 $length = 63;
                 $first = substr($first, 0, $length);
             }
@@ -207,8 +208,8 @@ class Packet
             $offset += $length + 1;
         }
 
-        if (empty($names)) {
-
+        if (empty($names) == true)
+        {
             $compname .= pack('C', 0);
             $offset++;
         }
@@ -234,8 +235,8 @@ class Packet
         $names = explode('.', $name);
         $compname = '';
 
-        while (!empty($names)) {
-
+        while(empty($names) == false)
+        {
             $first = array_shift($names);
             $length = strlen($first);
 
@@ -267,20 +268,23 @@ class Packet
     {
         $name = '';
 
-        while (1) {
-            if ($packet->rdlength < ($offset + 1)) {
+        while(1)
+        {
+            if ($packet->rdlength < ($offset + 1))
+            {
                 return null;
             }
             
             $xlen = ord($packet->rdata[$offset]);
-            if ($xlen == 0) {
-
+            if ($xlen == 0)
+            {
                 ++$offset;
                 break;
 
-            } else if (($xlen & 0xc0) == 0xc0) {
-                if ($packet->rdlength < ($offset + 2)) {
-
+            } else if (($xlen & 0xc0) == 0xc0)
+            {
+                if ($packet->rdlength < ($offset + 2))
+                {
                     return null;
                 }
 
@@ -288,8 +292,8 @@ class Packet
                 $ptr = $ptr & 0x3fff;
 
                 $name2 = \NetDNS2\Packet::expand($packet, $ptr);
-                if (is_null($name2)) {
-
+                if (is_null($name2) == true)
+                {
                     return null;
                 }
 
@@ -297,11 +301,12 @@ class Packet
                 $offset += 2;
     
                 break;
-            } else {
+            } else
+            {
                 ++$offset;
 
-                if ($packet->rdlength < ($offset + $xlen)) {
-
+                if ($packet->rdlength < ($offset + $xlen))
+                {
                     return null;
                 }
 
@@ -311,8 +316,8 @@ class Packet
                 //
                 // escape literal dots in certain cases (SOA rname)
                 //
-                if ( ($escape_dot_literals == true) && (strpos($elem, '.') !== false) ) {
-
+                if ( ($escape_dot_literals == true) && (strpos($elem, '.') !== false) )
+                {
                     $elem = str_replace('.', '\.', $elem);
                 }
 
@@ -338,20 +343,20 @@ class Packet
     {
         $name = '';
 
-        if ($packet->rdlength < ($offset + 1)) {
-
+        if ($packet->rdlength < ($offset + 1))
+        {
             return null;
         }
 
         $xlen = ord($packet->rdata[$offset]);
         ++$offset;
 
-        if (($xlen + $offset) > $packet->rdlength) {
-
+        if (($xlen + $offset) > $packet->rdlength)
+        {
             $name = substr($packet->rdata, $offset);
             $offset = $packet->rdlength;
-        } else {
-
+        } else
+        {
             $name = substr($packet->rdata, $offset, $xlen);
             $offset += $xlen;
         }

@@ -57,9 +57,7 @@ class Updater extends \NetDNS2\Client
         //
         // create the packet
         //
-        $this->_packet = new \NetDNS2\Packet\Request(
-            strtolower(trim($zone, " \n\r\t.")), 'SOA', 'IN'
-        );
+        $this->_packet = new \NetDNS2\Packet\Request(strtolower(trim($zone, " \n\r\t.")), 'SOA', 'IN');
 
         //
         // make sure the opcode on the packet is set to UPDATE
@@ -79,13 +77,10 @@ class Updater extends \NetDNS2\Client
      */
     private function _checkName($name)
     {
-        if (!preg_match('/' . $this->_packet->question[0]->qname . '$/', $name)) {
-            
-            throw new \NetDNS2\Exception(
-                'name provided (' . $name . ') does not match zone name (' .
-                $this->_packet->question[0]->qname . ')',
-                \NetDNS2\Lookups::E_PACKET_INVALID
-            );
+        if (preg_match('/' . $this->_packet->question[0]->qname . '$/', $name) !== 1)
+        {
+            throw new \NetDNS2\Exception('name provided (' . $name . ') does not match zone name (' . $this->_packet->question[0]->qname . ')',
+                \NetDNS2\Lookups::E_PACKET_INVALID);
         }
     
         return true;
@@ -130,7 +125,8 @@ class Updater extends \NetDNS2\Client
         //
         // add the RR to the "update" section
         //
-        if (!in_array($rr, $this->_packet->authority)) {
+        if (in_array($rr, $this->_packet->authority) == false)
+        {
             $this->_packet->authority[] = $rr;
         }
 
@@ -164,7 +160,8 @@ class Updater extends \NetDNS2\Client
         //
         // add the RR to the "update" section
         //
-        if (!in_array($rr, $this->_packet->authority)) {
+        if (in_array($rr, $this->_packet->authority) == false)
+        {
             $this->_packet->authority[] = $rr;
         }
 
@@ -193,15 +190,10 @@ class Updater extends \NetDNS2\Client
     {
         $this->_checkName($name);
 
-        $class = \NetDNS2\Lookups::$rr_types_id_to_class[
-            \NetDNS2\Lookups::$rr_types_by_name[$type]
-        ];
-        if (!isset($class)) {
-
-            throw new \NetDNS2\Exception(
-                'unknown or un-supported resource record type: ' . $type,
-                \NetDNS2\Lookups::E_RR_INVALID
-            );
+        $class = \NetDNS2\Lookups::$rr_types_id_to_class[\NetDNS2\Lookups::$rr_types_by_name[$type]];
+        if (isset($class) == false)
+        {
+            throw new \NetDNS2\Exception('unknown or un-supported resource record type: ' . $type, \NetDNS2\Lookups::E_RR_INVALID);
         }
     
         $rr = new $class;
@@ -215,7 +207,8 @@ class Updater extends \NetDNS2\Client
         //
         // add the RR to the "update" section
         //
-        if (!in_array($rr, $this->_packet->authority)) {
+        if (in_array($rr, $this->_packet->authority) == false)
+        {
             $this->_packet->authority[] = $rr;
         }
 
@@ -259,7 +252,8 @@ class Updater extends \NetDNS2\Client
         //
         // add the RR to the "update" section
         //
-        if (!in_array($rr, $this->_packet->authority)) {
+        if (in_array($rr, $this->_packet->authority) == false)
+        {
             $this->_packet->authority[] = $rr;
         }
 
@@ -291,15 +285,10 @@ class Updater extends \NetDNS2\Client
     {
         $this->_checkName($name);
         
-        $class = \NetDNS2\Lookups::$rr_types_id_to_class[
-            \NetDNS2\Lookups::$rr_types_by_name[$type]
-        ];
-        if (!isset($class)) {
-
-            throw new \NetDNS2\Exception(
-                'unknown or un-supported resource record type: ' . $type,
-                \NetDNS2\Lookups::E_RR_INVALID
-            );
+        $class = \NetDNS2\Lookups::$rr_types_id_to_class[\NetDNS2\Lookups::$rr_types_by_name[$type]];
+        if (isset($class) == false)
+        {
+            throw new \NetDNS2\Exception('unknown or un-supported resource record type: ' . $type, \NetDNS2\Lookups::E_RR_INVALID);
         }
     
         $rr = new $class;
@@ -313,7 +302,8 @@ class Updater extends \NetDNS2\Client
         //
         // add the RR to the "prerequisite" section
         //
-        if (!in_array($rr, $this->_packet->answer)) {
+        if (in_array($rr, $this->_packet->answer) == false)
+        {
             $this->_packet->answer[] = $rr;
         }
 
@@ -351,7 +341,8 @@ class Updater extends \NetDNS2\Client
         //
         // add the RR to the "prerequisite" section
         //
-        if (!in_array($rr, $this->_packet->answer)) {
+        if (in_array($rr, $this->_packet->answer) == false)
+        {
             $this->_packet->answer[] = $rr;
         }
 
@@ -384,15 +375,10 @@ class Updater extends \NetDNS2\Client
     {
         $this->_checkName($name);
 
-        $class = \NetDNS2\Lookups::$rr_types_id_to_class[
-            \NetDNS2\Lookups::$rr_types_by_name[$type]
-        ];
-        if (!isset($class)) {
-
-            throw new \NetDNS2\Exception(
-                'unknown or un-supported resource record type: ' . $type,
-                \NetDNS2\Lookups::E_RR_INVALID
-            );
+        $class = \NetDNS2\Lookups::$rr_types_id_to_class[\NetDNS2\Lookups::$rr_types_by_name[$type]];
+        if (isset($class) == false)
+        {
+            throw new \NetDNS2\Exception('unknown or un-supported resource record type: ' . $type, \NetDNS2\Lookups::E_RR_INVALID);
         }
     
         $rr = new $class;
@@ -406,7 +392,8 @@ class Updater extends \NetDNS2\Client
         //
         // add the RR to the "prerequisite" section
         //
-        if (!in_array($rr, $this->_packet->answer)) {
+        if (in_array($rr, $this->_packet->answer) == false)
+        {
             $this->_packet->answer[] = $rr;
         }
 
@@ -455,7 +442,8 @@ class Updater extends \NetDNS2\Client
         //
         // add the RR to the "prerequisite" section
         //
-        if (!in_array($rr, $this->_packet->answer)) {
+        if (in_array($rr, $this->_packet->answer) == false)
+        {
             $this->_packet->answer[] = $rr;
         }
 
@@ -501,7 +489,8 @@ class Updater extends \NetDNS2\Client
         //
         // add the RR to the "prerequisite" section
         //
-        if (!in_array($rr, $this->_packet->answer)) {
+        if (in_array($rr, $this->_packet->answer) == false)
+        {
             $this->_packet->answer[] = $rr;
         }
 
@@ -525,9 +514,8 @@ class Updater extends \NetDNS2\Client
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->auth_signature instanceof \NetDNS2\RR\TSIG) 
-            || ($this->auth_signature instanceof \NetDNS2\RR\SIG)
-        ) {
+        if ( ($this->auth_signature instanceof \NetDNS2\RR\TSIG) || ($this->auth_signature instanceof \NetDNS2\RR\SIG) )
+        {
             $p->additional[] = $this->auth_signature;
         }
 
@@ -562,9 +550,8 @@ class Updater extends \NetDNS2\Client
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->auth_signature instanceof \NetDNS2\RR\TSIG) 
-            || ($this->auth_signature instanceof \NetDNS2\RR\SIG)
-        ) {
+        if ( ($this->auth_signature instanceof \NetDNS2\RR\TSIG) || ($this->auth_signature instanceof \NetDNS2\RR\SIG) )
+        {
             $this->_packet->additional[] = $this->auth_signature;
         }
 
@@ -579,13 +566,9 @@ class Updater extends \NetDNS2\Client
         //
         // make sure we have some data to send
         //
-        if (   ($this->_packet->header->qdcount == 0) 
-            || ($this->_packet->header->nscount == 0) 
-        ) {
-            throw new \NetDNS2\Exception(
-                'empty headers- nothing to send!',
-                \NetDNS2\Lookups::E_PACKET_INVALID
-            );
+        if ( ($this->_packet->header->qdcount == 0) || ($this->_packet->header->nscount == 0) )
+        {
+            throw new \NetDNS2\Exception('empty headers- nothing to send!', \NetDNS2\Lookups::E_PACKET_INVALID);
         }
 
         //

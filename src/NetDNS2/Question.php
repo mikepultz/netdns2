@@ -117,21 +117,16 @@ class Question
         // expand the name
         //
         $this->qname = $packet->expand($packet, $packet->offset);
-        if ($packet->rdlength < ($packet->offset + 4)) {
-
-            throw new \NetDNS2\Exception(
-                'invalid question section: to small',
-                \NetDNS2\Lookups::E_QUESTION_INVALID
-            );
+        if ($packet->rdlength < ($packet->offset + 4))
+        {
+            throw new \NetDNS2\Exception('invalid question section: to small', \NetDNS2\Lookups::E_QUESTION_INVALID);
         }
 
         //
         // unpack the type and class
         //
-        $type   = ord($packet->rdata[$packet->offset++]) << 8 | 
-            ord($packet->rdata[$packet->offset++]);
-        $class  = ord($packet->rdata[$packet->offset++]) << 8 | 
-            ord($packet->rdata[$packet->offset++]);
+        $type   = ord($packet->rdata[$packet->offset++]) << 8 | ord($packet->rdata[$packet->offset++]);
+        $class  = ord($packet->rdata[$packet->offset++]) << 8 | ord($packet->rdata[$packet->offset++]);
 
         //
         // validate it
@@ -139,20 +134,17 @@ class Question
         $type_name  = \NetDNS2\Lookups::$rr_types_by_id[$type];
         $class_name = \NetDNS2\Lookups::$classes_by_id[$class];
 
-        if ( (!isset($type_name)) || (!isset($class_name)) ) {
-
-            throw new \NetDNS2\Exception(
-                'invalid question section: invalid type (' . $type . 
-                ') or class (' . $class . ') specified.',
-                \NetDNS2\Lookups::E_QUESTION_INVALID
-            );
+        if ( (isset($type_name) == false) || (isset($class_name) == false) )
+        {
+            throw new \NetDNS2\Exception('invalid question section: invalid type (' . $type . ') or class (' . $class . ') specified.',
+                \NetDNS2\Lookups::E_QUESTION_INVALID);
         }
 
         //
         // store it
         //
-        $this->qtype     = $type_name;
-        $this->qclass    = $class_name;
+        $this->qtype    = $type_name;
+        $this->qclass   = $class_name;
 
         return true;
     }
@@ -179,18 +171,13 @@ class Question
         $type  = \NetDNS2\Lookups::$rr_types_by_name[$this->qtype];
         $class = \NetDNS2\Lookups::$classes_by_name[$this->qclass];
 
-        if ( (!isset($type)) || (!isset($class)) ) {
-
-            throw new \NetDNS2\Exception(
-                'invalid question section: invalid type (' . $this->qtype . 
-                ') or class (' . $this->qclass . ') specified.',
-                \NetDNS2\Lookups::E_QUESTION_INVALID
-            );
+        if ( (isset($type) == false) || (isset($class) == false) )
+        {
+            throw new \NetDNS2\Exception('invalid question section: invalid type (' . $this->qtype . ') or class (' . $this->qclass . ') specified.',
+                \NetDNS2\Lookups::E_QUESTION_INVALID);
         }
 
-        $data = $packet->compress($this->qname, $packet->offset);
-
-        $data .= chr($type >> 8) . chr($type) . chr($class >> 8) . chr($class);
+        $data = $packet->compress($this->qname, $packet->offset) . chr($type >> 8) . chr($type) . chr($class >> 8) . chr($class);
         $packet->offset += 4;
 
         return $data;

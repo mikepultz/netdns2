@@ -75,16 +75,16 @@ class Resolver extends Client
         // we dont' support incremental zone tranfers; so if it's requested, a full
         // zone transfer can be returned
         //
-        if ($type == 'IXFR') {
-
+        if ($type == 'IXFR')
+        {
             $type = 'AXFR';
         }
 
         //
         // if the name *looks* too short, then append the domain from the config
         //
-        if ( (strpos($name, '.') === false) && ($type != 'PTR') ) {
-
+        if ( (strpos($name, '.') === false) && ($type != 'PTR') )
+        {
             $name .= '.' . strtolower($this->domain);
         }
 
@@ -96,9 +96,8 @@ class Resolver extends Client
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->auth_signature instanceof \NetDNS2\RR\TSIG)
-            || ($this->auth_signature instanceof \NetDNS2\RR\SIG)
-        ) {
+        if ( ($this->auth_signature instanceof \NetDNS2\RR\TSIG) || ($this->auth_signature instanceof \NetDNS2\RR\SIG) )
+        {
             $packet->additional[]       = $this->auth_signature;
             $packet->header->arcount    = count($packet->additional);
         }
@@ -128,12 +127,12 @@ class Resolver extends Client
         //
         // set the DNSSEC AD or CD bits
         //
-        if ($this->dnssec_ad_flag == true) {
-
+        if ($this->dnssec_ad_flag == true)
+        {
             $packet->header->ad = 1;
         }
-        if ($this->dnssec_cd_flag == true) {
-
+        if ($this->dnssec_cd_flag == true)
+        {
             $packet->header->cd = 1;
         }
 
@@ -145,24 +144,20 @@ class Resolver extends Client
         //
         $packet_hash = '';
 
-        if ( ($this->use_cache == true) && ($this->cacheable($type) == true) ) {
-
+        if ( ($this->use_cache == true) && ($this->cacheable($type) == true) )
+        {
             //
             // open the cache
             //
-            $this->cache->open(
-                $this->cache_file, $this->cache_size, $this->cache_serializer
-            );
+            $this->cache->open($this->cache_file, $this->cache_size, $this->cache_serializer);
 
             //
             // build the key and check for it in the cache.
             //
-            $packet_hash = md5(
-                $packet->question[0]->qname . '|' . $packet->question[0]->qtype
-            );
+            $packet_hash = md5($packet->question[0]->qname . '|' . $packet->question[0]->qtype);
 
-            if ($this->cache->has($packet_hash)) {
-
+            if ($this->cache->has($packet_hash) == true)
+            {
                 return $this->cache->get($packet_hash);
             }
         }
@@ -171,20 +166,20 @@ class Resolver extends Client
         // set the RD (recursion desired) bit to 1 / 0 depending on the config
         // setting.
         //
-        if ($this->recurse == false) {
+        if ($this->recurse == false)
+        {
             $packet->header->rd = 0;
-        } else {
+        } else
+        {
             $packet->header->rd = 1;
         }
-print_r($packet);
+
         //
         // send the packet and get back the response
         //
         // *always* use TCP for zone transfers- does this cause any problems?
         //
-        $response = $this->sendPacket(
-            $packet, ($type == 'AXFR') ? true : $this->use_tcp
-        );
+        $response = $this->sendPacket($packet, ($type == 'AXFR') ? true : $this->use_tcp);
 
         //
         // if strict mode is enabled, then make sure that the name that was
@@ -193,21 +188,18 @@ print_r($packet);
         // only do this is strict_query_mode is turned on, AND we've received
         // some answers; no point doing any else if there were no answers.
         //
-        if ( ($this->strict_query_mode == true) 
-            && ($response->header->ancount > 0) 
-        ) {
-
+        if ( ($this->strict_query_mode == true) && ($response->header->ancount > 0) )
+        {
             $found = false;
 
             //
             // look for the requested name/type/class
             //
-            foreach ($response->answer as $index => $object) {
-
-                if ( (strcasecmp(trim($object->name, '.'), trim($packet->question[0]->qname, '.')) == 0)
-                    && ($object->type == $packet->question[0]->qtype)
-                    && ($object->class == $packet->question[0]->qclass)
-                ) {
+            foreach($response->answer as $index => $object)
+            {
+                if ( (strcasecmp(trim($object->name, '.'), trim($packet->question[0]->qname, '.')) == 0) && 
+                    ($object->type == $packet->question[0]->qtype) && ($object->class == $packet->question[0]->qclass) )
+                {
                     $found = true;
                     break;
                 }
@@ -222,8 +214,8 @@ print_r($packet);
             // the correct response in this case, is an empty answer section; the
             // authority section may still have usual information, like a SOA record.
             //
-            if ($found == false) {
-                
+            if ($found == false)
+            {
                 $response->answer = [];
                 $response->header->ancount = 0;
             }
@@ -232,8 +224,8 @@ print_r($packet);
         //
         // cache the response object
         //
-        if ( ($this->use_cache == true) && ($this->cacheable($type) == true) ) {
-
+        if ( ($this->use_cache == true) && ($this->cacheable($type) == true) )
+        {
             $this->cache->put($packet_hash, $response);
         }
 
@@ -283,9 +275,8 @@ print_r($packet);
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if (   ($this->auth_signature instanceof \NetDNS2\RR\TSIG)
-            || ($this->auth_signature instanceof \NetDNS2\RR\SIG)
-        ) {
+        if ( ($this->auth_signature instanceof \NetDNS2\RR\TSIG) || ($this->auth_signature instanceof \NetDNS2\RR\SIG) )
+        {
             $packet->additional[]       = $this->auth_signature;
             $packet->header->arcount    = count($packet->additional);
         }
