@@ -35,15 +35,27 @@ class ResolverTest extends \PHPUnit\Framework\TestCase
      */
     public function testResolver()
     {
-        $ns = [ '8.8.8.8', '8.8.4.4' ];
+        try
+        {
+            $r = new \NetDNS2\Resolver([ 'nameservers' => [ '8.8.8.8', '8.8.4.4' ] ]);
 
-        $r = new \NetDNS2\Resolver([ 'nameservers' => $ns ]);
+            $result = $r->query('google.com', 'MX');
 
-        $result = $r->query('google.com', 'MX');
+            $this->assertSame($result->header->qr, \NetDNS2\Lookups::QR_RESPONSE, 
+                sprintf('ResolverTest::testResolver(): %d != %d', $result->header->qr, \NetDNS2\Lookups::QR_RESPONSE));
 
-        $this->assertSame($result->header->qr, \NetDNS2\Lookups::QR_RESPONSE);
-        $this->assertSame(count($result->question), 1);
-        $this->assertTrue(count($result->answer) > 0);
-        $this->assertTrue($result->answer[0] instanceof \NetDNS2\RR\MX);
+            $this->assertSame(count($result->question), 1, 
+                sprintf('ResolverTest::testResolver(): question count (%d) != 1', count($result->question)));
+
+            $this->assertTrue(count($result->answer) > 0,
+                sprintf('ResolverTest::testResolver(): answer count (%d) is not > 0', count($result->answer)));
+
+            $this->assertTrue($result->answer[0] instanceof \NetDNS2\RR\MX,
+                sprintf('ResolverTest::testResolver(): answer is not an MX record'));
+
+        } catch(\NetDNS2\Exception $e)
+        {
+            $this->assertTrue(false, sprintf('ResolverTest::testResolver(): exception thrown: %s', $e->getMessage()));
+        }
     }
 }

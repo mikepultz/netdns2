@@ -70,7 +70,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         // the answer data in the response, should match our initial line exactly
         //
         $this->assertSame($line, substr($response->additional[0]->__toString(), 0, 58), 
-            sprintf('testTSIG(): $line ($s) != %s', $line, substr($response->additional[0]->__toString(), 0, 58)));
+            sprintf('ParserTest::testTSIG(): $line ($s) != %s', $line, substr($response->additional[0]->__toString(), 0, 58)));
     }
 
     /**
@@ -187,7 +187,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                 //
                 // check that the object is right
                 //
-                $this->assertTrue($a instanceof $class_name, sprintf('testParser(): $a is not an instance of %s', $class_name));
+                $this->assertTrue($a instanceof $class_name, sprintf('ParserTest::testParser(): $a is not an instance of %s', $class_name));
 
                 //
                 // set it on the packet
@@ -209,7 +209,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                 // the answer data in the response, should match our initial line exactly
                 //
                 $this->assertSame($line, $response->answer[0]->__toString(), 
-                    sprintf('testParser(): $line (%s) != %s', $line, $response->answer[0]->__toString()));
+                    sprintf('ParserTest::testParser(): $line (%s) != %s', $line, $response->answer[0]->__toString()));
             }
         }
     }
@@ -262,7 +262,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             //
             // check that the object is right
             //
-            $this->assertTrue($a instanceof $class_name, sprintf('testCompression(): $a is not an instance of %s', $class_name));
+            $this->assertTrue($a instanceof $class_name, sprintf('ParserTest::testCompression(): $a is not an instance of %s', $class_name));
 
             //
             // set it on the packet
@@ -310,6 +310,6 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         //
         // the new hashes should match.
         //
-        $this->assertSame($a, $b, sprintf('testCompression(): $a (%s) != $b (%s)', $a, $b));
+        $this->assertSame($a, $b, sprintf('ParserTest::testCompression(): $a (%s) != $b (%s)', $a, $b));
     }
 }

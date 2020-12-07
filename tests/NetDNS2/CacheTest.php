@@ -36,21 +36,28 @@ class CacheTest extends \PHPUnit\Framework\TestCase
     {
         $cache_file = '/tmp/net_dns2_test.cache';
 
-        $r = new \NetDNS2\Resolver(
-        [
-            'nameservers' => [ '8.8.8.8', '8.8.4.4' ],
-            'use_cache'     => true,
-            'cache_type'    => 'file',
-            'cache_file'    => $cache_file
-        ]);
+        try
+        {
+            $r = new \NetDNS2\Resolver(
+            [
+                'nameservers' => [ '8.8.8.8', '8.8.4.4' ],
+                'use_cache'     => true,
+                'cache_type'    => 'file',
+                'cache_file'    => $cache_file
+            ]);
 
-        $result = $r->query('google.com', 'MX');
+            $result = $r->query('google.com', 'MX');
 
-        //
-        // force __destruct() to execute
-        //
-        unset($r);
+            //
+            // force __destruct() to execute
+            //
+            unset($r);
 
-        $this->assertTrue(file_exists($cache_file));
+            $this->assertTrue(file_exists($cache_file), sprintf('CacheTest::testCache(): cache file %s doesn\'t exist!', $cache_file));
+
+        } catch(\NetDNS2\Exception $e)
+        {
+            $this->assertTrue(false, sprintf('CacheTest::testCache(): exception thrown: %s', $e->getMessage()));
+        }
     }
 }

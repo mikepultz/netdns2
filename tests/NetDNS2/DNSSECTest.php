@@ -42,14 +42,13 @@ class DNSSECTest extends \PHPUnit\Framework\TestCase
 
             $result = $r->query('org', 'SOA', 'IN');
 
-            $this->assertTrue(($result->header->ad == 1));
-            $this->assertTrue(($result->additional[0] instanceof \NetDNS2\RR\OPT));
-            $this->assertTrue(($result->additional[0]->do == 1));
+            $this->assertTrue(($result->header->ad == 1), sprintf('DNSSECTest::testDNSSEC(): the ad bit is not set!'));
+            $this->assertTrue(($result->additional[0] instanceof \NetDNS2\RR\OPT), sprintf('DNSSECTest::testDNSSEC(): additional[0] is not a OPT RR'));
+            $this->assertTrue(($result->additional[0]->do == 1), sprintf('DNSSECTest::testDNSSEC(): the do bit is not set!'));
 
         } catch(\NetDNS2\Exception $e)
         {
-            // TODO what to do here?
-            $this->assertTrue(false);
+            $this->assertTrue(false, sprintf('DNSSECTest::testDNSSEC(): exception thrown: %s', $e->getMessage()));
         }
     }
 }
