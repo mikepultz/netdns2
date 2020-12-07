@@ -94,8 +94,7 @@ class L32 extends \NetDNS2\RR
             //
             // build the locator value
             //
-            $this->locator32 = $x['locator1'] . '.' . $x['locator2'] . '.' .
-                $x['locator3'] . '.' . $x['locator4'];
+            $this->locator32 = $x['locator1'] . '.' . $x['locator2'] . '.' . $x['locator3'] . '.' . $x['locator4'];
 
             return true;
         }

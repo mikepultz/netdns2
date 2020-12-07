@@ -130,8 +130,6 @@ class LOC extends \NetDNS2\RR
         // d1 [m1 [s1]] {"N"|"S"} d2 [m2 [s2]] {"E"|"W"} alt["m"] 
         //      [siz["m"] [hp["m"] [vp["m"]]]]
         //
-        $res = preg_match(
-
         if (preg_match('/^(\d+) \s+((\d+) \s+)?(([\d.]+) \s+)?(N|S) \s+(\d+) ' .
             '\s+((\d+) \s+)?(([\d.]+) \s+)?(E|W) \s+(-?[\d.]+) m?(\s+ ([\d.]+) m?)?(\s+ ([\d.]+) m?)?(\s+ ([\d.]+) m?)?/ix', implode(' ', $rdata), $x) == 1)
         {
