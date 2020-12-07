@@ -44,10 +44,17 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
         //
         // check that the file exists first
         //
-        if ( ($this->cache_opened == false) 
-            && (file_exists($this->cache_file) == true) 
-            && (filesize($this->cache_file) > 0)
-        ) {
+        if ( ($this->cache_opened == false) && (file_exists($this->cache_file) == true) ) {
+
+            //   
+            // check the file size                
+            //                   
+            $file_size = filesize($this->cache_file);
+            if ( ($file_size === false) || ($file_size <= 0) ) {
+
+                return;
+            }
+
             //
             // open the file for reading
             //
@@ -62,7 +69,7 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
                 //
                 // read the file contents
                 //
-                $data = fread($fp, filesize($this->cache_file));
+                $data = fread($fp, $file_size);
 
                 $decoded = null;
                     
@@ -137,29 +144,39 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
             fseek($fp, 0, SEEK_SET);
 
             //
-            // read the file contents
-            //
-            $data = @fread($fp, filesize($this->cache_file));
-            if ( ($data !== false) && (strlen($data) > 0) ) {
+            // get the file size first; in PHP 8.0 fread() was changed to throw an exception if you try
+            // and read 0 bytes from a file.
+            //         
+            $file_size = @filesize($this->cache_file);
+
+            if ( ($file_size !== false) && ($file_size > 0) ) {
 
                 //
-                // unserialize and store the data
+                // read the file contents
                 //
-                $c = $this->cache_data;
-
-                $decoded = null;
-
-                if ($this->cache_serializer == 'json') {
-
-                    $decoded = json_decode($data, true);
-                } else {
-
-                    $decoded = unserialize($data);
-                }
+                $data = @fread($fp, $file_size);
                 
-                if (is_array($decoded) == true) {
+                if ( ($data !== false) && (strlen($data) > 0) ) {
 
-                    $this->cache_data = array_merge($c, $decoded);
+                    //
+                    // unserialize and store the data
+                    //
+                    $c = $this->cache_data;
+
+                    $decoded = null;
+
+                    if ($this->cache_serializer == 'json') {
+
+                        $decoded = json_decode($data, true);
+                    } else {
+
+                        $decoded = unserialize($data);
+                    }
+                
+                    if (is_array($decoded) == true) {
+
+                        $this->cache_data = array_merge($c, $decoded);
+                    }
                 }
             }
 

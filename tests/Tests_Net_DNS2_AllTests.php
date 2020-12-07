@@ -23,6 +23,7 @@ if (!defined('PHPUNIT_MAIN_METHOD')) {
     define('PHPUNIT_MAIN_METHOD', 'Tests_Net_DNS2_AllTests::main');
 }
 
+require_once 'Tests_Net_DNS2_CacheTest.php';
 require_once 'Tests_Net_DNS2_ParserTest.php';
 require_once 'Tests_Net_DNS2_ResolverTest.php';
 require_once 'Tests_Net_DNS2_DNSSECTest.php';
@@ -60,6 +61,7 @@ class Tests_Net_DNS2_AllTests
     {
         $suite = new PHPUnit_Framework_TestSuite('PEAR - Net_DNS2');
 
+        $suite->addTestSuite('Tests_Net_DNS2_CacheTest');
         $suite->addTestSuite('Tests_Net_DNS2_ParserTest');
         $suite->addTestSuite('Tests_Net_DNS2_ResolverTest');
         $suite->addTestSuite('Tests_Net_DNS2_DNSSECTest');

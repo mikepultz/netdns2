@@ -253,8 +253,13 @@ class Net_DNS2_Cache_Shm extends Net_DNS2_Cache
 
             //
             // close the segment
+            //       
+            // shmop_close() is deprecated in v8.0.0
             //
-            shmop_close($this->_cache_id);
+            if (version_compare(PHP_VERSION, '8.0.0', '<') == true)          
+            {
+                shmop_close($this->_cache_id);  
+            }
 
             //
             // unlock
