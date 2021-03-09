@@ -333,7 +333,7 @@ class Net_DNS2_Socket
         //
         // select on read
         //
-        $result = stream_select($read, $write, $except, $this->timeout);
+        $result = @stream_select($read, $write, $except, $this->timeout);
         if ($result === false) {
 
             $this->last_error = 'error on read select()';
