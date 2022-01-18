@@ -43,7 +43,7 @@ class Net_DNS2_Socket
     /*
      * the local IP and port we'll send the request from
      */
-    private $local_host;
+    private $local_host = '';
     private $local_port;
 
     /*
