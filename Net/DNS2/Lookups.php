@@ -1,7 +1,7 @@
 <?php
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
  * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
@@ -37,7 +37,7 @@ Net_DNS2_Lookups::$protocol_by_id       = array_flip(Net_DNS2_Lookups::$protocol
 
 /**
  * This class provides simple lookups used througout the Net_DNS2 code
- * 
+ *
  */
 class Net_DNS2_Lookups
 {
@@ -95,7 +95,7 @@ class Net_DNS2_Lookups
     // 12-15 reserved
 
     const RCODE_BADSIG          = 16;       // RFC 2845
-    const RCODE_BADVERS         = 16;       // RFC 6891    
+    const RCODE_BADVERS         = 16;       // RFC 6891
     const RCODE_BADKEY          = 17;       // RFC 2845
     const RCODE_BADTIME         = 18;       // RFC 2845
     const RCODE_BADMODE         = 19;       // RFC 2930
@@ -127,7 +127,7 @@ class Net_DNS2_Lookups
     const E_DNS_BADMODE         = self::RCODE_BADMODE;
     const E_DNS_BADNAME         = self::RCODE_BADNAME;
     const E_DNS_BADALG          = self::RCODE_BADALG;
-    const E_DNS_BADTRUNC        = self::RCODE_BADTRUNC;    
+    const E_DNS_BADTRUNC        = self::RCODE_BADTRUNC;
     const E_DNS_BADCOOKIE       = self::RCODE_BADCOOKIE;
 
     // other error conditions
@@ -279,7 +279,7 @@ class Net_DNS2_Lookups
         'HIP'           => 55,      // RFC 5205
         'NINFO'         => 56,      // Not implemented
         'RKEY'          => 57,      // Not implemented
-        'TALINK'        => 58,      // 
+        'TALINK'        => 58,      //
         'CDS'           => 59,      // RFC 7344
         'CDNSKEY'       => 60,      // RFC 7344
         'OPENPGPKEY'    => 61,      // RFC 7929
@@ -321,6 +321,7 @@ class Net_DNS2_Lookups
 
         'TA'            => 32768,   // same as DS
         'DLV'           => 32769,   // RFC 4431
+        'ALIAS'         => 65401,
         'TYPE65534'     => 65534    // Private Bind record
     ];
 
@@ -419,6 +420,7 @@ class Net_DNS2_Lookups
         260         => 'Net_DNS2_RR_AMTRELAY',
         32768       => 'Net_DNS2_RR_TA',
         32769       => 'Net_DNS2_RR_DLV',
+        65401       => 'Net_DNS2_RR_ALIAS',
         65534       => 'Net_DNS2_RR_TYPE65534'
     ];
 
