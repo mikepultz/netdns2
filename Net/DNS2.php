@@ -1093,7 +1093,7 @@ class Net_DNS2
             //
             // if a local IP address / port is set, then add it
             //
-            if (strlen($this->local_host) > 0) {
+            if (is_string($this->local_host) && strlen($this->local_host) > 0) {
 
                 $this->sock[Net_DNS2_Socket::SOCK_STREAM][$_ns]->bindAddress(
                     $this->local_host, $this->local_port
