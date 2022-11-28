@@ -17,7 +17,7 @@
  *
  */
 
-error_reporting(E_ALL | E_STRICT);
+error_reporting(-1);
 
 if (!defined('PHPUNIT_MAIN_METHOD')) {
     define('PHPUNIT_MAIN_METHOD', 'Tests_Net_DNS2_AllTests::main');

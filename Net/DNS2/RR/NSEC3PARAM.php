@@ -33,7 +33,6 @@ class Net_DNS2_RR_NSEC3PARAM extends Net_DNS2_RR
     /*
      * Algorithm to use
      *
-     * TODO: same as the NSEC3
      */
     public $algorithm;
 

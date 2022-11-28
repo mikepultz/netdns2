@@ -37,9 +37,18 @@ $pkg->setReleaseVersion('1.5.3');
 $pkg->setReleaseStability('stable');
 $pkg->setAPIStability('stable');
 $pkg->setNotes(
+"- added the ZONEMD resource record type.\n" .
 "- added a new PHPUnit file to test the file cache.\n" .
-"- PHP 8 issue: shmop_close() is deprecated is PHP 8.\n" .
-"- PHP 8 issue: fread() throws an exception now if you set the length to 0; so I have to check the filesize() first before reading.\n"
+"- added a new PHPUnit file to do real-time checks against a public internal server.\n" .
+"- muted errors from stream_select(); it's safe to mute them since the error condition is handled.\n" .
+"- double checked the class index exists first in Net_DNS2_RR::parse() before using it.\n" .
+"- added a typehint for Net_DNS::$last_exception in the comments so PHPStorm doesn't complain.\n" .
+"- added a quick check to confirm all the DNS servers are IP addresses.\n" .
+"- cleaned up the logic around binding to a local host and/or port; some cases wouldn't have worked correctly.\n" . 
+"- PHP 8.0 issue: shmop_close() is deprecated in PHP 8.\n" .
+"- PHP 8.0 issue: strlen() generates an error if you pass in null; there's a few placing the code that wasn't testing for this first.\n" .
+"- PHP 8.0 issue: fread() throws an exception now if you set the length to 0; so I have to check the filesize() first before reading.\n" .
+"- PHP 8.1 issue: passing null to preg_split() generates an error; there were three cases where it was possible.\n"
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();

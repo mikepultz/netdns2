@@ -184,6 +184,8 @@ class Net_DNS2
 
     /*
      * the last exeception that was generated
+     *
+     * @var Net_DNS2_Exception|null
      */
     public $last_exception = null;
 
@@ -193,7 +195,7 @@ class Net_DNS2
     public $last_exception_list = [];
 
     /*
-     * name server list
+     * name server list specified as IPv4 or IPv6 addresses
      */
     public $nameservers = [];
 
@@ -322,6 +324,17 @@ class Net_DNS2
         // otherwise, see if it's a path to a resolv.conf file and if so, load it
         //
         if (is_array($nameservers)) {
+
+            //
+            // make sure all the name servers are IP addresses (either v4 or v6)
+            //
+            foreach($nameservers as $value) {
+
+                if ( (self::isIPv4($value) == false) && (self::isIPv6($value) == false) ) {
+
+                    throw new Net_DNS2_Exception('invalid nameserver entry: ' . $value, Net_DNS2_Lookups::E_NS_INVALID_ENTRY);
+                }
+            }
 
             $this->nameservers = $nameservers;
 
@@ -543,9 +556,10 @@ class Net_DNS2
     {
         if (empty($this->nameservers)) {
 
-            if (isset($default)) {
+            if (is_null($default) == false) {
 
                 $this->setServers($default);
+
             } else {
 
                 throw new Net_DNS2_Exception(
@@ -1093,7 +1107,7 @@ class Net_DNS2
             //
             // if a local IP address / port is set, then add it
             //
-            if (strlen($this->local_host) > 0) {
+            if ( (strlen($this->local_host) > 0) || ($this->local_port > 0) ) {
 
                 $this->sock[Net_DNS2_Socket::SOCK_STREAM][$_ns]->bindAddress(
                     $this->local_host, $this->local_port
@@ -1303,7 +1317,7 @@ class Net_DNS2
             //
             // if a local IP address / port is set, then add it
             //
-            if (strlen($this->local_host) > 0) {
+            if ( (strlen($this->local_host) > 0) || ($this->local_port > 0) ) {
 
                 $this->sock[Net_DNS2_Socket::SOCK_DGRAM][$_ns]->bindAddress(
                     $this->local_host, $this->local_port

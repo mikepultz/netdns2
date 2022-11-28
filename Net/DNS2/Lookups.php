@@ -398,6 +398,7 @@ class Net_DNS2_Lookups
         60          => 'Net_DNS2_RR_CDNSKEY',
         61          => 'Net_DNS2_RR_OPENPGPKEY',
         62          => 'Net_DNS2_RR_CSYNC',
+        63          => 'Net_DNS2_RR_ZONEMD',
         99          => 'Net_DNS2_RR_SPF',
         104         => 'Net_DNS2_RR_NID',
         105         => 'Net_DNS2_RR_L32',

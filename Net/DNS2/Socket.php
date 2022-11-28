@@ -43,8 +43,8 @@ class Net_DNS2_Socket
     /*
      * the local IP and port we'll send the request from
      */
-    private $local_host;
-    private $local_port;
+    private $local_host = '';
+    private $local_port = 0;
 
     /*
      * the last error message on the object
@@ -129,12 +129,46 @@ class Net_DNS2_Socket
         //
         // bind to a local IP/port if it's set
         //
-        if (strlen($this->local_host) > 0) {
+        if ( ((is_null($this->local_host) == false) && (strlen($this->local_host) > 0)) || ($this->local_port > 0) ) {
 
-            $opts['socket']['bindto'] = $this->local_host;
+            //
+            // build the host
+            //
+            if ( (is_null($this->local_host) == false) && (strlen($this->local_host) > 0) ) {
+
+                //
+                // it's possible users are already setting the IPv6 brackets, so I'll just clean them off first
+                //
+                $host = str_replace([ '[', ']' ], '', $this->local_host);
+
+                if (Net_DNS2::isIPv4($this->local_host) == true) {
+
+                    $opts['socket']['bindto'] = $this->local_host;
+
+                } else if (Net_DNS2::isIPv6($this->local_host) == true) {
+
+                    $opts['socket']['bindto'] = '[' . $this->local_host . ']';
+
+                } else
+                {
+                    $this->last_error = 'invalid bind address value: ' . $this->local_host;
+                    return false;
+                }
+
+            } else
+            {
+                $opts['socket']['bindto'] = '0';
+            }
+
+            //
+            // then add the port
+            //
             if ($this->local_port > 0) {
 
                 $opts['socket']['bindto'] .= ':' . $this->local_port;
+            } else {
+
+                $opts['socket']['bindto'] .= ':0';
             }
         }
 
@@ -264,7 +298,7 @@ class Net_DNS2_Socket
         //
         // select on write
         //
-        $result = stream_select($read, $write, $except, $this->timeout);
+        $result = @stream_select($read, $write, $except, $this->timeout);
         if ($result === false) {
 
             $this->last_error = 'failed on write select()';
@@ -333,7 +367,7 @@ class Net_DNS2_Socket
         //
         // select on read
         //
-        $result = stream_select($read, $write, $except, $this->timeout);
+        $result = @stream_select($read, $write, $except, $this->timeout);
         if ($result === false) {
 
             $this->last_error = 'error on read select()';

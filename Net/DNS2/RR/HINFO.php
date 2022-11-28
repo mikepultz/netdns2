@@ -89,8 +89,8 @@ class Net_DNS2_RR_HINFO extends Net_DNS2_RR
 
             $offset = $packet->offset;
     
-            $this->cpu  = Net_DNS2_Packet::label($packet, $offset);
-            $this->os   = Net_DNS2_Packet::label($packet, $offset);
+            $this->cpu  = Net_DNS2_Names::unpack($packet->rdata, $offset);
+            $this->os   = Net_DNS2_Names::unpack($packet->rdata, $offset);
 
             return true;
         }
@@ -113,7 +113,7 @@ class Net_DNS2_RR_HINFO extends Net_DNS2_RR
     {
         if (strlen($this->cpu) > 0) {
 
-            $data = pack('Ca*Ca*', strlen($this->cpu), $this->cpu, strlen($this->os), $this->os);
+            $data = Net_DNS2_Names::pack($this->cpu) . Net_DNS2_Names::pack($this->os);
 
             $packet->offset += strlen($data);
 

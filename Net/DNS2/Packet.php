@@ -215,39 +215,6 @@ class Net_DNS2_Packet
     }
 
     /**
-     * applies a standard DNS name compression on the given name/offset
-     *
-     * This logic was based on the Net::DNS::Packet::dn_comp() function 
-     * by Michanel Fuhr
-     *
-     * @param string $name the name to be compressed
-     *
-     * @return string
-     * @access public
-     *
-     */
-    public static function pack($name)
-    {
-        $offset = 0;
-        $names = explode('.', $name);
-        $compname = '';
-
-        while (!empty($names)) {
-
-            $first = array_shift($names);
-            $length = strlen($first);
-
-            $compname .= pack('Ca*', $length, $first);
-            $offset += $length + 1;
-        }
-
-        $compname .= "\0";
-        $offset++;
-
-        return $compname;
-    }
-
-    /**
      * expands the domain name stored at a given offset in a DNS Packet
      *
      * This logic was based on the Net::DNS::Packet::dn_expand() function
@@ -323,6 +290,23 @@ class Net_DNS2_Packet
     }
 
     /**
+     * applies a standard DNS name compression on the given name/offset
+     *
+     * This logic was based on the Net::DNS::Packet::dn_comp() function 
+     * by Michanel Fuhr
+     *
+     * @param string $name the name to be compressed
+     *
+     * @return string
+     * @access public
+     *
+     */
+    public static function pack($name)
+    {
+        return (is_null($name) == true) ? null : pack('Ca*', strlen($name), $name);
+    }
+
+    /**
      * parses a domain label from a DNS Packet at the given offset
      *
      * @param Net_DNS2_Packet &$packet the DNS packet to look in for the domain name
@@ -332,29 +316,29 @@ class Net_DNS2_Packet
      * @access public
      *
      */
-    public static function label(Net_DNS2_Packet &$packet, &$offset)
+    public static function label($rdata, &$offset)
     {
         $name = '';
 
-        if ($packet->rdlength < ($offset + 1)) {
-
+        if (strlen($rdata) < ($offset + 1))
+        {
             return null;
         }
 
-        $xlen = ord($packet->rdata[$offset]);
+        $xlen = ord($rdata[$offset]);
         ++$offset;
 
-        if (($xlen + $offset) > $packet->rdlength) {
+        if (($xlen + $offset) > strlen($rdata)) {
 
-            $name = substr($packet->rdata, $offset);
-            $offset = $packet->rdlength;
+            $name = substr($rdata, $offset);
+            $offset = strlen($rdata);
         } else {
 
-            $name = substr($packet->rdata, $offset, $xlen);
+            $name = substr($rdata, $offset, $xlen);
             $offset += $xlen;
         }
 
-        return $name;
+        return trim($name, '.');
     }
 
     /**

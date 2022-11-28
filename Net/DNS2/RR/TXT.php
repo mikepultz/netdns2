@@ -87,13 +87,13 @@ class Net_DNS2_RR_TXT extends Net_DNS2_RR
     protected function rrSet(Net_DNS2_Packet &$packet)
     {
         if ($this->rdlength > 0) {
-            
-            $length = $packet->offset + $this->rdlength;
+
             $offset = $packet->offset;
+            $limit  = $offset + $this->rdlength;
 
-            while ($length > $offset) {
-
-                $this->text[] = Net_DNS2_Packet::label($packet, $offset);
+            while($offset < $limit) {
+                
+                $this->text[] = Net_DNS2_Names::unpack($packet->rdata, $offset);
             }
 
             return true;
@@ -115,11 +115,11 @@ class Net_DNS2_RR_TXT extends Net_DNS2_RR
      */
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
-        $data = null;
+        $data = '';
 
-        foreach ($this->text as $t) {
+        foreach($this->text as $text) {
 
-            $data .= chr(strlen($t)) . $t;
+            $data .= Net_DNS2_Names::pack($text);
         }
 
         $packet->offset += strlen($data);

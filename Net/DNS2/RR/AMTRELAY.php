@@ -195,9 +195,7 @@ class Net_DNS2_RR_AMTRELAY extends Net_DNS2_RR
                 break;
 
             case self::AMTRELAY_TYPE_DOMAIN:
-                $doffset = $packet->offset + $offset;
-                $this->relay = Net_DNS2_Packet::label($packet, $doffset);
-
+                $this->relay = Net_DNS2_Names::unpack($this->rdata, $offset);
                 break;
 
             default:
@@ -245,7 +243,8 @@ class Net_DNS2_RR_AMTRELAY extends Net_DNS2_RR
             break;
 
         case self::AMTRELAY_TYPE_DOMAIN:
-            $data .= pack('Ca*', strlen($this->relay), $this->relay);
+            $data .= Net_DNS2_Names::pack($this->relay);
+            $packet->offset += 1;
             break;
 
         default:

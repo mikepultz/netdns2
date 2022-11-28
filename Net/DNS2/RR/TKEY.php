@@ -213,6 +213,8 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
     {
         if (strlen($this->algorithm) > 0) {
 
+            $offset = 0;
+
             //
             // make sure the size values are correct
             //
@@ -222,7 +224,7 @@ class Net_DNS2_RR_TKEY extends Net_DNS2_RR
             //
             // add the algorithm without compression
             //
-            $data = Net_DNS2_Packet::pack($this->algorithm);
+            $data = $packet->compress($this->algorithm, $packet->offset);
 
             //
             // pack in the inception, expiration, mode, error and key size

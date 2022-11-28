@@ -76,8 +76,7 @@ class Net_DNS2_RR_LOC extends Net_DNS2_RR
     /*
      * used for quick power-of-ten lookups
      */
-    private $_powerOfTen = [ 1, 10, 100, 1000, 10000, 100000, 
-                                 1000000,10000000,100000000,1000000000 ];
+    private $_powerOfTen = [ 0.01, 0.1, 1, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 0, 0, 0, 0, 0 ];
 
     /*
      * some conversion values
@@ -198,6 +197,7 @@ class Net_DNS2_RR_LOC extends Net_DNS2_RR
             // version must be 0 per RFC 1876 section 2
             //
             $this->version = $x['ver'];
+
             if ($this->version == 0) {
 
                 $this->size         = $this->_precsizeNtoA($x['size']);
@@ -307,10 +307,9 @@ class Net_DNS2_RR_LOC extends Net_DNS2_RR
      */
     private function _precsizeNtoA($prec)
     {
-        $mantissa = (($prec >> 4) & 0x0f) % 10;
-        $exponent = (($prec >> 0) & 0x0f) % 10;
+        $mantissa = $prec >> 4;
 
-        return $mantissa * $this->_powerOfTen[$exponent];
+        return $mantissa * $this->_powerOfTen[$prec & 0x0F];
     }
 
     /**
@@ -326,13 +325,15 @@ class Net_DNS2_RR_LOC extends Net_DNS2_RR
     private function _precsizeAtoN($prec)
     {
         $exponent = 0;
-        while ($prec >= 10) {
 
-            $prec /= 10;
-            ++$exponent;
+        while($prec > $this->_powerOfTen[1 + $exponent]) {
+
+            $exponent++;
         }
 
-        return ($prec << 4) | ($exponent & 0x0f);
+        $mantissa = intval(0.5 + ($prec / $this->_powerOfTen[$exponent]));
+
+        return ($mantissa & 0xF) << 4 | $exponent;
     }
 
     /**
