@@ -134,10 +134,10 @@ class Net_DNS2_Question
         //
         // validate it
         //
-        $type_name  = Net_DNS2_Lookups::$rr_types_by_id[$type];
-        $class_name = Net_DNS2_Lookups::$classes_by_id[$class];
+        $type_name  = Net_DNS2_Lookups::$rr_types_by_id[$type] ?? false;
+        $class_name = Net_DNS2_Lookups::$classes_by_id[$class] ?? false;
 
-        if ( (!isset($type_name)) || (!isset($class_name)) ) {
+        if ( false === $type_name || false === $class_name ) {
 
             throw new Net_DNS2_Exception(
                 'invalid question section: invalid type (' . $type . 
