@@ -309,7 +309,7 @@ class Net_DNS2_RR_LOC extends Net_DNS2_RR
     {
         $mantissa = $prec >> 4;
 
-        return $mantissa * $this->_powerOfTen[$prec & 0x0F];
+        return strval($mantissa * $this->_powerOfTen[$prec & 0x0F]);
     }
 
     /**

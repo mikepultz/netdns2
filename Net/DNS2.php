@@ -32,7 +32,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = '1.5.3';
+    const VERSION = '1.5.4';
 
     /*
      * the default path to a resolv.conf file
@@ -222,7 +222,7 @@ class Net_DNS2
     /**
      * Constructor - base constructor for the Resolver and Updater
      *
-     * @param mixed $options array of options or null for none
+     * @param array $options array of options or null for none
      *
      * @throws Net_DNS2_Exception
      * @access public
@@ -1349,7 +1349,7 @@ class Net_DNS2
         $result = $this->sock[Net_DNS2_Socket::SOCK_DGRAM][$_ns]->read($size, 
             ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
 
-        if (( $result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE)) {
+        if ( ($result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
 
             $this->generateError(Net_DNS2_Socket::SOCK_DGRAM, $_ns, Net_DNS2_Lookups::E_NS_SOCKET_FAILED);
         }

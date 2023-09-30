@@ -452,9 +452,8 @@ abstract class Net_DNS2_RR
             (class_exists(Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']]) == true) ) {
 
             $o = new Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']]($packet, $object);
-            if ($o) {
-                $packet->offset += $object['rdlength'];            
-            }
+
+            $packet->offset += $object['rdlength'];            
 
             return $o;
         }

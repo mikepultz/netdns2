@@ -40,8 +40,8 @@ class Net_DNS2_Names
     /**
      * parses a domain string into a single string
      *
-     * @param Net_DNS2_Packet &$packet the DNS packet to look in for the domain name
-     * @param integer         &$offset the offset into the given packet object
+     * @param string  $rdata the DNS packet to look in for the domain name
+     * @param integer &$offset the offset into the given packet object
      *
      * @return mixed either a name string or null if it's not found.
      * @access public
@@ -69,6 +69,6 @@ class Net_DNS2_Names
             $offset += $xlen;
         }
 
-        return trim($name, '.');
+        return $name;
     }
 }
