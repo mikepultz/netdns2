@@ -38,6 +38,33 @@ class Net_DNS2_Names
     }
 
     /**
+     * returns the canonical wire-format representation of the domain name
+     *
+     * @param string $name a name to be packed
+     *
+     * @return string
+     * @access public
+     *
+     */
+    public static function canonical($name)
+    {
+        $names = explode('.', $name);
+        $compname = '';
+
+        while (!empty($names)) {
+
+            $first = array_shift($names);
+            $length = strlen($first);
+
+            $compname .= pack('Ca*', $length, $first);
+        }
+
+        $compname .= "\0";
+
+        return $compname;
+    }
+
+    /**
      * parses a domain string into a single string
      *
      * @param string  $rdata the DNS packet to look in for the domain name
@@ -49,25 +76,30 @@ class Net_DNS2_Names
      */
     public static function unpack($rdata, &$offset)
     {
-        $name = '';
-
-        if (strlen($rdata) < ($offset + 1))
+        if ($offset > strlen($rdata))
         {
             return null;
         }
 
-        $xlen = ord($rdata[$offset]);
-        ++$offset;
+        $name = '';
 
-        if (($xlen + $offset) > strlen($rdata)) {
+        $len = ord($rdata[$offset]);
+        if ($len == 0)
+        {
+            return null;
+        }
+        
+        $offset++;
+
+        if ( ($len + $offset) > strlen($rdata)) {
 
             $name = substr($rdata, $offset);
-            $offset = strlen($rdata);
         } else {
 
-            $name = substr($rdata, $offset, $xlen);
-            $offset += $xlen;
+            $name = substr($rdata, $offset, $len);
         }
+
+        $offset += strlen($name);
 
         return $name;
     }
