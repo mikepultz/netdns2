@@ -283,12 +283,8 @@ class Net_DNS2_Socket
         if ($this->type == Net_DNS2_Socket::SOCK_STREAM) {
 
             $s = chr($length >> 8) . chr($length);
-
-            if (@fwrite($this->sock, $s) === false) {
-
-                $this->last_error = 'failed to fwrite() 16bit length';
-                return false;
-            }
+            $data = $s . $data;
+            $length = strlen($data);
         }
 
         //
