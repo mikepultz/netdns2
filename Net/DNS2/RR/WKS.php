@@ -109,7 +109,12 @@ class Net_DNS2_RR_WKS extends Net_DNS2_RR
             // unpack the port list bitmap
             //
             $port = 0;
-            foreach (unpack('@5/C*', $this->rdata) as $set) {
+            $data = unpack('@5/C*', $this->rdata);
+            if ($data === false) {
+                return false;
+            }
+
+            foreach ($data as $set) {
 
                 $s = sprintf('%08b', $set);
 
@@ -171,7 +176,7 @@ class Net_DNS2_RR_WKS extends Net_DNS2_RR
 
                 if ($n == 8) {
 
-                    $data .= chr(bindec($string));
+                    $data .= chr(intval(bindec($string)));
                     $string = '';
                     $n = 0;
                 }

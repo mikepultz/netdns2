@@ -30,11 +30,11 @@ class Net_DNS2_Exception extends Exception
      * Constructor - overload the constructor so we can pass in the request
      *               and response object (when it's available)
      *
-     * @param string $message  the exception message
-     * @param int    $code     the exception code
-     * @param object $previous the previous Exception object
-     * @param object $request  the Net_DNS2_Packet_Request object for this request
-     * @param object $response the Net_DNS2_Packet_Response object for this request
+     * @param string                   $message  the exception message
+     * @param int                      $code     the exception code
+     * @param Exception                $previous the previous Exception object
+     * @param Net_DNS2_Packet_Request  $request  the Net_DNS2_Packet_Request object for this request
+     * @param Net_DNS2_Packet_Response $response the Net_DNS2_Packet_Response object for this request
      *
      * @access public
      *
@@ -43,8 +43,8 @@ class Net_DNS2_Exception extends Exception
         $message = '', 
         $code = 0, 
         $previous = null, 
-        Net_DNS2_Packet_Request $request = null,
-        Net_DNS2_Packet_Response $response = null
+        ?Net_DNS2_Packet_Request $request = null,
+        ?Net_DNS2_Packet_Response $response = null
     ) {
         //
         // store the request/response objects (if passed)
@@ -52,20 +52,7 @@ class Net_DNS2_Exception extends Exception
         $this->_request = $request;
         $this->_response = $response;
 
-        //
-        // call the parent constructor
-        //
-        // the "previous" argument was added in PHP 5.3.0
-        //
-        //      https://code.google.com/p/netdns2/issues/detail?id=25
-        //
-        if (version_compare(PHP_VERSION, '5.3.0', '>=') == true) {
-
-            parent::__construct($message, $code, $previous);
-        } else {
-
-            parent::__construct($message, $code);
-        }
+        parent::__construct($message, $code, $previous);
     }
 
     /**

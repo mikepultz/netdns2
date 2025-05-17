@@ -138,9 +138,9 @@ class Net_DNS2_RR_NAPTR extends Net_DNS2_RR
 
             $offset             = $packet->offset + 4;
 
-            $this->flags        = Net_DNS2_Packet::label($packet, $offset);
-            $this->services     = Net_DNS2_Packet::label($packet, $offset);
-            $this->regexp       = Net_DNS2_Packet::label($packet, $offset);
+            $this->flags        = Net_DNS2_Names::unpack($packet->rdata, $offset);
+            $this->services     = Net_DNS2_Names::unpack($packet->rdata, $offset);
+            $this->regexp       = Net_DNS2_Names::unpack($packet->rdata, $offset);
 
             $this->replacement  = Net_DNS2_Packet::expand($packet, $offset);
 
@@ -167,9 +167,9 @@ class Net_DNS2_RR_NAPTR extends Net_DNS2_RR
             
             $data = pack('nn', $this->order, $this->preference);
 
-            $data .= chr(strlen($this->flags)) . $this->flags;
-            $data .= chr(strlen($this->services)) . $this->services;
-            $data .= chr(strlen($this->regexp)) . $this->regexp;
+            $data .= Net_DNS2_Names::pack($this->flags);
+            $data .= Net_DNS2_Names::pack($this->services);
+            $data .= Net_DNS2_Names::pack($this->regexp);
 
             $packet->offset += strlen($data);
 

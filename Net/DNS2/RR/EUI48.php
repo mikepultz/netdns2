@@ -102,6 +102,10 @@ class Net_DNS2_RR_EUI48 extends Net_DNS2_RR
         if ($this->rdlength > 0) {
 
             $x = unpack('C6', $this->rdata);
+            if ($x === false) {
+                return false;
+            }
+
             if (count($x) == 6) {
             
                 $this->address = vsprintf('%02x-%02x-%02x-%02x-%02x-%02x', $x);
@@ -130,7 +134,7 @@ class Net_DNS2_RR_EUI48 extends Net_DNS2_RR
         $a = explode('-', $this->address);
         foreach ($a as $b) {
 
-            $data .= chr(hexdec($b));
+            $data .= chr(intval(hexdec($b)));
         }
 
         $packet->offset += 6;

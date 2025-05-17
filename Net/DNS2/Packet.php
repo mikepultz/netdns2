@@ -168,7 +168,7 @@ class Net_DNS2_Packet
         //
         // there's only a few cases like this- the rname in SOA for example
         //
-        $names      = str_replace('\.', '.', preg_split('/(?<!\\\)\./', $name));
+        $names      = str_replace('\.', '.', preg_split('/(?<!\\\)\./', $name));    // @phpstan-ignore-line
         $compname   = '';
 
         while (!empty($names)) {
@@ -187,7 +187,7 @@ class Net_DNS2_Packet
 
             $first = array_shift($names);
 
-            $length = strlen($first);
+            $length = strlen(strval($first));
             if ($length <= 0) {
                 continue;
             }
@@ -198,7 +198,7 @@ class Net_DNS2_Packet
             if ($length > 63) {
 
                 $length = 63;
-                $first = substr($first, 0, $length);
+                $first = substr(strval($first), 0, $length);
             }
 
             $compname .= pack('Ca*', $length, $first);
@@ -210,39 +210,6 @@ class Net_DNS2_Packet
             $compname .= pack('C', 0);
             $offset++;
         }
-
-        return $compname;
-    }
-
-    /**
-     * applies a standard DNS name compression on the given name/offset
-     *
-     * This logic was based on the Net::DNS::Packet::dn_comp() function 
-     * by Michanel Fuhr
-     *
-     * @param string $name the name to be compressed
-     *
-     * @return string
-     * @access public
-     *
-     */
-    public static function pack($name)
-    {
-        $offset = 0;
-        $names = explode('.', $name);
-        $compname = '';
-
-        while (!empty($names)) {
-
-            $first = array_shift($names);
-            $length = strlen($first);
-
-            $compname .= pack('Ca*', $length, $first);
-            $offset += $length + 1;
-        }
-
-        $compname .= "\0";
-        $offset++;
 
         return $compname;
     }
@@ -323,38 +290,55 @@ class Net_DNS2_Packet
     }
 
     /**
+     * applies a standard DNS name compression on the given name/offset
+     *
+     * This logic was based on the Net::DNS::Packet::dn_comp() function 
+     * by Michanel Fuhr
+     *
+     * @param string $name the name to be compressed
+     *
+     * @return string
+     * @access public
+     *
+     */
+    public static function pack($name)
+    {
+        return (is_null($name) == true) ? null : pack('Ca*', strlen($name), $name);
+    }
+
+    /**
      * parses a domain label from a DNS Packet at the given offset
      *
-     * @param Net_DNS2_Packet &$packet the DNS packet to look in for the domain name
-     * @param integer         &$offset the offset into the given packet object
+     * @param string    $rdata the DNS packet to look in for the domain name
+     * @param integer   &$offset the offset into the given packet object
      *
      * @return mixed either the domain name or null if it's not found.
      * @access public
      *
      */
-    public static function label(Net_DNS2_Packet &$packet, &$offset)
+    public static function label($rdata, &$offset)
     {
         $name = '';
 
-        if ($packet->rdlength < ($offset + 1)) {
-
+        if (strlen($rdata) < ($offset + 1))
+        {
             return null;
         }
 
-        $xlen = ord($packet->rdata[$offset]);
+        $xlen = ord($rdata[$offset]);
         ++$offset;
 
-        if (($xlen + $offset) > $packet->rdlength) {
+        if (($xlen + $offset) > strlen($rdata)) {
 
-            $name = substr($packet->rdata, $offset);
-            $offset = $packet->rdlength;
+            $name = substr($rdata, $offset);
+            $offset = strlen($rdata);
         } else {
 
-            $name = substr($packet->rdata, $offset, $xlen);
+            $name = substr($rdata, $offset, $xlen);
             $offset += $xlen;
         }
 
-        return $name;
+        return trim($name, '.');
     }
 
     /**

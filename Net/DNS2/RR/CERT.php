@@ -90,10 +90,8 @@ class Net_DNS2_RR_CERT extends Net_DNS2_RR
      * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
      * @param array           $rr      a array with parsed RR values
      *
-     * @return
-     *
      */
-    public function __construct(Net_DNS2_Packet &$packet = null, array $rr = null)
+    public function __construct(?Net_DNS2_Packet &$packet = null, ?array $rr = null)
     {
         parent::__construct($packet, $rr);
     

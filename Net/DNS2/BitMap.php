@@ -64,9 +64,10 @@ class Net_DNS2_BitMap
             // have a 'B' flag for unpack()
             //
             $bitstr = '';
-            foreach ($bitmap as $r) {
-                
-                $bitstr .= sprintf('%08b', $r);
+            if ($bitmap !== false) {
+                foreach ($bitmap as $r) {
+                    $bitstr .= sprintf('%08b', $r);
+                }
             }
 
             $blen = strlen($bitstr);
@@ -120,8 +121,11 @@ class Net_DNS2_BitMap
             //
             // get the type id for the RR
             //
-            $type = @Net_DNS2_Lookups::$rr_types_by_name[$rr];
-            if (isset($type)) {
+            $type = null;
+
+            if (isset(Net_DNS2_Lookups::$rr_types_by_name[$rr]) == true) {
+
+                $type = Net_DNS2_Lookups::$rr_types_by_name[$rr];
 
                 //
                 // skip meta types or qtypes
@@ -138,8 +142,12 @@ class Net_DNS2_BitMap
                 // if it's not found, then it must be defined as TYPE<id>, per
                 // RFC3845 section 2.2, if it's not, we ignore it.
                 //
-                list($name, $type) = explode('TYPE', $rr);
-                if (!isset($type)) {
+                list($name, $index) = explode('TYPE', $rr);
+                
+                if ( (strlen($index) > 0) && (is_numeric($index) == true) ) {
+
+                    $type = $index;
+                } else {
 
                     continue;
                 }
@@ -195,10 +203,11 @@ class Net_DNS2_BitMap
 
         $bin = substr(chunk_split(strrev($number), 4, '-'), 0, -1);
         $temp = preg_split('[-]', $bin, -1, PREG_SPLIT_DELIM_CAPTURE);
-        
-        for ($i = count($temp)-1;$i >= 0;$i--) {
-            
-            $result = $result . base_convert(strrev($temp[$i]), 2, 16);
+
+        if ($temp !== false) {
+            for ($i = count($temp)-1;$i >= 0;$i--) {
+                $result = $result . base_convert(strrev($temp[$i]), 2, 16);
+            }
         }
         
         return strtoupper($result);

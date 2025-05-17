@@ -55,7 +55,7 @@ abstract class Net_DNS2_RR
     /*
      * The name of the resource record
      */
-    public $name;
+    public $name = '';
 
     /*
      * The resource record type
@@ -139,7 +139,7 @@ abstract class Net_DNS2_RR
      * @access public
      *
      */
-    public function __construct(Net_DNS2_Packet &$packet = null, array $rr = null)
+    public function __construct(?Net_DNS2_Packet &$packet = null, ?array $rr = null)
     {
         if ( (!is_null($packet)) && (!is_null($rr)) ) {
 
@@ -337,7 +337,7 @@ abstract class Net_DNS2_RR
             //
             // pre-build the TTL value
             //
-            $this->preBuild();
+            $this->preBuild();  // @phpstan-ignore-line
 
             //
             // the class value is different for OPT types
@@ -374,7 +374,13 @@ abstract class Net_DNS2_RR
         //
         // add the RR
         //
-        $data .= pack('n', strlen($rdata)) . $rdata;
+        if ( (is_null($rdata) == false) && (strlen($rdata) > 0) ) {
+
+            $data .= pack('n', strlen($rdata)) . $rdata;
+        } else
+        {
+            $data .= pack('n', 0);
+        }
 
         return $data;
     }
@@ -432,31 +438,27 @@ abstract class Net_DNS2_RR
                                 ord($packet->rdata[$packet->offset++]);
 
         if ($packet->rdlength < ($packet->offset + $object['rdlength'])) {
-            return null;
+
+            throw new Net_DNS2_Exception(
+                'failed to parse resource record: packet too small.',
+                Net_DNS2_Lookups::E_PARSE_ERROR
+            );
         }
 
         //
         // lookup the class to use
         //
-        $o      = null;
-        $class  = Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']];
+        if ( (isset(Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']]) == true) &&
+            (class_exists(Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']]) == true) ) {
 
-        if (isset($class)) {
+            $o = new Net_DNS2_Lookups::$rr_types_id_to_class[$object['type']]($packet, $object);
 
-            $o = new $class($packet, $object);
-            if ($o) {
+            $packet->offset += $object['rdlength'];            
 
-                $packet->offset += $object['rdlength'];
-            }
-        } else {
-
-            throw new Net_DNS2_Exception(
-                'un-implemented resource record type: ' . $object['type'],
-                Net_DNS2_Lookups::E_RR_INVALID
-            );
+            return $o;
         }
 
-        return $o;
+        throw new Net_DNS2_Exception('un-implemented resource record type: ' . $object['type'], Net_DNS2_Lookups::E_RR_INVALID);
     }
 
     /**
@@ -471,7 +473,7 @@ abstract class Net_DNS2_RR
      */
     public function cleanString($data)
     {
-        return strtolower(rtrim($data, '.'));
+        return (is_null($data) == true) ? null : strtolower(rtrim($data, '.'));
     }
 
     /**
@@ -495,7 +497,8 @@ abstract class Net_DNS2_RR
      */
     public static function fromString($line)
     {
-        if (strlen($line) == 0) {
+        if ( (is_null($line) == true) || (strlen($line) == 0) ) {
+
             throw new Net_DNS2_Exception(
                 'empty config line provided.',
                 Net_DNS2_Lookups::E_PARSE_ERROR
@@ -511,7 +514,7 @@ abstract class Net_DNS2_RR
         // split the line by spaces
         //
         $values = preg_split('/[\s]+/', $line);
-        if (count($values) < 3) {
+        if ( ($values === false) || (count($values) < 3) ) {
 
             throw new Net_DNS2_Exception(
                 'failed to parse config: minimum of name, type and rdata required.',
@@ -539,7 +542,7 @@ abstract class Net_DNS2_RR
             // this is here because of a bug in is_numeric() in certain versions of
             // PHP on windows.
             //
-            case ($value === 0):
+            case ($value === 0):    // @phpstan-ignore-line
                 
                 $ttl = array_shift($values);
                 break;
@@ -553,7 +556,6 @@ abstract class Net_DNS2_RR
 
                 $type = strtoupper(array_shift($values));
                 break 2;
-                break;
 
             default:
 
@@ -575,31 +577,22 @@ abstract class Net_DNS2_RR
         if (isset($class_name)) {
 
             $o = new $class_name;
-            if (!is_null($o)) {
 
-                //
-                // set the parsed values
-                //
-                $o->name    = $name;
-                $o->class   = $class;
-                $o->ttl     = $ttl;
+            //
+            // set the parsed values
+            //
+            $o->name    = $name;    // @phpstan-ignore-line
+            $o->class   = $class;   // @phpstan-ignore-line
+            $o->ttl     = $ttl;     // @phpstan-ignore-line
 
-                //
-                // parse the rdata
-                //
-                if ($o->rrFromString($values) === false) {
-
-                    throw new Net_DNS2_Exception(
-                        'failed to parse rdata for config: ' . $line,
-                        Net_DNS2_Lookups::E_PARSE_ERROR
-                    );
-                }
-
-            } else {
+            //
+            // parse the rdata
+            //
+            if ($o->rrFromString($values) === false) {  // @phpstan-ignore-line
 
                 throw new Net_DNS2_Exception(
-                    'failed to create new RR record for type: ' . $type,
-                    Net_DNS2_Lookups::E_RR_INVALID
+                    'failed to parse rdata for config: ' . $line,
+                    Net_DNS2_Lookups::E_PARSE_ERROR
                 );
             }
 

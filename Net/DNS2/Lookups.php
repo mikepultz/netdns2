@@ -171,10 +171,14 @@ class Net_DNS2_Lookups
     const EDNS0_OPT_PADDING         = 12;
     const EDNS0_OPT_CHAIN           = 13;
     const EDNS0_OPT_KEY_TAG         = 14;
-    // 15 - unsassigned
+    const EDNS0_OPT_EXTENDED_ERROR  = 15;
     const EDNS0_OPT_CLIENT_TAG      = 16;
     const EDNS0_OPT_SERVER_TAG      = 17;
-    // 18-26945 - unassigned
+    const EDNS0_OPT_REPORT_CHANNEL  = 18;
+    const EDNS0_OPT_ZONE_VERSION    = 19;
+    // 20 - 20291       - unassigned
+    const EDNS0_OPT_UMBRELLA_IDENT  = 20292;
+    // 20293 - 26945    - unassigned
     const EDNS0_OPT_DEVICEID        = 26946;
 
     /*
@@ -287,8 +291,9 @@ class Net_DNS2_Lookups
         'ZONEMD'        => 63,      // Not implemented yet
         'SVCB'          => 64,      // Not implemented yet
         'HTTPS'         => 65,      // Not implemented yet
+        'DSYNC'         => 66,      // Not Implemented yet
 
-                                    // 66 - 98 unassigned
+                                    // 67 - 98 unassigned
 
         'SPF'           => 99,      // RFC 4408
         'UINFO'         => 100,     // no RFC, Not implemented
@@ -302,7 +307,11 @@ class Net_DNS2_Lookups
         'EUI48'         => 108,     // RFC 7043
         'EUI64'         => 109,     // RFC 7043
 
-                                    // 110 - 248 unassigned
+                                    // 110 - 127 unassigned
+
+        'NXNAME'        => 128,     // Not Implemented yet
+
+                                    // 129 - 248 unassigned
 
         'TKEY'          => 249,     // RFC 2930
         'TSIG'          => 250,     // RFC 2845
@@ -316,8 +325,12 @@ class Net_DNS2_Lookups
         'AVC'           => 258,     // Application Visibility and Control
         'DOA'           => 259,     // Not implemented yet
         'AMTRELAY'      => 260,     // RFC 8777
+        'RESINFO'       => 261,     // RFC 9606, Not Implemented yet
+        'WALLET'        => 262,     // Not Implemented yet
+        'CLA'           => 263,     // Not Implemented yet
+        'IPN'           => 264,     // Not Implemented yet
 
-                                    // 261 - 32767 unassigned
+                                    // 265 - 32767 unassigned
 
         'TA'            => 32768,   // same as DS
         'DLV'           => 32769,   // RFC 4431
@@ -398,6 +411,7 @@ class Net_DNS2_Lookups
         60          => 'Net_DNS2_RR_CDNSKEY',
         61          => 'Net_DNS2_RR_OPENPGPKEY',
         62          => 'Net_DNS2_RR_CSYNC',
+        63          => 'Net_DNS2_RR_ZONEMD',
         99          => 'Net_DNS2_RR_SPF',
         104         => 'Net_DNS2_RR_NID',
         105         => 'Net_DNS2_RR_L32',
@@ -405,7 +419,6 @@ class Net_DNS2_Lookups
         107         => 'Net_DNS2_RR_LP',
         108         => 'Net_DNS2_RR_EUI48',
         109         => 'Net_DNS2_RR_EUI64',
-
         249         => 'Net_DNS2_RR_TKEY',
         250         => 'Net_DNS2_RR_TSIG',
 

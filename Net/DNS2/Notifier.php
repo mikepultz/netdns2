@@ -41,13 +41,13 @@ class Net_DNS2_Notifier extends Net_DNS2
      * DNS notification for a changed zone
      *
      * @param string $zone    the domain name to use for DNS updates
-     * @param mixed  $options an array of config options or null
+     * @param array  $options an array of config options or null
      *
      * @throws Net_DNS2_Exception
      * @access public
      *
      */
-    public function __construct($zone, array $options = null)
+    public function __construct($zone, ?array $options = null)
     {
         parent::__construct($options);
 
@@ -115,6 +115,7 @@ class Net_DNS2_Notifier extends Net_DNS2
      *
      * @param string $keyname   the key name to use for the TSIG RR
      * @param string $signature the key to sign the request.
+     * @param string $algorithm the algorithm to use for the request.
      *
      * @return     boolean
      * @access     public
@@ -171,7 +172,7 @@ class Net_DNS2_Notifier extends Net_DNS2
      * @access public
      *
      */
-    public function notify(&$response = null)
+    public function notify(&$response)
     {
         //
         // check for an authentication method; either TSIG or SIG

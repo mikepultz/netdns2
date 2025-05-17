@@ -42,13 +42,13 @@ class Net_DNS2_Updater extends Net_DNS2
      * dynamic DNS updates
      *
      * @param string $zone    the domain name to use for DNS updates
-     * @param mixed  $options an array of config options or null
+     * @param array  $options an array of config options or null
      *
      * @throws Net_DNS2_Exception
      * @access public
      *
      */
-    public function __construct($zone, array $options = null)
+    public function __construct($zone, ?array $options = null)
     {
         parent::__construct($options);
 
@@ -204,11 +204,11 @@ class Net_DNS2_Updater extends Net_DNS2
     
         $rr = new $class;
 
-        $rr->name       = $name;
-        $rr->ttl        = 0;
-        $rr->class      = 'ANY';
-        $rr->rdlength   = -1;
-        $rr->rdata      = '';    
+        $rr->name       = $name;    // @phpstan-ignore-line
+        $rr->ttl        = 0;        // @phpstan-ignore-line
+        $rr->class      = 'ANY';    // @phpstan-ignore-line
+        $rr->rdlength   = -1;       // @phpstan-ignore-line
+        $rr->rdata      = '';       // @phpstan-ignore-line
 
         //
         // add the RR to the "update" section
@@ -302,11 +302,11 @@ class Net_DNS2_Updater extends Net_DNS2
     
         $rr = new $class;
 
-        $rr->name       = $name;
-        $rr->ttl        = 0;
-        $rr->class      = 'ANY';
-        $rr->rdlength   = -1;
-        $rr->rdata      = '';    
+        $rr->name       = $name;    // @phpstan-ignore-line
+        $rr->ttl        = 0;        // @phpstan-ignore-line
+        $rr->class      = 'ANY';    // @phpstan-ignore-line
+        $rr->rdlength   = -1;       // @phpstan-ignore-line
+        $rr->rdata      = '';       // @phpstan-ignore-line
 
         //
         // add the RR to the "prerequisite" section
@@ -395,11 +395,11 @@ class Net_DNS2_Updater extends Net_DNS2
     
         $rr = new $class;
 
-        $rr->name       = $name;
-        $rr->ttl        = 0;
-        $rr->class      = 'NONE';
-        $rr->rdlength   = -1;
-        $rr->rdata      = '';    
+        $rr->name       = $name;    // @phpstan-ignore-line
+        $rr->ttl        = 0;        // @phpstan-ignore-line
+        $rr->class      = 'NONE';   // @phpstan-ignore-line
+        $rr->rdlength   = -1;       // @phpstan-ignore-line
+        $rr->rdata      = '';       // @phpstan-ignore-line
 
         //
         // add the RR to the "prerequisite" section
@@ -550,7 +550,7 @@ class Net_DNS2_Updater extends Net_DNS2
      * @access public
      *
      */
-    public function update(&$response = null)
+    public function update(?Net_DNS2_Packet_Response &$response = null) // @phpstan-ignore-line
     {
         //
         // make sure we have some name servers set

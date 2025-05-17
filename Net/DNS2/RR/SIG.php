@@ -251,8 +251,8 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             $this->algorithm,
             $this->labels,
             $this->origttl,
-            gmmktime($e[4], $e[5], $e[6], $e[2], $e[3], $e[1]),
-            gmmktime($i[4], $i[5], $i[6], $i[2], $i[3], $i[1]),
+            gmmktime(intval($e[4]), intval($e[5]), intval($e[6]), intval($e[2]), intval($e[3]), intval($e[1])),
+            gmmktime(intval($i[4]), intval($i[5]), intval($i[6]), intval($i[2]), intval($i[3]), intval($i[1])),
             $this->keytag
         );
 
@@ -267,7 +267,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             $data .= $name;
         }
 
-        $data .= chr('0');
+        $data .= chr(0);
 
         //
         // if the signature is empty, and $this->private_key is an instance of a 
@@ -324,33 +324,17 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
                 break;
 
             //
-            // SHA256 (PHP 5.4.8 or higher)
+            // SHA256
             //
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
-
-                if (version_compare(PHP_VERSION, '5.4.8', '<') == true) {
-
-                    throw new Net_DNS2_Exception(
-                        'SHA256 support is only available in PHP >= 5.4.8',
-                        Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
-                    );
-                }
 
                 $algorithm = OPENSSL_ALGO_SHA256;
                 break;
 
             //
-            // SHA512 (PHP 5.4.8 or higher)
+            // SHA512
             //
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:
-
-                if (version_compare(PHP_VERSION, '5.4.8', '<') == true) {
-
-                    throw new Net_DNS2_Exception(
-                        'SHA512 support is only available in PHP >= 5.4.8',
-                        Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
-                    );
-                }
 
                 $algorithm = OPENSSL_ALGO_SHA512;
                 break;
@@ -366,7 +350,6 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
                     'invalid or unsupported algorithm',
                     Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
                 );
-                break;
             }
 
             //
@@ -375,7 +358,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             if (openssl_sign($sigdata, $this->signature, $this->private_key->instance, $algorithm) == false) {
 
                 throw new Net_DNS2_Exception(
-                    openssl_error_string(), 
+                    strval(openssl_error_string()), 
                     Net_DNS2_Lookups::E_OPENSSL_ERROR
                 );
             }

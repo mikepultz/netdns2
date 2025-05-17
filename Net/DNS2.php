@@ -32,7 +32,7 @@ class Net_DNS2
     /*
      * the current version of this library
      */
-    const VERSION = '1.5.3';
+    const VERSION = '1.5.5';
 
     /*
      * the default path to a resolv.conf file
@@ -67,7 +67,7 @@ class Net_DNS2
     /*
      * timeout value for socket connections
      */
-    public $timeout = 5;
+    public $timeout = 5.0;
 
     /*
      * randomize the name servers list
@@ -184,6 +184,8 @@ class Net_DNS2
 
     /*
      * the last exeception that was generated
+     *
+     * @var Net_DNS2_Exception|null
      */
     public $last_exception = null;
 
@@ -193,7 +195,7 @@ class Net_DNS2
     public $last_exception_list = [];
 
     /*
-     * name server list
+     * name server list specified as IPv4 or IPv6 addresses
      */
     public $nameservers = [];
 
@@ -220,13 +222,13 @@ class Net_DNS2
     /**
      * Constructor - base constructor for the Resolver and Updater
      *
-     * @param mixed $options array of options or null for none
+     * @param array $options array of options or null for none
      *
      * @throws Net_DNS2_Exception
      * @access public
      *
      */
-    public function __construct(array $options = null)
+    public function __construct(?array $options = null)
     {
         //
         // load any options that were provided
@@ -323,6 +325,17 @@ class Net_DNS2
         //
         if (is_array($nameservers)) {
 
+            //
+            // make sure all the name servers are IP addresses (either v4 or v6)
+            //
+            foreach($nameservers as $value) {
+
+                if ( (self::isIPv4($value) == false) && (self::isIPv6($value) == false) ) {
+
+                    throw new Net_DNS2_Exception('invalid nameserver entry: ' . $value, Net_DNS2_Lookups::E_NS_INVALID_ENTRY);
+                }
+            }
+
             $this->nameservers = $nameservers;
 
         } else {
@@ -371,10 +384,10 @@ class Net_DNS2
                         continue;
                     }
 
-                    list($key, $value) = preg_split('/\s+/', $line, 2);
+                    list($key, $value) = (array)preg_split('/\s+/', $line, 2);
 
-                    $key    = trim(strtolower($key));
-                    $value  = trim(strtolower($value));
+                    $key    = trim(strtolower(strval($key)));
+                    $value  = trim(strtolower(strval($value)));
 
                     switch($key) {
                     case 'nameserver':
@@ -502,6 +515,9 @@ class Net_DNS2
         }
 
         $options = preg_split('/\s+/', strtolower($value));
+        if ($options === false) {
+            return false;
+        }
 
         foreach ($options as $option) {
 
@@ -543,9 +559,10 @@ class Net_DNS2
     {
         if (empty($this->nameservers)) {
 
-            if (isset($default)) {
+            if (is_null($default) == false) {
 
                 $this->setServers($default);
+
             } else {
 
                 throw new Net_DNS2_Exception(
@@ -836,7 +853,7 @@ class Net_DNS2
      */
     public static function expandIPv6($_address)
     {
-        $hex = unpack('H*hex', inet_pton($_address));
+        $hex = unpack('H*hex', strval(inet_pton($_address)));
     
         return substr(preg_replace('/([A-f0-9]{4})/', "$1:", $hex['hex']), 0, -1);
     }
@@ -844,8 +861,8 @@ class Net_DNS2
     /**
      * sends a standard Net_DNS2_Packet_Request packet
      *
-     * @param Net_DNS2_Packet $request a Net_DNS2_Packet_Request object
-     * @param boolean         $use_tcp true/false if the function should
+     * @param Net_DNS2_Packet_Request $request a Net_DNS2_Packet_Request object
+     * @param boolean                 $use_tcp true/false if the function should
      *                                 use TCP for the request
      *
      * @return Net_DNS2_Packet_Response
@@ -853,7 +870,7 @@ class Net_DNS2
      * @access protected
      *
      */
-    protected function sendPacket(Net_DNS2_Packet $request, $use_tcp)
+    protected function sendPacket(Net_DNS2_Packet_Request $request, $use_tcp)
     {
         //
         // get the data from the packet
@@ -1025,10 +1042,11 @@ class Net_DNS2
     /**
      * cleans up a failed socket and throws the given exception
      *
-     * @param string  $_proto the protocol of the socket
+     * @param integer $_proto the protocol of the socket
      * @param string  $_ns    the name server to use for the request
-     * @param string  $_error the error message to throw at the end of the function
+     * @param integer $_error the error message to throw at the end of the function
      *
+     * @return void
      * @throws Net_DNS2_Exception
      * @access private
      *
@@ -1093,7 +1111,7 @@ class Net_DNS2
             //
             // if a local IP address / port is set, then add it
             //
-            if (strlen($this->local_host) > 0) {
+            if ( (strlen($this->local_host) > 0) || ($this->local_port > 0) ) {
 
                 $this->sock[Net_DNS2_Socket::SOCK_STREAM][$_ns]->bindAddress(
                     $this->local_host, $this->local_port
@@ -1140,7 +1158,7 @@ class Net_DNS2
                 $result = $this->sock[Net_DNS2_Socket::SOCK_STREAM][$_ns]->read($size, 
                     ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
 
-                if ( ($result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
+                if ( ($result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {     // @phpstan-ignore-line
 
                     //
                     // if we get an error, then keeping this socket around for a future request, could cause
@@ -1238,7 +1256,7 @@ class Net_DNS2
             $result = $this->sock[Net_DNS2_Socket::SOCK_STREAM][$_ns]->read($size, 
                 ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
 
-            if ( ($result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {
+            if ( ($result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {     // @phpstan-ignore-line
 
                 $this->generateError(Net_DNS2_Socket::SOCK_STREAM, $_ns, Net_DNS2_Lookups::E_NS_SOCKET_FAILED);
             }
@@ -1303,7 +1321,7 @@ class Net_DNS2
             //
             // if a local IP address / port is set, then add it
             //
-            if (strlen($this->local_host) > 0) {
+            if ( (strlen($this->local_host) > 0) || ($this->local_port > 0) ) {
 
                 $this->sock[Net_DNS2_Socket::SOCK_DGRAM][$_ns]->bindAddress(
                     $this->local_host, $this->local_port
@@ -1335,7 +1353,7 @@ class Net_DNS2
         $result = $this->sock[Net_DNS2_Socket::SOCK_DGRAM][$_ns]->read($size, 
             ($this->dnssec == true) ? $this->dnssec_payload_size : Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
 
-        if (( $result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE)) {
+        if ( ($result === false) || ($size < Net_DNS2_Lookups::DNS_HEADER_SIZE) ) {     // @phpstan-ignore-line
 
             $this->generateError(Net_DNS2_Socket::SOCK_DGRAM, $_ns, Net_DNS2_Lookups::E_NS_SOCKET_FAILED);
         }

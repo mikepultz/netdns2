@@ -20,8 +20,7 @@
 /**
  * KX Resource Record - RFC2230 section 3.1
  *
- * This class is almost identical to MX, except that the the exchanger
- * domain is not compressed, it's added as a label
+ * This class is almost identical to MX
  *
  *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *   |                  PREFERENCE                   |
@@ -95,7 +94,7 @@ class Net_DNS2_RR_KX extends Net_DNS2_RR
             // get the exchange entry server)
             //
             $offset = $packet->offset + 2;
-            $this->exchange = Net_DNS2_Packet::label($packet, $offset);
+            $this->exchange = Net_DNS2_Packet::expand($packet, $offset);
 
             return true;
         }
@@ -117,12 +116,11 @@ class Net_DNS2_RR_KX extends Net_DNS2_RR
     protected function rrGet(Net_DNS2_Packet &$packet)
     {
         if (strlen($this->exchange) > 0) {
-     
-            $data = pack('nC', $this->preference, strlen($this->exchange)) . 
-                $this->exchange;
 
-            $packet->offset += strlen($data);
+            $data = pack('n', $this->preference);
+            $packet->offset += 2;
 
+            $data .= $packet->compress($this->exchange, $packet->offset);
             return $data;
         }
     

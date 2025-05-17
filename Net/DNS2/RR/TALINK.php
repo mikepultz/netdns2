@@ -84,8 +84,8 @@ class Net_DNS2_RR_TALINK extends Net_DNS2_RR
 
             $offset         = $packet->offset;
 
-            $this->previous = Net_DNS2_Packet::label($packet, $offset);
-            $this->next     = Net_DNS2_Packet::label($packet, $offset);
+            $this->previous = Net_DNS2_Packet::expand($packet, $offset);
+            $this->next     = Net_DNS2_Packet::expand($packet, $offset);
 
             return true;
         }
@@ -108,12 +108,7 @@ class Net_DNS2_RR_TALINK extends Net_DNS2_RR
     {
         if ( (strlen($this->previous) > 0) || (strlen($this->next) > 0) ) {
 
-            $data = chr(strlen($this->previous)) . $this->previous . 
-                chr(strlen($this->next)) . $this->next;
-
-            $packet->offset += strlen($data);
-
-            return $data;
+            return $packet->compress($this->previous, $packet->offset) . $packet->compress($this->next, $packet->offset);
         }
 
         return null;

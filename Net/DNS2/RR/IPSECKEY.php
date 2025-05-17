@@ -228,7 +228,12 @@ class Net_DNS2_RR_IPSECKEY extends Net_DNS2_RR
                 break;
 
             case self::GATEWAY_TYPE_IPV6:
+
                 $ip = unpack('n8', substr($this->rdata, $offset, 16));
+                if ($ip === false) {
+                    return false;
+                }
+
                 if (count($ip) == 8) {
 
                     $this->gateway = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', $ip);

@@ -100,6 +100,10 @@ class Net_DNS2_RR_AAAA extends Net_DNS2_RR
             // it manually.
             //
             $x = unpack('n8', $this->rdata);
+            if ($x === false) {
+                return false;
+            }
+
             if (count($x) == 8) {
 
                 $this->address = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', $x);

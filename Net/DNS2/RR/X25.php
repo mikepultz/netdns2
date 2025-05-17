@@ -78,7 +78,10 @@ class Net_DNS2_RR_X25 extends Net_DNS2_RR
     {
         if ($this->rdlength > 0) {
 
-            $this->psdnaddress = Net_DNS2_Packet::label($packet, $packet->offset);
+            $offset = $packet->offset;
+
+            $this->psdnaddress = Net_DNS2_Names::unpack($packet->rdata, $offset);
+
             return true;
         }
 
@@ -100,7 +103,7 @@ class Net_DNS2_RR_X25 extends Net_DNS2_RR
     {
         if (strlen($this->psdnaddress) > 0) {
 
-            $data = chr(strlen($this->psdnaddress)) . $this->psdnaddress;
+            $data = Net_DNS2_Names::pack($this->psdnaddress);
             
             $packet->offset += strlen($data);
 

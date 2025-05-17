@@ -63,13 +63,13 @@ class Net_DNS2_Header
     /**
      * Constructor - builds a new Net_DNS2_Header object
      *
-     * @param mixed &$packet either a Net_DNS2_Packet object or null
+     * @param Net_DNS2_Packet &$packet either a Net_DNS2_Packet object or null
      *
      * @throws Net_DNS2_Exception
      * @access public
      *
      */
-    public function __construct(Net_DNS2_Packet &$packet = null)
+    public function __construct(?Net_DNS2_Packet &$packet = null)
     {
         if (!is_null($packet)) {
 

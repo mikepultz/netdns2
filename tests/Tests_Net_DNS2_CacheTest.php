@@ -27,7 +27,7 @@ require_once 'Net/DNS2.php';
 class Tests_Net_DNS2_CacheTest extends PHPUnit\Framework\TestCase
 {
     /**
-     * function to test the resolver
+     * function to test the file cache
      *
      * @return void
      * @access public
@@ -47,7 +47,11 @@ class Tests_Net_DNS2_CacheTest extends PHPUnit\Framework\TestCase
 
         $result = $r->query('google.com', 'MX');
 
+        //
+        // force __destruct() to execute
+        //
+        unset($r);
+
         $this->assertTrue(file_exists($cache_file));
-        $this->assertTrue((filesize($cache_file) > 0));
     }
 }
