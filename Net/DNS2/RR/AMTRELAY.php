@@ -186,6 +186,10 @@ class Net_DNS2_RR_AMTRELAY extends Net_DNS2_RR
                 // with the preferred standard, so we'll parse it manually.
                 //
                 $ip = unpack('n8', substr($this->rdata, $offset, 16));
+                if ($ip === false) {
+                    return false;
+                }
+
                 if (count($ip) == 8) {
                     $this->relay = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', $ip);
                 } else

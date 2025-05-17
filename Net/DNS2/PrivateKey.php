@@ -201,7 +201,7 @@ class Net_DNS2_PrivateKey
         // read all the data from the
         //
         $data = file($file, FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
-        if (count($data) == 0) {
+        if ( ($data === false) || (count($data) == 0) ) {
             
             throw new Net_DNS2_Exception(
                 'file ' . $keyname . ' is empty!',
@@ -362,7 +362,7 @@ class Net_DNS2_PrivateKey
         $this->instance = openssl_pkey_new($args);
         if ($this->instance === false) {
             throw new Net_DNS2_Exception(
-                openssl_error_string(),
+                strval(openssl_error_string()),
                 Net_DNS2_Lookups::E_OPENSSL_ERROR
             );
         }

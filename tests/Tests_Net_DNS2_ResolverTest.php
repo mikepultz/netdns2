@@ -66,7 +66,7 @@ class Tests_Net_DNS2_ResolverTest extends PHPUnit\Framework\TestCase
             //'SOA'           => [
             //
             //    'name'  => 'netdns2.com',
-            //    'res'   => 'netdns2.com. 86400 IN SOA ns.netdns2.com. abuse.netdns2.com. 2022113035 21600 3600 604800 86400'
+            //    'res'   => 'netdns2.com. 86400 IN SOA ns.netdns2.com. abuse.netdns2.com. 2025051512 43200 900 345600 7200'
             //],
 
             //
@@ -117,6 +117,11 @@ class Tests_Net_DNS2_ResolverTest extends PHPUnit\Framework\TestCase
 
                 'name'  => '8d5730bd8d76d417bf974c03f59eedb7af98cb5c3dc73ea8ebbd54b7._openpgpkey.netdns2.com',
                 'res'   => '8d5730bd8d76d417bf974c03f59eedb7af98cb5c3dc73ea8ebbd54b7._openpgpkey.netdns2.com. 86400 IN OPENPGPKEY d0VBQVlDWGgvWkFCaThraUpJRFhZbXlVbEh6QzBDSGVCenFjcHlaQUlqQzdkSzF3a1JZVmNVdklscFRPcG5PVlZmY0MzUHk5VWkveDQ1cUtiMEx5dHZLN1dZQWUzV3lPT3drNWtsd0lxUkMvMHA0bHVhZmJkMnloUk1GN3F1T0JWcVlyTG9Id3Y4aTlMclYrcjhkaEI3clh2L2xrVFNJNm1FWnNnNXJEZmVlOFl5MQ=='
+            ],
+            'PTR'           => [
+
+                'name'  => '1.0.0.127.netdns2.com',
+                'res'   => '1.0.0.127.netdns2.com. 86400 IN PTR localhost.netdns2.com.'
             ],
             'PX'            => 'px.netdns2.com. 86400 IN PX 10 ab.net2.it. o-ab.prmd-net2.admdb.c-it.',
             'RP'            => 'rp.netdns2.com. 86400 IN RP louie\.trantor.umd.edu. lam1.people.test.com.',

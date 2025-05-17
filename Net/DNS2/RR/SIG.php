@@ -324,33 +324,17 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
                 break;
 
             //
-            // SHA256 (PHP 5.4.8 or higher)
+            // SHA256
             //
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA256:
-
-                if (version_compare(PHP_VERSION, '5.4.8', '<') == true) {
-
-                    throw new Net_DNS2_Exception(
-                        'SHA256 support is only available in PHP >= 5.4.8',
-                        Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
-                    );
-                }
 
                 $algorithm = OPENSSL_ALGO_SHA256;
                 break;
 
             //
-            // SHA512 (PHP 5.4.8 or higher)
+            // SHA512
             //
             case Net_DNS2_Lookups::DNSSEC_ALGORITHM_RSASHA512:
-
-                if (version_compare(PHP_VERSION, '5.4.8', '<') == true) {
-
-                    throw new Net_DNS2_Exception(
-                        'SHA512 support is only available in PHP >= 5.4.8',
-                        Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
-                    );
-                }
 
                 $algorithm = OPENSSL_ALGO_SHA512;
                 break;
@@ -366,7 +350,6 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
                     'invalid or unsupported algorithm',
                     Net_DNS2_Lookups::E_OPENSSL_INV_ALGO
                 );
-                break;
             }
 
             //
@@ -375,7 +358,7 @@ class Net_DNS2_RR_SIG extends Net_DNS2_RR
             if (openssl_sign($sigdata, $this->signature, $this->private_key->instance, $algorithm) == false) {
 
                 throw new Net_DNS2_Exception(
-                    openssl_error_string(), 
+                    strval(openssl_error_string()), 
                     Net_DNS2_Lookups::E_OPENSSL_ERROR
                 );
             }

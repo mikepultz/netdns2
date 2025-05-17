@@ -215,9 +215,9 @@ class Net_DNS2_Cache
             // only do this part if the size allocated to the cache storage
             // is smaller than the actual cache data
             //
-            if (strlen($cache) > $this->cache_size) {
+            if (strlen(strval($cache)) > $this->cache_size) {
 
-                while (strlen($cache) > $this->cache_size) {
+                while (strlen(strval($cache)) > $this->cache_size) {
 
                     //
                     // go through the data, and remove the entries closed to

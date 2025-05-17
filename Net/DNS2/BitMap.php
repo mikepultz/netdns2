@@ -64,9 +64,10 @@ class Net_DNS2_BitMap
             // have a 'B' flag for unpack()
             //
             $bitstr = '';
-            foreach ($bitmap as $r) {
-                
-                $bitstr .= sprintf('%08b', $r);
+            if ($bitmap !== false) {
+                foreach ($bitmap as $r) {
+                    $bitstr .= sprintf('%08b', $r);
+                }
             }
 
             $blen = strlen($bitstr);
@@ -202,10 +203,11 @@ class Net_DNS2_BitMap
 
         $bin = substr(chunk_split(strrev($number), 4, '-'), 0, -1);
         $temp = preg_split('[-]', $bin, -1, PREG_SPLIT_DELIM_CAPTURE);
-        
-        for ($i = count($temp)-1;$i >= 0;$i--) {
-            
-            $result = $result . base_convert(strrev($temp[$i]), 2, 16);
+
+        if ($temp !== false) {
+            for ($i = count($temp)-1;$i >= 0;$i--) {
+                $result = $result . base_convert(strrev($temp[$i]), 2, 16);
+            }
         }
         
         return strtoupper($result);

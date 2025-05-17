@@ -168,7 +168,7 @@ class Net_DNS2_Packet
         //
         // there's only a few cases like this- the rname in SOA for example
         //
-        $names      = str_replace('\.', '.', preg_split('/(?<!\\\)\./', $name));
+        $names      = str_replace('\.', '.', preg_split('/(?<!\\\)\./', $name));    // @phpstan-ignore-line
         $compname   = '';
 
         while (!empty($names)) {
@@ -187,7 +187,7 @@ class Net_DNS2_Packet
 
             $first = array_shift($names);
 
-            $length = strlen($first);
+            $length = strlen(strval($first));
             if ($length <= 0) {
                 continue;
             }
@@ -198,7 +198,7 @@ class Net_DNS2_Packet
             if ($length > 63) {
 
                 $length = 63;
-                $first = substr($first, 0, $length);
+                $first = substr(strval($first), 0, $length);
             }
 
             $compname .= pack('Ca*', $length, $first);

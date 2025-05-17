@@ -101,6 +101,10 @@ class Net_DNS2_RR_EUI64 extends Net_DNS2_RR
         if ($this->rdlength > 0) {
 
             $x = unpack('C8', $this->rdata);
+            if ($x === false) {
+                return false;
+            }
+
             if (count($x) == 8) {
             
                 $this->address = vsprintf(

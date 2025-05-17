@@ -62,7 +62,7 @@ class Net_DNS2_RR_TLSA extends Net_DNS2_RR
     protected function rrToString()
     {
         return $this->cert_usage . ' ' . $this->selector . ' ' . 
-            $this->matching_type . ' ' . implode('', unpack('H*', $this->certificate));
+            $this->matching_type . ' ' . implode('', (array)unpack('H*', $this->certificate));
     }
 
     /**

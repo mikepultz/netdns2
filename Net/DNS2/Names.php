@@ -83,13 +83,11 @@ class Net_DNS2_Names
 
         $name = '';
 
-        $len = ord($rdata[$offset]);
+        $len = ord($rdata[$offset++]);
         if ($len == 0)
         {
             return null;
         }
-        
-        $offset++;
 
         if ( ($len + $offset) > strlen($rdata)) {
 

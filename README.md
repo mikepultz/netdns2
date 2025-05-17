@@ -30,7 +30,7 @@ Or download the source above.
 
 ## Requirements ##
 
-* PHP 5.4+
+* PHP 7.1+ (as of v1.5.5)
 * The PHP INI setting `mbstring.func_overload` equals 0, 1, 4, or 5.
 
 

@@ -136,6 +136,10 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
                     $r = unpack(
                         'C*', substr($this->rdata, $offset + 4, $item['afd_length'])
                     );
+                    if ($r === false) {
+                        return false;
+                    }
+
                     if (count($r) < 4) {
 
                         for ($c=count($r)+1; $c<4+1; $c++) {
@@ -151,6 +155,10 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
                     $r = unpack(
                         'C*', substr($this->rdata, $offset + 4, $item['afd_length'])
                     );
+                    if ($r === false) {
+                        return false;
+                    }
+
                     if (count($r) < 8) {
 
                         for ($c=count($r)+1; $c<8+1; $c++) {

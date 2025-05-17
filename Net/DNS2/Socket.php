@@ -38,6 +38,8 @@ class Net_DNS2_Socket
     private $host;
     private $port;
     private $timeout;
+    private $timeout_sec;
+    private $timeout_usec;
     private $context;
 
     /*
@@ -69,7 +71,7 @@ class Net_DNS2_Socket
      * @param integer $type    the socket type
      * @param string  $host    the IP address of the DNS server to connect to
      * @param integer $port    the port of the DNS server to connect to
-     * @param integer $timeout the timeout value to use for socket functions
+     * @param float   $timeout the timeout value to use for socket functions
      *
      * @access public
      *       
@@ -79,8 +81,14 @@ class Net_DNS2_Socket
         $this->type         = $type;
         $this->host         = $host;
         $this->port         = $port;
-        $this->timeout      = $timeout;
         $this->date_created = microtime(true);
+
+        //
+        // timeout can be provided as a float as seconds.microseconds
+        //
+        $this->timeout      = $timeout;
+        $this->timeout_sec  = floor($timeout);
+        $this->timeout_usec = ceil(($timeout - $this->timeout_sec) * 1000000);
     }
 
     /**
@@ -244,7 +252,7 @@ class Net_DNS2_Socket
         // set it to non-blocking and set the timeout
         //
         @stream_set_blocking($this->sock, false);
-        @stream_set_timeout($this->sock, $this->timeout);
+        @stream_set_timeout($this->sock, $this->timeout_sec, $this->timeout_usec);
 
         return true;
     }
@@ -295,7 +303,7 @@ class Net_DNS2_Socket
         //
         // select on write
         //
-        $result = @stream_select($read, $write, $except, $this->timeout);
+        $result = @stream_select($read, $write, $except, $this->timeout_sec, $this->timeout_usec);
         if ($result === false) {
 
             $this->last_error = 'failed on write select()';
@@ -310,16 +318,14 @@ class Net_DNS2_Socket
         //
         // if it's a TCP socket, then we need to packet and send the length of the
         // data as the first 16bit of data.
-        //        
+        //
+        // to avoid any TCP segmentation issues, we changed this to prefix the data
+        // and only do a single write.
+        //
         if ($this->type == Net_DNS2_Socket::SOCK_STREAM) {
 
-            $s = chr($length >> 8) . chr($length);
-
-            if (@fwrite($this->sock, $s) === false) {
-
-                $this->last_error = 'failed to fwrite() 16bit length';
-                return false;
-            }
+            $data = chr($length >> 8) . chr($length) . $data;
+            $length += 2;
         }
 
         //
@@ -351,6 +357,12 @@ class Net_DNS2_Socket
         $write  = null;
         $except = null;
 
+        if ($max_size <= 0) {
+
+            $this->last_error = 'invalid max_size value provided.';
+            return false;
+        }
+
         //
         // increment the date last used timestamp
         //
@@ -364,7 +376,7 @@ class Net_DNS2_Socket
         //
         // select on read
         //
-        $result = @stream_select($read, $write, $except, $this->timeout);
+        $result = @stream_select($read, $write, $except, $this->timeout_sec, $this->timeout_usec);
         if ($result === false) {
 
             $this->last_error = 'error on read select()';
@@ -396,8 +408,8 @@ class Net_DNS2_Socket
                 $this->last_error = 'failed on fread() for data length';
                 return false;
             }
-
             $length = ord($data[0]) << 8 | ord($data[1]);
+
             if ($length < Net_DNS2_Lookups::DNS_HEADER_SIZE) {
 
                 return false;
@@ -435,7 +447,7 @@ class Net_DNS2_Socket
             //
             while (1) {
 
-                $chunk = fread($this->sock, max(0, $chunk_size));
+                $chunk = fread($this->sock, $chunk_size);
                 if ($chunk === false) {
             
                     $this->last_error = 'failed on fread() for data';
@@ -445,7 +457,8 @@ class Net_DNS2_Socket
                 $data .= $chunk;
                 $chunk_size -= strlen($chunk);
 
-                if (strlen($data) >= $length) {
+                if ( (strlen($data) >= $length) || ($chunk_size <= 0) ) {
+
                     break;
                 }
             }
@@ -456,7 +469,7 @@ class Net_DNS2_Socket
             // if it's UDP, it's a single fixed-size frame, and the streams library
             // doesn't seem to have a problem reading it.
             //
-            $data = fread($this->sock, max(0, $length));
+            $data = fread($this->sock, $length);
             if ($data === false) {
             
                 $this->last_error = 'failed on fread() for data';

@@ -47,7 +47,7 @@ class Net_DNS2_Notifier extends Net_DNS2
      * @access public
      *
      */
-    public function __construct($zone, array $options = null)
+    public function __construct($zone, ?array $options = null)
     {
         parent::__construct($options);
 
@@ -172,7 +172,7 @@ class Net_DNS2_Notifier extends Net_DNS2
      * @access public
      *
      */
-    public function notify(&$response = null)
+    public function notify(&$response)
     {
         //
         // check for an authentication method; either TSIG or SIG

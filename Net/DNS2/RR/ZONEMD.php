@@ -76,7 +76,7 @@ class Net_DNS2_RR_ZONEMD extends Net_DNS2_RR
     protected function rrToString()
     {
         return $this->serial . ' ' . $this->scheme . ' ' . $this->hash_algorithm .
-            ' ' . implode('', unpack('H*', $this->digest));
+            ' ' . implode('', (array)unpack('H*', $this->digest));
     }
 
     /**

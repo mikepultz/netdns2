@@ -70,23 +70,25 @@ class Net_DNS2_Cache_File extends Net_DNS2_Cache
                 // read the file contents
                 //
                 $data = fread($fp, $file_size);
+                if ($data !== false) {
 
-                $decoded = null;
+                    $decoded = null;
                     
-                if ($this->cache_serializer == 'json') {
+                    if ($this->cache_serializer == 'json') {
 
-                    $decoded = json_decode($data, true);         
-                } else {
+                        $decoded = json_decode($data, true);         
+                    } else {
 
-                    $decoded = unserialize($data);                
-                }
+                        $decoded = unserialize($data);                
+                    }
 
-                if (is_array($decoded) == true) {
+                    if (is_array($decoded) == true) {
 
-                    $this->cache_data = $decoded;
-                } else {
+                        $this->cache_data = $decoded;
+                    } else {
 
-                    $this->cache_data = [];
+                        $this->cache_data = [];
+                    }
                 }
 
                 //

@@ -139,7 +139,7 @@ abstract class Net_DNS2_RR
      * @access public
      *
      */
-    public function __construct(Net_DNS2_Packet &$packet = null, array $rr = null)
+    public function __construct(?Net_DNS2_Packet &$packet = null, ?array $rr = null)
     {
         if ( (!is_null($packet)) && (!is_null($rr)) ) {
 
@@ -337,7 +337,7 @@ abstract class Net_DNS2_RR
             //
             // pre-build the TTL value
             //
-            $this->preBuild();
+            $this->preBuild();  // @phpstan-ignore-line
 
             //
             // the class value is different for OPT types
@@ -514,7 +514,7 @@ abstract class Net_DNS2_RR
         // split the line by spaces
         //
         $values = preg_split('/[\s]+/', $line);
-        if (count($values) < 3) {
+        if ( ($values === false) || (count($values) < 3) ) {
 
             throw new Net_DNS2_Exception(
                 'failed to parse config: minimum of name, type and rdata required.',
@@ -542,7 +542,7 @@ abstract class Net_DNS2_RR
             // this is here because of a bug in is_numeric() in certain versions of
             // PHP on windows.
             //
-            case ($value === 0):
+            case ($value === 0):    // @phpstan-ignore-line
                 
                 $ttl = array_shift($values);
                 break;
@@ -556,7 +556,6 @@ abstract class Net_DNS2_RR
 
                 $type = strtoupper(array_shift($values));
                 break 2;
-                break;
 
             default:
 
@@ -582,14 +581,14 @@ abstract class Net_DNS2_RR
             //
             // set the parsed values
             //
-            $o->name    = $name;
-            $o->class   = $class;
-            $o->ttl     = $ttl;
+            $o->name    = $name;    // @phpstan-ignore-line
+            $o->class   = $class;   // @phpstan-ignore-line
+            $o->ttl     = $ttl;     // @phpstan-ignore-line
 
             //
             // parse the rdata
             //
-            if ($o->rrFromString($values) === false) {
+            if ($o->rrFromString($values) === false) {  // @phpstan-ignore-line
 
                 throw new Net_DNS2_Exception(
                     'failed to parse rdata for config: ' . $line,
