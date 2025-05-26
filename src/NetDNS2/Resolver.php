@@ -1,25 +1,25 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
 namespace NetDNS2;
 
-/*
+/**
  * register the auto-load function
  *
  */
@@ -35,80 +35,84 @@ spl_autoload_register(function($_class)
  * This is the main resolver class, providing DNS query functions.
  *
  */
-class Resolver extends Client
+final class Resolver extends Client
 {
     use \NetDNS2\Opts;
 
     /**
      * Constructor - creates a new \NetDNS2\Resolver object
      *
-     * @param mixed $options either an array with options or null
-     *
-     * @access public
+     * @param array<int,mixed> $_options either an array with options or null
      *
      */
-    public function __construct(array $options = null)
+    public function __construct(?array $_options = null)
     {
-        parent::__construct($options);
+        parent::__construct($_options);
     }
 
     /**
      * does a basic DNS lookup query
      *
-     * @param string $name  the DNS name to loookup
-     * @param string $type  the name of the RR type to lookup
-     * @param string $class the name of the RR class to lookup
+     * @param string $_name  the DNS name to loookup
+     * @param string $_type  the name of the RR type to lookup
+     * @param string $_class the name of the RR class to lookup
      *
-     * @return \NetDNS2\Packet\Response object
      * @throws \NetDNS2\Exception
-     * @access public
      *
      */
-    public function query($name, $type = 'A', $class = 'IN')
+    public function query(string $_name, string $_type = 'A', string $_class = 'IN'): \NetDNS2\Packet\Response
     {
+        //
+        // init some network settings
+        //
+        $this->initNetwork();
+
         //
         // make sure we have some name servers set
         //
         $this->checkServers(\NetDNS2\Client::RESOLV_CONF);
 
         //
-        // we dont' support incremental zone tranfers; so if it's requested, a full
-        // zone transfer can be returned
+        // we dont' support incremental zone tranfers; so if it's requested, a full zone transfer can be returned
         //
-        if ($type == 'IXFR')
+        if ($_type == 'IXFR')
         {
-            $type = 'AXFR';
+            $_type = 'AXFR';
         }
 
         //
         // if the name *looks* too short, then append the domain from the config
         //
-        if ( (strpos($name, '.') === false) && ($type != 'PTR') )
+        if ( (strpos($_name, '.') === false) && (strlen($this->domain) > 0) && ($_type != 'PTR') )
         {
-            $name .= '.' . strtolower($this->domain);
+            $_name .= '.' . strtolower($this->domain);
         }
+
+        //
+        // clear the name compression cache
+        //
+        \NetDNS2\Data::$compressed = [];
 
         //
         // create a new packet based on the input
         //
-        $packet = new \NetDNS2\Packet\Request($name, $type, $class);
+        $packet = new \NetDNS2\Packet\Request($_name, $_type, $_class);
 
         //
         // check for an authentication method; either TSIG or SIG
         //
         if ( ($this->auth_signature instanceof \NetDNS2\RR\TSIG) || ($this->auth_signature instanceof \NetDNS2\RR\SIG) )
         {
-            $packet->additional[]       = $this->auth_signature;
-            $packet->header->arcount    = count($packet->additional);
+            $packet->additional[]    = clone $this->auth_signature;
+            $packet->header->arcount = count($packet->additional);
         }
 
         //
-        // check for the DNSSEC flag, and if it's true, then add an OPT
-        // RR to the additional section, and set the DO flag to 1.
+        // check for the DNSSEC flag, and if it's true, then add an OPT RR to the additional section, and set the DO flag to 1.
         //
         if ($this->dnssec == true)
         {
-            $this->dnssec(true);
+            $this->dnssec(true);    // @phpstan-ignore-line
         }
 
         //
@@ -118,7 +122,7 @@ class Resolver extends Client
         {
             foreach($this->opts as $opt)
             {
-                $packet->additional[] = $opt;
+                $packet->additional[] = clone $opt;
             }
 
             $packet->header->arcount = count($packet->additional);
@@ -137,14 +141,13 @@ class Resolver extends Client
         }
 
         //
-        // if caching is turned on, then check then hash the question, and
-        // do a cache lookup.
+        // if caching is turned on, then check then hash the question, and do a cache lookup.
         //
         // don't use the cache for zone transfers
         //
         $packet_hash = '';
 
-        if ( ($this->use_cache == true) && ($this->cacheable($type) == true) )
+        if ( ($this->use_cache == true) && ($this->cacheable($_type) == true) )
         {
             //
             // open the cache
@@ -154,17 +157,17 @@ class Resolver extends Client
             //
             // build the key and check for it in the cache.
             //
-            $packet_hash = md5($packet->question[0]->qname . '|' . $packet->question[0]->qtype);
+            $packet_hash = md5($packet->question[0]->qname . '|' . $packet->question[0]->qtype->label());
 
             if ($this->cache->has($packet_hash) == true)
             {
+                // TODO: this returns an object instead of a NetDNS2\Packet\Response object
                 return $this->cache->get($packet_hash);
             }
         }
 
         //
-        // set the RD (recursion desired) bit to 1 / 0 depending on the config
-        // setting.
+        // set the RD (recursion desired) bit to 1 / 0 depending on the config setting.
         //
         if ($this->recurse == false)
         {
@@ -179,14 +182,12 @@ class Resolver extends Client
         //
         // *always* use TCP for zone transfers- does this cause any problems?
         //
-        $response = $this->sendPacket($packet, ($type == 'AXFR') ? true : $this->use_tcp);
+        $response = $this->sendPacket($packet, ($_type == 'AXFR') ? true : $this->use_tcp);
 
         //
-        // if strict mode is enabled, then make sure that the name that was
-        // looked up is *actually* in the response object.
+        // if strict mode is enabled, then make sure that the name that was looked up is *actually* in the response object.
         //
-        // only do this is strict_query_mode is turned on, AND we've received
-        // some answers; no point doing any else if there were no answers.
+        // only do this is strict_query_mode is turned on, AND we've received some answers; no point doing any else if there were no answers.
         //
         if ( ($this->strict_query_mode == true) && ($response->header->ancount > 0) )
         {
@@ -197,7 +198,7 @@ class Resolver extends Client
             //
             foreach($response->answer as $index => $object)
             {
-                if ( (strcasecmp(trim($object->name, '.'), trim($packet->question[0]->qname, '.')) == 0) && 
+                if ( (strcasecmp(trim($object->name->value(), '.'), trim($packet->question[0]->qname->value(), '.')) == 0) && 
                     ($object->type == $packet->question[0]->qtype) && ($object->class == $packet->question[0]->qclass) )
                 {
                     $found = true;
@@ -206,13 +207,10 @@ class Resolver extends Client
             }
 
             //
-            // if it's not found, then unset the answer section; it's not correct to
-            // throw an exception here; if the hostname didn't exist, then 
-            // sendPacket() would have already thrown an NXDOMAIN error- so the host 
-            // *exists*, but just not the request type/class.
+            // if it's not found, then unset the answer section; it's not correct to throw an exception here; if the hostname didn't exist, then 
+            // sendPacket() would have already thrown an NXDOMAIN error- so the host *exists*, but just not the request type/class.
             //
-            // the correct response in this case, is an empty answer section; the
-            // authority section may still have usual information, like a SOA record.
+            // the correct response in this case, is an empty answer section; the authority section may still have usual information, like a SOA record.
             //
             if ($found == false)
             {
@@ -224,7 +222,7 @@ class Resolver extends Client
         //
         // cache the response object
         //
-        if ( ($this->use_cache == true) && ($this->cacheable($type) == true) )
+        if ( ($this->use_cache == true) && ($this->cacheable($_type) == true) )
         {
             $this->cache->put($packet_hash, $response);
         }
@@ -233,17 +231,14 @@ class Resolver extends Client
     }
 
     /**
-     * does an inverse query for the given RR; most DNS servers do not implement 
-     * inverse queries, but they should be able to return "not implemented"
+     * does an inverse query for the given RR; most DNS servers do not implement inverse queries, but they should be able to return "not implemented"
      *
-     * @param \NetDNS2\RR $rr the RR object to lookup
+     * @param \NetDNS2\RR $_rr the RR object to lookup
      * 
-     * @return \NetDNS2\RR object
      * @throws \NetDNS2\Exception
-     * @access public
      *
      */
-    public function iquery(\NetDNS2\RR $rr)
+    public function iquery(\NetDNS2\RR $_rr): \NetDNS2\Packet\Response
     {
         //
         // make sure we have some name servers set
@@ -253,7 +248,7 @@ class Resolver extends Client
         //
         // create an empty packet
         //
-        $packet = new \NetDNS2\Packet\Request($rr->name, 'A', 'IN');
+        $packet = new \NetDNS2\Packet\Request(strval($_rr->name), 'A', 'IN');
 
         //
         // unset the question
@@ -264,21 +259,21 @@ class Resolver extends Client
         //
         // set the opcode to IQUERY
         //
-        $packet->header->opcode = \NetDNS2\Lookups::OPCODE_IQUERY;
+        $packet->header->opcode = \NetDNS2\Header::OPCODE_IQUERY;
 
         //
         // add the given RR as the answer
         //
-        $packet->answer[] = $rr;
+        $packet->answer[] = clone $_rr;
         $packet->header->ancount = 1;
 
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if ( ($this->auth_signature instanceof \NetDNS2\RR\TSIG) || ($this->auth_signature instanceof \NetDNS2\RR\SIG) )
+        if ( (($this->auth_signature instanceof \NetDNS2\RR\TSIG) == true) || (($this->auth_signature instanceof \NetDNS2\RR\SIG) == true) )
         {
-            $packet->additional[]       = $this->auth_signature;
-            $packet->header->arcount    = count($packet->additional);
+            $packet->additional[] = clone $this->auth_signature;
+            $packet->header->arcount = count($packet->additional);
         }
 
         //
@@ -287,4 +282,3 @@ class Resolver extends Client
         return $this->sendPacket($packet, $this->use_tcp);
     }
 }
-

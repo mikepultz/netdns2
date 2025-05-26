@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * DNS Library for handling lookups and updates. 
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.  
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 1.1.0
+ * @since     1.1.0
  *
  */
 
@@ -21,69 +21,110 @@ namespace NetDNS2;
 
 /**
  * A class to provide simple dns lookup caching.
- *
  */
-class Cache
+abstract class Cache
 {
-    /*
+    /**
      * the filename of the cache file
      */
-    protected $cache_file = '';
+    protected string $cache_file = '';
 
-    /*
+    /**
      * the local data store for the cache
+     *
+     * @var array<string,mixed>
      */
-    protected $cache_data = [];
+    protected array $cache_data = [];
 
-    /*
+    /**
      * the size of the cache to use
      */
-    protected $cache_size = 0;
+    protected int $cache_size = 0;
 
-    /*
+    /**
      * the cache serializer
      */
-    protected $cache_serializer;
+    protected string $cache_serializer = 'serialize';
 
-    /*
-     * an internal flag to make sure we don't load the cache content more
-     * than once per instance.
+    /**
+     * an internal flag to make sure we don't load the cache content more than once per instance.
      */ 
-    protected $cache_opened = false;
+    protected bool $cache_opened = false;
+
+    /**
+     * open a cache object
+     *
+     * @param string  $_cache_file path to a file to use for cache storage
+     * @param integer $_size       the size of the shared memory segment to create
+     * @param string  $_serializer the name of the cache serialize to use
+     *
+     * @throws \NetDNS2\Exception
+     *
+     */
+    abstract public function open(string $_cache_file, int $_size, string $_serializer): void;
+
+    /**
+     * return an instance of a caching object based on the type selected
+     *
+     * @param string $_type the type name of the caching object to use
+     *
+     * @throws \NetDNS2\Exception
+     *
+     */
+    public static function factory(string $_type): mixed
+    {
+        switch(strtolower(trim($_type)))
+        {
+            case 'shared':
+            {
+                if (extension_loaded('shmop') == false)
+                {
+                    throw new \NetDNS2\Exception('shmop library is not available for cache', \NetDNS2\ENUM\Error::CACHE_SHM_UNAVAIL);
+                }
+
+                return new \NetDNS2\Cache\Shm;
+            }
+            case 'file':
+            {
+                return new \NetDNS2\Cache\File;
+            }
+            case 'none':
+            default:
+                ;            
+        }
+
+        return null;
+    }
 
     /**
      * returns true/false if the provided key is defined in the cache
      * 
-     * @param string $key the key to lookup in the local cache
-     *
-     * @return boolean
-     * @access public
+     * @param string $_key the key to lookup in the local cache
      *
      */
-    public function has($key)
+    public function has(string $_key): bool
     {
-        return isset($this->cache_data[$key]);
+        return (isset($this->cache_data[$_key]) == true) ? true : false;
     }
 
     /**
      * returns the value for the given key
      * 
-     * @param string $key the key to lookup in the local cache
+     * @param string $_key the key to lookup in the local cache
      *
      * @return mixed returns the cache data on sucess, false on error
-     * @access public
      *
      */
-    public function get($key)
+    public function get(string $_key): mixed
     {
-        if (isset($this->cache_data[$key]) == true)
+        if (isset($this->cache_data[$_key]) == true)
         {
             if ($this->cache_serializer == 'json')
             {
-                return json_decode($this->cache_data[$key]['object']);
+                return json_decode($this->cache_data[$_key]['object']);
             } else
             {
-                return unserialize($this->cache_data[$key]['object']);
+                return unserialize($this->cache_data[$_key]['object']);
             }
         }
 
@@ -93,14 +134,11 @@ class Cache
     /**
      * adds a new key/value pair to the cache
      * 
-     * @param string $key  the key for the new cache entry
-     * @param mixed  $data the data to store in cache
-     *
-     * @return void
-     * @access public
+     * @param string $_key  the key for the new cache entry
+     * @param mixed  $_data the data to store in cache
      *
      */
-    public function put($key, $data)
+    public function put(string $_key, mixed $_data): void
     {
         //
         // default time to live
@@ -110,20 +148,17 @@ class Cache
         //
         // clear the rdata values
         //
-        $data->rdata    = '';
-        $data->rdlength = 0;
+        $_data->rdata = '';
+        $_data->rdlength = 0;
 
         //
-        // find the lowest TTL, and use that as the TTL for the whole cached 
-        // object. The downside to using one TTL for the whole object, is that
-        // we'll invalidate entries before they actuall expire, causing a
-        // real lookup to happen.
+        // find the lowest TTL, and use that as the TTL for the whole cached object. The downside to using one TTL for the whole object, is that
+        // we'll invalidate entries before they actuall expire, causing a real lookup to happen.
         //
-        // The upside is that we don't need to require() each RR type in the
-        // cache, so we can look at their individual TTL's on each run- we only
+        // The upside is that we don't need to require() each RR type in the cache, so we can look at their individual TTL's on each run- we only
         // unserialize the actual RR object when it's get() from the cache.
         //
-        foreach($data->answer as $index => $rr)
+        foreach($_data->answer as $index => $rr)
         {
             if ($rr->ttl < $ttl)
             {
@@ -133,18 +168,18 @@ class Cache
             $rr->rdata = '';
             $rr->rdlength = 0;
         }
-        foreach($data->authority as $index => $rr)
+        foreach($_data->authority as $index => $rr)
         {
             $rr->rdata = '';
             $rr->rdlength = 0;
         }
-        foreach($data->additional as $index => $rr)
+        foreach($_data->additional as $index => $rr)
         {
             $rr->rdata = '';
             $rr->rdlength = 0;
         }
 
-        $this->cache_data[$key] = [
+        $this->cache_data[$_key] = [
 
             'cache_date'    => time(),
             'ttl'           => $ttl
@@ -152,23 +187,23 @@ class Cache
 
         if ($this->cache_serializer == 'json')
         {
-            $this->cache_data[$key]['object'] = json_encode($data);
+            $this->cache_data[$_key]['object'] = @json_encode($_data);
+            if ($this->cache_data[$_key]['object'] === false)
+            {
+                unset($this->cache_data[$_key]['object']);
+            }
+
         } else
         {
-            $this->cache_data[$key]['object'] = serialize($data);
+            $this->cache_data[$_key]['object'] = serialize($_data);
         }
-
-        return;
     }
 
     /**
      * runs a clean up process on the cache data
      *
-     * @return void
-     * @access protected
-     *
      */
-    protected function clean()
+    protected function clean(): void
     {
         if (count($this->cache_data) > 0)
         {
@@ -192,18 +227,13 @@ class Cache
                 }
             }
         }
-
-        return;
     }
 
     /**
      * runs a clean up process on the cache data
      *
-     * @return mixed
-     * @access protected
-     *
      */
-    protected function resize()
+    protected function resize(): ?string
     {
         if (count($this->cache_data) > 0)
         {
@@ -212,7 +242,12 @@ class Cache
             //
             if ($this->cache_serializer == 'json')
             {
-                $cache = json_encode($this->cache_data);
+                $cache = @json_encode($this->cache_data);
+                if ($cache === false)
+                {
+                    return null;
+                }
+
             } else
             {
                 $cache = serialize($this->cache_data);
@@ -252,7 +287,12 @@ class Cache
                     //
                     if ($this->cache_serializer == 'json')
                     {
-                        $cache = json_encode($this->cache_data);
+                        $cache = @json_encode($this->cache_data);
+                        if ($cache === false)
+                        {
+                            return null;
+                        }
+
                     } else
                     {
                         $cache = serialize($this->cache_data);

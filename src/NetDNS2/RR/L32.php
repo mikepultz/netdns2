@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 1.3.1
+ * @since     1.3.1
  *
  */
 
@@ -30,104 +30,90 @@ namespace NetDNS2\RR;
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-class L32 extends \NetDNS2\RR
+final class L32 extends \NetDNS2\RR
 {
-    /*
+    /**
      * The preference
      */
-    public $preference;
-
-    /*
-     * The locator32 field
-     */
-    public $locator32;
+    protected int $preference;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * The locator32 field
      */
-    protected function rrToString()
+    protected string $locator32;
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
         return $this->preference . ' ' . $this->locator32;
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $this->preference = array_shift($rdata);
-        $this->locator32 = array_shift($rdata);
+        $this->preference = intval($this->sanitize(array_shift($_rdata)));
+        $this->locator32  = $this->sanitize(array_shift($_rdata));
 
         return true;
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     * 
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // unpack the values
-            //
-            $x = unpack('npreference/C4locator', $this->rdata);
-
-            $this->preference = $x['preference'];
-
-            //
-            // build the locator value
-            //
-            $this->locator32 = $x['locator1'] . '.' . $x['locator2'] . '.' . $x['locator3'] . '.' . $x['locator4'];
-
-            return true;
+            return false;
         }
 
-        return false;
+        //
+        // unpack the values
+        //
+        $val = unpack('nx/C4y', $this->rdata);
+        if ($val === false)
+        {
+            return false;
+        }
+
+        list('x' => $this->preference, 'y1' => $a, 'y2' => $b, 'y3' => $c, 'y4' => $d) = (array)$val;
+
+        //
+        // build the locator value
+        //
+        $this->locator32 = $a . '.' . $b . '.' . $c . '.' . $d;
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     * 
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed 
-     *                                 string or null on failure
-     * @access protected
-     * 
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if (strlen($this->locator32) > 0)
+        if (strlen($this->locator32) == 0)
         {
-            //
-            // break out the locator value
-            //
-            $n = explode('.', $this->locator32);
-
-            //
-            // pack the data
-            //
-            return pack('nC4', $this->preference, $n[0], $n[1], $n[2], $n[3]);
+            return '';
         }
+            
+        //
+        // increment the offset
+        //
+        $_packet->offset += 6;
+        
+        //
+        // break out the locator value
+        //
+        $n = explode('.', $this->locator32);
 
-        return null;
+        //
+        // pack the data
+        //
+        return pack('nC4', $this->preference, $n[0], $n[1], $n[2], $n[3]);
     }
 }

@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  * This file contains code based off the Net::DNS::SEC Perl module by Olaf M. Kolkman
  *
@@ -67,95 +67,83 @@ namespace NetDNS2\RR;
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-class SIG extends \NetDNS2\RR
+final class SIG extends \NetDNS2\RR
 {
-    /*
+    /**
      * and instance of a \NetDNS2\PrivateKey object
      */
-    public $private_key = null;
-
-    /*
-     * the RR type covered by this signature
-     */
-    public $typecovered;
-
-    /*
-     * the algorithm used for the signature
-     */
-    public $algorithm;
-    
-    /*
-     * the number of labels in the name
-     */
-    public $labels;
-
-    /*
-     * the original TTL
-     */
-    public $origttl;
-
-    /*
-     * the signature expiration
-     */
-    public $sigexp;
-
-    /*
-     * the inception of the signature
-    */
-    public $sigincep;
-
-    /*
-     * the keytag used
-     */
-    public $keytag;
-
-    /*
-     * the signer's name
-     */
-    public $signname;
-
-    /*
-     * the signature
-     */
-    public $signature;
+    protected \NetDNS2\PrivateKey $private_key;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * the RR type covered by this signature; we store the string value of the RR
      */
-    protected function rrToString()
+    protected string $typecovered;
+
+    /**
+     * the algorithm used for the signature
+     */
+    protected \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm;
+    
+    /**
+     * the number of labels in the name
+     */
+    protected int $labels;
+
+    /**
+     * the original TTL
+     */
+    protected string $origttl;
+
+    /**
+     * the signature expiration
+     */
+    protected string $sigexp;
+
+    /**
+     * the inception of the signature
+    */
+    protected string $sigincep;
+
+    /**
+     * the keytag used
+     */
+    protected int $keytag;
+
+    /**
+     * the signer's name
+     */
+    protected \NetDNS2\Data\Domain $signname;
+
+    /**
+     * the signature
+     */
+    protected string $signature = '';
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
-        return $this->typecovered . ' ' . $this->algorithm . ' ' . 
-            $this->labels . ' ' . $this->origttl . ' ' .
-            $this->sigexp . ' ' . $this->sigincep . ' ' . 
-            $this->keytag . ' ' . $this->cleanString($this->signname) . '. ' . 
-            $this->signature;
+        return $this->typecovered . ' ' . $this->algorithm->value . ' ' . $this->labels . ' ' . $this->origttl . ' ' . $this->sigexp . ' ' . 
+            $this->sigincep . ' ' . $this->keytag . ' ' . $this->signname . '. ' . $this->signature;
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $this->typecovered  = strtoupper(array_shift($rdata));
-        $this->algorithm    = array_shift($rdata);
-        $this->labels       = array_shift($rdata);
-        $this->origttl      = array_shift($rdata);
-        $this->sigexp       = array_shift($rdata);
-        $this->sigincep     = array_shift($rdata);
-        $this->keytag       = array_shift($rdata);
-        $this->signname     = $this->cleanString(array_shift($rdata));
+        $this->typecovered  = strtoupper($this->sanitize(array_shift($_rdata)));
+        $this->algorithm    = \NetDNS2\ENUM\DNSSEC\Algorithm::set(intval($this->sanitize(array_shift($_rdata))));
+        $this->labels       = intval($this->sanitize(array_shift($_rdata)));
+        $this->origttl      = $this->sanitize(array_shift($_rdata));
+        $this->sigexp       = $this->sanitize(array_shift($_rdata));
+        $this->sigincep     = $this->sanitize(array_shift($_rdata));
+        $this->keytag       = intval($this->sanitize(array_shift($_rdata)));
+        $this->signname     = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, array_shift($_rdata));
 
-        foreach($rdata as $line)
+        foreach($_rdata as $line)
         {
             $this->signature .= $line;
         }
@@ -166,66 +154,57 @@ class SIG extends \NetDNS2\RR
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // unpack 
-            //
-            $x = unpack('ntc/Calgorithm/Clabels/Norigttl/Nsigexp/Nsigincep/nkeytag', $this->rdata);
-
-            $this->typecovered  = \NetDNS2\Lookups::$rr_types_by_id[$x['tc']];
-            $this->algorithm    = $x['algorithm'];
-            $this->labels       = $x['labels'];
-            $this->origttl      = \NetDNS2\Client::expandUint32($x['origttl']);
-
-            //
-            // the dates are in GM time
-            //
-            $this->sigexp       = gmdate('YmdHis', $x['sigexp']);
-            $this->sigincep     = gmdate('YmdHis', $x['sigincep']);
-
-            //
-            // get the keytag
-            //
-            $this->keytag       = $x['keytag'];
-
-            //
-            // get teh signers name and signature
-            //
-            $offset             = $packet->offset + 18;
-            $sigoffset          = $offset;
-
-            $this->signname     = strtolower(\NetDNS2\Packet::expand($packet, $sigoffset));
-            $this->signature    = base64_encode(substr($this->rdata, 18 + ($sigoffset - $offset)));
-
-            return true;
+            return false;
         }
 
-        return false;
+        $val = unpack('na/Cb/Cc/Nd/Ne/Nf/ng', $this->rdata);
+        if ($val === false)
+        {
+            return false;
+        }
+
+        list('a' => $a, 'b' => $algorithm, 'c' => $this->labels, 'd' => $d, 'e' => $e, 'f' => $f, 'g' => $this->keytag) = (array)$val;
+
+        $this->algorithm = \NetDNS2\ENUM\DNSSEC\Algorithm::set($algorithm);
+
+        if (\NetDNS2\ENUM\RRType::exists($a) == true)
+        {
+            $this->typecovered = \NetDNS2\ENUM\RRType::set($a)->label();
+        } else
+        {
+            $this->typecovered = 'TYPE' . $a;
+        }
+
+        $this->origttl     = \NetDNS2\Client::expandUint32($d);
+
+        //
+        // the dates are in GM time
+        //
+        $this->sigexp      = gmdate('YmdHis', $e);
+        $this->sigincep    = gmdate('YmdHis', $f);
+
+        //
+        // get teh signers name and signature
+        //
+        $offset            = $_packet->offset + 18;
+        $sigoffset         = $offset;
+
+        $this->signname    = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $_packet, $sigoffset);
+        $this->signature   = base64_encode(substr($this->rdata, 18 + ($sigoffset - $offset)));
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
         //
         // parse the values out of the dates
@@ -236,37 +215,26 @@ class SIG extends \NetDNS2\RR
         //
         // pack the value
         //
-        $data = pack('nCCNNNn', 
-            \NetDNS2\Lookups::$rr_types_by_name[$this->typecovered],
-            $this->algorithm,
+        $data = pack('nCCNNNn',
+            \NetDNS2\ENUM\RRType::set($this->typecovered)->value,
+            $this->algorithm->value,
             $this->labels,
             $this->origttl,
-            gmmktime($e[4], $e[5], $e[6], $e[2], $e[3], $e[1]),
-            gmmktime($i[4], $i[5], $i[6], $i[2], $i[3], $i[1]),
+            gmmktime(intval($e[4]), intval($e[5]), intval($e[6]), intval($e[2]), intval($e[3]), intval($e[1])),
+            gmmktime(intval($i[4]), intval($i[5]), intval($i[6]), intval($i[2]), intval($i[3]), intval($i[1])),
             $this->keytag
         );
 
         //
-        // the signer name is special; it's not allowed to be compressed 
-        // (see section 3.1.7)
+        // the signer name is special; it's not allowed to be compressed (see section 3.1.7)
         //
-        $names = explode('.', strtolower($this->signname));
-
-        foreach($names as $name)
-        {
-            $data .= chr(strlen($name));
-            $data .= $name;
-        }
-
-        $data .= chr('0');
+        $data .= $this->signname->encode($_packet->offset);
 
         //
-        // if the signature is empty, and $this->private_key is an instance of a 
-        // private key object, and we have access to openssl, then assume this
+        // if the signature is empty, and $this->private_key is an instance of a private key object, and we have access to openssl, then assume this
         // is a SIG(0), and generate a new signature
         //
-        if ( (strlen($this->signature) == 0) && ($this->private_key instanceof \NetDNS2\PrivateKey) && 
-            (extension_loaded('openssl') === true) )
+        if ( (strlen($this->signature) == 0) && (extension_loaded('openssl') === true) )
         {
             //
             // create a new packet for the signature-
@@ -276,7 +244,7 @@ class SIG extends \NetDNS2\RR
             //
             // copy the packet data over
             //
-            $new_packet->copy($packet);
+            $new_packet->copy($_packet);
 
             //
             // remove the SIG object from the additional list
@@ -292,75 +260,14 @@ class SIG extends \NetDNS2\RR
             //
             // based on the algorithm
             //
-            $algorithm = 0;
-
-            switch($this->algorithm)
-            {
-                //
-                // MD5
-                //
-                case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSAMD5:
-                {
-                    $algorithm = OPENSSL_ALGO_MD5;
-                }
-                break;
-
-                //
-                // SHA1
-                //
-                case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA1:
-                {
-                    $algorithm = OPENSSL_ALGO_SHA1;
-                }
-                break;
-
-                //
-                // SHA256 (PHP 5.4.8 or higher)
-                //
-                case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA256:
-                {
-                    if (version_compare(PHP_VERSION, '5.4.8', '<') == true)
-                    {
-                        throw new \NetDNS2\Exception('SHA256 support is only available in PHP >= 5.4.8', \NetDNS2\Lookups::E_OPENSSL_INV_ALGO);
-                    }
-
-                    $algorithm = OPENSSL_ALGO_SHA256;
-                }
-                break;
-
-                //
-                // SHA512 (PHP 5.4.8 or higher)
-                //
-                case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA512:
-                {
-                    if (version_compare(PHP_VERSION, '5.4.8', '<') == true)
-                    {
-                        throw new \NetDNS2\Exception('SHA512 support is only available in PHP >= 5.4.8', \NetDNS2\Lookups::E_OPENSSL_INV_ALGO);
-                    }
-
-                    $algorithm = OPENSSL_ALGO_SHA512;
-                }
-                break;
-        
-                //
-                // unsupported at the moment
-                //
-                case \NetDNS2\Lookups::DNSSEC_ALGORITHM_DSA:
-                case \NetDNS2\Lookups::DSNSEC_ALGORITHM_RSASHA1NSEC3SHA1:
-                case \NetDNS2\Lookups::DNSSEC_ALGORITHM_DSANSEC3SHA1:            
-                default:
-                {
-                    throw new \NetDNS2\Exception('invalid or unsupported algorithm', \NetDNS2\Lookups::E_OPENSSL_INV_ALGO);
-                }
-                break;
-            }
+            $openssl_algorithm = $this->algorithm->openssl();
 
             //
             // sign the data
             //
-            if (openssl_sign($sigdata, $this->signature, $this->private_key->instance, $algorithm) == false)
+            if (openssl_sign($sigdata, $this->signature, $this->private_key->instance, $openssl_algorithm) == false)
             {
-                throw new \NetDNS2\Exception(openssl_error_string(), \NetDNS2\Lookups::E_OPENSSL_ERROR);
+                throw new \NetDNS2\Exception('OpenSSL error: ' . strval(openssl_error_string()), \NetDNS2\ENUM\Error::OPENSSL_ERROR);
             }
 
             //
@@ -371,10 +278,10 @@ class SIG extends \NetDNS2\RR
                 //
                 // RSA- add it directly
                 //
-                case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSAMD5:
-                case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA1:
-                case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA256:
-                case \NetDNS2\Lookups::DNSSEC_ALGORITHM_RSASHA512:
+                case \NetDNS2\ENUM\DNSSEC\Algorithm::RSAMD5:
+                case \NetDNS2\ENUM\DNSSEC\Algorithm::RSASHA1:
+                case \NetDNS2\ENUM\DNSSEC\Algorithm::RSASHA256:
+                case \NetDNS2\ENUM\DNSSEC\Algorithm::RSASHA512:
                 {
                     $this->signature = base64_encode($this->signature);
                 }
@@ -387,9 +294,13 @@ class SIG extends \NetDNS2\RR
         //
         // add the signature
         //
-        $data .= base64_decode($this->signature);
+        $decode = base64_decode($this->signature);
+        if ($decode !== false)
+        {
+            $data .= $decode;
+        }
 
-        $packet->offset += strlen($data);
+        $_packet->offset += strlen($data);
 
         return $data;
     }

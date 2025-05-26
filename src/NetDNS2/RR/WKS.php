@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 1.0.1
+ * @since     1.0.1
  *
  */
 
@@ -33,164 +33,160 @@ namespace NetDNS2\RR;
  *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
-class WKS extends \NetDNS2\RR
+final class WKS extends \NetDNS2\RR
 {
-    /*
+    /**
      * The IP address of the service
      */
-    public $address;
-
-    /*
-     * The protocol of the service
-     */
-    public $protocol;
-
-    /*
-     * bitmap
-     */
-    public $bitmap = [];
+    protected string $address;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * The protocol of the service
      */
-    protected function rrToString()
+    protected int $protocol;
+
+    /**
+     * bitmap
+     *
+     * @var array<int,int>
+     */
+    protected array $bitmap = [];
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
-        $data = $this->address . ' ' . $this->protocol;
-
-        foreach($this->bitmap as $port)
-        {
-            $data .= ' ' . $port;
-        }
-
-        return $data;
+        return $this->address . ' ' . $this->protocol . ' ' . implode(' ', $this->bitmap);
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $this->address  = strtolower(trim(array_shift($rdata), '.'));
-        $this->protocol = array_shift($rdata);
-        $this->bitmap   = $rdata;
+        $this->address  = $this->sanitize(array_shift($_rdata));
+        $this->protocol = intval($this->sanitize(array_shift($_rdata)));
+
+        foreach($_rdata as $value)
+        {
+            $this->bitmap[] = intval($value);
+        }
+
+        if (\NetDNS2\Client::isIPv4($this->address) == false)
+        {
+            throw new \NetDNS2\Exception('address value provided is not a valid IPv4 address: ' . $this->address, \NetDNS2\ENUM\Error::PARSE_ERROR);
+        }
 
         return true;
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // get the address and protocol value
-            //
-            $x = unpack('Naddress/Cprotocol', $this->rdata);
-
-            $this->address  = long2ip($x['address']);
-            $this->protocol = $x['protocol'];
-
-            //
-            // unpack the port list bitmap
-            //
-            $port = 0;
-            foreach(unpack('@5/C*', $this->rdata) as $set)
-            {
-                $s = sprintf('%08b', $set);
-
-                for($i=0; $i<8; $i++, $port++)
-                {
-                    if ($s[$i] == '1')
-                    {
-                        $this->bitmap[] = $port;
-                    }
-                }
-            }
-
-            return true;
+            return false;
+        }
+            
+        //
+        // get the address and protocol value
+        //
+        $val = unpack('Nx/Cy', $this->rdata);
+        if ($val === false)
+        {
+            return false;
         }
 
-        return false;
+        list('x' => $address, 'y' => $this->protocol) = (array)$val;
+
+        //
+        // convert the IP
+        //
+        $this->address = long2ip(intval($address));
+
+        //
+        // unpack the port list bitmap
+        //
+        $port = 0;
+
+        $val = unpack('@5/C*', $this->rdata);
+        if ($val === false)
+        {
+            return false;
+        }
+
+        foreach((array)$val as $set)
+        {
+            $s = sprintf('%08b', $set);
+
+            for($i=0; $i<8; $i++, $port++)
+            {
+                if ($s[$i] == '1')
+                {
+                    $this->bitmap[] = $port;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if (strlen($this->address) > 0)
+        if (strlen($this->address) == 0)
         {
-            $data = pack('NC', ip2long($this->address), $this->protocol);
+            return '';
+        }
+            
+        $data = pack('NC', ip2long($this->address), $this->protocol);
 
-            $ports = [];
-            $n = 0;
+        $ports = [];
+        $n = 0;
 
-            foreach($this->bitmap as $port)
+        foreach($this->bitmap as $port)
+        {
+            $ports[$port] = 1;
+
+            if ($port > $n)
             {
-                $ports[$port] = 1;
-
-                if ($port > $n)
-                {
-                    $n = $port;
-                }
+                $n = $port;
             }
-            for($i=0; $i<ceil($n/8)*8; $i++)
+        }
+        for($i=0; $i<ceil($n/8)*8; $i++)
+        {
+            if (!isset($ports[$i]))
             {
-                if (!isset($ports[$i]))
-                {
-                    $ports[$i] = 0;
-                }
+                $ports[$i] = 0;
             }
-
-            ksort($ports);
-
-            $string = '';
-            $n = 0;
-
-            foreach($ports as $s)
-            {
-                $string .= $s;
-                $n++;
-
-                if ($n == 8)
-                {
-                    $data .= chr(bindec($string));
-                    $string = '';
-                    $n = 0;
-                }
-            }
-
-            $packet->offset += strlen($data);
-
-            return $data;
         }
 
-        return null;
+        ksort($ports);
+
+        $string = '';
+        $n = 0;
+
+        foreach($ports as $s)
+        {
+            $string .= $s;
+            $n++;
+
+            if ($n == 8)
+            {
+                $data .= chr(intval(bindec($string)));
+                $string = '';
+                $n = 0;
+            }
+        }
+
+        $_packet->offset += strlen($data);
+
+        return $data;
     }
 }

@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
@@ -22,11 +22,10 @@ namespace NetDNS2;
 /**
  * DNS Packet Header class
  *
- * This class handles parsing and constructing DNS Packet Headers as defined
- * by section 4.1.1 of RFC1035.
+ * This class handles parsing and constructing DNS Packet Headers as defined by section 4.1.1 of RFC1035.
  * 
- *  DNS header format - RFC1035 section 4.1.1
- *  DNS header format - RFC4035 section 3.2
+ * DNS header format - RFC1035 section 4.1.1
+ * DNS header format - RFC4035 section 3.2
  *
  *      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
@@ -44,43 +43,72 @@ namespace NetDNS2;
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
-class Header
+final class Header implements \Stringable
 {
-    public $id;         // 16 bit - identifier
-    public $qr;         //  1 bit - 0 = query, 1 = response
-    public $opcode;     //  4 bit - op code
-    public $aa;         //  1 bit - Authoritative Answer
-    public $tc;         //  1 bit - TrunCation
-    public $rd;         //  1 bit - Recursion Desired
-    public $ra;         //  1 bit - Recursion Available
-    public $z;          //  1 bit - Reserved
-    public $ad;         //  1 bit - Authentic Data (RFC4035)
-    public $cd;         //  1 bit - Checking Disabled (RFC4035)
-    public $rcode;      //  4 bit - Response code
-    public $qdcount;    // 16 bit - entries in the question section
-    public $ancount;    // 16 bit - resource records in the answer section
-    public $nscount;    // 16 bit - name server rr in the authority records section
-    public $arcount;    // 16 bit - rr's in the additional records section
+    /**
+     * max size of a UDP packet
+     */
+    public const DNS_MAX_UDP_SIZE      = 512;
+
+    /**
+     * size (in bytes) of a header in a standard DNS packet
+     */
+    public const DNS_HEADER_SIZE       = 12;
+
+    /**
+     * Query/Response flag
+     */
+    public const QR_QUERY              = 0;     // RFC 1035
+    public const QR_RESPONSE           = 1;     // RFC 1035
+
+    /**
+     * DNS Op Codes
+     */
+    public const OPCODE_QUERY          = 0;     // RFC 1035
+    public const OPCODE_IQUERY         = 1;     // RFC 1035, RFC 3425
+    public const OPCODE_STATUS         = 2;     // RFC 1035
+    public const OPCODE_NOTIFY         = 4;     // RFC 1996
+    public const OPCODE_UPDATE         = 5;     // RFC 2136
+    public const OPCODE_DSO            = 6;     // RFC 8490
+
+    /**
+     * DNS header values
+     */
+    public int $id;                     // 16 bit - identifier
+    public int $qr;                     //  1 bit - 0 = query, 1 = response
+    public int $opcode;                 //  4 bit - op code
+    public int $aa;                     //  1 bit - Authoritative Answer
+    public int $tc;                     //  1 bit - TrunCation
+    public int $rd;                     //  1 bit - Recursion Desired
+    public int $ra;                     //  1 bit - Recursion Available
+    public int $z;                      //  1 bit - Reserved
+    public int $ad;                     //  1 bit - Authentic Data (RFC4035)
+    public int $cd;                     //  1 bit - Checking Disabled (RFC4035)
+    public \NetDNS2\ENUM\RCode $rcode;  //  4 bit - Response code
+    public int $qdcount;                // 16 bit - entries in the question section
+    public int $ancount;                // 16 bit - resource records in the answer section
+    public int $nscount;                // 16 bit - name server rr in the authority records section
+    public int $arcount;                // 16 bit - rr's in the additional records section
 
     /**
      * Constructor - builds a new NetDNS2\Header object
      *
-     * @param mixed &$packet either a NetDNS2\Packet object or null
+     * @param \NetDNS2\Packet &$_packet either a NetDNS2\Packet object or null
      *
-     * @throws NetDNS2\Exception
-     * @access public
+     * @throws \NetDNS2\Exception
      *
      */
-    public function __construct(\NetDNS2\Packet &$packet = null)
+    public function __construct(?\NetDNS2\Packet &$_packet = null)
     {
-        if (is_null($packet) == false)
+        if (is_null($_packet) == false)
         {
-            $this->set($packet);
+            $this->set($_packet);
+
         } else
         {
-            $this->id       = $this->nextPacketId();
-            $this->qr       = \NetDNS2\Lookups::QR_QUERY;
-            $this->opcode   = \NetDNS2\Lookups::OPCODE_QUERY;
+            $this->id       = mt_rand(0, 65535);
+            $this->qr       = self::QR_QUERY;
+            $this->opcode   = self::OPCODE_QUERY;
             $this->aa       = 0;
             $this->tc       = 0;
             $this->rd       = 1;
@@ -88,7 +116,7 @@ class Header
             $this->z        = 0;
             $this->ad       = 0;
             $this->cd       = 0;
-            $this->rcode    = \NetDNS2\Lookups::RCODE_NOERROR;
+            $this->rcode    = \NetDNS2\ENUM\RCode::NOERROR;
             $this->qdcount  = 1;
             $this->ancount  = 0;
             $this->nscount  = 0;
@@ -97,30 +125,10 @@ class Header
     }
 
     /**
-     * returns the next available packet id
-     *
-     * @return    integer
-     * @access    public
-     *
-     */
-    public function nextPacketId()
-    {
-        if (++\NetDNS2\Lookups::$next_packet_id > 65535)
-        {
-            \NetDNS2\Lookups::$next_packet_id = 1;
-        }
-
-        return \NetDNS2\Lookups::$next_packet_id;
-    }
-
-    /**
      * magic __toString() method to return the header as a string
      *
-     * @return    string
-     * @access    public
-     *
      */
-    public function __toString()
+    public function __toString(): string
     {
         $output = ";;\n;; Header:\n";
 
@@ -134,7 +142,7 @@ class Header
         $output .= ";;\t z          = " . $this->z . "\n";
         $output .= ";;\t ad         = " . $this->ad . "\n";
         $output .= ";;\t cd         = " . $this->cd . "\n";
-        $output .= ";;\t rcode      = " . $this->rcode . "\n";
+        $output .= ";;\t rcode      = " . $this->rcode->value . "\n";
         $output .= ";;\t qdcount    = " . $this->qdcount . "\n";
         $output .= ";;\t ancount    = " . $this->ancount . "\n";
         $output .= ";;\t nscount    = " . $this->nscount . "\n";
@@ -146,21 +154,17 @@ class Header
     /**
      * constructs a \NetDNS2\Header from a \NetDNS2\Packet object
      *
-     * @param \NetDNS2\Packet &$packet Object
-     *
-     * @return boolean
      * @throws \NetDNS2\Exception
-     * @access public
      *
      */
-    public function set(\NetDNS2\Packet &$packet)
+    public function set(\NetDNS2\Packet &$_packet): bool
     {
         //
         // the header must be at least 12 bytes long.
         //
-        if ($packet->rdlength < \NetDNS2\Lookups::DNS_HEADER_SIZE)
+        if ($_packet->rdlength < self::DNS_HEADER_SIZE)
         {
-            throw new \NetDNS2\Exception('invalid header data provided; too small', \NetDNS2\Lookups::E_HEADER_INVALID);
+            throw new \NetDNS2\Exception('invalid header data provided; too small', \NetDNS2\ENUM\Error::HEADER_INVALID);
         }
 
         $offset = 0;
@@ -168,31 +172,31 @@ class Header
         //
         // parse the values
         //
-        $this->id       = ord($packet->rdata[$offset]) << 8 | ord($packet->rdata[++$offset]);
+        $this->id       = ord($_packet->rdata[$offset]) << 8 | ord($_packet->rdata[++$offset]);
 
         ++$offset;
-        $this->qr       = (ord($packet->rdata[$offset]) >> 7) & 0x1;
-        $this->opcode   = (ord($packet->rdata[$offset]) >> 3) & 0xf;
-        $this->aa       = (ord($packet->rdata[$offset]) >> 2) & 0x1;
-        $this->tc       = (ord($packet->rdata[$offset]) >> 1) & 0x1;
-        $this->rd       = ord($packet->rdata[$offset]) & 0x1;
+        $this->qr       = (ord($_packet->rdata[$offset]) >> 7) & 0x1;
+        $this->opcode   = (ord($_packet->rdata[$offset]) >> 3) & 0xf;
+        $this->aa       = (ord($_packet->rdata[$offset]) >> 2) & 0x1;
+        $this->tc       = (ord($_packet->rdata[$offset]) >> 1) & 0x1;
+        $this->rd       = ord($_packet->rdata[$offset]) & 0x1;
 
         ++$offset;
-        $this->ra       = (ord($packet->rdata[$offset]) >> 7) & 0x1;
-        $this->z        = (ord($packet->rdata[$offset]) >> 6) & 0x1;
-        $this->ad       = (ord($packet->rdata[$offset]) >> 5) & 0x1;
-        $this->cd       = (ord($packet->rdata[$offset]) >> 4) & 0x1;
-        $this->rcode    = ord($packet->rdata[$offset]) & 0xf;
+        $this->ra       = (ord($_packet->rdata[$offset]) >> 7) & 0x1;
+        $this->z        = (ord($_packet->rdata[$offset]) >> 6) & 0x1;
+        $this->ad       = (ord($_packet->rdata[$offset]) >> 5) & 0x1;
+        $this->cd       = (ord($_packet->rdata[$offset]) >> 4) & 0x1;
+        $this->rcode    = \NetDNS2\ENUM\RCode::set(ord($_packet->rdata[$offset]) & 0xf);
             
-        $this->qdcount  = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
-        $this->ancount  = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
-        $this->nscount  = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
-        $this->arcount  = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
+        $this->qdcount  = ord($_packet->rdata[++$offset]) << 8 | ord($_packet->rdata[++$offset]);
+        $this->ancount  = ord($_packet->rdata[++$offset]) << 8 | ord($_packet->rdata[++$offset]);
+        $this->nscount  = ord($_packet->rdata[++$offset]) << 8 | ord($_packet->rdata[++$offset]);
+        $this->arcount  = ord($_packet->rdata[++$offset]) << 8 | ord($_packet->rdata[++$offset]);
 
         //
         // increment the internal offset
         //
-        $packet->offset += \NetDNS2\Lookups::DNS_HEADER_SIZE;
+        $_packet->offset += self::DNS_HEADER_SIZE;
 
         return true;
     }
@@ -200,19 +204,13 @@ class Header
     /**
      * returns a binary packed DNS Header
      *
-     * @param \NetDNS2\Packet &$packet Object
-     *
-     * @return    string
-     * @access    public
-     *
      */
-    public function get(\NetDNS2\Packet &$packet)
+    public function get(\NetDNS2\Packet &$_packet): string
     {
-        $packet->offset += \NetDNS2\Lookups::DNS_HEADER_SIZE;
+        $_packet->offset += self::DNS_HEADER_SIZE;
 
-        return pack('n', $this->id) . 
-            chr(($this->qr << 7) | ($this->opcode << 3) | ($this->aa << 2) | ($this->tc << 1) | ($this->rd)) .
-            chr(($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode) .
+        return pack('n', $this->id) . chr(($this->qr << 7) | ($this->opcode << 3) | ($this->aa << 2) | ($this->tc << 1) | ($this->rd)) .
+            chr(($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode->value) . 
             pack('n4', $this->qdcount, $this->ancount, $this->nscount, $this->arcount);
     }
 }

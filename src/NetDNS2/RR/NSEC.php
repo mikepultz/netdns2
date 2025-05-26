@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
@@ -30,107 +30,82 @@ namespace NetDNS2\RR;
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-class NSEC extends \NetDNS2\RR
+final class NSEC extends \NetDNS2\RR
 {
-    /*
+    /**
      * The next owner name
      */
-    public $next_domain_name;
-
-    /*
-     * identifies the RRset types that exist at the NSEC RR's owner name.
-     */
-    public $type_bit_maps = [];
+    protected \NetDNS2\Data\Domain $next_domain_name;
 
     /**
-     * method to return the rdata portion of the packet as a string
+     * identifies the RRset types that exist at the NSEC RR's owner name.
      *
-     * @return  string
-     * @access  protected
-     *
+     * @var array<int,string>
      */
-    protected function rrToString()
+    protected array $type_bit_maps = [];
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
-        $data = $this->cleanString($this->next_domain_name) . '.';
-
-        foreach($this->type_bit_maps as $rr)
-        {
-            $data .= ' ' . $rr;
-        }
-
-        return $data;
+        return $this->next_domain_name . '. ' . implode(' ', $this->type_bit_maps);
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $this->next_domain_name = $this->cleanString(array_shift($rdata));
-        $this->type_bit_maps = $rdata;
-        
+        $this->next_domain_name = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, array_shift($_rdata));
+
+        //
+        // validate the list of RR's
+        //
+        $this->type_bit_maps = \NetDNS2\BitMap::validateArray($_rdata);
+
         return true;
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // expand the next domain name
-            //
-            $offset = $packet->offset;
-            $this->next_domain_name = \NetDNS2\Packet::expand($packet, $offset);
-
-            //
-            // parse out the RR's from the bitmap
-            //
-            $this->type_bit_maps = \NetDNS2\BitMap::bitMapToArray(substr($this->rdata, $offset - $packet->offset));
-
-            return true;
+            return false;
         }
 
-        return false;
+        //
+        // expand the next domain name
+        //
+        $offset = $_packet->offset;
+        $this->next_domain_name = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $_packet, $offset);
+
+        //
+        // parse out the RR's from the bitmap
+        //
+        $this->type_bit_maps = \NetDNS2\BitMap::bitMapToArray(substr($this->rdata, $offset - $_packet->offset));
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if (strlen($this->next_domain_name) > 0)
+        if ($this->next_domain_name->length() == 0)
         {
-            $data = $packet->compress($this->next_domain_name, $packet->offset);
-            $bitmap = \NetDNS2\BitMap::arrayToBitMap($this->type_bit_maps);
-    
-            $packet->offset += strlen($bitmap);
-
-            return $data . $bitmap;
+            return '';
         }
 
-        return null;
+        $data = $this->next_domain_name->encode() . \NetDNS2\BitMap::arrayToBitMap($this->type_bit_maps);
+
+        $_packet->offset += strlen($data);
+
+        return $data;
     }
 }

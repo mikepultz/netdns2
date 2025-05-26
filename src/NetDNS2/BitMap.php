@@ -1,66 +1,150 @@
-<?php
+<?php declare(strict_types=1);
 
-/**
- * DNS Library for handling lookups and updates. 
+/**               
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
- *
- * See LICENSE for more details.  
- *
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ *       
+ * See LICENSE for more details.
+ *                  
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
 namespace NetDNS2;
 
 /**
- * a class to handle converting RR bitmaps to arrays and back; used on NSEC
- * and NSEC3 RR's
+ * a class to handle converting RR bitmaps to arrays and back; used on NSEC and NSEC3 RR's
  *
  */
-class BitMap
+final class BitMap
 {
+    /**
+     * validate a list of RR's for NEC and NSEC bitmap fields
+     *
+     * @param array<int,int|string> $_data an array of RR id's or mnemonics to validate
+     *
+     * @return array<int,string>
+     *
+     */
+    public static function validateArray(array $_data): array
+    {
+        if (count($_data) == 0)
+        {
+            return [];
+        }
+
+        $out = [];
+
+        //
+        // loop through the RR's provided
+        //
+        foreach($_data as $rr)
+        {
+            //
+            // RR's can be provided as integer values
+            //
+            if (is_numeric($rr) == true)
+            {
+                //
+                // per RFC 4034 4.1.2 the RR field is a single octect
+                //
+                if ( ($rr < 0) || ($rr > 255) )
+                {
+                    throw new \NetDNS2\Exception('NSEC resource records must be between 0-255.', \NetDNS2\ENUM\Error::PARSE_ERROR);
+                }
+                if (\NetDNS2\ENUM\RRType::exists($rr) == true)
+                {
+                    $out[] = \NetDNS2\ENUM\RRType::set($rr)->label();
+                } else
+                {
+                    $out[] = 'TYPE' . $rr;
+                }
+
+            //
+            // or as mnemonics
+            //
+            } else
+            {
+                $mnemonic = strtoupper($rr);
+
+                if (\NetDNS2\ENUM\RRType::exists($mnemonic) == true)
+                {
+                    $out[] = $mnemonic;
+
+                } else if (strncmp($mnemonic, 'TYPE', 4) == 0)
+                {
+                    $value = intval(str_replace('TYPE', '', $mnemonic));
+
+                    if ( ($value < 0) || ($value > 255) )
+                    {
+                        throw new \NetDNS2\Exception('NSEC resource records must be between 0-255.', \NetDNS2\ENUM\Error::PARSE_ERROR);
+                    } else
+                    {
+                        $out[] = $mnemonic;
+                    }
+
+                } else
+                {
+                    throw new \NetDNS2\Exception('unknown or un-supported resource record type: ' . $mnemonic, \NetDNS2\ENUM\Error::RR_INVALID);
+                }
+            }
+        }
+
+        return $out;
+    }
+
     /**
      * parses a RR bitmap field defined in RFC3845, into an array of RR names.
      *
      * Type Bit Map(s) Field = ( Window Block # | Bitmap Length | Bitmap ) +
      *
-     * @param string $data a bitmap stringto parse
+     * @param string $_data a bitmap stringto parse
      *
-     * @return array
-     * @access public
+     * @return array<string>
      *
      */
-    public static function bitMapToArray($data)
+    public static function bitMapToArray(string $_data): array
     {
-        if (strlen($data) == 0)
+        if (strlen($_data) == 0)
         {
             return [];
         }
 
         $output = [];
         $offset = 0;
-        $length = strlen($data);
+        $length = strlen($_data);
 
         while($offset < $length)
         {
             //
             // unpack the window and length values
             //
-            $x = unpack('@' . $offset . '/Cwindow/Clength', $data);
+            $val = unpack('Cx/Cy', $_data, $offset);
+            if ($val === false)
+            {
+                return [];
+            }
+
+            list('x' => $window, 'y' => $length) = (array)$val;
             $offset += 2;
 
             //
             // copy out the bitmap value
             //
-            $bitmap = unpack('C*', substr($data, $offset, $x['length']));
-            $offset += $x['length'];
+            $bitmap = unpack('C*', substr($_data, $offset, $length));
+            if ($bitmap === false)
+            {
+                return [];
+            }
+
+            $offset += $length;
 
             //
             // I'm not sure if there's a better way of doing this, but PHP doesn't
@@ -68,7 +152,7 @@ class BitMap
             //
             $bitstr = '';
 
-            foreach($bitmap as $r)
+            foreach((array)$bitmap as $r)
             {
                 $bitstr .= sprintf('%08b', $r);
             }
@@ -79,11 +163,11 @@ class BitMap
             {
                 if ($bitstr[$i] == '1')
                 {
-                    $type = $x['window'] * 256 + $i;
+                    $type = $window * 256 + $i;
 
-                    if (isset(\NetDNS2\Lookups::$rr_types_by_id[$type]))
+                    if (\NetDNS2\ENUM\RRType::exists($type) == true)
                     {
-                        $output[] = \NetDNS2\Lookups::$rr_types_by_id[$type];
+                        $output[] = \NetDNS2\ENUM\RRType::set($type)->label();
                     } else
                     {
                         $output[] = 'TYPE' . $type;
@@ -98,15 +182,12 @@ class BitMap
     /**
      * builds a RR Bit map from an array of RR type names
      *
-     * @param array $data a list of RR names
-     *
-     * @return string
-     * @access public
+     * @param array<string> $_data a list of RR names
      *
      */
-    public static function arrayToBitMap(array $data)
+    public static function arrayToBitMap(array $_data): string
     {
-        if (count($data) == 0)
+        if (count($_data) == 0)
         {
             return '';
         }
@@ -117,23 +198,25 @@ class BitMap
         // go through each RR
         //
         $max = 0;
-        $bm = [];
+        $bm  = [];
 
-        foreach($data as $rr)
+        foreach($_data as $rr)
         {
             $rr = strtoupper($rr);
 
             //
             // get the type id for the RR
             //
-            $type = @\NetDNS2\Lookups::$rr_types_by_name[$rr];
-            if (isset($type))
+            $type = null;
+
+            if (\NetDNS2\ENUM\RRType::exists($rr) == true)
             {
+                $type = \NetDNS2\ENUM\RRType::set($rr)->value;
+
                 //
                 // skip meta types or qtypes
-                //  
-                if ( (isset(\NetDNS2\Lookups::$rr_qtypes_by_id[$type]) == true) || 
-                    (isset(\NetDNS2\Lookups::$rr_metatypes_by_id[$type]) == true) )
+                //
+                if (\NetDNS2\ENUM\RRType::set($rr)->meta() == true)
                 {
                     continue;
                 }
@@ -141,11 +224,12 @@ class BitMap
             } else
             {
                 //
-                // if it's not found, then it must be defined as TYPE<id>, per
-                // RFC3845 section 2.2, if it's not, we ignore it.
+                // if it's not found, then it must be defined as TYPE<id>, per RFC3845 section 2.2, if it's not, we ignore it.
                 //
                 list($name, $type) = explode('TYPE', $rr);
-                if (isset($type) == false)
+                
+                $type = intval($type);
+                if ($type <= 0)
                 {
                     continue;
                 }
@@ -174,7 +258,7 @@ class BitMap
 
             for($i=0; $i<$bm[$window]['length'] * 8; $i++)
             {
-                if (isset($bm[$window][$i]))
+                if (isset($bm[$window][$i]) == true)
                 {
                     $bitstr .= '1';
                 } else
@@ -193,22 +277,19 @@ class BitMap
     /**
      * a base_convert that handles large numbers; forced to 2/16
      *
-     * @param string $number a bit string
-     *
-     * @return string
-     * @access public
+     * @param string $_number a bit string
      *
      */
-    public static function bigBaseConvert($number)
+    public static function bigBaseConvert(string $_number): string
     {
         $result = '';
 
-        $bin = substr(chunk_split(strrev($number), 4, '-'), 0, -1);
-        $temp = preg_split('[-]', $bin, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $bin    = substr(chunk_split(strrev($_number), 4, '-'), 0, -1);
+        $temp   = (array)preg_split('[-]', $bin, -1, PREG_SPLIT_DELIM_CAPTURE);
         
-        for($i = count($temp)-1;$i >= 0;$i--)
+        for($i = count($temp) - 1; $i >= 0; $i--)
         {
-            $result = $result . base_convert(strrev($temp[$i]), 2, 16);
+            $result = $result . base_convert(strrev(strval($temp[$i])), 2, 16);
         }
         
         return strtoupper($result);

@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 1.2.0
+ * @since     1.2.0
  *
  */
 
@@ -31,109 +31,95 @@ namespace NetDNS2\RR;
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
-class CAA extends \NetDNS2\RR
+final class CAA extends \NetDNS2\RR
 {
-    /*
+    /**
      * The critcal flag
      */
-    public $flags;
-
-    /*
-     * The property identifier
-     */
-    public $tag;
-
-    /*
-      * The property value
-     */
-    public $value;
+    protected int $flags;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * The tag length value
      */
-    protected function rrToString()
+    protected int $tag_length;
+
+    /**
+     * The property identifier
+     */
+    protected \NetDNS2\Data\Text $tag;
+
+    /**
+     * The property value
+     */
+    protected \NetDNS2\Data\Text $value;
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
-        return $this->flags . ' ' . $this->tag . ' "' . trim($this->cleanString($this->value), '"') . '"';
+        return $this->flags . ' ' . $this->tag . ' ' . \NetDNS2\RR::formatString($this->value->value());
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $this->flags    = array_shift($rdata);
-        $this->tag      = array_shift($rdata);
-
-        $this->value    = trim($this->cleanString(implode(' ', $rdata)), '"');
+        $this->flags = intval($this->sanitize(array_shift($_rdata)));
+        $this->tag   = new \NetDNS2\Data\Text($this->sanitize(array_shift($_rdata)));
+        $this->value = new \NetDNS2\Data\Text($this->sanitize(implode(' ', $_rdata)));
         
         return true;
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // unpack the flags and tag length
-            //
-            $x = unpack('Cflags/Ctag_length', $this->rdata);
-
-            $this->flags    = $x['flags'];
-            $offset         = 2;
-
-            $this->tag      = substr($this->rdata, $offset, $x['tag_length']);
-            $offset         += $x['tag_length'];
-
-            $this->value    = substr($this->rdata, $offset);
-
-            return true;
+            return false;
+        }
+            
+        //
+        // unpack the flags and tag length
+        //
+        $val = unpack('Cx/Cy', $this->rdata);
+        if ($val === false)
+        {
+            return false;
         }
 
-        return false;
+        list('x' => $this->flags, 'y' => $this->tag_length) = (array)$val;
+
+        //
+        // extract the tag value
+        //
+        $this->tag = new \NetDNS2\Data\Text(substr($this->rdata, 2, $this->tag_length));
+
+        //
+        // extract the value;
+        //
+        $this->value = new \NetDNS2\Data\Text(substr($this->rdata, 2 + $this->tag_length));
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if (strlen($this->value) > 0)
+        if ($this->value->length() == 0)
         {
-            $data  = chr($this->flags);
-            $data .= chr(strlen($this->tag)) . $this->tag . $this->value;
-
-            $packet->offset += strlen($data);
-
-            return $data;
+            return '';
         }
 
-        return null;
+        $_packet->offset += 2 + $this->tag->length() + $this->value->length();
+
+        return pack('CC', $this->flags, $this->tag->length()) . $this->tag . $this->value;
     }
 }

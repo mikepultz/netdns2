@@ -1,96 +1,89 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
 namespace NetDNS2\Packet;
 
 /**
- * This class handles building new DNS response packets; it parses binary packed
- * packets that come off the wire
+ * This class handles building new DNS response packets; it parses binary packed packets that come off the wire
  * 
  */
-class Response extends \NetDNS2\Packet
+final class Response extends \NetDNS2\Packet
 {
-    /*
+    /**
      * The name servers that this response came from
      */
-    public $answer_from;
+    public string $answer_from;
 
-    /*
+    /**
      * The socket type the answer came from (TCP/UDP)
      */
-    public $answer_socket_type;
+    public int $answer_socket_type;
 
-    /*
+    /**
      * The query response time in microseconds
      */
-    public $response_time = 0;
+    public float $response_time = 0;
 
     /**
      * Constructor - builds a new \NetDNS2\Packet\Response object
      *
-     * @param string  $data binary DNS packet
-     * @param integer $size the length of the DNS packet
+     * @param string  $_data binary DNS packet
+     * @param integer $_size the length of the DNS packet
      *
      * @throws \NetDNS2\Exception
-     * @access public
      *
      */
-    public function __construct($data, $size)
+    public function __construct(string $_data, int $_size)
     {
-        $this->set($data, $size);
+        $this->set($_data, $_size);
     }
 
     /**
      * builds a new \NetDNS2\Packet\Response object
      *
-     * @param string  $data binary DNS packet
-     * @param integer $size the length of the DNS packet
+     * @param string  $_data binary DNS packet
+     * @param integer $_size the length of the DNS packet
      *
-     * @return boolean
      * @throws \NetDNS2\Exception
-     * @access public
      *
      */
-    public function set($data, $size)
+    public function set(string $_data, int $_size): bool
     {
         //
         // store the full packet
         //
-        $this->rdata    = $data;
-        $this->rdlength = $size;
+        $this->rdata    = $_data;
+        $this->rdlength = $_size;
 
         //
         // parse the header
         // 
-        // we don't bother checking the size earlier, because the first thing the
-        // header class does, is check the size and throw and exception if it's
+        // we don't bother checking the size earlier, because the first thing the header class does, is check the size and throw and exception if it's
         // invalid.
         //
         $this->header = new \NetDNS2\Header($this);
 
         //
-        // if the truncation bit is set, then just return right here, because the
-        // rest of the packet is probably empty; and there's no point in processing
+        // if the truncation bit is set, then just return right here, because the rest of the packet is probably empty; and there's no point in processing
         // anything else.
         //
-        // we also don't need to worry about checking to see if the the header is 
-        // null or not, since the \NetDNS2\Header() constructor will throw an 
+        // we also don't need to worry about checking to see if the the header is null or not, since the \NetDNS2\Header() constructor will throw an 
         // exception if the packet is invalid.
         //
         if ($this->header->tc == 1)
@@ -115,7 +108,7 @@ class Response extends \NetDNS2\Packet
 
             if (is_null($o) == false)
             {
-                $this->answer[] = $o;
+                $this->answer[] = clone $o; // @phpstan-ignore-line
             }
         } 
 
@@ -128,7 +121,7 @@ class Response extends \NetDNS2\Packet
 
             if (is_null($o) == false)
             {
-                $this->authority[] = $o;  
+                $this->authority[] = clone $o;  // @phpstan-ignore-line
             }
         }
 
@@ -141,7 +134,7 @@ class Response extends \NetDNS2\Packet
 
             if (is_null($o) == false)
             {
-                $this->additional[] = $o; 
+                $this->additional[] = clone $o; // @phpstan-ignore-line
             }
         }
 

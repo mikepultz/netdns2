@@ -36,7 +36,7 @@ class DNSSECTest extends \PHPUnit\Framework\TestCase
     {
         try
         {
-            $r = new \NetDNS2\Resolver([ 'nameservers' => [ '8.8.8.8', '8.8.4.4' ] ]);
+            $r = new \NetDNS2\Resolver([ 'nameservers' => [ '1.1.1.1' ] ]);
 
             $r->dnssec = true;
 

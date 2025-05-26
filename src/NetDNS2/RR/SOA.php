@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
@@ -45,143 +45,117 @@ namespace NetDNS2\RR;
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
-class SOA extends \NetDNS2\RR
+final class SOA extends \NetDNS2\RR
 {
-    /*
+    /**
      * The master DNS server
      */
-    public $mname;
-
-    /*
-     * mailbox of the responsible person
-     */
-    public $rname;
-
-    /*
-     * serial number
-      */
-    public $serial;
-
-    /*
-      * refresh time
-      */
-    public $refresh;
-
-    /*
-      * retry interval
-     */
-    public $retry;
-
-    /*
-     * expire time
-      */
-    public $expire;
-
-    /*
-     * minimum TTL for any RR in this zone
-      */
-    public $minimum;
+    protected \NetDNS2\Data\Domain $mname;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * mailbox of the responsible person
      */
-    protected function rrToString()
+    protected \NetDNS2\Data\Mailbox $rname;
+
+    /**
+     * serial number
+     */
+    protected string $serial;
+
+    /**
+     * refresh time
+     */
+    protected string $refresh;
+
+    /**
+     * retry interval
+     */
+    protected string $retry;
+
+    /**
+     * expire time
+     */
+    protected string $expire;
+
+    /**
+     * minimum TTL for any RR in this zone
+     */
+    protected string $minimum;
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
-        return $this->cleanString($this->mname) . '. ' . 
-            $this->cleanString($this->rname) . '. ' . 
-            $this->serial . ' ' . $this->refresh . ' ' . $this->retry . ' ' . 
-            $this->expire . ' ' . $this->minimum;
+        return $this->mname . '. ' . $this->rname->display() . '. ' . $this->serial . ' ' . $this->refresh . ' ' . $this->retry . ' ' . $this->expire . ' ' . $this->minimum;
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $this->mname    = $this->cleanString($rdata[0]);
-        $this->rname    = $this->cleanString($rdata[1]);
+        $this->mname    = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, array_shift($_rdata));
+        $this->rname    = new \NetDNS2\Data\Mailbox(\NetDNS2\Data::DATA_TYPE_RFC1035, array_shift($_rdata));
 
-        $this->serial   = $rdata[2];
-        $this->refresh  = $rdata[3];
-        $this->retry    = $rdata[4];
-        $this->expire   = $rdata[5];
-        $this->minimum  = $rdata[6];
+        $this->serial   = $this->sanitize(array_shift($_rdata));
+        $this->refresh  = $this->sanitize(array_shift($_rdata));
+        $this->retry    = $this->sanitize(array_shift($_rdata));
+        $this->expire   = $this->sanitize(array_shift($_rdata));
+        $this->minimum  = $this->sanitize(array_shift($_rdata));
 
         return true;
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // parse the 
-            //
-            $offset = $packet->offset;
-
-            $this->mname = \NetDNS2\Packet::expand($packet, $offset);
-            $this->rname = \NetDNS2\Packet::expand($packet, $offset, true);
-
-            //
-            // get the SOA values
-            //
-            $x = unpack('@' . $offset . '/Nserial/Nrefresh/Nretry/Nexpire/Nminimum/', $packet->rdata);
-
-            $this->serial   = \NetDNS2\Client::expandUint32($x['serial']);
-            $this->refresh  = \NetDNS2\Client::expandUint32($x['refresh']);
-            $this->retry    = \NetDNS2\Client::expandUint32($x['retry']);
-            $this->expire   = \NetDNS2\Client::expandUint32($x['expire']);
-            $this->minimum  = \NetDNS2\Client::expandUint32($x['minimum']);
-
-            return true;
+            return false;
         }
 
-        return false;
+        $offset = $_packet->offset;
+
+        //
+        // parse the names
+        //
+        $this->mname = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_packet, $offset);
+        $this->rname = new \NetDNS2\Data\Mailbox(\NetDNS2\Data::DATA_TYPE_RFC1035, $_packet, $offset);
+
+        //
+        // get the SOA values
+        //
+        $val = unpack('Na/Nb/Nc/Nd/Ne/', $_packet->rdata, $offset);
+        if ($val === false)
+        {
+            return false;
+        }
+
+        list('a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e) = (array)$val;
+
+        $this->serial  = \NetDNS2\Client::expandUint32($a);
+        $this->refresh = \NetDNS2\Client::expandUint32($b);
+        $this->retry   = \NetDNS2\Client::expandUint32($c);
+        $this->expire  = \NetDNS2\Client::expandUint32($d);
+        $this->minimum = \NetDNS2\Client::expandUint32($e);
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if (strlen($this->mname) > 0)
-        {
-            $data = $packet->compress($this->mname, $packet->offset);
-            $data .= $packet->compress($this->rname, $packet->offset);
-            $data .= pack('N5', $this->serial, $this->refresh, $this->retry, $this->expire, $this->minimum);
+        $data = $this->mname->encode($_packet->offset) . $this->rname->encode($_packet->offset) .
+            pack('N5', $this->serial, $this->refresh, $this->retry, $this->expire, $this->minimum);
 
-            $packet->offset += 20;
+        $_packet->offset += 20;
 
-            return $data;
-        }
-
-        return null;
+        return $data;
     }
 }

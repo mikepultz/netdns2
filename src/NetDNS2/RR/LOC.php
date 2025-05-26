@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
@@ -38,91 +38,73 @@ namespace NetDNS2\RR;
  *      +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
-class LOC extends \NetDNS2\RR
+final class LOC extends \NetDNS2\RR
 {
-    /*
+    /**
+     * some conversion values
+     */
+    public const CONV_SEC         = 1000;
+    public const CONV_MIN         = 60000;
+    public const CONV_DEG         = 3600000;
+    public const REFERENCE_ALT    = 10000000;
+    public const REFERENCE_LATLON = 2147483648;
+
+    /**
      * the LOC version- should only ever be 0
      */
-    public $version;
+    protected int $version = 0;
 
-    /*
+    /**
      * The diameter of a sphere enclosing the described entity
      */
-    public $size;
+    protected string $size;
 
-    /*
+    /**
      * The horizontal precision of the data
      */
-    public $horiz_pre;
+    protected string $horiz_pre;
 
-    /*
+    /**
      * The vertical precision of the data
      */
-    public $vert_pre;
+    protected string $vert_pre;
 
-    /*
+    /**
      * The latitude - stored in decimal degrees
      */
-    public $latitude;
+    protected float $latitude;
 
     /* 
      * The longitude - stored in decimal degrees
      */
-    public $longitude;
-
-    /*
-     * The altitude - stored in decimal
-     */
-    public $altitude;
-
-    /*
-     * used for quick power-of-ten lookups
-     */
-    private $_powerOfTen = [ 1, 10, 100, 1000, 10000, 100000, 
-                                 1000000,10000000,100000000,1000000000 ];
-
-    /*
-     * some conversion values
-     */
-    const CONV_SEC          = 1000;
-    const CONV_MIN          = 60000;
-    const CONV_DEG          = 3600000;
-
-    const REFERENCE_ALT     = 10000000;
-    const REFERENCE_LATLON  = 2147483648;
+    protected float $longitude;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * The altitude - stored in decimal
      */
-    protected function rrToString()
+    protected float $altitude;
+
+    /**
+     * used for quick power-of-ten lookups
+     *
+     * @var array<float>
+     */
+    private array $m_power_of_ten = [ 0.01, 0.1, 1, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 0, 0, 0, 0, 0 ];
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
-        if ($this->version == 0)
-        {
-            return $this->_d2Dms($this->latitude, 'LAT') . ' ' . 
-                $this->_d2Dms($this->longitude, 'LNG') . ' ' . 
-                sprintf('%.2fm', $this->altitude) . ' ' .
-                sprintf('%.2fm', $this->size) . ' ' .
-                sprintf('%.2fm', $this->horiz_pre) . ' ' .
-                sprintf('%.2fm', $this->vert_pre);
-        }
-        
-        return '';
+        return $this->d2Dms($this->latitude, 'LAT') . ' ' . $this->d2Dms($this->longitude, 'LNG') . ' ' . sprintf('%.2fm', $this->altitude) . ' ' . 
+            sprintf('%.2fm', $this->size) . ' ' . sprintf('%.2fm', $this->horiz_pre) . ' ' . sprintf('%.2fm', $this->vert_pre);
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
         //
         // format as defined by RFC1876 section 3
@@ -131,37 +113,37 @@ class LOC extends \NetDNS2\RR
         //      [siz["m"] [hp["m"] [vp["m"]]]]
         //
         if (preg_match('/^(\d+) \s+((\d+) \s+)?(([\d.]+) \s+)?(N|S) \s+(\d+) ' .
-            '\s+((\d+) \s+)?(([\d.]+) \s+)?(E|W) \s+(-?[\d.]+) m?(\s+ ([\d.]+) m?)?(\s+ ([\d.]+) m?)?(\s+ ([\d.]+) m?)?/ix', implode(' ', $rdata), $x) == 1)
+            '\s+((\d+) \s+)?(([\d.]+) \s+)?(E|W) \s+(-?[\d.]+) m?(\s+ ([\d.]+) m?)?(\s+ ([\d.]+) m?)?(\s+ ([\d.]+) m?)?/ix', implode(' ', $_rdata), $x) == 1)
         {
             //
             // latitude
             //
-            $latdeg     = $x[1];
-            $latmin     = (isset($x[3])) ? $x[3] : 0;
-            $latsec     = (isset($x[5])) ? $x[5] : 0;
+            $latdeg     = floatval($x[1]);
+            $latmin     = floatval($x[3] ?? 0);     // @phpstan-ignore-line
+            $latsec     = floatval($x[5] ?? 0);     // @phpstan-ignore-line
             $lathem     = strtoupper($x[6]);
 
-            $this->latitude = $this->_dms2d($latdeg, $latmin, $latsec, $lathem);
+            $this->latitude = $this->dms2d($latdeg, $latmin, $latsec, $lathem);
 
             //
             // longitude
             //
-            $londeg     = $x[7];
-            $lonmin     = (isset($x[9])) ? $x[9] : 0;
-            $lonsec     = (isset($x[11])) ? $x[11] : 0;
+            $londeg     = floatval($x[7]);
+            $lonmin     = floatval($x[9] ?? 0);     // @phpstan-ignore-line
+            $lonsec     = floatval($x[11] ?? 0);    // @phpstan-ignore-line
             $lonhem     = strtoupper($x[12]);
 
-            $this->longitude = $this->_dms2d($londeg, $lonmin, $lonsec, $lonhem);
+            $this->longitude = $this->dms2d($londeg, $lonmin, $lonsec, $lonhem);
 
             //
             // the rest of teh values
             //
             $version            = 0;
 
-            $this->size         = (isset($x[15])) ? $x[15] : 1;
-            $this->horiz_pre    = ((isset($x[17])) ? $x[17] : 10000);
-            $this->vert_pre     = ((isset($x[19])) ? $x[19] : 10);
-            $this->altitude     = $x[13];
+            $this->size         = strval($x[15] ?? 1);
+            $this->horiz_pre    = strval($x[17] ?? 10000);
+            $this->vert_pre     = strval($x[19] ?? 10);
+            $this->altitude     = floatval($x[13]);
 
             return true;
         }
@@ -170,190 +152,159 @@ class LOC extends \NetDNS2\RR
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // unpack all the values
-            //
-            $x = unpack('Cver/Csize/Choriz_pre/Cvert_pre/Nlatitude/Nlongitude/Naltitude', $this->rdata);
-
-            //
-            // version must be 0 per RFC 1876 section 2
-            //
-            $this->version = $x['ver'];
-            if ($this->version == 0)
-            {
-                $this->size         = $this->_precsizeNtoA($x['size']);
-                $this->horiz_pre    = $this->_precsizeNtoA($x['horiz_pre']);
-                $this->vert_pre     = $this->_precsizeNtoA($x['vert_pre']);
-
-                //
-                // convert the latitude and longitude to degress in decimal
-                //
-                if ($x['latitude'] < 0)
-                {
-                    $this->latitude = ($x['latitude'] + self::REFERENCE_LATLON) / self::CONV_DEG;
-                } else
-                {
-                    $this->latitude = ($x['latitude'] - self::REFERENCE_LATLON) / self::CONV_DEG;
-                }
-
-                if ($x['longitude'] < 0)
-                {
-                    $this->longitude = ($x['longitude'] + self::REFERENCE_LATLON) / self::CONV_DEG;
-                } else
-                {
-                    $this->longitude = ($x['longitude'] - self::REFERENCE_LATLON) / self::CONV_DEG;
-                }
-
-                //
-                // convert down the altitude
-                //
-                $this->altitude = ($x['altitude'] - self::REFERENCE_ALT) / 100;
-
-                return true;
-
-            } else
-            {
-                return false;
-            }
-
-            return true;
+            return false;
         }
 
-        return false;
-    }
-
-    /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
-     */
-    protected function rrGet(\NetDNS2\Packet &$packet)
-    {
-        if ($this->version == 0)
+        //
+        // unpack all the values
+        //
+        $x = unpack('Cver/Csize/Choriz_pre/Cvert_pre/Nlatitude/Nlongitude/Naltitude', $this->rdata);
+        if ($x === false)
         {
-            $lat = 0;
-            $lng = 0;
-
-            if ($this->latitude < 0)
-            {
-                $lat = ($this->latitude * self::CONV_DEG) - self::REFERENCE_LATLON;
-            } else
-            {
-                $lat = ($this->latitude * self::CONV_DEG) + self::REFERENCE_LATLON;
-            }
-            if ($this->longitude < 0)
-            {
-                $lng = ($this->longitude * self::CONV_DEG) - self::REFERENCE_LATLON;
-            } else
-            {
-                $lng = ($this->longitude * self::CONV_DEG) + self::REFERENCE_LATLON;
-            }
-
-            $packet->offset += 16;
-
-            return pack('CCCCNNN', 
-                $this->version,
-                $this->_precsizeAtoN($this->size),
-                $this->_precsizeAtoN($this->horiz_pre),
-                $this->_precsizeAtoN($this->vert_pre),
-                $lat, $lng,
-                ($this->altitude * 100) + self::REFERENCE_ALT
-            );
+            return false;
         }
 
-        return null;
+        //
+        // version must be 0 per RFC 1876 section 2
+        //
+        if (intval($x['ver']) != 0)
+        {
+            return false;
+        }
+
+        $this->version   = intval($x['ver']);
+        $this->size      = $this->precision_n_to_a($x['size']);
+        $this->horiz_pre = $this->precision_n_to_a($x['horiz_pre']);
+        $this->vert_pre  = $this->precision_n_to_a($x['vert_pre']);
+
+        //
+        // convert the latitude and longitude to degress in decimal
+        //
+        if ($x['latitude'] < 0)
+        {
+            $this->latitude = ($x['latitude'] + self::REFERENCE_LATLON) / self::CONV_DEG;
+        } else
+        {
+            $this->latitude = ($x['latitude'] - self::REFERENCE_LATLON) / self::CONV_DEG;
+        }
+
+        if ($x['longitude'] < 0)
+        {
+            $this->longitude = ($x['longitude'] + self::REFERENCE_LATLON) / self::CONV_DEG;
+        } else
+        {
+            $this->longitude = ($x['longitude'] - self::REFERENCE_LATLON) / self::CONV_DEG;
+        }
+
+        //
+        // convert down the altitude
+        //
+        $this->altitude = ($x['altitude'] - self::REFERENCE_ALT) / 100;
+
+        return true;
     }
 
     /**
-     * takes an XeY precision/size value, returns a string representation.
-     * shamlessly stolen from RFC1876 Appendix A
-     *
-     * @param integer $prec the value to convert
-     *
-     * @return string
-     * @access private
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    private function _precsizeNtoA($prec)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        $mantissa = (($prec >> 4) & 0x0f) % 10;
-        $exponent = (($prec >> 0) & 0x0f) % 10;
+        $lat = 0;
+        $lng = 0;
 
-        return $mantissa * $this->_powerOfTen[$exponent];
+        if ($this->latitude < 0)
+        {
+            $lat = ($this->latitude * self::CONV_DEG) - self::REFERENCE_LATLON;
+        } else
+        {
+            $lat = ($this->latitude * self::CONV_DEG) + self::REFERENCE_LATLON;
+        }
+        if ($this->longitude < 0)
+        {
+            $lng = ($this->longitude * self::CONV_DEG) - self::REFERENCE_LATLON;
+        } else
+        {
+            $lng = ($this->longitude * self::CONV_DEG) + self::REFERENCE_LATLON;
+        }
+
+        $_packet->offset += 16;
+
+        return pack('CCCCNNN',
+            $this->version,
+            $this->precision_a_to_n($this->size),
+            $this->precision_a_to_n($this->horiz_pre),
+            $this->precision_a_to_n($this->vert_pre),
+            $lat, $lng,
+            ($this->altitude * 100) + self::REFERENCE_ALT
+        );
     }
 
     /**
-     * converts ascii size/precision X * 10**Y(cm) to 0xXY.
-     * shamlessly stolen from RFC1876 Appendix A
+     * takes an XeY precision/size value, returns a string representation. shamlessly stolen from RFC1876 Appendix A
      *
-     * @param string $prec the value to convert
-     *
-     * @return integer
-     * @access private
+     * @param integer $_precision the value to convert
      *
      */
-    private function _precsizeAtoN($prec)
+    private function precision_n_to_a(int $_precision): string
+    {
+        $mantissa = $_precision >> 4;
+
+        return strval($mantissa * $this->m_power_of_ten[$_precision & 0x0F]);
+    }
+
+    /**
+     * converts ascii size/precision X * 10**Y(cm) to 0xXY. shamlessly stolen from RFC1876 Appendix A
+     *
+     * @param string $_precision the value to convert
+     *
+     */
+    private function precision_a_to_n(string $_precision): int
     {
         $exponent = 0;
-        while($prec >= 10)
+
+        while(intval($_precision) > $this->m_power_of_ten[1 + $exponent])
         {
-            $prec /= 10;
-            ++$exponent;
+            $exponent++;
         }
 
-        return ($prec << 4) | ($exponent & 0x0f);
+        $mantissa = intval(0.5 + (intval($_precision) / $this->m_power_of_ten[$exponent]));
+
+        return ($mantissa & 0xF) << 4 | $exponent;
     }
 
     /**
      * convert lat/lng in deg/min/sec/hem to decimal value
      *
-     * @param integer $deg the degree value
-     * @param integer $min the minutes value
-     * @param integer $sec the seconds value
-     * @param string  $hem the hemisphere (N/E/S/W)
-     *
-     * @return float the decinmal value
-     * @access private
+     * @param float  $_deg the degree value
+     * @param float  $_min the minutes value
+     * @param float  $_sec the seconds value
+     * @param string $_hem the hemisphere (N/E/S/W)
      *
      */
-    private function _dms2d($deg, $min, $sec, $hem)
+    private function dms2d(float $_deg, float $_min, float $_sec, string $_hem): float
     {
-        $deg = $deg - 0;
-        $min = $min - 0;
+        $_deg = $_deg - 0;
+        $_min = $_min - 0;
 
-        $sign = ($hem == 'W' || $hem == 'S') ? -1 : 1;
-        return ((($sec/60+$min)/60)+$deg) * $sign;
+        $sign = ($_hem == 'W' || $_hem == 'S') ? -1 : 1;
+
+        return ((($_sec / 60 + $_min) / 60) + $_deg) * $sign;
     }
 
     /**
      * convert lat/lng in decimal to deg/min/sec/hem
      *
-     * @param float  $data   the decimal value
-     * @param string $latlng either LAT or LNG so we can determine the HEM value
-     *
-     * @return string
-     * @access private
+     * @param float  $_data   the decimal value
+     * @param string $_latlng either LAT or LNG so we can determine the HEM value
      *
      */
-    private function _d2Dms($data, $latlng)
+    private function d2Dms(float $_data, string $_latlng): string
     {
         $deg = 0;
         $min = 0;
@@ -361,20 +312,20 @@ class LOC extends \NetDNS2\RR
         $msec = 0;
         $hem = '';
 
-        if ($latlng == 'LAT')
+        if ($_latlng == 'LAT')
         {
-            $hem = ($data > 0) ? 'N' : 'S';
+            $hem = ($_data > 0) ? 'N' : 'S';
         } else
         {
-            $hem = ($data > 0) ? 'E' : 'W';
+            $hem = ($_data > 0) ? 'E' : 'W';
         }
 
-        $data = abs($data);
+        $_data = abs($_data);
 
-        $deg = (int)$data;
-        $min = (int)(($data - $deg) * 60);
-        $sec = (int)(((($data - $deg) * 60) - $min) * 60);
-        $msec = round((((((($data - $deg) * 60) - $min) * 60) - $sec) * 1000));
+        $deg = (int)$_data;
+        $min = (int)(($_data - $deg) * 60);
+        $sec = (int)(((($_data - $deg) * 60) - $min) * 60);
+        $msec = round((((((($_data - $deg) * 60) - $min) * 60) - $sec) * 1000));
 
         return sprintf('%d %02d %02d.%03d %s', $deg, $min, $sec, round($msec), $hem);
     }

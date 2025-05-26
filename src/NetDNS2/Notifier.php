@@ -1,152 +1,135 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
 namespace NetDNS2;
 
 /**
- * The main dynamic DNS notifier class.
- *
- * This class provices functions to handle DNS notify requests as defined by RFC 1996.
- *
- * This is separate from the \NetDNS2\Resolver class, as while the underlying
- * protocol is the same, the functionality is completely different.
- *
- * Generally, query (recursive) lookups are done against caching server, while
- * notify requests are done against authoratative servers.
+ * register the auto-load function
  *
  */
-class Notifier extends \NetDNS2\Client
+spl_autoload_register(function($_class)
 {
-    /*
+    if (strncmp($_class, 'NetDNS2', 7) == 0)
+    {
+        require_once \str_replace('\\', DIRECTORY_SEPARATOR, $_class) . '.php';
+    }
+});
+
+/**
+ * The main dynamic DNS notifier class.
+ *
+ * This class provides functions to handle DNS notify requests as defined by RFC 1996.
+ *
+ * This is separate from the \NetDNS2\Resolver class, as while the underlying protocol is the same, the functionality is completely different. Generally, 
+ * query (recursive) lookups are done against caching server, while notify requests are done against authoratative servers.
+ *
+ */
+final class Notifier extends \NetDNS2\Client
+{
+    /**
      * a \NetDNS2\Packet\Request object used for the notify request
      */
-    private $_packet;
+    private \NetDNS2\Packet\Request $m_packet;
 
     /**
-     * Constructor - builds a new \NetDNS2\Notifier objected used for doing 
-     * DNS notification for a changed zone
+     * Constructor - builds a new \NetDNS2\Notifier objected used for doing DNS notification for a changed zone
      *
-     * @param string $zone    the domain name to use for DNS updates
-     * @param mixed  $options an array of config options or null
+     * @param string           $_zone    the domain name to use for DNS updates
+     * @param array<int,mixed> $_options an array of config options or null
      *
      * @throws \NetDNS2\Exception
-     * @access public
      *
      */
-    public function __construct($zone, array $options = null)
+    public function __construct(string $_zone, ?array $_options = null)
     {
-        parent::__construct($options);
+        parent::__construct($_options);
 
         //
         // create the packet
         //
-        $this->_packet = new \NetDNS2\Packet\Request(strtolower(trim($zone, " \n\r\t.")), 'SOA', 'IN');
+        $this->m_packet = new \NetDNS2\Packet\Request($_zone, 'SOA', 'IN');
 
         //
         // make sure the opcode on the packet is set to NOTIFY
         //
-        $this->_packet->header->opcode = \NetDNS2\Lookups::OPCODE_NOTIFY;
+        $this->m_packet->header->opcode = \NetDNS2\Header::OPCODE_NOTIFY;
     }
 
     /**
      * checks that the given name matches the name for the zone we're notifying
      *
-     * @param string $name The name to be checked.
+     * @param string $_name The name to be checked.
      *
-     * @return boolean
      * @throws \NetDNS2\Exception
-     * @access private
      *
      */
-    private function _checkName($name)
+    private function checkName(string $_name): void
     {
-        if (preg_match('/' . $this->_packet->question[0]->qname . '$/', $name) !== 1)
+        if (preg_match('/' . $this->m_packet->question[0]->qname . '$/', $_name) !== 1)
         {
-            throw new \NetDNS2\Exception('name provided (' . $name . ') does not match zone name (' . $this->_packet->question[0]->qname . ')',
-                \NetDNS2\Lookups::E_PACKET_INVALID);
+            throw new \NetDNS2\Exception('name provided (' . $_name . ') does not match zone name (' . $this->m_packet->question[0]->qname . ')',
+                \NetDNS2\ENUM\Error::PACKET_INVALID);
         }
     
-        return true;
+        return;
     }
 
     /**
-     *   3.7 - Add RR to notify
+     * 3.7 - Add RR to notify
      *
-     * @param \NetDNS2\RR $rr the \NetDNS2\RR object to be sent in the notify message
+     * @param \NetDNS2\RR $_rr the \NetDNS2\RR object to be sent in the notify message
      *
-     * @return boolean
      * @throws \NetDNS2\Exception
-     * @access public
      *
      */
-    public function add(\NetDNS2\RR $rr)
+    public function add(\NetDNS2\RR $_rr): void
     {
-        $this->_checkName($rr->name);
+        $this->checkName(strval($_rr->name));
 
         //
         // add the RR to the "notify" section
         //
-        if (in_array($rr, $this->_packet->answer) == false)
+        if (in_array($_rr, $this->m_packet->answer) == false)
         {
-            $this->_packet->answer[] = $rr;
+            $this->m_packet->answer[] = clone $_rr;
         }
 
-        return true;
-    }
-
-    /**
-     * add a signature to the request for authentication 
-     *
-     * @param string $keyname   the key name to use for the TSIG RR
-     * @param string $signature the key to sign the request.
-     *
-     * @return     boolean
-     * @access     public
-     * @see        \NetDNS2\Client::signTSIG()
-     * @deprecated function deprecated in 1.1.0
-     *
-     */
-    public function signature($keyname, $signature, $algorithm = \NetDNS2\RR\TSIG::HMAC_MD5)
-    {
-        return $this->signTSIG($keyname, $signature, $algorithm);
+        return;
     }
 
     /**
      * returns the current internal packet object.
      *
-     * @return \NetDNS2\Packet\Request
-     * @access public
-     #
      */
-    public function packet()
+    public function packet(): \NetDNS2\Packet\Request
     {
         //
         // take a copy
         //
-        $p = $this->_packet;
+        $p = clone $this->m_packet;
 
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if ( ($this->auth_signature instanceof \NetDNS2\RR\TSIG) || ($this->auth_signature instanceof \NetDNS2\RR\SIG) )
+        if ( (($this->auth_signature instanceof \NetDNS2\RR\TSIG) == true) || (($this->auth_signature instanceof \NetDNS2\RR\SIG) == true) )
         {
-            $p->additional[] = $this->auth_signature;
+            $p->additional[] = clone $this->auth_signature;
         }
 
         //
@@ -163,54 +146,55 @@ class Notifier extends \NetDNS2\Client
     /**
      * executes the notify request
      *
-     * @param \NetDNS2\Packet\Response &$response ref to the response object
+     * @param \NetDNS2\Packet\Response &$_response ref to the response object
      *
-     * @return boolean
      * @throws \NetDNS2\Exception
-     * @access public
      *
      */
-    public function notify(&$response = null)
+    public function notify(?\NetDNS2\Packet\Response &$_response = null): void  // @phpstan-ignore-line
     {
+        //
+        // init some network settings
+        //
+        $this->initNetwork();
+
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if ( ($this->auth_signature instanceof \NetDNS2\RR\TSIG) || ($this->auth_signature instanceof \NetDNS2\RR\SIG) )
+        if ( (($this->auth_signature instanceof \NetDNS2\RR\TSIG) == true) || (($this->auth_signature instanceof \NetDNS2\RR\SIG) == true) )
         {
-            $this->_packet->additional[] = $this->auth_signature;
+            $this->m_packet->additional[] = clone $this->auth_signature;
         }
 
         //
         // update the counts
         //
-        $this->_packet->header->qdcount = count($this->_packet->question);
-        $this->_packet->header->ancount = count($this->_packet->answer);
-        $this->_packet->header->nscount = count($this->_packet->authority);
-        $this->_packet->header->arcount = count($this->_packet->additional);
+        $this->m_packet->header->qdcount = count($this->m_packet->question);
+        $this->m_packet->header->ancount = count($this->m_packet->answer);
+        $this->m_packet->header->nscount = count($this->m_packet->authority);
+        $this->m_packet->header->arcount = count($this->m_packet->additional);
 
         //
         // make sure we have some data to send
         //
-        if ($this->_packet->header->qdcount == 0)
+        if ($this->m_packet->header->qdcount == 0)
         {
-            throw new \NetDNS2\Exception('empty headers- nothing to send!', \NetDNS2\Lookups::E_PACKET_INVALID);
+            throw new \NetDNS2\Exception('empty headers- nothing to send!', \NetDNS2\ENUM\Error::PACKET_INVALID);
         }
 
         //
         // send the packet and get back the response
         //
-        $response = $this->sendPacket($this->_packet, $this->use_tcp);
+        $_response = $this->sendPacket($this->m_packet, $this->use_tcp);
 
         //
-        // clear the internal packet so if we make another request, we don't have
-        // old data being sent.
+        // clear the internal packet so if we make another request, we don't have old data being sent.
         //
-        $this->_packet->reset();
+        $this->m_packet->reset();
 
         //
-        // for notifies, we just need to know it worked- we don't actualy need to
-        // return the response object
+        // clear the name compression cache
         //
-        return true;
+        \NetDNS2\Data::$compressed = [];
     }
 }

@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 1.3.1
+ * @since     1.3.1
  *
  */
 
@@ -32,100 +32,77 @@ namespace NetDNS2\RR;
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-class LP extends \NetDNS2\RR
+final class LP extends \NetDNS2\RR
 {
-    /*
+    /**
      * The preference
      */
-    public $preference;
-
-    /*
-     * The fdqn field
-     */
-    public $fqdn;
+    protected int $preference;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * The fdqn field
      */
-    protected function rrToString()
+    protected \NetDNS2\Data\Domain $fqdn;
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
         return $this->preference . ' ' . $this->fqdn . '.';
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $this->preference = array_shift($rdata);
-        $this->fqdn = trim(array_shift($rdata), '.');
+        $this->preference = intval($this->sanitize(array_shift($_rdata)));
+        $this->fqdn       = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, array_shift($_rdata));
 
         return true;
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     * 
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // parse the preference
-            //
-            $x = unpack('npreference', $this->rdata);
-            $this->preference = $x['preference'];
-            $offset = $packet->offset + 2;
-
-            //
-            // get the hostname
-            //
-            $this->fqdn = \NetDNS2\Packet::expand($packet, $offset);
-
-            return true;
+            return false;
         }
-       
-        return false;
+
+        $val = unpack('n', $this->rdata);
+        if ($val === false)
+        {
+            return false;
+        }        
+
+        $this->preference = ((array)$val)[1];
+
+        $offset = $_packet->offset + 2;
+
+        $this->fqdn = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $_packet, $offset);
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     * 
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed 
-     *                                 string or null on failure
-     * @access protected
-     * 
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if (strlen($this->fqdn) > 0)
+        if ($this->fqdn->length() == 0)
         {
-            $data = pack('n', $this->preference);
-            $packet->offset += 2;
-
-            $data .= $packet->compress($this->fqdn, $packet->offset);
-            return $data;
+            return '';
         }
 
-        return null;
+        $data = pack('n', $this->preference) . $this->fqdn->encode();
+
+        $_packet->offset += strlen($data);
+
+        return $data;
     }
 }

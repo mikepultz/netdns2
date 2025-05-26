@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
@@ -34,62 +34,59 @@ namespace NetDNS2\RR;
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-class NSEC3 extends \NetDNS2\RR
+final class NSEC3 extends \NetDNS2\RR
 {
-    /*
+    /**
      * Algorithm to use
      */
-    public $algorithm;
+    protected int $algorithm;
  
-    /*
+    /**
      * flags
      */
-    public $flags;
+    protected int $flags;
  
-    /*
+    /**
      *  defines the number of additional times the hash is performed.
      */
-    public $iterations;
+    protected int $iterations;
  
-    /*
+    /**
      * the length of the salt- not displayed
      */
-    public $salt_length;
+    protected int $salt_length;
  
-    /*
+    /**
      * the salt
      */
-    public $salt;
-
-    /*
-     * the length of the hash value
-     */
-    public $hash_length;
-
-    /*
-     * the hashed value of the owner name
-     */
-    public $hashed_owner_name;
-
-    /*
-     * array of RR type names
-     */
-    public $type_bit_maps = [];
+    protected string $salt;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * the length of the hash value
      */
-    protected function rrToString()
+    protected int $hash_length;
+
+    /**
+     * the hashed value of the owner name
+     */
+    protected string $hashed_owner_name;
+
+    /**
+     * array of RR type names
+     *
+     * @var array<int,string>
+     */
+    protected array $type_bit_maps = [];
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
         $out = $this->algorithm . ' ' . $this->flags . ' ' . $this->iterations . ' ';
  
         //
-        // per RFC5155, the salt_length value isn't displayed, and if the salt
-        // is empty, the salt is displayed as '-'
+        // per RFC5155, the salt_length value isn't displayed, and if the salt is empty, the salt is displayed as '-'
         //
         if ($this->salt_length > 0)
         {
@@ -99,41 +96,25 @@ class NSEC3 extends \NetDNS2\RR
             $out .= '-';
         }
 
-        //
-        // per RFC5255 the hash length isn't shown
-        //
-        $out .= ' ' . $this->hashed_owner_name;
- 
-        //
-        // show the RR's
-        //
-        foreach($this->type_bit_maps as $rr)
-        {
-            $out .= ' ' . strtoupper($rr);
-        }
+        $out .= ' ' . $this->hashed_owner_name . ' ' . implode(' ', $this->type_bit_maps);
 
         return $out;
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $this->algorithm    = array_shift($rdata);
-        $this->flags        = array_shift($rdata);
-        $this->iterations   = array_shift($rdata);
+        $this->algorithm  = intval($this->sanitize(array_shift($_rdata)));
+        $this->flags      = intval($this->sanitize(array_shift($_rdata)));
+        $this->iterations = intval($this->sanitize(array_shift($_rdata)));
      
         //
         // an empty salt is represented as '-' per RFC5155 section 3.3
         //
-        $salt = array_shift($rdata);
+        $salt = $this->sanitize(array_shift($_rdata));
 
         if ($salt == '-')
         {
@@ -145,86 +126,92 @@ class NSEC3 extends \NetDNS2\RR
             $this->salt = strtoupper($salt);
         }
 
-        $this->hashed_owner_name = array_shift($rdata);
-        $this->hash_length = strlen(base64_decode($this->hashed_owner_name));
+        $this->hashed_owner_name = $this->sanitize(array_shift($_rdata));
 
-        $this->type_bit_maps = $rdata;
+        //
+        // base64 decode the hash
+        //
+        $decode = base64_decode($this->hashed_owner_name);
+        if ($decode === false)
+        {
+            $decode = '';
+        }
+
+        $this->hash_length   = strlen($decode);
+
+        //
+        // validate the list of RR's
+        //
+        $this->type_bit_maps = \NetDNS2\BitMap::validateArray($_rdata);
 
         return true;
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // unpack the first values
-            //
-            $x = unpack('Calgorithm/Cflags/niterations/Csalt_length', $this->rdata);
-        
-            $this->algorithm    = $x['algorithm'];
-            $this->flags        = $x['flags'];
-            $this->iterations   = $x['iterations'];
-            $this->salt_length  = $x['salt_length'];
-
-            $offset = 5;
-
-            if ($this->salt_length > 0)
-            {
-                $x = unpack('H*', substr($this->rdata, $offset, $this->salt_length));
-                $this->salt = strtoupper($x[1]);
-                $offset += $this->salt_length;
-            }
-
-            //
-            // unpack the hash length
-            //
-            $x = unpack('@' . $offset . '/Chash_length', $this->rdata);
-            $offset++;
-
-            //
-            // copy out the hash
-            //
-            $this->hash_length  = $x['hash_length'];
-
-            if ($this->hash_length > 0)
-            {
-                $this->hashed_owner_name = base64_encode(substr($this->rdata, $offset, $this->hash_length));
-                $offset += $this->hash_length;
-            }
-
-            //
-            // parse out the RR bitmap
-            //
-            $this->type_bit_maps = \NetDNS2\BitMap::bitMapToArray(substr($this->rdata, $offset));
-
-            return true;
+            return false;
         }
-     
-        return false;
+            
+        //
+        // unpack the first values
+        //
+        $val = unpack('Cw/Cx/ny/Cz', $this->rdata);
+        if ($val === false)
+        {
+            return false;
+        }
+
+        list('w' => $this->algorithm, 'x' => $this->flags, 'y' => $this->iterations, 'z' => $this->salt_length) = (array)$val;
+
+        $offset = 5;
+
+        if ($this->salt_length > 0)
+        {
+            $val = unpack('H*', substr($this->rdata, $offset, $this->salt_length));
+            if ($val === false)
+            {
+                return false;
+            }
+
+            $this->salt = strtoupper(((array)$val)[1]);
+            $offset += $this->salt_length;
+        }
+
+        //
+        // unpack the hash length
+        //
+        $val = unpack('Cx', $this->rdata, $offset);
+        if ($val === false)
+        {
+            return false;
+        }
+
+        list('x' => $this->hash_length) = (array)$val;
+        $offset++;
+
+        if ($this->hash_length > 0)
+        {
+            $this->hashed_owner_name = base64_encode(substr($this->rdata, $offset, $this->hash_length));
+            $offset += $this->hash_length;
+        }
+
+        //
+        // parse out the RR bitmap
+        //
+        $this->type_bit_maps = \NetDNS2\BitMap::bitMapToArray(substr($this->rdata, $offset));
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
         //
         // pull the salt and build the length
@@ -244,7 +231,11 @@ class NSEC3 extends \NetDNS2\RR
         $data .= chr($this->hash_length);
         if ($this->hash_length > 0)
         {
-            $data .= base64_decode($this->hashed_owner_name);
+            $decode = base64_decode($this->hashed_owner_name);
+            if ($decode !== false)
+            {
+                $data .= $decode;
+            }
         }
 
         //
@@ -252,7 +243,7 @@ class NSEC3 extends \NetDNS2\RR
         //
         $data .= \NetDNS2\BitMap::arrayToBitMap($this->type_bit_maps);
 
-        $packet->offset += strlen($data);
+        $_packet->offset += strlen($data);
      
         return $data;
     }

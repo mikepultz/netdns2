@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
@@ -23,72 +23,57 @@ namespace NetDNS2;
  * Exception handler used by NetDNS2
  * 
  */
-class Exception extends \Exception
+final class Exception extends \Exception
 {
-    private $_request;
-    private $_response;
+    private ?\NetDNS2\Packet\Request $m_request   = null;
+    private ?\NetDNS2\Packet\Response $m_response = null;
 
     /**
-     * Constructor - overload the constructor so we can pass in the request
-     *               and response object (when it's available)
+     * Constructor - overload the constructor so we can pass in the request and response object (when it's available)
      *
-     * @param string $message  the exception message
-     * @param int    $code     the exception code
-     * @param object $previous the previous Exception object
-     * @param object $request  the \NetDNS2\Packet\Request object for this request
-     * @param object $response the \NetDNS2\Packet\Response object for this request
-     *
-     * @access public
+     * @param string                   $_message  the exception message
+     * @param \NetDNS2\ENUM\Error      $_code     the exception code
+     * @param \Throwable               $_previous the previous Exception object
+     * @param \NetDNS2\Packet\Request  $_request  the \NetDNS2\Packet\Request object for this request
+     * @param \NetDNS2\Packet\Response $_response the \NetDNS2\Packet\Response object for this request
      *
      */
-    public function __construct($message = '', $code = 0, $previous = null, 
-        \NetDNS2\Packet\Request $request = null, \NetDNS2\Packet\Response $response = null)
+    public function __construct(string $_message = '', \NetDNS2\ENUM\Error $_code = \NetDNS2\ENUM\Error::NONE, ?\Throwable $_previous = null, 
+        ?\NetDNS2\Packet\Request $_request = null, ?\NetDNS2\Packet\Response $_response = null)
     {
         //
         // store the request/response objects (if passed)
         //
-        $this->_request = $request;
-        $this->_response = $response;
+        if (is_null($_request) == false)
+        {
+            $this->m_request  = clone $_request;
+        }
+        if (is_null($_response) == false)
+        {
+            $this->m_response = clone $_response;
+        }
 
         //
         // call the parent constructor
         //
-        // the "previous" argument was added in PHP 5.3.0
-        //
-        //      https://code.google.com/p/netdns2/issues/detail?id=25
-        //
-        if (version_compare(PHP_VERSION, '5.3.0', '>=') == true)
-        {
-            parent::__construct($message, $code, $previous);
-        } else
-        {
-            parent::__construct($message, $code);
-        }
+        parent::__construct($_message, $_code->value, $_previous);
     }
 
     /**
      * returns the \NetDNS2\Packet\Request object (if available)
      *
-     * @return \NetDNS2\Packet\Request object
-     * @access public
-     * @since  function available since release 1.3.1
-     *
      */
-    public function getRequest()
+    public function getRequest(): ?\NetDNS2\Packet\Request
     {
-        return $this->_request;
+        return $this->m_request;
     }
 
     /**
      * returns the \NetDNS2\Packet\Response object (if available)
      *
-     * @return \NetDNS2\Packet\Response object
-     * @access public
-     * @since  function available since release 1.3.1
-     *
      */
-    public function getResponse()
+    public function getResponse(): ?\NetDNS2\Packet\Response
     {
-        return $this->_response;
+        return $this->m_response;
     }
 }

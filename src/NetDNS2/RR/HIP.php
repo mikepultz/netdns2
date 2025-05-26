@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 1.0.0
+ * @since     1.0.0
  *
  */
 
@@ -46,46 +46,44 @@ namespace NetDNS2\RR;
  *  +-+-+-+-+-+-+-+
  *
  */
-class HIP extends \NetDNS2\RR
+final class HIP extends \NetDNS2\RR
 {
-    /*
+    /**
      * The length of the HIT field
      */
-    public $hit_length;
-
-    /*
-     * the public key cryptographic algorithm
-     */
-    public $pk_algorithm;
-
-    /*
-     * the length of the public key field
-     */
-    public $pk_length;
-    
-    /*
-     * The HIT is stored as a binary value in network byte order.
-     */
-    public $hit;
-
-    /*
-     * The public key
-     */
-    public $public_key;
-
-    /*
-     * a list of rendezvous servers
-     */
-    public $rendezvous_servers = [];
+    protected int $hit_length;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * the public key cryptographic algorithm
      */
-    protected function rrToString()
+    protected int $pk_algorithm;
+
+    /**
+     * the length of the public key field
+     */
+    protected int $pk_length;
+    
+    /**
+     * The HIT is stored as a binary value in network byte order.
+     */
+    protected string $hit;
+
+    /**
+     * The public key
+     */
+    protected string $public_key;
+
+    /**
+     * a list of rendezvous servers
+     *
+     * @var array<int,\NetDNS2\Data\Domain>
+     */
+    protected array $rendezvous_servers = [];
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
         $out = $this->pk_algorithm . ' ' . $this->hit . ' ' . $this->public_key . ' ';
 
@@ -98,133 +96,128 @@ class HIP extends \NetDNS2\RR
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $this->pk_algorithm     = array_shift($rdata);
-        $this->hit              = strtoupper(array_shift($rdata));
-        $this->public_key       = array_shift($rdata);
+        $this->pk_algorithm = intval($this->sanitize(array_shift($_rdata)));
+        $this->hit          = strtoupper($this->sanitize(array_shift($_rdata)));
+        $this->public_key   = array_shift($_rdata);
 
         //
-        // anything left on the array, must be one or more rendezevous servers. add
-        // them and strip off the trailing dot
+        // anything left on the array, must be one or more rendezevous servers. add them and strip off the trailing dot
         //
-        if (count($rdata) > 0)
+        foreach($_rdata as $data)
         {
-            $this->rendezvous_servers = preg_replace('/\.$/', '', $rdata);
+            $this->rendezvous_servers[] = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $data);
         }
 
         //
-        // store the lengths; 
+        // base64 deocde the public key
         //
-        $this->hit_length       = strlen(pack('H*', $this->hit));
-        $this->pk_length        = strlen(base64_decode($this->public_key));        
+        $decode = base64_decode($this->public_key);
+        if ($decode === false)
+        {
+            $decode = '';
+        }
+
+        //
+        // store the lengths
+        //
+        $this->hit_length = strlen(pack('H*', $this->hit));
+        $this->pk_length  = strlen($decode);
 
         return true;
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // unpack the algorithm and length values
-            //
-            $x = unpack('Chit_length/Cpk_algorithm/npk_length', $this->rdata);
-
-            $this->hit_length   = $x['hit_length'];
-            $this->pk_algorithm = $x['pk_algorithm'];
-            $this->pk_length    = $x['pk_length'];
-
-            $offset = 4;
-
-            //
-            // copy out the HIT value
-            //
-            $hit = unpack('H*', substr($this->rdata, $offset, $this->hit_length));
-            
-            $this->hit = strtoupper($hit[1]);
-            $offset += $this->hit_length;
-
-            //
-            // copy out the public key
-            //
-            $this->public_key = base64_encode(substr($this->rdata, $offset, $this->pk_length));
-            $offset += $this->pk_length;
-
-            //
-            // copy out any possible rendezvous servers
-            //
-            $offset = $packet->offset + $offset;
-
-            while( ($offset - $packet->offset) < $this->rdlength)
-            {
-                $this->rendezvous_servers[] = \NetDNS2\Packet::expand($packet, $offset);
-            }
-
-            return true;
+            return false;
         }
 
-        return false;
+        //
+        // unpack the algorithm and length values
+        //
+        $val = unpack('Cx/Cy/nz', $this->rdata);
+        if ($val === false)
+        {
+            return false;
+        }
+
+        list('x' => $this->hit_length, 'y' => $this->pk_algorithm, 'z' => $this->pk_length) = (array)$val;
+        $offset = 4;
+
+        //
+        // copy out the HIT value
+        //
+        $val = unpack('H*', substr($this->rdata, $offset, $this->hit_length));
+        if ($val === false)
+        {
+            return false;
+        }
+        $this->hit = strtoupper(((array)$val)[1]);
+        $offset += $this->hit_length;
+
+        //
+        // copy out the public key
+        //
+        $this->public_key = base64_encode(substr($this->rdata, $offset, $this->pk_length));
+        $offset += $this->pk_length;
+
+        //
+        // copy out any possible rendezvous servers
+        //
+        while($offset < $this->rdlength)
+        {
+            $this->rendezvous_servers[] = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $this->rdata, $offset);
+        }
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if ( (strlen($this->hit) > 0) && (strlen($this->public_key) > 0) )
+        if ( (strlen($this->hit) == 0) || (strlen($this->public_key) == 0) )
         {
-            //
-            // pack the length, algorithm and HIT values
-            //
-            $data = pack('CCnH*', $this->hit_length, $this->pk_algorithm, $this->pk_length, $this->hit);
-            
-            //
-            // add the public key
-            //
-            $data .= base64_decode($this->public_key);
-
-            //
-            // add the offset
-            //
-            $packet->offset += strlen($data);
-
-            //
-            // add each rendezvous server
-            //
-            foreach($this->rendezvous_servers as $index => $server)
-            {
-                $data .= $packet->compress($server, $packet->offset);
-            }
-
-            return $data;
+            return '';
         }
 
-        return null;
+        //
+        // pack the length, algorithm and HIT values
+        //
+        $data = pack('CCnH*', $this->hit_length, $this->pk_algorithm, $this->pk_length, $this->hit);
+            
+        //
+        // add the public key
+        //
+        $decode = base64_decode($this->public_key);
+        if ($decode !== false)
+        {
+            $data .= $decode;
+        }
+
+        //
+        // add each rendezvous server
+        //
+        foreach($this->rendezvous_servers as $index => $server)
+        {
+            $data .= $server->encode();
+        }
+
+        //
+        // add the offset
+        //
+        $_packet->offset += strlen($data);
+
+        return $data;
     }
 }

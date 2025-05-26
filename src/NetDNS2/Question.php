@@ -1,27 +1,26 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
 namespace NetDNS2;
 
 /**
- * This class handles parsing and constructing the question sectino of DNS
- * packets.
+ * This class handles parsing and constructing the question sectino of DNS packets.
  *
  * This is referred to as the "zone" for update per RFC2136
  *
@@ -39,145 +38,120 @@ namespace NetDNS2;
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
-class Question
+final class Question implements \Stringable
 {
-    /*
+    /**
      * The name of the question
      *
      * referred to as "zname" for updates per RFC2136
      *
      */
-    public $qname;
+    public \NetDNS2\Data\Domain $qname;
 
-    /*
-     * The RR type for the questino
+    /**
+     * The RR type for the question
      *
      * referred to as "ztype" for updates per RFC2136
      *
      */
-    public $qtype;
+    public \NetDNS2\ENUM\RRType $qtype;
     
-    /*
-     * The RR class for the questino
+    /**
+     * The RR class for the question
      *
      * referred to as "zclass" for updates per RFC2136
      *
      */
-    public $qclass;
+    public \NetDNS2\ENUM\RRClass $qclass;
 
     /**
      * Constructor - builds a new \NetDNS2\Question object
      *
-     * @param mixed &$packet either a \NetDNS2\Packet object, or null to 
-     *                       build an empty object
+     * @param \NetDNS2\Packet &$_packet either a \NetDNS2\Packet object, or null to build an empty object
      *
      * @throws \NetDNS2\Exception
-     * @access public
      *
      */
-    public function __construct(\NetDNS2\Packet &$packet = null)
+    public function __construct(?\NetDNS2\Packet &$_packet = null)
     {
-        if (is_null($packet) == false)
+        if (is_null($_packet) == false)
         {
-            $this->set($packet);
+            $this->set($_packet);
+
         } else
         {
-            $this->qname    = '';
-            $this->qtype    = 'A';
-            $this->qclass   = 'IN';
+            $this->qname  = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035);
+            $this->qtype  = \NetDNS2\ENUM\RRType::set('A');
+            $this->qclass = \NetDNS2\ENUM\RRClass::set('IN');
         }
     }
 
     /**
      * magic __toString() function to return the \NetDNS2\Question object as a string
      *
-     * @return string
-     * @access public
-     *
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return ";;\n;; Question:\n;;\t " . $this->qname . '. ' . $this->qtype . ' ' . $this->qclass . "\n";
+        return ";;\n;; Question:\n;;\t " . $this->qname . '. ' . $this->qtype->label() . ' ' . $this->qclass->label() . "\n";
     }
 
     /**
      * builds a new \NetDNS2\Header object from a \NetDNS2\Packet object
      *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet object
+     * @param \NetDNS2\Packet &$_packet a \NetDNS2\Packet object
      *
-     * @return boolean
      * @throws \NetDNS2\Exception
-     * @access public
      *
      */
-    public function set(\NetDNS2\Packet &$packet)
+    public function set(\NetDNS2\Packet &$_packet): void
     {
+        if ($_packet->rdlength < ($_packet->offset + 4))
+        {
+            throw new \NetDNS2\Exception('invalid question section: to small', \NetDNS2\ENUM\Error::QUESTION_INVALID);
+        }
+
         //
         // expand the name
         //
-        $this->qname = $packet->expand($packet, $packet->offset);
-        if ($packet->rdlength < ($packet->offset + 4))
-        {
-            throw new \NetDNS2\Exception('invalid question section: to small', \NetDNS2\Lookups::E_QUESTION_INVALID);
-        }
+        $this->qname = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_packet, $_packet->offset);
 
         //
         // unpack the type and class
         //
-        $type   = ord($packet->rdata[$packet->offset++]) << 8 | ord($packet->rdata[$packet->offset++]);
-        $class  = ord($packet->rdata[$packet->offset++]) << 8 | ord($packet->rdata[$packet->offset++]);
-
-        //
-        // validate it
-        //
-        $type_name  = \NetDNS2\Lookups::$rr_types_by_id[$type];
-        $class_name = \NetDNS2\Lookups::$classes_by_id[$class];
-
-        if ( (isset($type_name) == false) || (isset($class_name) == false) )
+        $val = unpack('nx/ny', $_packet->rdata, $_packet->offset);
+        if ($val == false)
         {
-            throw new \NetDNS2\Exception('invalid question section: invalid type (' . $type . ') or class (' . $class . ') specified.',
-                \NetDNS2\Lookups::E_QUESTION_INVALID);
+            throw new \NetDNS2\Exception('invalid question section: failed to parse values.', \NetDNS2\ENUM\Error::QUESTION_INVALID);
         }
 
+        list('x' => $type, 'y' => $class) = (array)$val;
+
+        //
+        // advance the offset pointer
+        //
+        $_packet->offset += 4;
+        
         //
         // store it
         //
-        $this->qtype    = $type_name;
-        $this->qclass   = $class_name;
-
-        return true;
+        $this->qtype  = \NetDNS2\ENUM\RRType::set($type);
+        $this->qclass = \NetDNS2\ENUM\RRClass::set($class);
     }
 
     /**
      * returns a binary packed \NetDNS2\Question object
      *
-     * @param \NetDNS2\Packet &$packet the \NetDNS2\Packet object this question is 
-     *                                 part of. This needs to be passed in so that
-     *                                 the compressed qname value can be packed in
-     *                                 with the names of the other parts of the 
-     *                                 packet.
+     * @param \NetDNS2\Packet &$_packet the \NetDNS2\Packet object this question is part of. This needs to be passed in so that
+     *                                 the compressed qname value can be packed in with the names of the other parts of the packet.
      *
-     * @return string
      * @throws \NetDNS2\Exception
-     * @access public
      *
      */
-    public function get(\NetDNS2\Packet &$packet)
+    public function get(\NetDNS2\Packet &$_packet): string
     {
-        //
-        // validate the type and class
-        //
-        $type  = \NetDNS2\Lookups::$rr_types_by_name[$this->qtype];
-        $class = \NetDNS2\Lookups::$classes_by_name[$this->qclass];
+        $data = $this->qname->encode($_packet->offset) . pack('nn', $this->qtype->value, $this->qclass->value);
 
-        if ( (isset($type) == false) || (isset($class) == false) )
-        {
-            throw new \NetDNS2\Exception('invalid question section: invalid type (' . $this->qtype . ') or class (' . $this->qclass . ') specified.',
-                \NetDNS2\Lookups::E_QUESTION_INVALID);
-        }
-
-        $data = $packet->compress($this->qname, $packet->offset) . chr($type >> 8) . chr($type) . chr($class >> 8) . chr($class);
-        $packet->offset += 4;
+        $_packet->offset += 4;
 
         return $data;
     }

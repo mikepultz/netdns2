@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 1.1.0
+ * @since     1.1.0
  *
  */
 
@@ -23,25 +23,23 @@ namespace NetDNS2\Cache;
  * File-based caching for the NetDNS2\Cache class
  *
  */
-class File extends \NetDNS2\Cache
+final class File extends \NetDNS2\Cache
 {
     /**
      * open a cache object
      *
-     * @param string  $cache_file path to a file to use for cache storage
-     * @param integer $size       the size of the shared memory segment to create
-     * @param string  $serializer the name of the cache serialize to use
+     * @param string  $_cache_file path to a file to use for cache storage
+     * @param integer $_size       the size of the shared memory segment to create
+     * @param string  $_serializer the name of the cache serialize to use
      *
      * @throws \NetDNS2\Exception
-     * @access public
-     * @return void
      *
      */
-    public function open($cache_file, $size, $serializer)
+    public function open(string $_cache_file, int $_size, string $_serializer): void
     {
-        $this->cache_size       = $size;
-        $this->cache_file       = $cache_file;
-        $this->cache_serializer = $serializer;
+        $this->cache_file       = $_cache_file;
+        $this->cache_size       = $_size;
+        $this->cache_serializer = $_serializer;
 
         //
         // check that the file exists first
@@ -72,23 +70,33 @@ class File extends \NetDNS2\Cache
                 // read the file contents
                 //
                 $data = fread($fp, $file_size);
-
-                $decoded = null;
+                if ($data !== false)
+                {
+                    $decoded = null;
                     
-                if ($this->cache_serializer == 'json')
-                {
-                    $decoded = json_decode($data, true);         
-                } else
-                {
-                    $decoded = unserialize($data);                
-                }
+                    if ($this->cache_serializer == 'json')
+                    {
+                        try
+                        {
+                            $decoded = @json_decode(strval($data), true, 512, JSON_THROW_ON_ERROR);
 
-                if (is_array($decoded) == true)
-                {
-                    $this->cache_data = $decoded;
-                } else
-                {
-                    $this->cache_data = [];
+                        } catch(\ValueError $e)
+                        {
+                            $decoded = null;
+                        }
+                    
+                    } else
+                    {
+                        $decoded = unserialize(strval($data));                
+                    }
+
+                    if (is_array($decoded) == true)
+                    {
+                        $this->cache_data = $decoded;
+                    } else
+                    {
+                        $this->cache_data = [];
+                    }
                 }
 
                 //
@@ -112,14 +120,10 @@ class File extends \NetDNS2\Cache
                 $this->cache_opened = true;
             }
         }
-
-        return;
     }
 
     /**
      * Destructor
-     *
-     * @access public
      *
      */
     public function __destruct()
@@ -149,8 +153,7 @@ class File extends \NetDNS2\Cache
             fseek($fp, 0, SEEK_SET);
 
             //
-            // get the file size first; in PHP 8.0 fread() was changed to throw an exception if you try
-            // and read 0 bytes from a file.
+            // get the file size first; in PHP 8.0 fread() was changed to throw an exception if you try and read 0 bytes from a file.
             //
             $file_size = @filesize($this->cache_file);
 
@@ -172,10 +175,18 @@ class File extends \NetDNS2\Cache
 
                     if ($this->cache_serializer == 'json')
                     {
-                        $decoded = json_decode($data, true);
+                        try
+                        {
+                            $decoded = @json_decode(strval($data), true, 512, JSON_THROW_ON_ERROR);
+
+                        } catch(\ValueError $e)
+                        {
+                            $decoded = null;
+                        }
+
                     } else
                     {
-                        $decoded = unserialize($data);
+                        $decoded = unserialize(strval($data));
                     }
                 
                     if (is_array($decoded) == true)
@@ -199,6 +210,7 @@ class File extends \NetDNS2\Cache
             // resize the data
             //
             $data = $this->resize();
+
             if (is_null($data) == false)
             {
                 //

@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 1.2.5
+ * @since     1.2.5
  *
  */
 
@@ -34,113 +34,97 @@ namespace NetDNS2\RR;
  */
 class TLSA extends \NetDNS2\RR
 {
-    /*
+    /**
      * The Certificate Usage Field
      */
-    public $cert_usage;
-
-    /*
-     * The Selector Field
-     */
-    public $selector;
-
-    /*
-     * The Matching Type Field
-     */
-    public $matching_type;
-
-    /*
-     * The Certificate Association Data Field
-     */
-    public $certificate;
+    protected int $cert_usage;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * The Selector Field
      */
-    protected function rrToString()
+    protected int $selector;
+
+    /**
+     * The Matching Type Field
+     */
+    protected int $matching_type;
+
+    /**
+     * The Certificate Association Data Field
+     */
+    protected string $certificate;
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
-        return $this->cert_usage . ' ' . $this->selector . ' ' . 
-            $this->matching_type . ' ' . base64_encode($this->certificate);
+        return $this->cert_usage . ' ' . $this->selector . ' ' . $this->matching_type . ' ' . $this->certificate;
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $this->cert_usage       = array_shift($rdata);
-        $this->selector         = array_shift($rdata);
-        $this->matching_type    = array_shift($rdata);
-        $this->certificate      = base64_decode(implode('', $rdata));
+        $this->cert_usage    = intval($this->sanitize(array_shift($_rdata)));
+        $this->selector      = intval($this->sanitize(array_shift($_rdata)));
+        $this->matching_type = intval($this->sanitize(array_shift($_rdata)));
+        $this->certificate   = implode('', $_rdata);
 
         return true;
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // unpack the format, keytag and algorithm
-            //
-            $x = unpack('Cusage/Cselector/Ctype', $this->rdata);
-
-            $this->cert_usage       = $x['usage'];
-            $this->selector         = $x['selector'];
-            $this->matching_type    = $x['type'];
-
-            //
-            // copy the certificate
-            //
-            $this->certificate  = substr($this->rdata, 3, $this->rdlength - 3);
-
-            return true;
+            return false;
         }
 
-        return false;
+        //
+        // unpack the format, keytag and algorithm
+        //
+        $val = unpack('Cx/Cy/Cz', $this->rdata);
+        if ($val === false)
+        {
+            return false;
+        }
+
+        list('x' => $this->cert_usage, 'y' => $this->selector, 'z' => $this->matching_type) = (array)$val;
+
+        //
+        // copy the certificate
+        //
+        $val = unpack('H*', substr($this->rdata, 3, $this->rdlength - 3));
+        if ($val === false)
+        {
+            return false;
+        }
+
+        $this->certificate  = implode('', (array)$val);
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if (strlen($this->certificate) > 0)
+        if (strlen($this->certificate) == 0)
         {
-            $data = pack('CCC', $this->cert_usage, $this->selector, $this->matching_type) . $this->certificate;
-
-            $packet->offset += strlen($data);
-
-            return $data;
+            return '';
         }
 
-        return null;
+        $cert = pack('H*', $this->certificate);
+
+        $_packet->offset = strlen($cert) + 3;
+            
+        return pack('CCC', $this->cert_usage, $this->selector, $this->matching_type) . $cert;
     }
 }

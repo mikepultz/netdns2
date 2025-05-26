@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
@@ -39,78 +39,64 @@ namespace NetDNS2\RR;
  *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
-class NAPTR extends \NetDNS2\RR
+final class NAPTR extends \NetDNS2\RR
 {
-    /*
+    /**
      * the order in which the NAPTR records MUST be processed
      */
-    public $order;
-
-    /*
-     * specifies the order in which NAPTR records with equal "order"
-     * values SHOULD be processed
-     */
-    public $preference;
-
-    /*
-     * rewrite flags
-     */
-    public $flags;
-
-    /* 
-     * Specifies the service(s) available down this rewrite path
-     */
-    public $services;
-
-    /*
-     * regular expression
-     */
-    public $regexp;
-
-    /* 
-     * The next NAME to query for NAPTR, SRV, or address records
-     * depending on the value of the flags field
-     */
-    public $replacement;
+    protected int $order;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * specifies the order in which NAPTR records with equal "order" values SHOULD be processed
      */
-    protected function rrToString()
+    protected int $preference;
+
+    /**
+     * rewrite flags
+     */
+    protected \NetDNS2\Data\Text $flags;
+
+    /**
+     * Specifies the service(s) available down this rewrite path
+     */
+    protected \NetDNS2\Data\Text $services;
+
+    /**
+     * regular expression
+     */
+    protected \NetDNS2\Data\Text $regexp;
+
+    /**
+     * The next NAME to query for NAPTR, SRV, or address records depending on the value of the flags field
+     */
+    protected \NetDNS2\Data\Domain $replacement;
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
-        return $this->order . ' ' . $this->preference . ' ' . 
-            $this->formatString($this->flags) . ' ' . 
-            $this->formatString($this->services) . ' ' . 
-            $this->formatString($this->regexp) . ' ' . 
-            $this->cleanString($this->replacement) . '.';
+        return $this->order . ' ' . $this->preference . ' ' . \NetDNS2\RR::formatString($this->flags->value()) . ' ' . 
+            \NetDNS2\RR::formatString($this->services->value()) . ' ' . \NetDNS2\RR::formatString($this->regexp->value()) . ' ' . $this->replacement . '.';
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $this->order        = array_shift($rdata);
-        $this->preference   = array_shift($rdata);
+        $this->order      = intval($this->sanitize(array_shift($_rdata)));
+        $this->preference = intval($this->sanitize(array_shift($_rdata)));
 
-        $data = $this->buildString($rdata);
+        $data = $this->buildString($_rdata);
 
         if (count($data) == 4)
         {
-            $this->flags        = $data[0];
-            $this->services     = $data[1];
-            $this->regexp       = $data[2];
-            $this->replacement  = $this->cleanString($data[3]);
+            $this->flags       = new \NetDNS2\Data\Text($data[0]);
+            $this->services    = new \NetDNS2\Data\Text($data[1]);
+            $this->regexp      = new \NetDNS2\Data\Text($data[2]);
+            $this->replacement = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC2535, $data[3]);
         
             return true;
         }
@@ -119,68 +105,48 @@ class NAPTR extends \NetDNS2\RR
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // unpack the order and preference
-            //
-            $x = unpack('norder/npreference', $this->rdata);
-            
-            $this->order        = $x['order'];
-            $this->preference   = $x['preference'];
-
-            $offset             = $packet->offset + 4;
-
-            $this->flags        = \NetDNS2\Packet::label($packet, $offset);
-            $this->services     = \NetDNS2\Packet::label($packet, $offset);
-            $this->regexp       = \NetDNS2\Packet::label($packet, $offset);
-
-            $this->replacement  = \NetDNS2\Packet::expand($packet, $offset);
-
-            return true;
+            return false;
         }
 
-        return false;
+        $val = unpack('nx/ny', $this->rdata);
+        if ($val === false)
+        {
+            return false;
+        }
+            
+        list('x' => $this->order, 'y' => $this->preference) = (array)$val;
+
+        $offset = $_packet->offset + 4;
+
+        $this->flags       = new \NetDNS2\Data\Text($_packet->rdata, $offset);
+        $this->services    = new \NetDNS2\Data\Text($_packet->rdata, $offset);
+        $this->regexp      = new \NetDNS2\Data\Text($_packet->rdata, $offset);
+
+        $this->replacement = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC2535, $_packet, $offset);
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if ( (isset($this->order) == true) && (strlen($this->services) > 0) )
+        if ( (isset($this->order) == false) || ($this->services->length() == 0) )
         {
-            $data = pack('nn', $this->order, $this->preference);
-
-            $data .= chr(strlen($this->flags)) . $this->flags;
-            $data .= chr(strlen($this->services)) . $this->services;
-            $data .= chr(strlen($this->regexp)) . $this->regexp;
-
-            $packet->offset += strlen($data);
-
-            $data .= $packet->compress($this->replacement, $packet->offset);
-
-            return $data;
+            return '';
         }
+            
+        $data = pack('nn', $this->order, $this->preference) . $this->flags->encode() . $this->services->encode() . $this->regexp->encode();
 
-        return null;
+        $_packet->offset += strlen($data);
+
+        return $data . $this->replacement->encode($_packet->offset);
     }
 }

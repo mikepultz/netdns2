@@ -40,10 +40,10 @@ $pkg->setNotes(
 );
 $pkg->setPackageType('php');
 $pkg->addRelease();
-$pkg->setPhpDep('5.4');
+$pkg->setPhpDep('8.0');
 $pkg->setPearinstallerDep('1.4.0a12');
 $pkg->addMaintainer('lead', 'mikepultz', 'Mike Pultz', 'mike@mikepultz.com');
-$pkg->setLicense('BSD License', 'http://www.opensource.org/licenses/bsd-license.php');
+$pkg->setLicense('BSD License', 'https://opensource.org/license/bsd-3-clause/');
 $pkg->generateContents();
 
 $pkg->writePackageFile();

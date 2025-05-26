@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 1.0.0
+ * @since     1.0.0
  *
  */
 
@@ -32,21 +32,19 @@ namespace NetDNS2\RR;
  *     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
  */
-class APL extends \NetDNS2\RR
+final class APL extends \NetDNS2\RR
 {
-    /*
+    /**
      * a list of all the address prefix list items
+     *
+     * @var array<int,mixed>
      */
-    public $apl_items = [];
+    protected array $apl_items = [];
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * @see \NetDNS2\RR::rrToString()
      */
-    protected function rrToString()
+    protected function rrToString(): string
     {
         $out = '';
 
@@ -64,17 +62,12 @@ class APL extends \NetDNS2\RR
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        foreach($rdata as $item)
+        foreach($_rdata as $item)
         {
             if (preg_match('/^(!?)([1|2])\:([^\/]*)\/([0-9]{1,3})$/', $item, $m) == 1)
             {
@@ -86,7 +79,7 @@ class APL extends \NetDNS2\RR
                     'afd_part'          => strtolower($m[3])
                 ];
 
-                $address = $this->_trimZeros($i['address_family'], $i['afd_part']);
+                $address = $this->trimZeros(intval($i['address_family']), $i['afd_part']);
 
                 $i['afd_length'] = count(explode('.', $address));
 
@@ -98,169 +91,171 @@ class APL extends \NetDNS2\RR
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            $offset = 0;
-
-            while($offset < $this->rdlength)
-            {
-                //
-                // unpack the family, prefix, negate and length values
-                //   
-                $x = unpack('naddress_family/Cprefix/Cextra', substr($this->rdata, $offset));
-
-                $item = [
+            return false;
+        }
             
-                    'address_family'    => $x['address_family'],
-                    'prefix'            => $x['prefix'],
-                    'n'                 => ($x['extra'] >> 7) & 0x1,
-                    'afd_length'        => $x['extra'] & 0xf
-                ];
+        $offset = 0;
 
-                switch($item['address_family'])
+        while($offset < $this->rdlength)
+        {
+            //
+            // unpack the family, prefix, negate and length values
+            //
+            $val = unpack('naddress_family/Cprefix/Cextra', substr($this->rdata, $offset));
+            if ($val === false)
+            {
+                return false;
+            }
+
+            $x = unpack('naddress_family/Cprefix/Cextra', substr($this->rdata, $offset));
+            if ($x === false)
+            {
+                return false;
+            }
+
+            $item = [
+            
+                'address_family'    => $x['address_family'],
+                'prefix'            => $x['prefix'],
+                'n'                 => ($x['extra'] >> 7) & 0x1,
+                'afd_length'        => $x['extra'] & 0xf
+            ];
+
+            switch($item['address_family'])
+            {
+                case 1:
                 {
-                    case 1:
-                    {
-                        $r = unpack('C*', substr($this->rdata, $offset + 4, $item['afd_length']));
-                        if (count($r) < 4)
-                        {
-                            for($c=count($r)+1; $c<4+1; $c++)
-                            {
-                                $r[$c] = 0;
-                            }
-                        }
-
-                        $item['afd_part'] = implode('.', $r);
-                    }
-                    break;
-                    case 2:
-                    {
-                        $r = unpack('C*', substr($this->rdata, $offset + 4, $item['afd_length']));
-
-                        if (count($r) < 8)
-                        {
-                            for($c=count($r)+1; $c<8+1; $c++)
-                            {
-                                $r[$c] = 0;
-                            }
-                        }
-
-                        $item['afd_part'] = sprintf('%x:%x:%x:%x:%x:%x:%x:%x', $r[1], $r[2], $r[3], $r[4], $r[5], $r[6], $r[7], $r[8]);
-                    }
-                    break;
-                    default:
+                    $r = unpack('C*', substr($this->rdata, $offset + 4, $item['afd_length']));
+                    if ($r === false)
                     {
                         return false;
                     }
+                    if (count($r) < 4)
+                    {
+                        for($c=count($r)+1; $c<4+1; $c++)
+                        {
+                            $r[$c] = 0;
+                        }
+                    }
+
+                    $item['afd_part'] = implode('.', $r);
                 }
+                break;
+                case 2:
+                {
+                    $r = unpack('C*', substr($this->rdata, $offset + 4, $item['afd_length']));
+                    if ($r === false)
+                    {
+                        return false;
+                    }
 
-                $this->apl_items[] = $item;
+                    if (count($r) < 8)
+                    {
+                        for($c=count($r)+1; $c<8+1; $c++)
+                        {
+                            $r[$c] = 0;
+                        }
+                    }
 
-                $offset += 4 + $item['afd_length'];
+                    $item['afd_part'] = sprintf('%x:%x:%x:%x:%x:%x:%x:%x', $r[1], $r[2], $r[3], $r[4], $r[5], $r[6], $r[7], $r[8]);
+                }
+                break;
+                default:
+                {
+                    return false;
+                }
             }
 
-            return true;
+            $this->apl_items[] = $item;
+
+            $offset += 4 + $item['afd_length'];
         }
 
-        return false;
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if (count($this->apl_items) > 0)
+        if (count($this->apl_items) == 0)
         {
-            $data = '';
-
-            foreach($this->apl_items as $item)
-            {
-                //
-                // pack the address_family and prefix values
-                //
-                $data .= pack('nCC', $item['address_family'], $item['prefix'], ($item['n'] << 7) | $item['afd_length']);
-
-                switch($item['address_family'])
-                {
-                    case 1:
-                    {
-                        $address = explode('.', $this->_trimZeros($item['address_family'], $item['afd_part']));
-
-                        foreach($address as $b)
-                        {
-                            $data .= chr($b);
-                        }
-                    }
-                    break;
-                    case 2:
-                    {
-                        $address = explode(':', $this->_trimZeros($item['address_family'], $item['afd_part']));
-
-                        foreach($address as $b)
-                        {
-                            $data .= pack('H', $b);
-                        }
-                    }
-                    break;
-                    default:
-                    {
-                        return null;
-                    }
-                }
-            }
-
-            $packet->offset += strlen($data);
-
-            return $data;
+            return '';
         }
 
-        return null;
+        $data = '';
+
+        foreach($this->apl_items as $item)
+        {
+            //
+            // pack the address_family and prefix values
+            //
+            $data .= pack('nCC', $item['address_family'], $item['prefix'], ($item['n'] << 7) | $item['afd_length']);
+
+            switch($item['address_family'])
+            {
+                case 1:
+                {
+                    $address = explode('.', $this->trimZeros(intval($item['address_family']), $item['afd_part']));
+
+                    foreach($address as $b)
+                    {
+                        $data .= chr(intval($b));
+                    }
+                }
+                break;
+                case 2:
+                {
+                    $address = explode(':', $this->trimZeros(intval($item['address_family']), $item['afd_part']));
+
+                    foreach($address as $b)
+                    {
+                        $data .= pack('H', $b);
+                    }
+                }
+                break;
+                default:
+                {
+                    return '';
+                }
+            }
+        }
+
+        $_packet->offset += strlen($data);
+
+        return $data;
     }
 
     /**
      * returns an IP address with the right-hand zero's trimmed
      *
-     * @param integer $family  the IP address family from the rdata
-     * @param string  $address the IP address
+     * @param integer $_family  the IP address family from the rdata
+     * @param string  $_address the IP address
      *
      * @return string the trimmed IP addresss.
      *
-     * @access private
-     *
      */
-    private function _trimZeros($family, $address)
+    private function trimZeros(int $_family, string $_address): string
     {
         $a = [];
 
-        switch($family)
+        switch($_family)
         {
             case 1:
             {
-                $a = array_reverse(explode('.', $address));
+                $a = array_reverse(explode('.', $_address));
             }
             break;
             case 2:
             {
-                $a = array_reverse(explode(':', $address));
+                $a = array_reverse(explode(':', $_address));
             }
             break;
             default:
@@ -279,7 +274,7 @@ class APL extends \NetDNS2\RR
 
         $out = '';
 
-        switch($family)
+        switch($_family)
         {
             case 1:
             {

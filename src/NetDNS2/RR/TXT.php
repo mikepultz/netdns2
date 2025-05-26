@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
@@ -29,104 +29,81 @@ namespace NetDNS2\RR;
  */
 class TXT extends \NetDNS2\RR
 {
-    /*
+    /**
      * an array of the text strings
+     *
+     * @var array<int,\NetDNS2\Data\Text>
      */
-    public $text = [];
+    protected array $text = [];
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * @see \NetDNS2\RR::rrToString()
      */
-    protected function rrToString()
+    protected function rrToString(): string
     {
         if (count($this->text) == 0)
         {
             return '""';
         }
 
-        $data = '';
-
-        foreach($this->text as $t)
+        return implode(' ', array_map(function($value)
         {
-            $data .= $this->formatString($t) . ' ';
-        }
+            return \NetDNS2\RR::formatString($value->value());
 
-        return trim($data);
+        }, $this->text));
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $data = $this->buildString($rdata);
+        $data = $this->buildString($_rdata);
 
         if (count($data) > 0)
         {
-            $this->text = $data;
+            foreach($data as $value)
+            {
+                $this->text[] = new \NetDNS2\Data\Text($value);
+            }
         }
 
         return true;
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            $length = $packet->offset + $this->rdlength;
-            $offset = $packet->offset;
-
-            while($length > $offset)
-            {
-                $this->text[] = \NetDNS2\Packet::label($packet, $offset);
-            }
-
-            return true;
+            return false;
         }
 
-        return false;
+        $offset = $_packet->offset;
+        $limit  = $offset + $this->rdlength;
+
+        while($offset < $limit)
+        {
+            $this->text[] = new \NetDNS2\Data\Text($_packet->rdata, $offset);
+        }
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        $data = null;
+        $data = '';
 
-        foreach($this->text as $t)
+        foreach($this->text as $text)
         {
-            $data .= chr(strlen($t)) . $t;
+            $data .= $text->encode();
         }
-
-        $packet->offset += strlen($data);
 
         return $data;
     }

@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
@@ -32,25 +32,32 @@ namespace NetDNS2\RR;
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
  *
  */
-class CERT extends \NetDNS2\RR
+final class CERT extends \NetDNS2\RR
 {
     /*
      * format's allowed for certificates
      */
-    const CERT_FORMAT_RES       = 0;
-    const CERT_FORMAT_PKIX      = 1;
-    const CERT_FORMAT_SPKI      = 2;
-    const CERT_FORMAT_PGP       = 3;
-    const CERT_FORMAT_IPKIX     = 4;
-    const CERT_FORMAT_ISPKI     = 5;
-    const CERT_FORMAT_IPGP      = 6;
-    const CERT_FORMAT_ACPKIX    = 7;
-    const CERT_FORMAT_IACPKIX   = 8;
-    const CERT_FORMAT_URI       = 253;
-    const CERT_FORMAT_OID       = 254;
+    public const CERT_FORMAT_RES       = 0;
+    public const CERT_FORMAT_PKIX      = 1;
+    public const CERT_FORMAT_SPKI      = 2;
+    public const CERT_FORMAT_PGP       = 3;
+    public const CERT_FORMAT_IPKIX     = 4;
+    public const CERT_FORMAT_ISPKI     = 5;
+    public const CERT_FORMAT_IPGP      = 6;
+    public const CERT_FORMAT_ACPKIX    = 7;
+    public const CERT_FORMAT_IACPKIX   = 8;
+    public const CERT_FORMAT_URI       = 253;
+    public const CERT_FORMAT_OID       = 254;
 
-    public $cert_format_name_to_id = [];
-    public $cert_format_id_to_name = [
+    /**
+     * @var array<string,int>
+     */
+    public array $cert_format_name_to_id = [];
+
+    /**
+     * @var array<int,string>
+     */
+    public array $cert_format_id_to_name = [
 
         self::CERT_FORMAT_RES       => 'Reserved',
         self::CERT_FORMAT_PKIX      => 'PKIX',
@@ -65,39 +72,37 @@ class CERT extends \NetDNS2\RR
         self::CERT_FORMAT_OID       => 'OID'
     ];
 
-    /*
-      * certificate format
+    /**
+     * certificate format
      */
-    public $format;
+    protected int $format;
 
-    /*
+    /**
      * key tag
      */
-    public $keytag;
+    protected int $keytag;
 
-    /*
-     * The algorithm used for the CERt
+    /**
+     * The algorithm used for the cert
      */
-    public $algorithm;
+    protected \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm;
 
-    /*
+    /**
      * certificate
      */
-    public $certificate;
+    protected string $certificate = '';
 
     /**
      * we have our own constructor so that we can load our certificate
      * information for parsing.
      *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     * @param array           $rr      a array with parsed RR values
-     *
-     * @return
+     * @param \NetDNS2\Packet     &$_packet a \NetDNS2\Packet packet to parse the RR from
+     * @param array<string,mixed> $_rr      a array with parsed RR values
      *
      */
-    public function __construct(\NetDNS2\Packet &$packet = null, array $rr = null)
+    public function __construct(?\NetDNS2\Packet &$_packet = null, ?array $_rr = null)
     {
-        parent::__construct($packet, $rr);
+        parent::__construct($_packet, $_rr);
     
         //
         // load the lookup values
@@ -106,144 +111,105 @@ class CERT extends \NetDNS2\RR
     }
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * @see \NetDNS2\RR::rrToString()
      */
-    protected function rrToString()
+    protected function rrToString(): string
     {
-        return $this->format . ' ' . $this->keytag . ' ' . $this->algorithm . ' ' . base64_encode($this->certificate);
+        return $this->format . ' ' . $this->keytag . ' ' . $this->algorithm->value . ' ' . base64_encode($this->certificate);
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        //
-        // load and check the format; can be an int, or a mnemonic symbol
-        //
-        $this->format = array_shift($rdata);
+        $format             = $this->sanitize(array_shift($_rdata));
+        $this->keytag       = intval($this->sanitize(array_shift($_rdata)));
+        $this->algorithm    = \NetDNS2\ENUM\DNSSEC\Algorithm::set($this->sanitize(array_shift($_rdata)));
 
-        if (is_numeric($this->format) == false)
+        //
+        // check the format; can be an int, or a mnemonic symbol
+        //
+        if (is_numeric($format) == false)
         {
-            $mnemonic = strtoupper(trim($this->format));
+            $mnemonic = strtoupper(trim($format));
 
             if (isset($this->cert_format_name_to_id[$mnemonic]) == false)
             {
-                return false;
+                throw new \NetDNS2\Exception('invalid format value provided: ' . $format, \NetDNS2\ENUM\Error::PARSE_ERROR);
             }
 
             $this->format = $this->cert_format_name_to_id[$mnemonic];
 
         } else
         {
-            if (isset($this->cert_format_id_to_name[$this->format]) == false)
+            if (isset($this->cert_format_id_to_name[$format]) == false)
             {
-                return false;
+                throw new \NetDNS2\Exception('invalid format value provided: ' . $format, \NetDNS2\ENUM\Error::PARSE_ERROR);
             }
+
+            $this->format = intval($format);
         }
     
-        $this->keytag = array_shift($rdata);
-
-        //
-        // parse and check the algorithm; can be an int, or a mnemonic symbol
-        //
-        $this->algorithm = array_shift($rdata);
-
-        if (is_numeric($this->algorithm) == false)
-        {
-            $mnemonic = strtoupper(trim($this->algorithm));
-
-            if (isset(\NetDNS2\Lookups::$algorithm_name_to_id[$mnemonic]) == false)
-            {
-                return false;
-            }
-
-            $this->algorithm = \NetDNS2\Lookups::$algorithm_name_to_id[$mnemonic];
-
-        } else
-        {
-            if (isset(\NetDNS2\Lookups::$algorithm_id_to_name[$this->algorithm]) == false)
-            {
-                return false;
-            }
-        }
-
         //
         // parse and base64 decode the certificate
         //
-        // certificates MUST be provided base64 encoded, if not, everything will
-        // be broken after this point, as we assume it's base64 encoded.
+        // certificates MUST be provided base64 encoded, if not, everything will be broken after this point, as we assume it's base64 encoded.
         //
-        $this->certificate = base64_decode(implode(' ', $rdata));
+        $this->certificate = base64_decode(implode(' ', $_rdata));
+
+        if ($this->certificate === false)
+        {
+            throw new \NetDNS2\Exception('invalid certificate value provided: ' . $this->certificate, \NetDNS2\ENUM\Error::PARSE_ERROR);
+        }
 
         return true;
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            //
-            // unpack the format, keytag and algorithm
-            //
-            $x = unpack('nformat/nkeytag/Calgorithm', $this->rdata);
-
-            $this->format       = $x['format'];
-            $this->keytag       = $x['keytag'];
-            $this->algorithm    = $x['algorithm'];
-
-            //
-            // copy the certificate
-            //
-            $this->certificate  = substr($this->rdata, 5, $this->rdlength - 5);
-
-            return true;
+            return false;
+        }
+            
+        //
+        // unpack the format, keytag and algorithm
+        //
+        $val = unpack('nx/ny/Cz', $this->rdata);
+        if ($val === false)
+        {
+            return false;
         }
 
-        return false;
+        list('x' => $this->format, 'y' => $this->keytag, 'z' => $algorithm) = (array)$val;
+
+        $this->algorithm = \NetDNS2\ENUM\DNSSEC\Algorithm::set($algorithm);
+
+        //
+        // copy the certificate
+        //
+        $this->certificate = substr($this->rdata, 5, $this->rdlength - 5);
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if (strlen($this->certificate) > 0)
+        if (strlen($this->certificate) == 0)
         {
-            $data = pack('nnC', $this->format, $this->keytag, $this->algorithm) . $this->certificate;
-
-            $packet->offset += strlen($data);
-
-            return $data;
+            return '';
         }
+        
+        $_packet->offset += strlen($this->certificate) + 5;
 
-        return null;
+        return pack('nnC', $this->format, $this->keytag, $this->algorithm->value) . $this->certificate;
     }
 }

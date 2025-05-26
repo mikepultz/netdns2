@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
@@ -30,49 +30,42 @@ namespace NetDNS2\RR;
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-class NSEC3PARAM extends \NetDNS2\RR
+final class NSEC3PARAM extends \NetDNS2\RR
 {
-    /*
+    /**
      * Algorithm to use
-     *
-     * TODO: same as the NSEC3
      */
-    public $algorithm;
-
-    /*
-     * flags
-     */
-    public $flags;
-
-    /*
-     *  defines the number of additional times the hash is performed.
-     */
-    public $iterations;
-
-    /*
-     * the length of the salt- not displayed
-     */
-    public $salt_length;
-
-    /*
-     * the salt
-     */
-    public $salt;
+    protected int $algorithm;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * flags
      */
-    protected function rrToString()
+    protected int $flags;
+
+    /**
+     *  defines the number of additional times the hash is performed.
+     */
+    protected int $iterations;
+
+    /**
+     * the length of the salt- not displayed
+     */
+    protected int $salt_length;
+
+    /**
+     * the salt
+     */
+    protected string $salt;
+
+    /**
+     * @see \NetDNS2\RR::rrToString()
+     */
+    protected function rrToString(): string
     {
         $out = $this->algorithm . ' ' . $this->flags . ' ' . $this->iterations . ' ';
 
         //
-        // per RFC5155, the salt_length value isn't displayed, and if the salt 
-        // is empty, the salt is displayed as "-"
+        // per RFC5155, the salt_length value isn't displayed, and if the salt is empty, then  salt is displayed as "-"
         //        
         if ($this->salt_length > 0)
         {
@@ -86,21 +79,17 @@ class NSEC3PARAM extends \NetDNS2\RR
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $this->algorithm    = array_shift($rdata);
-        $this->flags        = array_shift($rdata);
-        $this->iterations   = array_shift($rdata);
+        $this->algorithm  = intval($this->sanitize(array_shift($_rdata)));
+        $this->flags      = intval($this->sanitize(array_shift($_rdata)));
+        $this->iterations = intval($this->sanitize(array_shift($_rdata)));
 
-        $salt = array_shift($rdata);
+        $salt = $this->sanitize(array_shift($_rdata));
+
         if ($salt == '-')
         {
             $this->salt_length = 0;
@@ -115,57 +104,46 @@ class NSEC3PARAM extends \NetDNS2\RR
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrSet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        if ($this->rdlength > 0)
+        if ($this->rdlength == 0)
         {
-            $x = unpack('Calgorithm/Cflags/niterations/Csalt_length', $this->rdata);
-
-            $this->algorithm    = $x['algorithm'];
-            $this->flags        = $x['flags'];
-            $this->iterations   = $x['iterations'];
-            $this->salt_length  = $x['salt_length'];
-
-            if ($this->salt_length > 0)
-            {
-                $x = unpack('H*', substr($this->rdata, 5, $this->salt_length));
-                $this->salt = strtoupper($x[1]);
-            }
-
-            return true;
+            return false;
         }
 
-        return false;
+        $val = unpack('Cw/Cx/ny/Cz', $this->rdata);
+        if ($val === false)
+        {
+            return false;
+        }
+            
+        list('w' => $this->algorithm, 'x' => $this->flags, 'y' => $this->iterations, 'z' => $this->salt_length) = (array)$val;
+
+        if ($this->salt_length > 0)
+        {
+            $val = unpack('H*', substr($this->rdata, 5, $this->salt_length));
+            if ($val === false)
+            {
+                return false;
+            }
+
+            $this->salt = strtoupper(((array)$val)[1]);
+        }
+
+        return true;
     }
 
     /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrGet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
         $salt = pack('H*', $this->salt);
-        $this->salt_length = strlen($salt);
 
-        $data = pack('CCnC', $this->algorithm, $this->flags, $this->iterations, $this->salt_length) . $salt;
+        $_packet->offset += strlen($salt) + 5;
 
-        $packet->offset += strlen($data);
-
-        return $data;
+        return pack('CCnC', $this->algorithm, $this->flags, $this->iterations, strlen($salt)) . $salt;
     }
 }

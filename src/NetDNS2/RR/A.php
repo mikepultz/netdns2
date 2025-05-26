@@ -1,19 +1,19 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
  * See LICENSE for more details.
  *
  * @category  Networking
  * @package   NetDNS2
  * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @copyright 2023 Mike Pultz <mike@mikepultz.com>
+ * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
+ * @since     0.6.0
  *
  */
 
@@ -27,41 +27,51 @@ namespace NetDNS2\RR;
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
-class A extends \NetDNS2\RR
+final class A extends \NetDNS2\RR
 {
-    /*
+    /**
      * The IPv4 address in quad-dotted notation
      */
-    public $address;
+    protected string $address;
 
     /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
+     * @see \NetDNS2\RR::rrToString()
      */
-    protected function rrToString()
+    protected function rrToString(): string
     {
         return $this->address;
     }
 
     /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
+     * @see \NetDNS2\RR::rrFromString()
+     * @param array<string> $_rdata
      */
-    protected function rrFromString(array $rdata)
+    protected function rrFromString(array $_rdata): bool
     {
-        $value = array_shift($rdata);
+        $this->address = $this->sanitize(array_shift($_rdata));
 
-        if (\NetDNS2\Client::isIPv4($value) == true)
+        if (\NetDNS2\Client::isIPv4($this->address) == false)
         {
-            $this->address = $value;
+            throw new \NetDNS2\Exception('address provided is not a valid IPv4 address: ' . $this->address, \NetDNS2\ENUM\Error::PARSE_ERROR);
+        }
+
+        return true;
+    }
+
+    /**
+     * @see \NetDNS2\RR::rrSet()
+     */
+    protected function rrSet(\NetDNS2\Packet &$_packet): bool
+    {
+        if ($this->rdlength != 4)
+        {
+            return false;
+        }
+
+        $val = inet_ntop($this->rdata);
+        if ($val !== false)
+        {
+            $this->address = strval($val);
             return true;
         }
 
@@ -69,42 +79,17 @@ class A extends \NetDNS2\RR
     }
 
     /**
-     * parses the rdata of the \NetDNS2\Packet object
-     *
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     * 
+     * @see \NetDNS2\RR::rrGet()
      */
-    protected function rrSet(\NetDNS2\Packet &$packet)
+    protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if ($this->rdlength > 0)
+        $val = inet_pton($this->address);
+        if ($val !== false)
         {
-            $this->address = inet_ntop($this->rdata);
-            if ($this->address !== false)
-            {
-                return true;
-            }
+            $_packet->offset += 4;
+            return strval($val);
         }
 
-        return false;
-    }
-
-    /**
-     * returns the rdata portion of the DNS packet
-     * 
-     * @param \NetDNS2\Packet &$packet a \NetDNS2\Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed 
-     *                                 string or null on failure
-     * @access protected
-     * 
-     */
-    protected function rrGet(\NetDNS2\Packet &$packet)
-    {
-        $packet->offset += 4;
-        return inet_pton($this->address);
+        return '';
     }
 }
