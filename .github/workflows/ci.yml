@@ -17,6 +17,8 @@ jobs:
       uses: php-actions/phpstan@v3
       with:
         version: 2.1.17
+        level: 8
+        memory_limit: 2G
         configuration: tests/phpstan.neon
 
     - name: PHPUnit Tests
