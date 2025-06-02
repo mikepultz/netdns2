@@ -35,6 +35,12 @@ namespace NetDNS2\RR;
 final class APL extends \NetDNS2\RR
 {
     /**
+     * possible address faimily values
+     */
+    public const ADDRESS_FAMILY_IPV4    = 1;
+    public const ADDRESS_FAMILY_IPV6    = 2;
+
+    /**
      * a list of all the address prefix list items
      *
      * @var array<int,mixed>
@@ -50,7 +56,7 @@ final class APL extends \NetDNS2\RR
 
         foreach($this->apl_items as $item)
         {
-            if ($item['n'] == 1)
+            if ($item['negate'] == 1)
             {
                 $out .= '!';
             }
@@ -63,7 +69,6 @@ final class APL extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
@@ -71,19 +76,36 @@ final class APL extends \NetDNS2\RR
         {
             if (preg_match('/^(!?)([1|2])\:([^\/]*)\/([0-9]{1,3})$/', $item, $m) == 1)
             {
-                $i = [
+                $val = [
 
                     'address_family'    => $m[2],
                     'prefix'            => $m[4],
-                    'n'                 => ($m[1] == '!') ? 1 : 0,
-                    'afd_part'          => strtolower($m[3])
+                    'negate'            => ($m[1] == '!') ? 1 : 0
                 ];
 
-                $address = $this->trimZeros(intval($i['address_family']), $i['afd_part']);
+                $address = self::trimZeros(intval($val['address_family']), $m[3]);
 
-                $i['afd_length'] = count(explode('.', $address));
+                $val['afd_length'] = count($address);
 
-                $this->apl_items[] = $i;
+                switch($val['address_family'])
+                {
+                    case self::ADDRESS_FAMILY_IPV4:
+                    {
+                        $val['afd_part'] = new \NetDNS2\Data\IPv4($m[3]);
+                    }
+                    break;
+                    case self::ADDRESS_FAMILY_IPV6:
+                    {
+                        $val['afd_part'] = new \NetDNS2\Data\IPv6($m[3]);
+                    }
+                    break;
+                    default:
+                    {
+                        throw new \NetDNS2\Exception(sprintf('invalid address family value: %d', $val['address_family']), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
+                    }
+                }
+
+                $this->apl_items[] = $val;
             }
         }
 
@@ -113,68 +135,49 @@ final class APL extends \NetDNS2\RR
                 return false;
             }
 
-            $x = unpack('naddress_family/Cprefix/Cextra', substr($this->rdata, $offset));
-            if ($x === false)
+            //
+            // the negate value is the first bit from the length section
+            //
+            $val['negate']     = ($val['extra'] >> 7) & 0x1;
+            $val['afd_length'] = $val['extra'] & 0xf;
+
+            unset($val['extra']);
+            $offset += 4;
+
+            //
+            // the address portion is a 0-truncated value, based on the length
+            //
+            $address = unpack('C*', substr($this->rdata, $offset, $val['afd_length']));
+            if ($address === false)
             {
                 return false;
             }
 
-            $item = [
-            
-                'address_family'    => $x['address_family'],
-                'prefix'            => $x['prefix'],
-                'n'                 => ($x['extra'] >> 7) & 0x1,
-                'afd_length'        => $x['extra'] & 0xf
-            ];
+            $offset += $val['afd_length'];
 
-            switch($item['address_family'])
+            switch($val['address_family'])
             {
-                case 1:
+                case self::ADDRESS_FAMILY_IPV4:
                 {
-                    $r = unpack('C*', substr($this->rdata, $offset + 4, $item['afd_length']));
-                    if ($r === false)
-                    {
-                        return false;
-                    }
-                    if (count($r) < 4)
-                    {
-                        for($c=count($r)+1; $c<4+1; $c++)
-                        {
-                            $r[$c] = 0;
-                        }
-                    }
+                    $address = array_pad($address, 4, 0);
 
-                    $item['afd_part'] = implode('.', $r);
+                    $val['afd_part'] = new \NetDNS2\Data\IPv4(inet_ntop(pack('C*', ...$address)));
                 }
                 break;
-                case 2:
+                case self::ADDRESS_FAMILY_IPV6:
                 {
-                    $r = unpack('C*', substr($this->rdata, $offset + 4, $item['afd_length']));
-                    if ($r === false)
-                    {
-                        return false;
-                    }
+                    $address = array_pad($address, 16, 0);
 
-                    if (count($r) < 8)
-                    {
-                        for($c=count($r)+1; $c<8+1; $c++)
-                        {
-                            $r[$c] = 0;
-                        }
-                    }
-
-                    $item['afd_part'] = sprintf('%x:%x:%x:%x:%x:%x:%x:%x', $r[1], $r[2], $r[3], $r[4], $r[5], $r[6], $r[7], $r[8]);
+                    $val['afd_part'] = new \NetDNS2\Data\IPv6(inet_ntop(pack('C*', ...$address)));
                 }
                 break;
                 default:
                 {
-                    return false;
+                    throw new \NetDNS2\Exception(sprintf('invalid address family value: %d', $val['address_family']), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
                 }
             }
 
-            $this->apl_items[] = $item;
-
-            $offset += 4 + $item['afd_length'];
+            $this->apl_items[] = $val;
         }
 
         return true;
@@ -195,37 +198,20 @@ final class APL extends \NetDNS2\RR
         foreach($this->apl_items as $item)
         {
             //
+            // get the address so we know the length
+            //
+            $vals = self::trimZeros(intval($item['address_family']), strval($item['afd_part']));
+            $item['afd_length'] = count($vals);
+
+            //
             // pack the address_family and prefix values
             //
-            $data .= pack('nCC', $item['address_family'], $item['prefix'], ($item['n'] << 7) | $item['afd_length']);
+            $data .= pack('nCC', $item['address_family'], $item['prefix'], ($item['negate'] << 7) | $item['afd_length']);
 
-            switch($item['address_family'])
-            {
-                case 1:
-                {
-                    $address = explode('.', $this->trimZeros(intval($item['address_family']), $item['afd_part']));
-
-                    foreach($address as $b)
-                    {
-                        $data .= chr(intval($b));
-                    }
-                }
-                break;
-                case 2:
-                {
-                    $address = explode(':', $this->trimZeros(intval($item['address_family']), $item['afd_part']));
-
-                    foreach($address as $b)
-                    {
-                        $data .= pack('H', $b);
-                    }
-                }
-                break;
-                default:
-                {
-                    return '';
-                }
-            }
+            //
+            // trimZeros() returns the value as octects for both IPv4 & IPv6
+            //
+            $data .= pack('C*', ...$vals);
         }
 
         $_packet->offset += strlen($data);
@@ -239,59 +225,55 @@ final class APL extends \NetDNS2\RR
      * @param integer $_family  the IP address family from the rdata
      * @param string  $_address the IP address
      *
-     * @return string the trimmed IP addresss.
+     * @return array<int> the trimmed IP addresss.
      *
      */
-    private function trimZeros(int $_family, string $_address): string
+    public static function trimZeros(int $_family, string $_address): array
     {
-        $a = [];
+        $out = [];
 
         switch($_family)
         {
-            case 1:
+            case self::ADDRESS_FAMILY_IPV4:
             {
                 $a = array_reverse(explode('.', $_address));
+
+                foreach($a as $value)
+                {
+                    if ( ($value != 0) && (strlen($value) != 0) )
+                    {
+                        $out[] = intval($value);
+                    }
+                }
             }
             break;
-            case 2:
+            case self::ADDRESS_FAMILY_IPV6:
             {
-                $a = array_reverse(explode(':', $_address));
-            }
-            break;
-            default:
-            {
-                return '';
-            }
-        }
+                $address = str_replace(':', '', \NetDNS2\Client::expandIPv6($_address));
+                $begin   = false;
 
-        foreach($a as $value)
-        {
-            if ($value === '0')
-            {
-                array_shift($a);
-            }
-        }
+                for($i=strlen($address); $i!=0; $i-=2)
+                {
+                    $x = hexdec(substr($address, $i - 2, 2));
 
-        $out = '';
+                    if ( ($x == 0) && ($begin == false) )
+                    {
+                        continue;
+                    } else
+                    {
+                        $out[] = intval($x);
 
-        switch($_family)
-        {
-            case 1:
-            {
-                $out = implode('.', array_reverse($a));
-            }
-            break;
-            case 2:
-            {
-                $out = implode(':', array_reverse($a));
+                        $begin = true;
+                    }
+                }
             }
             break;
             default:
             {
-                return '';
+                throw new \NetDNS2\Exception(sprintf('invalid address family value: %d', $_family), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
             }
         }
 
-        return $out;
+        return array_reverse($out);
     }
 }

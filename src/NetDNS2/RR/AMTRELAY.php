@@ -58,7 +58,7 @@ final class AMTRELAY extends \NetDNS2\RR
     /**
      * The relay field is the address or domain name of the AMT relay.
      */
-    protected mixed $relay;
+    protected \NetDNS2\Data $relay;
 
     /**
      * @see \NetDNS2\RR::rrToString()
@@ -80,8 +80,6 @@ final class AMTRELAY extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
-     * @throws \NetDNS2\Exception
      */
     protected function rrFromString(array $_rdata): bool
     {
@@ -107,32 +105,22 @@ final class AMTRELAY extends \NetDNS2\RR
         {
             case self::AMTRELAY_TYPE_NONE:
             {
-                $this->relay = strval('');
+                $this->relay = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, '');
             }
             break;
             case self::AMTRELAY_TYPE_IPV4:
             {
-                $this->relay = strval($this->sanitize(array_shift($_rdata)));
-
-                if (\NetDNS2\Client::isIPv4($this->relay) == false)
-                {
-                    throw new \NetDNS2\Exception('relay provided is not a valid IPv4 address: ' . $this->relay, \NetDNS2\ENUM\Error::PARSE_ERROR);
-                }
+                $this->relay = new \NetDNS2\Data\IPv4($this->sanitize(array_shift($_rdata) ?? ''));
             }
             break;
             case self::AMTRELAY_TYPE_IPV6:
             {
-                $this->relay = strval($this->sanitize(array_shift($_rdata)));
-
-                if (\NetDNS2\Client::isIPv6($this->relay) == false)
-                {
-                    throw new \NetDNS2\Exception('relay provided is not a valid IPv6 address: ' . $this->relay, \NetDNS2\ENUM\Error::PARSE_ERROR);
-                }
+                $this->relay = new \NetDNS2\Data\IPv6($this->sanitize(array_shift($_rdata) ?? ''));
             }
             break;
             case self::AMTRELAY_TYPE_DOMAIN:
             {
-                $this->relay = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $this->sanitize(array_shift($_rdata)));
+                $this->relay = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $this->sanitize(array_shift($_rdata) ?? ''));
             }
             break;
             default:
@@ -177,17 +165,17 @@ final class AMTRELAY extends \NetDNS2\RR
         {
             case self::AMTRELAY_TYPE_NONE:
             {
-                $this->relay = '';
+                $this->relay = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, '');
             }
             break;
             case self::AMTRELAY_TYPE_IPV4:
             {
-                $this->relay = strval(inet_ntop(substr($this->rdata, $offset, 4)));
+                $this->relay = new \NetDNS2\Data\IPv4($this->rdata, $offset);
             }
             break;
             case self::AMTRELAY_TYPE_IPV6:
             {
-                $this->relay = strval(vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', (array)unpack('n8', substr($this->rdata, $offset, 16))));
+                $this->relay = new \NetDNS2\Data\IPv6($this->rdata, $offset);
             }            
             break;
             case self::AMTRELAY_TYPE_DOMAIN:
@@ -226,10 +214,6 @@ final class AMTRELAY extends \NetDNS2\RR
             break;
             case self::AMTRELAY_TYPE_IPV4:
             case self::AMTRELAY_TYPE_IPV6:
-            {
-                $data .= inet_pton($this->relay);
-            }
-            break;
             case self::AMTRELAY_TYPE_DOMAIN:
             {
                 $data .= $this->relay->encode($_packet->offset);

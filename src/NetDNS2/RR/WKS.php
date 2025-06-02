@@ -38,7 +38,7 @@ final class WKS extends \NetDNS2\RR
     /**
      * The IP address of the service
      */
-    protected string $address;
+    protected \NetDNS2\Data\IPv4 $address;
 
     /**
      * The protocol of the service
@@ -62,21 +62,15 @@ final class WKS extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
-        $this->address  = $this->sanitize(array_shift($_rdata));
+        $this->address  = new \NetDNS2\Data\IPv4(array_shift($_rdata) ?? '');
         $this->protocol = intval($this->sanitize(array_shift($_rdata)));
 
         foreach($_rdata as $value)
         {
             $this->bitmap[] = intval($value);
-        }
-
-        if (\NetDNS2\Client::isIPv4($this->address) == false)
-        {
-            throw new \NetDNS2\Exception('address value provided is not a valid IPv4 address: ' . $this->address, \NetDNS2\ENUM\Error::PARSE_ERROR);
         }
 
         return true;
@@ -91,29 +85,28 @@ final class WKS extends \NetDNS2\RR
         {
             return false;
         }
+
+        $offset = 0;
+        $this->address = new \NetDNS2\Data\IPv4($this->rdata, $offset);
             
         //
         // get the address and protocol value
         //
-        $val = unpack('Nx/Cy', $this->rdata);
+        $val = unpack('Cx', $this->rdata, $offset);
         if ($val === false)
         {
             return false;
         }
 
-        list('x' => $address, 'y' => $this->protocol) = (array)$val;
-
-        //
-        // convert the IP
-        //
-        $this->address = long2ip(intval($address));
+        list('x' => $this->protocol) = (array)$val;
+        $offset++;
 
         //
         // unpack the port list bitmap
         //
         $port = 0;
 
-        $val = unpack('@5/C*', $this->rdata);
+        $val = unpack('C*', $this->rdata, $offset);
         if ($val === false)
         {
             return false;
@@ -140,12 +133,13 @@ final class WKS extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if (strlen($this->address) == 0)
+        if ($this->address->length() == 0)
         {
             return '';
         }
-            
-        $data = pack('NC', ip2long($this->address), $this->protocol);
+
+        $data = $this->address->encode();
+        $data .= pack('C', $this->protocol);
 
         $ports = [];
         $n = 0;

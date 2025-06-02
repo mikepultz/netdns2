@@ -108,7 +108,7 @@ final class Response extends \NetDNS2\Packet
 
             if (is_null($o) == false)
             {
-                $this->answer[] = clone $o; // @phpstan-ignore-line
+                $this->answer[] = clone $o;
             }
         } 
 
@@ -121,7 +121,7 @@ final class Response extends \NetDNS2\Packet
 
             if (is_null($o) == false)
             {
-                $this->authority[] = clone $o;  // @phpstan-ignore-line
+                $this->authority[] = clone $o;
             }
         }
 
@@ -134,7 +134,7 @@ final class Response extends \NetDNS2\Packet
 
             if (is_null($o) == false)
             {
-                $this->additional[] = clone $o; // @phpstan-ignore-line
+                $this->additional[] = clone $o;
             }
         }
 

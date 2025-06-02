@@ -74,11 +74,10 @@ final class DHCID extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
-        $data = base64_decode(array_shift($_rdata));
+        $data = base64_decode(array_shift($_rdata) ?? '');
 
         if ( ($data !== false) && (strlen($data) > 0) )
         {

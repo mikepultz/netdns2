@@ -25,31 +25,43 @@ namespace NetDNS2\Cache;
  */
 final class File extends \NetDNS2\Cache
 {
+    use \NetDNS2\Cache\Model\Data;
+
     /**
-     * open a cache object
-     *
-     * @param string  $_cache_file path to a file to use for cache storage
-     * @param integer $_size       the size of the shared memory segment to create
-     * @param string  $_serializer the name of the cache serialize to use
-     *
-     * @throws \NetDNS2\Exception
-     *
+     * @see \NetDNS2\Cache::__construct()
      */
-    public function open(string $_cache_file, int $_size, string $_serializer): void
+    public function __construct(array $_options = [])
     {
-        $this->cache_file       = $_cache_file;
-        $this->cache_size       = $_size;
-        $this->cache_serializer = $_serializer;
+        //
+        // copy over the options
+        //
+        $this->m_options = $_options;
+
+        //
+        // make sure we have a file location
+        //
+        if (isset($this->m_options['file']) == false)
+        {
+            throw new \NetDNS2\Exception('you must provide a file to cache dns results to.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
+        }
+
+        //
+        // check for a default max cache size
+        //
+        if (isset($this->m_options['size']) == false)
+        {
+            $this->m_options['size'] = \NetDNS2\Cache::CACHE_DEFAULT_MAX_SIZE;
+        }
 
         //
         // check that the file exists first
         //
-        if ( ($this->cache_opened == false) && (file_exists($this->cache_file) == true) )
+        if ( ($this->cache_opened == false) && (file_exists($this->m_options['file']) == true) )
         {
             //
             // check the file size
             //
-            $file_size = filesize($this->cache_file);
+            $file_size = filesize($this->m_options['file']);
             if ( ($file_size === false) || ($file_size <= 0) )
             {
                 return;
@@ -58,7 +70,7 @@ final class File extends \NetDNS2\Cache
             //
             // open the file for reading
             //
-            $fp = @fopen($this->cache_file, 'r');
+            $fp = @fopen($this->m_options['file'], 'r');
             if ($fp !== false)
             {
                 //
@@ -72,23 +84,7 @@ final class File extends \NetDNS2\Cache
                 $data = fread($fp, $file_size);
                 if ($data !== false)
                 {
-                    $decoded = null;
-                    
-                    if ($this->cache_serializer == 'json')
-                    {
-                        try
-                        {
-                            $decoded = @json_decode(strval($data), true, 512, JSON_THROW_ON_ERROR);
-
-                        } catch(\ValueError $e)
-                        {
-                            $decoded = null;
-                        }
-                    
-                    } else
-                    {
-                        $decoded = unserialize(strval($data));                
-                    }
+                    $decoded = unserialize(strval($data));                
 
                     if (is_array($decoded) == true)
                     {
@@ -123,15 +119,14 @@ final class File extends \NetDNS2\Cache
     }
 
     /**
-     * Destructor
-     *
+     * destructor
      */
     public function __destruct()
     {
         //
         // if there's no cache file set, then there's nothing to do
         //
-        if (strlen($this->cache_file) == 0)
+        if (strlen($this->m_options['file']) == 0)
         {
             return;
         }
@@ -139,7 +134,7 @@ final class File extends \NetDNS2\Cache
         //
         // open the file for reading/writing
         //
-        $fp = fopen($this->cache_file, 'a+');
+        $fp = fopen($this->m_options['file'], 'a+');
         if ($fp !== false)
         {
             //
@@ -155,7 +150,7 @@ final class File extends \NetDNS2\Cache
             //
             // get the file size first; in PHP 8.0 fread() was changed to throw an exception if you try and read 0 bytes from a file.
             //
-            $file_size = @filesize($this->cache_file);
+            $file_size = @filesize($this->m_options['file']);
 
             if ( ($file_size !== false) && ($file_size > 0) )
             {
@@ -171,23 +166,7 @@ final class File extends \NetDNS2\Cache
                     //
                     $c = $this->cache_data;
 
-                    $decoded = null;
-
-                    if ($this->cache_serializer == 'json')
-                    {
-                        try
-                        {
-                            $decoded = @json_decode(strval($data), true, 512, JSON_THROW_ON_ERROR);
-
-                        } catch(\ValueError $e)
-                        {
-                            $decoded = null;
-                        }
-
-                    } else
-                    {
-                        $decoded = unserialize(strval($data));
-                    }
+                    $decoded = unserialize(strval($data));
                 
                     if (is_array($decoded) == true)
                     {

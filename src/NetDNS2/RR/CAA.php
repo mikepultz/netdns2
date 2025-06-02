@@ -63,13 +63,12 @@ final class CAA extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
         $this->flags = intval($this->sanitize(array_shift($_rdata)));
         $this->tag   = new \NetDNS2\Data\Text($this->sanitize(array_shift($_rdata)));
-        $this->value = new \NetDNS2\Data\Text($this->sanitize(implode(' ', $_rdata)));
+        $this->value = new \NetDNS2\Data\Text($this->sanitize(implode(' ', $_rdata), false));
         
         return true;
     }

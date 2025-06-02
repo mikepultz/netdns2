@@ -1,0 +1,23 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Git Checkout
+      uses: actions/checkout@v3
+
+    - name: PHPStan Static Analysis
+      uses: php-actions/phpstan@v3
+      with:
+        php_version: 8.1
+        configuration: tests/phpstan.neon
+
+    - name: PHPUnit Tests
+      uses: php-actions/phpunit@v3
+      with:
+        php_version: 8.1
+        configuration: phpunit.xml

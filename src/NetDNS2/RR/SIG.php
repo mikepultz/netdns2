@@ -76,6 +76,8 @@ final class SIG extends \NetDNS2\RR
 
     /**
      * the RR type covered by this signature; we store the string value of the RR
+     *
+     * TODO: we can't use the RR\Type ENUM here, since this RR supports undefined types (e.g. TYPE123)
      */
     protected string $typecovered;
 
@@ -92,7 +94,7 @@ final class SIG extends \NetDNS2\RR
     /**
      * the original TTL
      */
-    protected string $origttl;
+    protected int $origttl;
 
     /**
      * the signature expiration
@@ -130,14 +132,13 @@ final class SIG extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
         $this->typecovered  = strtoupper($this->sanitize(array_shift($_rdata)));
         $this->algorithm    = \NetDNS2\ENUM\DNSSEC\Algorithm::set(intval($this->sanitize(array_shift($_rdata))));
         $this->labels       = intval($this->sanitize(array_shift($_rdata)));
-        $this->origttl      = $this->sanitize(array_shift($_rdata));
+        $this->origttl      = intval($this->sanitize(array_shift($_rdata)));
         $this->sigexp       = $this->sanitize(array_shift($_rdata));
         $this->sigincep     = $this->sanitize(array_shift($_rdata));
         $this->keytag       = intval($this->sanitize(array_shift($_rdata)));
@@ -169,19 +170,17 @@ final class SIG extends \NetDNS2\RR
             return false;
         }
 
-        list('a' => $a, 'b' => $algorithm, 'c' => $this->labels, 'd' => $d, 'e' => $e, 'f' => $f, 'g' => $this->keytag) = (array)$val;
+        list('a' => $typecovered, 'b' => $algorithm, 'c' => $this->labels, 'd' => $this->origttl, 'e' => $e, 'f' => $f, 'g' => $this->keytag) = (array)$val;
 
-        $this->algorithm = \NetDNS2\ENUM\DNSSEC\Algorithm::set($algorithm);
-
-        if (\NetDNS2\ENUM\RRType::exists($a) == true)
+        if (\NetDNS2\ENUM\RR\Type::exists($typecovered) == true)
         {
-            $this->typecovered = \NetDNS2\ENUM\RRType::set($a)->label();
+            $this->typecovered = \NetDNS2\ENUM\RR\Type::set($typecovered)->label();
         } else
         {
-            $this->typecovered = 'TYPE' . $a;
+            $this->typecovered = 'TYPE' . $typecovered;
         }
 
-        $this->origttl     = \NetDNS2\Client::expandUint32($d);
+        $this->algorithm = \NetDNS2\ENUM\DNSSEC\Algorithm::set($algorithm);
 
         //
         // the dates are in GM time
@@ -216,7 +215,7 @@ final class SIG extends \NetDNS2\RR
         // pack the value
         //
         $data = pack('nCCNNNn',
-            \NetDNS2\ENUM\RRType::set($this->typecovered)->value,
+            \NetDNS2\ENUM\RR\Type::set($this->typecovered)->value,
             $this->algorithm->value,
             $this->labels,
             $this->origttl,
@@ -267,7 +266,7 @@ final class SIG extends \NetDNS2\RR
             //
             if (openssl_sign($sigdata, $this->signature, $this->private_key->instance, $openssl_algorithm) == false)
             {
-                throw new \NetDNS2\Exception('OpenSSL error: ' . strval(openssl_error_string()), \NetDNS2\ENUM\Error::OPENSSL_ERROR);
+                throw new \NetDNS2\Exception(sprintf('openssl exception: %s', strval(openssl_error_string())), \NetDNS2\ENUM\Error::INT_FAILED_OPENSSL);
             }
 
             //

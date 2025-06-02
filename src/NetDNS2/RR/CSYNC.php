@@ -37,12 +37,19 @@ final class CSYNC extends \NetDNS2\RR
     /**
      * serial number
      */
-    protected string $serial;
+    protected int $serial;
 
     /**
-     * flags
+     * flags; this value should not be accessed directly; the $immediate and $soaminimum values are used to
+     * build the flags value on the way in/out of the object.
      */
     protected int $flags;
+
+    /**
+     * flags parsed from the $flags value; currently only two are supported
+     */
+    protected bool $immediate;      // 0x0001
+    protected bool $soaminimum;     // 0x0002
 
     /**
      * array of RR type names
@@ -56,17 +63,29 @@ final class CSYNC extends \NetDNS2\RR
      */
     protected function rrToString(): string
     {
+        //
+        // pack the flags
+        //
+        $this->flags = 0;
+        $this->flags |= ($this->immediate == true) ? 0x0001 : 0;
+        $this->flags |= ($this->soaminimum == true) ? 0x0002 : 0;
+
         return $this->serial . ' ' . $this->flags . ' ' . implode(' ', $this->type_bit_maps);
     }
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
-        $this->serial = $this->sanitize(array_shift($_rdata));
+        $this->serial = intval($this->sanitize(array_shift($_rdata)));
         $this->flags  = intval($this->sanitize(array_shift($_rdata)));
+
+        //
+        // extract the flags
+        //
+        $this->immediate  = ($this->flags & 0x0001) ? true : false;
+        $this->soaminimum = ($this->flags & 0x0002) ? true : false;
 
         foreach($_rdata as $data)
         {
@@ -95,9 +114,13 @@ final class CSYNC extends \NetDNS2\RR
             return false;
         }
         
-        list('x' => $x, 'y' => $this->flags) = (array)$val;
+        list('x' => $this->serial, 'y' => $this->flags) = (array)$val;
 
-        $this->serial = \NetDNS2\Client::expandUint32($x);
+        //
+        // extract the flags
+        //
+        $this->immediate  = ($this->flags & 0x0001) ? true : false;
+        $this->soaminimum = ($this->flags & 0x0002) ? true : false;
 
         //
         // parse out the RR bitmap                 
@@ -112,6 +135,13 @@ final class CSYNC extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
+        //
+        // pack the flags
+        //
+        $this->flags = 0;
+        $this->flags |= ($this->immediate == true) ? 0x0001 : 0;
+        $this->flags |= ($this->soaminimum == true) ? 0x0002 : 0;
+
         //
         // pack the serial and flags values
         //

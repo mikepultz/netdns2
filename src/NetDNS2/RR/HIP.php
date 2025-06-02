@@ -49,6 +49,13 @@ namespace NetDNS2\RR;
 final class HIP extends \NetDNS2\RR
 {
     /**
+     * supported algorithms
+     */
+    public const ALGORITHM_NONE     = 0;
+    public const ALGORITHM_DSA      = 1;
+    public const ALGORITHM_RSA      = 2;
+
+    /**
      * The length of the HIT field
      */
     protected int $hit_length;
@@ -97,13 +104,12 @@ final class HIP extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
         $this->pk_algorithm = intval($this->sanitize(array_shift($_rdata)));
         $this->hit          = strtoupper($this->sanitize(array_shift($_rdata)));
-        $this->public_key   = array_shift($_rdata);
+        $this->public_key   = array_shift($_rdata) ?? '';
 
         //
         // anything left on the array, must be one or more rendezevous servers. add them and strip off the trailing dot
@@ -127,6 +133,28 @@ final class HIP extends \NetDNS2\RR
         //
         $this->hit_length = strlen(pack('H*', $this->hit));
         $this->pk_length  = strlen($decode);
+
+        //
+        // check the algorithm and key
+        //
+        switch($this->pk_algorithm)
+        {
+            case self::ALGORITHM_NONE:
+            {
+                $this->public_key = '';
+            }
+            break;
+            case self::ALGORITHM_DSA:
+            case self::ALGORITHM_RSA:
+            {
+                // do nothing
+            }
+            break;
+            default:
+            {
+                throw new \NetDNS2\Exception(sprintf('invalid algorithm value provided: %d', $this->pk_algorithm), \NetDNS2\ENUM\Error::INT_INVALID_ALGORITHM);
+            }
+        }
 
         return true;
     }
@@ -178,6 +206,28 @@ final class HIP extends \NetDNS2\RR
             $this->rendezvous_servers[] = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $this->rdata, $offset);
         }
 
+        //
+        // check the algorithm and key
+        //
+        switch($this->pk_algorithm)
+        {
+            case self::ALGORITHM_NONE:
+            {
+                $this->public_key = '';
+            }
+            break;
+            case self::ALGORITHM_DSA:
+            case self::ALGORITHM_RSA:
+            {
+                // do nothing
+            }
+            break;
+            default:
+            {
+                throw new \NetDNS2\Exception(sprintf('invalid algorithm value provided: %d', $this->pk_algorithm), \NetDNS2\ENUM\Error::INT_INVALID_ALGORITHM);
+            }
+        }
+
         return true;
     }
 
@@ -189,6 +239,25 @@ final class HIP extends \NetDNS2\RR
         if ( (strlen($this->hit) == 0) || (strlen($this->public_key) == 0) )
         {
             return '';
+        }
+
+        //
+        // check the algorithm and key
+        //
+        switch($this->pk_algorithm)
+        {
+            case self::ALGORITHM_NONE:
+            {
+                $this->public_key = '';
+                $this->pk_length = 0;
+            }
+            break;
+            case self::ALGORITHM_DSA:
+            case self::ALGORITHM_RSA:
+            {
+                // do nothing
+            }
+            break;
         }
 
         //

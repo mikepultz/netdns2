@@ -77,9 +77,9 @@ final class TSIG extends \NetDNS2\RR
     protected \NetDNS2\Data\Domain $algorithm;
 
     /**
-     * The time it was signed; this is stored as a string internally to avoid roll-over
+     * The time it was signed
      */
-    protected string $time_signed;
+    protected int $time_signed;
 
     /**
      * fudge- allowed offset from the time signed
@@ -126,12 +126,12 @@ final class TSIG extends \NetDNS2\RR
       */
     public function factory(string $_keyname, string $_algorithm, string $_signature): void
     {
+        $this->rrFromString([ $_signature ]);
+
         $this->name      = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, trim($_keyname));
         $this->ttl       = 0;
-        $this->class     = \NetDNS2\ENUM\RRClass::set('ANY');
+        $this->class     = \NetDNS2\ENUM\RR\Classes::set('ANY');
         $this->algorithm = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $_algorithm);
-
-        $this->rrFromString([ $_signature ]);
     }
 
     /**
@@ -152,7 +152,6 @@ final class TSIG extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
@@ -161,13 +160,13 @@ final class TSIG extends \NetDNS2\RR
         //
         // this assumes it's passed in base64 encoded.
         //
-        $this->key = preg_replace('/\s+/', '', array_shift($_rdata));
+        $this->key = preg_replace('/\s+/', '', array_shift($_rdata) ?? '') ?? '';
 
         //
         // the rest of the data is set to default
         //
         $this->algorithm    = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, self::HMAC_MD5);
-        $this->time_signed  = strval(time());
+        $this->time_signed  = time();
         $this->fudge        = 300;
         $this->mac_size     = 0;
         $this->mac          = '';
@@ -179,7 +178,7 @@ final class TSIG extends \NetDNS2\RR
         //
         // per RFC 2845 section 2.3
         //
-        $this->class        = \NetDNS2\ENUM\RRClass::set('ANY');
+        $this->class        = \NetDNS2\ENUM\RR\Classes::set('ANY');
         $this->ttl          = 0;
 
         return true;
@@ -210,9 +209,7 @@ final class TSIG extends \NetDNS2\RR
             return false;
         }
 
-        list('w' => $high, 'x' => $low, 'y' => $this->fudge, 'z' => $this->mac_size) = (array)$val;
-
-        $this->time_signed = \NetDNS2\Client::expandUint32($low);
+        list('w' => $high, 'x' => $this->time_signed, 'y' => $this->fudge, 'z' => $this->mac_size) = (array)$val;
         $offset += 10;
 
         //
@@ -240,7 +237,7 @@ final class TSIG extends \NetDNS2\RR
         //
         // The other length should be 6, and the other data field includes the servers current time - per RFC 2845 section 4.5.2
         //
-        if ( ($this->error == \NetDNS2\ENUM\RCode::BADTIME->value) && ($this->other_length == 6) )
+        if ( ($this->error == \NetDNS2\ENUM\RR\Code::BADTIME->value) && ($this->other_length == 6) )
         {
             //
             // other data is a 48bit timestamp
@@ -343,7 +340,7 @@ final class TSIG extends \NetDNS2\RR
         //
         // check the error and other_length
         //
-        if ($this->error == \NetDNS2\ENUM\RCode::BADTIME->value)
+        if ($this->error == \NetDNS2\ENUM\RR\Code::BADTIME->value)
         {
             $this->other_length = strlen($this->other_data);
             if ($this->other_length != 6)
@@ -382,47 +379,16 @@ final class TSIG extends \NetDNS2\RR
      * @throws \NetDNS2\Exception
      *
      */
-    private function signHMAC(string $_data, ?string $_key = null, \NetDNS2\Data\Domain $_algorithm = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, self::HMAC_MD5)): string
+    private function signHMAC(string $_data, string $_key, \NetDNS2\Data\Domain $_algorithm = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, self::HMAC_MD5)): string
     {
         //
-        // use the hash extension; this is included by default in >= 5.1.2 which is our dependent version anyway- so it's easy to switch to it.
+        // the hash extension is required for this function
         //
-        if (extension_loaded('hash') == true)
+        if (extension_loaded('hash') == false)
         {
-            if (isset(self::$hash_algorithms[strval($_algorithm)]) == false)
-            {
-                throw new \NetDNS2\Exception('invalid or unsupported algorithm', \NetDNS2\ENUM\Error::PARSE_ERROR);
-            }
-
-            return hash_hmac(self::$hash_algorithms[strval($_algorithm)], $_data, $_key, true);
+            throw new \NetDNS2\Exception('the hash extension is required to use TSIG signing.', \NetDNS2\ENUM\Error::INT_INVALID_EXTENSION);
         }
 
-        //
-        // if the hash extension isn't loaded, and they selected something other than MD5, throw an exception
-        //
-        if ($_algorithm != self::HMAC_MD5)
-        {
-            throw new \NetDNS2\Exception('only HMAC-MD5 supported. please install the php-extension "hash" in order to use the sha-family',
-                \NetDNS2\ENUM\Error::PARSE_ERROR);
-        }
-
-        //
-        // otherwise, do it ourselves
-        //
-        if (is_null($_key) == true)
-        {
-            return pack('H*', md5($_data));
-        }
-
-        $_key = str_pad($_key, 64, chr(0x00));
-        if (strlen($_key) > 64)
-        {
-            $_key = pack('H*', md5($_key));
-        }
-
-        $k_ipad = $_key ^ str_repeat(chr(0x36), 64);
-        $k_opad = $_key ^ str_repeat(chr(0x5c), 64);
-
-        return $this->signHMAC($k_opad . pack('H*', md5($k_ipad . $_data)), null, $_algorithm);
+        return hash_hmac(self::$hash_algorithms[strval($_algorithm)], $_data, $_key, true);
     }
 }

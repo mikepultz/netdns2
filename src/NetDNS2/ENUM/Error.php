@@ -23,57 +23,57 @@ enum Error: int
 {
     use \NetDNS2\ENUM\Base;
 
-    case NONE               = \NetDNS2\ENUM\RCode::NOERROR->value;
-    case DNS_FORMERR        = \NetDNS2\ENUM\RCode::FORMERR->value;
-    case DNS_SERVFAIL       = \NetDNS2\ENUM\RCode::SERVFAIL->value;
-    case DNS_NXDOMAIN       = \NetDNS2\ENUM\RCode::NXDOMAIN->value;
-    case DNS_NOTIMP         = \NetDNS2\ENUM\RCode::NOTIMP->value;
-    case DNS_REFUSED        = \NetDNS2\ENUM\RCode::REFUSED->value;
-    case DNS_YXDOMAIN       = \NetDNS2\ENUM\RCode::YXDOMAIN->value;
-    case DNS_YXRRSET        = \NetDNS2\ENUM\RCode::YXRRSET->value;
-    case DNS_NXRRSET        = \NetDNS2\ENUM\RCode::NXRRSET->value;
-    case DNS_NOTAUTH        = \NetDNS2\ENUM\RCode::NOTAUTH->value;
-    case DNS_NOTZONE        = \NetDNS2\ENUM\RCode::NOTZONE->value;
-    case DNS_DSOTYPENI      = \NetDNS2\ENUM\RCode::DSOTYPENI->value;
+    //
+    // error conditions mapped to DNS response codes
+    //
+    case NONE               = \NetDNS2\ENUM\RR\Code::NOERROR->value;
+    case DNS_FORMERR        = \NetDNS2\ENUM\RR\Code::FORMERR->value;
+    case DNS_SERVFAIL       = \NetDNS2\ENUM\RR\Code::SERVFAIL->value;
+    case DNS_NXDOMAIN       = \NetDNS2\ENUM\RR\Code::NXDOMAIN->value;
+    case DNS_NOTIMP         = \NetDNS2\ENUM\RR\Code::NOTIMP->value;
+    case DNS_REFUSED        = \NetDNS2\ENUM\RR\Code::REFUSED->value;
+    case DNS_YXDOMAIN       = \NetDNS2\ENUM\RR\Code::YXDOMAIN->value;
+    case DNS_YXRRSET        = \NetDNS2\ENUM\RR\Code::YXRRSET->value;
+    case DNS_NXRRSET        = \NetDNS2\ENUM\RR\Code::NXRRSET->value;
+    case DNS_NOTAUTH        = \NetDNS2\ENUM\RR\Code::NOTAUTH->value;
+    case DNS_NOTZONE        = \NetDNS2\ENUM\RR\Code::NOTZONE->value;
+    case DNS_DSOTYPENI      = \NetDNS2\ENUM\RR\Code::DSOTYPENI->value;
 
     // 12-15 reserved
 
-    case DNS_BADSIG         = \NetDNS2\ENUM\RCode::BADSIG->value;
-    case DNS_BADKEY         = \NetDNS2\ENUM\RCode::BADKEY->value;
-    case DNS_BADTIME        = \NetDNS2\ENUM\RCode::BADTIME->value;
-    case DNS_BADMODE        = \NetDNS2\ENUM\RCode::BADMODE->value;
-    case DNS_BADNAME        = \NetDNS2\ENUM\RCode::BADNAME->value;
-    case DNS_BADALG         = \NetDNS2\ENUM\RCode::BADALG->value;
-    case DNS_BADTRUNC       = \NetDNS2\ENUM\RCode::BADTRUNC->value;    
-    case DNS_BADCOOKIE      = \NetDNS2\ENUM\RCode::BADCOOKIE->value;
+    case DNS_BADSIG         = \NetDNS2\ENUM\RR\Code::BADSIG->value;
+    case DNS_BADKEY         = \NetDNS2\ENUM\RR\Code::BADKEY->value;
+    case DNS_BADTIME        = \NetDNS2\ENUM\RR\Code::BADTIME->value;
+    case DNS_BADMODE        = \NetDNS2\ENUM\RR\Code::BADMODE->value;
+    case DNS_BADNAME        = \NetDNS2\ENUM\RR\Code::BADNAME->value;
+    case DNS_BADALG         = \NetDNS2\ENUM\RR\Code::BADALG->value;
+    case DNS_BADTRUNC       = \NetDNS2\ENUM\RR\Code::BADTRUNC->value;    
+    case DNS_BADCOOKIE      = \NetDNS2\ENUM\RR\Code::BADCOOKIE->value;
 
-    // other error conditions
+    //
+    // other internal error conditions - 3841-4095
+    //
+    case INT_PARSE_ERROR            = 3841;
+    case INT_INVALID_PACKET         = 3842;
+    case INT_INVALID_TYPE           = 3843;
+    case INT_INVALID_CLASS          = 3844;
+    case INT_INVALID_ENUM           = 3845;
+    case INT_INVALID_IPV4           = 3846;
+    case INT_INVALID_IPV6           = 3847;
+    case INT_INVALID_EXTENSION      = 3848;
+    case INT_INVALID_ALGORITHM      = 3849;
+    case INT_INVALID_NAMESERVER     = 3850;
+    case INT_INVALID_SOCKET         = 3851;
+    case INT_INVALID_PRIVATE_KEY    = 3852;
+    case INT_INVALID_CERTIFICATE    = 3853;
 
-    case NS_INVALID_FILE    = 200;
-    case NS_INVALID_ENTRY   = 201;
-    case NS_FAILED          = 202;
-    case NS_SOCKET_FAILED   = 203;
-    case NS_INVALID_SOCKET  = 204;
-
-    case PACKET_INVALID     = 300;
-    case PARSE_ERROR        = 301;
-    case HEADER_INVALID     = 302;
-    case QUESTION_INVALID   = 303;
-    case RR_INVALID         = 304;
-    case TCP_REQUIRED       = 305;
-    case CLASS_INVALID      = 306;
-
-    case OPENSSL_ERROR      = 400;
-    case OPENSSL_UNAVAIL    = 401;
-    case OPENSSL_INV_PKEY   = 402;
-    case OPENSSL_INV_ALGO   = 403;
-
-    case CACHE_UNSUPPORTED  = 500;
-    case CACHE_SHM_FILE     = 501;
-    case CACHE_SHM_UNAVAIL  = 502;
-
-    case CURL_ERROR         = 600;
-    case CURL_UNAVAIL       = 601;
+    case INT_FAILED_NAMESERVER      = 3854;
+    case INT_FAILED_SOCKET          = 3855;
+    case INT_FAILED_SHMOP           = 3856;
+    case INT_FAILED_CURL            = 3857;
+    case INT_FAILED_OPENSSL         = 3858;
+    case INT_FAILED_MEMCACHED       = 3859;
+    case INT_FAILED_REDIS           = 3860;
 
     public function label(): string
     {

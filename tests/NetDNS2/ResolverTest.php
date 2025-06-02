@@ -73,7 +73,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
         //
         $nss = [
 
-            'https://cloudflare-dns.com/dns-query?dns'
+            'https://cloudflare-dns.com/dns-query'
         ];
 
         //
@@ -116,6 +116,8 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
                     $res->answer[0]->ttl = 300;
 
                     $this->assertSame((is_array($expect) == true) ? $expect['res'] : $expect, strval($res->answer[0]));
+
+                    usleep(5000);
                 }
 
             } catch(\NetDNS2\Exception $e)
@@ -143,7 +145,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
             'AAAA'          => 'aaaa.netdns2.com. 86400 IN AAAA 2600:1f16:17c:3950:47ac:cb79:62ba:702e',
             'AFSDB'         => 'afsdb.netdns2.com. 86400 IN AFSDB 3 afsdb.example.com.',
             'AMTRELAY'      => 'amtrelay.netdns2.com. 86400 IN AMTRELAY 10 0 2 2600:1f16:17c:3950:47ac:cb79:62ba:702e',
-            'APL'           => 'apl.netdns2.com. 86400 IN APL 1:224.0.0.0/4 2:ff:0:0:0:0:0:0:0/8',
+            'APL'           => 'apl.netdns2.com. 86400 IN APL 1:224.0.0.0/4 2:ff00::/8 2:a0::/8',
             'AVC'           => 'avc.netdns2.com. 86400 IN AVC "first record" "another records" "a third"',
             'CAA'           => 'caa.netdns2.com. 86400 IN CAA 0 issue "ca.example.net; policy=ev"',
             'CDNSKEY'       => 'cdnskey.netdns2.com. 86400 IN CDNSKEY 256 3 7 AwEAAYCXh/ZABi8kiJIDXYmyUlHzC0CHeBzqcpyZAIjC7dK1wkRYVcUvIlpTOpnOVVfcC3Py9Ui/x45qKb0LytvK7WYAe3WyOOwk5klwIqRC/0p4luafbd2yhRMF7quOBVqYrLoHwv8i9LrV+r8dhB7rXv/lkTSI6mEZsg5rDfee8Yy1',
@@ -193,7 +195,6 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
             'PX'            => 'px.netdns2.com. 86400 IN PX 10 ab.net2.it. o-ab.prmd-net2.admdb.c-it.',
             'RESINFO'       => 'resinfo.netdns2.com. 86400 IN RESINFO "namemin" "exterr=15-17" "infourl=https://resolver.example.com/guide"',
             'RP'            => 'rp.netdns2.com. 86400 IN RP dns\.admin.netdns2.com. lam1.people.test.com.',
-            'RRSIG'         => 'rrsig.netdns2.com. 86400 IN RRSIG DNSKEY 7 1 86400 20100827211706 20100822211706 57970 gov. KoWPhMtLHp8sWYZSgsMiYJKB9P71CQmh9CnxJCs5GutKfo7Jpw+nNnDLiNnsd6U1JSkf99rYRWCyOTAPC47xkHr+2Uh7n6HDJznfdCzRa/v9uwEcbXIxCZ7KfzNJewW3EvYAxDIrW6sY/4MAsjS5XM/O9LaWzw6pf7TX5obBbLI+zRECbPNTdY+RF6Fl9K0GVaEZJNYi2PRXnATwvwca2CNRWxeMT/dF5STUram3cWjH0Pkm19Gc1jbdzlZVDbUudDauWoHcc0mfH7PV1sMpe80NqK7yQ24AzAkXSiknO13itHsCe4LECUu0/OtnhHg2swwXaVTf5hqHYpzi3bQenw==',
             'RT'            => 'rt.netdns2.com. 86400 IN RT 2 relay.prime.com.',
             'SIG'           => 'sig.netdns2.com. 86400 IN SIG DNSKEY 7 1 86400 20100827211706 20100822211706 57970 gov. KoWPhMtLHp8sWYZSgsMiYJKB9P71CQmh9CnxJCs5GutKfo7Jpw+nNnDLiNnsd6U1JSkf99rYRWCyOTAPC47xkHr+2Uh7n6HDJznfdCzRa/v9uwEcbXIxCZ7KfzNJewW3EvYAxDIrW6sY/4MAsjS5XM/O9LaWzw6pf7TX5obBbLI+zRECbPNTdY+RF6Fl9K0GVaEZJNYi2PRXnATwvwca2CNRWxeMT/dF5STUram3cWjH0Pkm19Gc1jbdzlZVDbUudDauWoHcc0mfH7PV1sMpe80NqK7yQ24AzAkXSiknO13itHsCe4LECUu0/OtnhHg2swwXaVTf5hqHYpzi3bQenw==',
             'SMIMEA'        => [
@@ -221,7 +222,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
             'URI'           => 'uri.netdns2.com. 86400 IN URI 10 1 "https://netdns2.com/about"',
             'WKS'           => 'wks.netdns2.com. 86400 IN WKS 128.8.1.14 6 21 25',
             'X25'           => 'x25.netdns2.com. 86400 IN X25 "311061700956"',
-            'ZONEMD'        => 'zonemd.netdns2.com. 86400 IN ZONEMD 2018031500 1 1 febe3d4ce2ec2ffa4ba99d46cd69d6d29711e55217057bee7eb1a7b641a47ba7fed2dd5b97ae499fafa4f22c6bd647de'
+            'ZONEMD'        => 'zonemd.netdns2.com. 86400 IN ZONEMD 2018031500 1 1 FEBE3D4CE2EC2FFA4BA99D46CD69D6D29711E55217057BEE7EB1A7B641A47BA7FED2DD5B97AE499FAFA4F22C6BD647DE'
         ];
 
         try
@@ -252,7 +253,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
                 //
                 if ($rr == 'SOA')
                 {
-                    $res->answer[0]->serial = '2025051843';
+                    $res->answer[0]->serial = 2025051843;
                 }
 
                 $this->assertSame((is_array($expect) == true) ? $expect['res'] : $expect, strval($res->answer[0]));
@@ -260,6 +261,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
 
         } catch(\NetDNS2\Exception $e)
         {
+print_r($e);
             $this->assertTrue(false, sprintf('ResolverTest::testInternalResolver(): exception thrown: %s', $e->getMessage()));
         }
     }

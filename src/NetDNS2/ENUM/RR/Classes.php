@@ -17,9 +17,9 @@
  *
  */
 
-namespace NetDNS2\ENUM;
+namespace NetDNS2\ENUM\RR;
 
-enum RRClass: int
+enum Classes: int
 {
     use \NetDNS2\ENUM\Base;
 

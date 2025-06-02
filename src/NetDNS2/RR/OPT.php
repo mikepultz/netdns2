@@ -33,12 +33,12 @@ namespace NetDNS2\RR;
  *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
  */
-final class OPT extends \NetDNS2\RR
+class OPT extends \NetDNS2\RR
 {
     /**
      * option code - assigned by IANA
      */
-    protected int $option_code = 0;
+    protected \NetDNS2\ENUM\EDNS\Opt $option_code = \NetDNS2\ENUM\EDNS\Opt::NONE;
 
     /**
      * the length of the option data
@@ -73,22 +73,24 @@ final class OPT extends \NetDNS2\RR
     /**
      * Constructor - builds a new \NetDNS2\RR\OPT object; normally you wouldn't call this directly, but OPT RR's are a little different
      *
-     * @param \NetDNS2\Packet     &$_packet a \NetDNS2\Packet packet or null to create an empty object
-     * @param array<string,mixed> $_rr      an array with RR parse values or null to create an empty object
+     * @param \NetDNS2\Packet &$_packet a \NetDNS2\Packet packet or null to create an empty object
      *
      * @throws \NetDNS2\Exception
      *
      */
-    public function __construct(?\NetDNS2\Packet &$_packet = null, ?array $_rr = null)
+    public function __construct(?\NetDNS2\Packet &$_packet = null)
     {
         //
         // this is for when we're manually building an OPT RR object; we aren't
         // passing in binary data to parse, we just want a clean/empty object.
         //
         $this->name           = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, '');
-        $this->type           = \NetDNS2\ENUM\RRType::set('OPT');
+        $this->type           = \NetDNS2\ENUM\RR\Type::set('OPT');
+        $this->class          = \NetDNS2\ENUM\RR\Classes::set('NONE');
+        $this->udp_length     = 4000; // TODO
         $this->rdlength       = 0;
 
+        $this->option_code    = \NetDNS2\ENUM\EDNS\Opt::NONE;
         $this->option_length  = 0;
         $this->extended_rcode = 0;
         $this->version        = 0;
@@ -96,12 +98,44 @@ final class OPT extends \NetDNS2\RR
         $this->do             = 0;
 
         //
+        // if the current object is not an OPT type, then look it up in the EDNS
+        //
+        $class = get_class($this);
+        if ($class != 'NetDNS2\RR\OPT')
+        {
+            $this->option_code = \NetDNS2\ENUM\EDNS\Opt::class_id($class);
+        }
+
+        //
         // everthing else gets passed through to the parent.
         //
-        if ( (is_null($_packet) == false) && (is_null($_rr) == false) )
+        if (is_null($_packet) == false)
         {
-            parent::__construct($_packet, $_rr);
+            parent::__construct($_packet);
         }
+    }
+
+    /**
+     * generate and return an EDNS object based on the stored option code
+     */
+    public function generate_edns(\NetDNS2\Packet &$_packet): \NetDNS2\RR\OPT
+    {
+        /**
+          * @var \NetDNS2\RR\OPT $opt
+          */
+        $opt = new ($this->option_code->class())();
+
+        $opt->name          = $this->name;
+        $opt->type          = $this->type;
+        $opt->class         = $this->class;
+
+        $opt->option_code   = $this->option_code;
+        $opt->option_length = $this->option_length;
+        $opt->option_data   = $this->option_data;
+
+        $opt->rrSet($_packet);
+
+        return $opt;
     }
 
     /**
@@ -109,12 +143,11 @@ final class OPT extends \NetDNS2\RR
      */
     protected function rrToString(): string
     {
-        return $this->option_code . ' ' . $this->option_data;
+        return '';
     }
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
@@ -153,7 +186,9 @@ final class OPT extends \NetDNS2\RR
                 return false;
             }
 
-            list('y' => $this->option_code, 'z' => $this->option_length) = (array)$val;
+            list('y' => $option_code, 'z' => $this->option_length) = (array)$val;
+
+            $this->option_code = \NetDNS2\ENUM\EDNS\Opt::set($option_code);
 
             //
             // copy out the data based on the length
@@ -167,7 +202,6 @@ final class OPT extends \NetDNS2\RR
     /**
      * pre-builds the TTL value for this record; we needed to separate this out from the rrGet() function, as the logic in the \NetDNS2\RR packs the TTL
      * value before it builds the rdata value.
-     *
      */
     protected function pre_build(): void
     {
@@ -190,13 +224,13 @@ final class OPT extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if ($this->option_code == 0)
+        if ($this->option_code == \NetDNS2\ENUM\EDNS\Opt::NONE)
         {
             return '';
         }
 
         $_packet->offset += strlen($this->option_data) + 4;
     
-        return pack('nn', $this->option_code, $this->option_length) . $this->option_data;
+        return pack('nn', $this->option_code->value, $this->option_length) . $this->option_data;
     }
 }

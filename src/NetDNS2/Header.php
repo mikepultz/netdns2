@@ -62,33 +62,23 @@ final class Header implements \Stringable
     public const QR_RESPONSE           = 1;     // RFC 1035
 
     /**
-     * DNS Op Codes
-     */
-    public const OPCODE_QUERY          = 0;     // RFC 1035
-    public const OPCODE_IQUERY         = 1;     // RFC 1035, RFC 3425
-    public const OPCODE_STATUS         = 2;     // RFC 1035
-    public const OPCODE_NOTIFY         = 4;     // RFC 1996
-    public const OPCODE_UPDATE         = 5;     // RFC 2136
-    public const OPCODE_DSO            = 6;     // RFC 8490
-
-    /**
      * DNS header values
      */
-    public int $id;                     // 16 bit - identifier
-    public int $qr;                     //  1 bit - 0 = query, 1 = response
-    public int $opcode;                 //  4 bit - op code
-    public int $aa;                     //  1 bit - Authoritative Answer
-    public int $tc;                     //  1 bit - TrunCation
-    public int $rd;                     //  1 bit - Recursion Desired
-    public int $ra;                     //  1 bit - Recursion Available
-    public int $z;                      //  1 bit - Reserved
-    public int $ad;                     //  1 bit - Authentic Data (RFC4035)
-    public int $cd;                     //  1 bit - Checking Disabled (RFC4035)
-    public \NetDNS2\ENUM\RCode $rcode;  //  4 bit - Response code
-    public int $qdcount;                // 16 bit - entries in the question section
-    public int $ancount;                // 16 bit - resource records in the answer section
-    public int $nscount;                // 16 bit - name server rr in the authority records section
-    public int $arcount;                // 16 bit - rr's in the additional records section
+    public int $id;                         // 16 bit - identifier
+    public int $qr;                         //  1 bit - 0 = query, 1 = response
+    public \NetDNS2\ENUM\OpCode $opcode;    //  4 bit - op code
+    public int $aa;                         //  1 bit - Authoritative Answer
+    public int $tc;                         //  1 bit - TrunCation
+    public int $rd;                         //  1 bit - Recursion Desired
+    public int $ra;                         //  1 bit - Recursion Available
+    public int $z;                          //  1 bit - Reserved
+    public int $ad;                         //  1 bit - Authentic Data (RFC4035)
+    public int $cd;                         //  1 bit - Checking Disabled (RFC4035)
+    public \NetDNS2\ENUM\RR\Code $rcode;    //  4 bit - Response code
+    public int $qdcount;                    // 16 bit - entries in the question section
+    public int $ancount;                    // 16 bit - resource records in the answer section
+    public int $nscount;                    // 16 bit - name server rr in the authority records section
+    public int $arcount;                    // 16 bit - rr's in the additional records section
 
     /**
      * Constructor - builds a new NetDNS2\Header object
@@ -108,7 +98,7 @@ final class Header implements \Stringable
         {
             $this->id       = mt_rand(0, 65535);
             $this->qr       = self::QR_QUERY;
-            $this->opcode   = self::OPCODE_QUERY;
+            $this->opcode   = \NetDNS2\ENUM\OpCode::QUERY;
             $this->aa       = 0;
             $this->tc       = 0;
             $this->rd       = 1;
@@ -116,7 +106,7 @@ final class Header implements \Stringable
             $this->z        = 0;
             $this->ad       = 0;
             $this->cd       = 0;
-            $this->rcode    = \NetDNS2\ENUM\RCode::NOERROR;
+            $this->rcode    = \NetDNS2\ENUM\RR\Code::NOERROR;
             $this->qdcount  = 1;
             $this->ancount  = 0;
             $this->nscount  = 0;
@@ -134,7 +124,7 @@ final class Header implements \Stringable
 
         $output .= ";;\t id         = " . $this->id . "\n";
         $output .= ";;\t qr         = " . $this->qr . "\n";
-        $output .= ";;\t opcode     = " . $this->opcode . "\n";
+        $output .= ";;\t opcode     = " . $this->opcode->value . "\n";
         $output .= ";;\t aa         = " . $this->aa . "\n";
         $output .= ";;\t tc         = " . $this->tc . "\n";
         $output .= ";;\t rd         = " . $this->rd . "\n";
@@ -164,7 +154,7 @@ final class Header implements \Stringable
         //
         if ($_packet->rdlength < self::DNS_HEADER_SIZE)
         {
-            throw new \NetDNS2\Exception('invalid header data provided; too small', \NetDNS2\ENUM\Error::HEADER_INVALID);
+            throw new \NetDNS2\Exception('invalid or empty header data provided.', \NetDNS2\ENUM\Error::INT_INVALID_PACKET);
         }
 
         $offset = 0;
@@ -176,7 +166,7 @@ final class Header implements \Stringable
 
         ++$offset;
         $this->qr       = (ord($_packet->rdata[$offset]) >> 7) & 0x1;
-        $this->opcode   = (ord($_packet->rdata[$offset]) >> 3) & 0xf;
+        $this->opcode   = \NetDNS2\ENUM\OpCode::set((ord($_packet->rdata[$offset]) >> 3) & 0xf);
         $this->aa       = (ord($_packet->rdata[$offset]) >> 2) & 0x1;
         $this->tc       = (ord($_packet->rdata[$offset]) >> 1) & 0x1;
         $this->rd       = ord($_packet->rdata[$offset]) & 0x1;
@@ -186,7 +176,7 @@ final class Header implements \Stringable
         $this->z        = (ord($_packet->rdata[$offset]) >> 6) & 0x1;
         $this->ad       = (ord($_packet->rdata[$offset]) >> 5) & 0x1;
         $this->cd       = (ord($_packet->rdata[$offset]) >> 4) & 0x1;
-        $this->rcode    = \NetDNS2\ENUM\RCode::set(ord($_packet->rdata[$offset]) & 0xf);
+        $this->rcode    = \NetDNS2\ENUM\RR\Code::set(ord($_packet->rdata[$offset]) & 0xf);
             
         $this->qdcount  = ord($_packet->rdata[++$offset]) << 8 | ord($_packet->rdata[++$offset]);
         $this->ancount  = ord($_packet->rdata[++$offset]) << 8 | ord($_packet->rdata[++$offset]);
@@ -209,7 +199,7 @@ final class Header implements \Stringable
     {
         $_packet->offset += self::DNS_HEADER_SIZE;
 
-        return pack('n', $this->id) . chr(($this->qr << 7) | ($this->opcode << 3) | ($this->aa << 2) | ($this->tc << 1) | ($this->rd)) .
+        return pack('n', $this->id) . chr(($this->qr << 7) | ($this->opcode->value << 3) | ($this->aa << 2) | ($this->tc << 1) | ($this->rd)) .
             chr(($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode->value) . 
             pack('n4', $this->qdcount, $this->ancount, $this->nscount, $this->arcount);
     }

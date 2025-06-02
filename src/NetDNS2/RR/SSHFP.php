@@ -42,6 +42,7 @@ final class SSHFP extends \NetDNS2\RR
     public const SSHFP_ALGORITHM_DSS       = 2;
     public const SSHFP_ALGORITHM_ECDSA     = 3;
     public const SSHFP_ALGORITHM_ED25519   = 4;
+    public const SSHFP_ALGORITHM_ED448     = 6;
 
     /**
      * Fingerprint Types
@@ -75,7 +76,6 @@ final class SSHFP extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
@@ -89,20 +89,36 @@ final class SSHFP extends \NetDNS2\RR
         $this->fingerprint = strtolower($this->sanitize(implode('', $_rdata)));
 
         //
-        // There are only two algorithm's defined 
+        // validate the algorithm
         //
-        if ( ($this->algorithm != self::SSHFP_ALGORITHM_RSA) && ($this->algorithm != self::SSHFP_ALGORITHM_DSS) && 
-            ($this->algorithm != self::SSHFP_ALGORITHM_ECDSA) && ($this->algorithm != self::SSHFP_ALGORITHM_ED25519) )
+        switch($this->algorithm)
         {
-            throw new \NetDNS2\Exception('invalid algorithm value provided: ' . $this->algorithm, \NetDNS2\ENUM\Error::PARSE_ERROR);
+            case self::SSHFP_ALGORITHM_RSA:
+            case self::SSHFP_ALGORITHM_DSS:
+            case self::SSHFP_ALGORITHM_ECDSA:
+            case self::SSHFP_ALGORITHM_ED25519:
+            case self::SSHFP_ALGORITHM_ED448:
+                ;
+            break;
+            default:
+            {
+                throw new \NetDNS2\Exception(sprintf('invalid algorithm value provided: %d', $this->algorithm), \NetDNS2\ENUM\Error::INT_INVALID_ALGORITHM);
+            }
         }
 
         //
         // there are only two fingerprints defined
         //
-        if ( ($this->fp_type != self::SSHFP_FPTYPE_SHA1) && ($this->fp_type != self::SSHFP_FPTYPE_SHA256) )
+        switch($this->fp_type)
         {
-            throw new \NetDNS2\Exception('invalid fingerprint type value provided: ' . $this->fp_type, \NetDNS2\ENUM\Error::PARSE_ERROR);
+            case self::SSHFP_FPTYPE_SHA1:
+            case self::SSHFP_FPTYPE_SHA256:
+                ;
+            break;
+            default:
+            {
+                throw new \NetDNS2\Exception(sprintf('invalid fingerprint type value provided: %d', $this->fp_type), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
+            }
         }
 
         return true;

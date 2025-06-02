@@ -38,6 +38,8 @@ final class NSEC3 extends \NetDNS2\RR
 {
     /**
      * Algorithm to use
+     *
+     * TODO: NSEC3 uses a limit set of the DNSSEC algorithms, per RFC 5514 section 11
      */
     protected int $algorithm;
  
@@ -103,7 +105,6 @@ final class NSEC3 extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {

@@ -54,7 +54,7 @@ final class Question implements \Stringable
      * referred to as "ztype" for updates per RFC2136
      *
      */
-    public \NetDNS2\ENUM\RRType $qtype;
+    public \NetDNS2\ENUM\RR\Type $qtype;
     
     /**
      * The RR class for the question
@@ -62,7 +62,7 @@ final class Question implements \Stringable
      * referred to as "zclass" for updates per RFC2136
      *
      */
-    public \NetDNS2\ENUM\RRClass $qclass;
+    public \NetDNS2\ENUM\RR\Classes $qclass;
 
     /**
      * Constructor - builds a new \NetDNS2\Question object
@@ -81,8 +81,8 @@ final class Question implements \Stringable
         } else
         {
             $this->qname  = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035);
-            $this->qtype  = \NetDNS2\ENUM\RRType::set('A');
-            $this->qclass = \NetDNS2\ENUM\RRClass::set('IN');
+            $this->qtype  = \NetDNS2\ENUM\RR\Type::set('A');
+            $this->qclass = \NetDNS2\ENUM\RR\Classes::set('IN');
         }
     }
 
@@ -107,7 +107,7 @@ final class Question implements \Stringable
     {
         if ($_packet->rdlength < ($_packet->offset + 4))
         {
-            throw new \NetDNS2\Exception('invalid question section: to small', \NetDNS2\ENUM\Error::QUESTION_INVALID);
+            throw new \NetDNS2\Exception('invalid or empty question section provided.', \NetDNS2\ENUM\Error::INT_INVALID_PACKET);
         }
 
         //
@@ -121,7 +121,7 @@ final class Question implements \Stringable
         $val = unpack('nx/ny', $_packet->rdata, $_packet->offset);
         if ($val == false)
         {
-            throw new \NetDNS2\Exception('invalid question section: failed to parse values.', \NetDNS2\ENUM\Error::QUESTION_INVALID);
+            throw new \NetDNS2\Exception('failed to parse values from question section.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         list('x' => $type, 'y' => $class) = (array)$val;
@@ -134,8 +134,8 @@ final class Question implements \Stringable
         //
         // store it
         //
-        $this->qtype  = \NetDNS2\ENUM\RRType::set($type);
-        $this->qclass = \NetDNS2\ENUM\RRClass::set($class);
+        $this->qtype  = \NetDNS2\ENUM\RR\Type::set($type);
+        $this->qclass = \NetDNS2\ENUM\RR\Classes::set($class);
     }
 
     /**

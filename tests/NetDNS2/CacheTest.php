@@ -32,20 +32,24 @@ class CacheTest extends \PHPUnit\Framework\TestCase
      * @access public
      *
      */
-    public function testCache()
+    public function testFileCache()
     {
-$this->assertTrue(true);
-return;
-        $cache_file = '/tmp/net_dns2_test.cache';
+        //
+        // create a random temporary name
+        //
+        $cache_file = tempnam('/tmp', 'netdns2');
 
         try
         {
             $r = new \NetDNS2\Resolver(
             [
-                'nameservers' => [ '8.8.8.8', '8.8.4.4' ],
-                'use_cache'     => true,
-                'cache_type'    => 'file',
-                'cache_file'    => $cache_file
+                'nameservers'   => [ '8.8.8.8', '8.8.4.4' ],
+                'cache_type'    => \NetDNS2\Cache::CACHE_TYPE_FILE,
+                'cache_options' => [
+ 
+                   'file' => $cache_file,
+                   'size' => 50000
+                ]
             ]);
 
             $result = $r->query('google.com', 'MX');
@@ -55,11 +59,72 @@ return;
             //
             unset($r);
 
-            $this->assertTrue(file_exists($cache_file), sprintf('CacheTest::testCache(): cache file %s doesn\'t exist!', $cache_file));
+            $this->assertTrue(file_exists($cache_file), sprintf('CacheFileTest::testCache(): cache file %s doesn\'t exist!', $cache_file));
+
+            //
+            // clean up
+            //
+            unlink($cache_file);
 
         } catch(\NetDNS2\Exception $e)
         {
-            $this->assertTrue(false, sprintf('CacheTest::testCache(): exception thrown: %s', $e->getMessage()));
+            $this->assertTrue(false, sprintf('CacheFileTest::testCache(): exception thrown: %s', $e->getMessage()));
+        }
+    }
+
+    /**
+     * function to test the shared memory cache
+     *
+     * @return void
+     * @access public
+     *
+     */
+    public function testShmCache()
+    {
+        //
+        // we can only do this test if the shmop extension is loaded
+        //
+        if (extension_loaded('shmop') == false)
+        {
+            $this->assertTrue(true);
+            return;
+        }
+
+        //
+        // create a random temporary name
+        //
+        $cache_file = tempnam('/tmp', 'netdns2');
+
+        try
+        {
+            $r = new \NetDNS2\Resolver(
+            [
+                'nameservers'   => [ '8.8.8.8', '8.8.4.4' ],
+                'cache_type'    => \NetDNS2\Cache::CACHE_TYPE_SHM,
+                'cache_options' => [
+ 
+                   'file' => $cache_file,
+                   'size' => 50000
+                ]
+            ]);
+
+            $result = $r->query('google.com', 'MX');
+
+            //
+            // force __destruct() to execute
+            //
+            unset($r);
+
+            $this->assertTrue(file_exists($cache_file), sprintf('CacheShmTest::testCache(): cache file %s doesn\'t exist!', $cache_file));
+
+            //
+            // clean up
+            //
+            unlink($cache_file);
+
+        } catch(\NetDNS2\Exception $e)
+        {
+            $this->assertTrue(false, sprintf('CacheShmTest::testCache(): exception thrown: %s', $e->getMessage()));
         }
     }
 }

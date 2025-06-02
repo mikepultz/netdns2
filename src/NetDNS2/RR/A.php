@@ -32,28 +32,22 @@ final class A extends \NetDNS2\RR
     /**
      * The IPv4 address in quad-dotted notation
      */
-    protected string $address;
+    protected \NetDNS2\Data\IPv4 $address;
 
     /**
      * @see \NetDNS2\RR::rrToString()
      */
     protected function rrToString(): string
     {
-        return $this->address;
+        return strval($this->address);
     }
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
-        $this->address = $this->sanitize(array_shift($_rdata));
-
-        if (\NetDNS2\Client::isIPv4($this->address) == false)
-        {
-            throw new \NetDNS2\Exception('address provided is not a valid IPv4 address: ' . $this->address, \NetDNS2\ENUM\Error::PARSE_ERROR);
-        }
+        $this->address = new \NetDNS2\Data\IPv4(array_shift($_rdata) ?? '');
 
         return true;
     }
@@ -68,14 +62,11 @@ final class A extends \NetDNS2\RR
             return false;
         }
 
-        $val = inet_ntop($this->rdata);
-        if ($val !== false)
-        {
-            $this->address = strval($val);
-            return true;
-        }
+        $offset = 0;
 
-        return false;
+        $this->address = new \NetDNS2\Data\IPv4($this->rdata, $offset);
+       
+        return true;
     }
 
     /**
@@ -83,13 +74,6 @@ final class A extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        $val = inet_pton($this->address);
-        if ($val !== false)
-        {
-            $_packet->offset += 4;
-            return strval($val);
-        }
-
-        return '';
+        return $this->address->encode($_packet->offset);
     }
 }

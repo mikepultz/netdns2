@@ -20,24 +20,24 @@
 namespace NetDNS2\RR;
 
 /**
- *
+ * SVCB Resource Record - RFC 9460 section 2.2
  */
 class SVCB extends \NetDNS2\RR
 {
     /**
      * service binding parameter keys
      */
-    public const SVCB_PARAM_MANDATORY           = 0;    // RFC9460
-    public const SVCB_PARAM_ALPN                = 1;    // RFC9460
-    public const SVCB_PARAM_NO_DEFAULT_ALPN     = 2;    // RFC9460
-    public const SVCB_PARAM_PORT                = 3;    // RFC9460
-    public const SVCB_PARAM_IPV4HINT            = 4;    // RFC9460
-    public const SVCB_PARAM_ECH                 = 5;    // RFC9460
-    public const SVCB_PARAM_IPV6HINT            = 6;    // RFC9460
-    public const SVCB_PARAM_DOHPATH             = 7;    // RFC9461
-    public const SVCB_PARAM_OHTTP               = 8;    // RFC9540
-    public const SVCB_PARAM_TLS_SUPP_GROUPS     = 9;    // https://www.ietf.org/archive/id/draft-ietf-tls-key-share-prediction-01.html
-    // 65280-65534 private use
+    public const SVCB_PARAM_MANDATORY           = 0;        // RFC9460
+    public const SVCB_PARAM_ALPN                = 1;        // RFC9460
+    public const SVCB_PARAM_NO_DEFAULT_ALPN     = 2;        // RFC9460
+    public const SVCB_PARAM_PORT                = 3;        // RFC9460
+    public const SVCB_PARAM_IPV4HINT            = 4;        // RFC9460
+    public const SVCB_PARAM_ECH                 = 5;        // RFC9460
+    public const SVCB_PARAM_IPV6HINT            = 6;        // RFC9460
+    public const SVCB_PARAM_DOHPATH             = 7;        // RFC9461
+    public const SVCB_PARAM_OHTTP               = 8;        // RFC9540
+    public const SVCB_PARAM_TLS_SUPP_GROUPS     = 9;        // https://www.ietf.org/archive/id/draft-ietf-tls-key-share-prediction-01.html
+                                                            // 65280-65534 private use
     public const SVCB_PARAM_RESERVED            = 65535;
 
     /**
@@ -111,7 +111,7 @@ class SVCB extends \NetDNS2\RR
             return self::$param_id_to_name[$_service];
         }
 
-        throw new \NetDNS2\Exception('unsupported sevice id value provided: ' . $_service, \NetDNS2\ENUM\Error::PARSE_ERROR);
+        throw new \NetDNS2\Exception(sprintf('unsupported sevice id value provided: %d', $_service), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
     }
     private static function service_name_to_id(string $_service): int
     {
@@ -130,7 +130,7 @@ class SVCB extends \NetDNS2\RR
             return self::$param_name_to_id[strtolower($_service)];
         }
 
-        throw new \NetDNS2\Exception('unsupported sevice name value provided: ' . $_service, \NetDNS2\ENUM\Error::PARSE_ERROR);
+        throw new \NetDNS2\Exception(sprintf('unsupported sevice name value provided: %s', $_service), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
     }
 
     /**
@@ -186,7 +186,6 @@ class SVCB extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
@@ -209,12 +208,28 @@ class SVCB extends \NetDNS2\RR
             switch(self::service_name_to_id($service))
             {
                 case self::SVCB_PARAM_MANDATORY:
-                case self::SVCB_PARAM_IPV4HINT:
-                case self::SVCB_PARAM_IPV6HINT:
                 case self::SVCB_PARAM_ALPN:
                 case self::SVCB_PARAM_TLS_SUPP_GROUPS:
                 {
                     $this->svc_params[$service] = explode(',', trim($values, '"'));
+                }
+                break;
+                case self::SVCB_PARAM_IPV4HINT:
+                {
+                    $x = explode(',', trim($values, '"'));
+                    foreach($x as $ip)
+                    {
+                        $this->svc_params[$service][] = new \NetDNS2\Data\IPv4($ip);
+                    }
+                }
+                break;
+                case self::SVCB_PARAM_IPV6HINT:
+                {
+                    $x = explode(',', trim($values, '"'));
+                    foreach($x as $ip)
+                    {
+                        $this->svc_params[$service][] = new \NetDNS2\Data\IPv6($ip);
+                    }
                 }
                 break;
                 case self::SVCB_PARAM_PORT:
@@ -372,7 +387,7 @@ class SVCB extends \NetDNS2\RR
                         {
                             foreach((array)$values as $value)
                             {
-                                $this->svc_params[self::service_id_to_name($key)][] = long2ip($value);
+                                $this->svc_params[self::service_id_to_name($key)][] = new \NetDNS2\Data\IPv4(long2ip($value));
                             }
                         }
                     }
@@ -408,7 +423,7 @@ class SVCB extends \NetDNS2\RR
                             {
                                 if (count((array)$values) == 8)
                                 {
-                                    $this->svc_params[self::service_id_to_name($key)][] = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', (array)$values);
+                                    $this->svc_params[self::service_id_to_name($key)][] = new \NetDNS2\Data\IPv6(vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', (array)$values));
                                 }
                             }
                         }
@@ -459,7 +474,7 @@ class SVCB extends \NetDNS2\RR
 
                         } else
                         {
-                            throw new \NetDNS2\Exception('unsupported SVCB param key: ' . $key, \NetDNS2\ENUM\Error::PARSE_ERROR);
+                            throw new \NetDNS2\Exception(sprintf('unsupported SVCB param key: %s', $key), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
                         }
                     }
                 }
@@ -543,7 +558,7 @@ class SVCB extends \NetDNS2\RR
                         $data .= pack('nn', self::SVCB_PARAM_IPV4HINT, count($values) * 4);
                         foreach($values as $ip)
                         {
-                            $data .= inet_pton($ip);
+                            $data .= $ip->encode();
                         }
                     }
                 }
@@ -562,7 +577,7 @@ class SVCB extends \NetDNS2\RR
                         $data .= pack('nn', self::SVCB_PARAM_IPV6HINT, count($values) * 16);
                         foreach($values as $ip)
                         {
-                            $data .= inet_pton($ip);
+                            $data .= $ip->encode();
                         }
                     }
                 }
@@ -593,7 +608,7 @@ class SVCB extends \NetDNS2\RR
                         $data .= pack('nna*', $key, strlen($values), $values);
                     } else
                     {
-                        throw new \NetDNS2\Exception('unsupported SVCB param key: ' . $key, \NetDNS2\ENUM\Error::PARSE_ERROR);
+                        throw new \NetDNS2\Exception(sprintf('unsupported SVCB param key: %s', $key), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
                     }
                 }
                 break;

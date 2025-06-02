@@ -57,11 +57,16 @@ final class BitMap
                 //
                 if ( ($rr < 0) || ($rr > 255) )
                 {
-                    throw new \NetDNS2\Exception('NSEC resource records must be between 0-255.', \NetDNS2\ENUM\Error::PARSE_ERROR);
+                    throw new \NetDNS2\Exception('NSEC resource records must be between 0-255.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
                 }
-                if (\NetDNS2\ENUM\RRType::exists($rr) == true)
+
+                //
+                // TODO: we don't currently store the \NetDNS2\ENUM\RR\Type ENUM directly, since this object supports undefined RR types
+                //       (e.g. TYPE123), while the ENUM enforces a predefined list.
+                //
+                if (\NetDNS2\ENUM\RR\Type::exists($rr) == true)
                 {
-                    $out[] = \NetDNS2\ENUM\RRType::set($rr)->label();
+                    $out[] = \NetDNS2\ENUM\RR\Type::set($rr)->label();
                 } else
                 {
                     $out[] = 'TYPE' . $rr;
@@ -74,7 +79,7 @@ final class BitMap
             {
                 $mnemonic = strtoupper($rr);
 
-                if (\NetDNS2\ENUM\RRType::exists($mnemonic) == true)
+                if (\NetDNS2\ENUM\RR\Type::exists($mnemonic) == true)
                 {
                     $out[] = $mnemonic;
 
@@ -84,7 +89,7 @@ final class BitMap
 
                     if ( ($value < 0) || ($value > 255) )
                     {
-                        throw new \NetDNS2\Exception('NSEC resource records must be between 0-255.', \NetDNS2\ENUM\Error::PARSE_ERROR);
+                        throw new \NetDNS2\Exception('NSEC resource records must be between 0-255.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
                     } else
                     {
                         $out[] = $mnemonic;
@@ -92,7 +97,7 @@ final class BitMap
 
                 } else
                 {
-                    throw new \NetDNS2\Exception('unknown or un-supported resource record type: ' . $mnemonic, \NetDNS2\ENUM\Error::RR_INVALID);
+                    throw new \NetDNS2\Exception(sprintf('unknown or un-supported resource record type: %s', $mnemonic), \NetDNS2\ENUM\Error::INT_INVALID_TYPE);
                 }
             }
         }
@@ -165,9 +170,9 @@ final class BitMap
                 {
                     $type = $window * 256 + $i;
 
-                    if (\NetDNS2\ENUM\RRType::exists($type) == true)
+                    if (\NetDNS2\ENUM\RR\Type::exists($type) == true)
                     {
-                        $output[] = \NetDNS2\ENUM\RRType::set($type)->label();
+                        $output[] = \NetDNS2\ENUM\RR\Type::set($type)->label();
                     } else
                     {
                         $output[] = 'TYPE' . $type;
@@ -209,14 +214,14 @@ final class BitMap
             //
             $type = null;
 
-            if (\NetDNS2\ENUM\RRType::exists($rr) == true)
+            if (\NetDNS2\ENUM\RR\Type::exists($rr) == true)
             {
-                $type = \NetDNS2\ENUM\RRType::set($rr)->value;
+                $type = \NetDNS2\ENUM\RR\Type::set($rr)->value;
 
                 //
                 // skip meta types or qtypes
                 //
-                if (\NetDNS2\ENUM\RRType::set($rr)->meta() == true)
+                if (\NetDNS2\ENUM\RR\Type::set($rr)->meta() == true)
                 {
                     continue;
                 }

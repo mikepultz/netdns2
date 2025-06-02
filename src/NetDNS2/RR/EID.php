@@ -23,38 +23,6 @@ namespace NetDNS2\RR;
  * EID Resource Record - undefined; the rdata is simply used as-is in it's binary format, so not process has to be done.
  *
  */
-final class EID extends \NetDNS2\RR
+final class EID extends \NetDNS2\RR\NUL
 {
-    /**
-     * @see \NetDNS2\RR::rrToString()
-     */
-    protected function rrToString(): string
-    {
-        return '';
-    }
-
-    /**
-     * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
-     */
-    protected function rrFromString(array $_rdata): bool
-    {
-        return true;
-    }
-
-    /**
-     * @see \NetDNS2\RR::rrSet()
-     */
-    protected function rrSet(\NetDNS2\Packet &$_packet): bool
-    {
-        return true;
-    }
-
-    /**
-     * @see \NetDNS2\RR::rrGet()
-     */
-    protected function rrGet(\NetDNS2\Packet &$_packet): string
-    {
-        return $this->rdata;
-    }
 }

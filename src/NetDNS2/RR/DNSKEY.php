@@ -35,9 +35,17 @@ namespace NetDNS2\RR;
 class DNSKEY extends \NetDNS2\RR
 {
     /**
-     * flags
+     * flags; this value should not be accessed directly; the $zone, $sep, and $revoke values are used to
+     * build the flags value on the way in/out of the object.
      */
     protected int $flags;
+
+    /**
+     * flags extracted from the $flags value
+     */
+    protected bool $zone = false;   // 0x0100
+    protected bool $sep = false;    // 0x0001
+    protected bool $revoke = false; // 0x0080
 
     /**
      * protocol
@@ -47,7 +55,7 @@ class DNSKEY extends \NetDNS2\RR
     /**
      * algorithm used
      */
-    protected int $algorithm;
+    protected \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm;
 
     /**
      * the public key
@@ -59,20 +67,45 @@ class DNSKEY extends \NetDNS2\RR
      */
     protected function rrToString(): string
     {
-        return $this->flags . ' ' . $this->protocol . ' ' . $this->algorithm . ' ' . $this->key;
+        //
+        // pack the flags
+        //
+        $this->flags = 0;
+        $this->flags |= ($this->zone == true) ? 0x0100 : 0;
+        $this->flags |= ($this->sep == true) ? 0x0001 : 0;
+        $this->flags |= ($this->revoke == true) ? 0x0080 : 0;
+
+        return $this->flags . ' ' . $this->protocol . ' ' . $this->algorithm->value . ' ' . $this->key;
     }
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
         $this->flags     = intval($this->sanitize(array_shift($_rdata)));
         $this->protocol  = intval($this->sanitize(array_shift($_rdata)));
-        $this->algorithm = intval($this->sanitize(array_shift($_rdata)));
+        $this->algorithm = \NetDNS2\ENUM\DNSSEC\Algorithm::set(intval($this->sanitize(array_shift($_rdata))));
         $this->key       = implode(' ', $_rdata);
-    
+
+        //
+        // extract the flags
+        //
+        $this->zone   = ($this->flags & 0x0100) ? true : false;
+        $this->sep    = ($this->flags & 0x0001) ? true : false;
+        $this->revoke = ($this->flags & 0x0080) ? true : false;
+
+        //
+        // RFC 4034 - 2.1.2.  The Protocol Field
+        //
+        // The Protocol Field MUST have value 3, and the DNSKEY RR MUST be treated as invalid during signature verification 
+        // if it is found to be some value other than 3.
+        //
+        if ($this->protocol != 3)
+        {
+            throw new \NetDNS2\Exception('the DNSKEY protocol value must be 3.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
+        }
+
         return true;
     }
 
@@ -95,7 +128,27 @@ class DNSKEY extends \NetDNS2\RR
             return false;
         }
 
-        list('x' => $this->flags, 'y' => $this->protocol, 'z' => $this->algorithm) = (array)$val;
+        list('x' => $this->flags, 'y' => $this->protocol, 'z' => $algorithm) = (array)$val;
+
+        $this->algorithm = \NetDNS2\ENUM\DNSSEC\Algorithm::set($algorithm);
+
+        //
+        // extract the flags
+        //
+        $this->zone   = ($this->flags & 0x0100) ? true : false;
+        $this->sep    = ($this->flags & 0x0001) ? true : false;
+        $this->revoke = ($this->flags & 0x0080) ? true : false;
+
+        //
+        // RFC 4034 - 2.1.2.  The Protocol Field
+        //
+        // The Protocol Field MUST have value 3, and the DNSKEY RR MUST be treated as invalid during signature verification 
+        // if it is found to be some value other than 3.
+        //
+        if ($this->protocol != 3)
+        {
+            throw new \NetDNS2\Exception('the DNSKEY protocol value must be 3.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
+        }
 
         //
         // get the key
@@ -115,7 +168,15 @@ class DNSKEY extends \NetDNS2\RR
             return '';
         }
 
-        $data = pack('nCC', $this->flags, $this->protocol, $this->algorithm);
+        //
+        // pack the flags
+        //
+        $this->flags = 0;
+        $this->flags |= ($this->zone == true) ? 0x0100 : 0;
+        $this->flags |= ($this->sep == true) ? 0x0001 : 0;
+        $this->flags |= ($this->revoke == true) ? 0x0080 : 0;
+
+        $data = pack('nCC', $this->flags, $this->protocol, $this->algorithm->value);
 
         $decode = base64_decode($this->key);
         if ($decode !== false)

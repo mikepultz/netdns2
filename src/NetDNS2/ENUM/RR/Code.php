@@ -17,9 +17,9 @@
  *
  */
 
-namespace NetDNS2\ENUM;
+namespace NetDNS2\ENUM\RR;
 
-enum RCode: int
+enum Code: int
 {
     use \NetDNS2\ENUM\Base;
 
@@ -62,7 +62,7 @@ enum RCode: int
             self::NXRRSET       => 'RR Set that should exist does not.',
             self::NOTAUTH       => 'Server Not Authoritative for zone.',
             self::NOTZONE       => 'Name not contained in zone.',
-            self::DSOTYPENI     => '',
+            self::DSOTYPENI     => 'DSO-TYPE Not Implemented',
 
             self::BADSIG        => 'TSIG Signature Failure.',
             self::BADKEY        => 'Key not recognized.',
@@ -71,7 +71,7 @@ enum RCode: int
             self::BADNAME       => 'Duplicate key name.',
             self::BADALG        => 'Algorithm not supported.',
             self::BADTRUNC      => 'Bad truncation.',
-            self::BADCOOKIE     => ''
+            self::BADCOOKIE     => 'Bad/missing Server Cookie'
         };
     }
 }

@@ -151,7 +151,7 @@ final class PrivateKey
         //
         if (extension_loaded('openssl') === false)
         {
-            throw new \NetDNS2\Exception('the OpenSSL extension is required to use parse private key.', \NetDNS2\ENUM\Error::OPENSSL_UNAVAIL);
+            throw new \NetDNS2\Exception('the openssl extension is required to parse private key.', \NetDNS2\ENUM\Error::INT_INVALID_EXTENSION);
         }
 
         //
@@ -159,7 +159,7 @@ final class PrivateKey
         //
         if (is_readable($_file) == false)
         {
-            throw new \NetDNS2\Exception('invalid private key file: ' . $_file, \NetDNS2\ENUM\Error::OPENSSL_INV_PKEY);
+            throw new \NetDNS2\Exception(sprintf('invalid private key file: %s', $_file), \NetDNS2\ENUM\Error::INT_INVALID_PRIVATE_KEY);
         }
 
         //
@@ -169,7 +169,7 @@ final class PrivateKey
 
         if (strlen($keyname) == 0)
         {
-            throw new \NetDNS2\Exception('failed to get basename() for: ' . $_file, \NetDNS2\ENUM\Error::OPENSSL_INV_PKEY);
+            throw new \NetDNS2\Exception(sprintf('failed to get basename() for: %s', $_file), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         //
@@ -183,7 +183,7 @@ final class PrivateKey
 
         } else
         {
-            throw new \NetDNS2\Exception('file ' . $keyname . ' does not look like a private key file!', \NetDNS2\ENUM\Error::OPENSSL_INV_PKEY);
+            throw new \NetDNS2\Exception(sprintf('file %s does not look like a private key file!', $keyname), \NetDNS2\ENUM\Error::INT_INVALID_PRIVATE_KEY);
         }
 
         //
@@ -192,17 +192,17 @@ final class PrivateKey
         $data = file($_file, FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
         if ( ($data === false) || (count($data) == 0) )
         {
-            throw new \NetDNS2\Exception('file ' . $keyname . ' is empty!', \NetDNS2\ENUM\Error::OPENSSL_INV_PKEY);
+            throw new \NetDNS2\Exception(sprintf('file %s is empty.', $keyname), \NetDNS2\ENUM\Error::INT_INVALID_PRIVATE_KEY);
         }
 
         foreach((array)$data as $line)
         {
-            list($key, $value) = explode(':', $line);
+            list($key, $value) = explode(' ', $line, 3);
 
-            $key   = trim($key);
+            $key   = strtolower(trim(rtrim($key, ':')));
             $value = trim($value);
 
-            switch(strtolower($key))
+            switch($key)
             {
                 case 'private-key-format':
                 {
@@ -213,8 +213,7 @@ final class PrivateKey
                 {
                     if ($this->algorithm->value != $value)
                     {
-                        throw new \NetDNS2\Exception('Algorithm mis-match! filename is ' . $this->algorithm->value . ', contents say ' . $value,
-                            \NetDNS2\ENUM\Error::OPENSSL_INV_ALGO);
+                        throw new \NetDNS2\Exception(sprintf('algorithm mis-match! filename is %s, contents say %s', $this->algorithm->value, $value), \NetDNS2\ENUM\Error::INT_INVALID_ALGORITHM);
                     }
                 }
                 break;
@@ -294,7 +293,7 @@ final class PrivateKey
 
                 default:
                 {
-                    throw new \NetDNS2\Exception('unknown private key data: ' . $key . ': ' . $value, \NetDNS2\ENUM\Error::OPENSSL_INV_PKEY);
+                    //TODO: throw new \NetDNS2\Exception(sprintf('unknown private key data: %s: %s', $key, $value), \NetDNS2\ENUM\Error::INT_INVALID_PRIVATE_KEY);
                 }
             }
         }
@@ -332,7 +331,7 @@ final class PrivateKey
             break;
 
             //
-            // DSA - this won't work in PHP until the OpenSSL extension is better
+            // DSA
             //
             case \NetDNS2\ENUM\DNSSEC\Algorithm::DSA:
             {
@@ -351,7 +350,7 @@ final class PrivateKey
             break;
             default:
             {
-                throw new \NetDNS2\Exception('we only currently support RSAMD5 and RSASHA1 encryption.', \NetDNS2\ENUM\Error::OPENSSL_INV_PKEY);
+                throw new \NetDNS2\Exception('we only currently support RSAMD5 and RSASHA1 encryption.', \NetDNS2\ENUM\Error::INT_INVALID_PRIVATE_KEY);
             }
         }
 
@@ -361,10 +360,10 @@ final class PrivateKey
         $instance = openssl_pkey_new($args);
         if ($instance === false)
         {
-            throw new \NetDNS2\Exception('OpenSSL exception: ' . strval(openssl_error_string()), \NetDNS2\ENUM\Error::OPENSSL_ERROR);
+            throw new \NetDNS2\Exception(sprintf('openssl exception: %s', strval(openssl_error_string())), \NetDNS2\ENUM\Error::INT_FAILED_OPENSSL);
         }
 
-        $this->instance = clone $instance;
+        $this->instance = $instance;
 
         //
         // store the filename incase we need it for something

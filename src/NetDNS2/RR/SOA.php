@@ -60,27 +60,27 @@ final class SOA extends \NetDNS2\RR
     /**
      * serial number
      */
-    protected string $serial;
+    protected int $serial;
 
     /**
      * refresh time
      */
-    protected string $refresh;
+    protected int $refresh;
 
     /**
      * retry interval
      */
-    protected string $retry;
+    protected int $retry;
 
     /**
      * expire time
      */
-    protected string $expire;
+    protected int $expire;
 
     /**
      * minimum TTL for any RR in this zone
      */
-    protected string $minimum;
+    protected int $minimum;
 
     /**
      * @see \NetDNS2\RR::rrToString()
@@ -92,18 +92,17 @@ final class SOA extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
         $this->mname    = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, array_shift($_rdata));
         $this->rname    = new \NetDNS2\Data\Mailbox(\NetDNS2\Data::DATA_TYPE_RFC1035, array_shift($_rdata));
 
-        $this->serial   = $this->sanitize(array_shift($_rdata));
-        $this->refresh  = $this->sanitize(array_shift($_rdata));
-        $this->retry    = $this->sanitize(array_shift($_rdata));
-        $this->expire   = $this->sanitize(array_shift($_rdata));
-        $this->minimum  = $this->sanitize(array_shift($_rdata));
+        $this->serial   = intval($this->sanitize(array_shift($_rdata)));
+        $this->refresh  = intval($this->sanitize(array_shift($_rdata)));
+        $this->retry    = intval($this->sanitize(array_shift($_rdata)));
+        $this->expire   = intval($this->sanitize(array_shift($_rdata)));
+        $this->minimum  = intval($this->sanitize(array_shift($_rdata)));
 
         return true;
     }
@@ -135,13 +134,7 @@ final class SOA extends \NetDNS2\RR
             return false;
         }
 
-        list('a' => $a, 'b' => $b, 'c' => $c, 'd' => $d, 'e' => $e) = (array)$val;
-
-        $this->serial  = \NetDNS2\Client::expandUint32($a);
-        $this->refresh = \NetDNS2\Client::expandUint32($b);
-        $this->retry   = \NetDNS2\Client::expandUint32($c);
-        $this->expire  = \NetDNS2\Client::expandUint32($d);
-        $this->minimum = \NetDNS2\Client::expandUint32($e);
+        list('a' => $this->serial, 'b' => $this->refresh, 'c' => $this->retry, 'd' => $this->expire, 'e' => $this->minimum) = (array)$val;
 
         return true;
     }

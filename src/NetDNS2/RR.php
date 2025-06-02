@@ -60,12 +60,12 @@ abstract class RR implements \Stringable
     /**
      * The resource record type
      */
-    public \NetDNS2\ENUM\RRType $type;
+    public \NetDNS2\ENUM\RR\Type $type;
 
     /**
      * The resouce record class
      */
-    public \NetDNS2\ENUM\RRClass $class;
+    public \NetDNS2\ENUM\RR\Classes $class;
 
     /**
      * The UDP length used instead of the class value for OPT records
@@ -98,6 +98,7 @@ abstract class RR implements \Stringable
      *
      * @param array<string> $_rdata a string split line of values for the rdata
      *
+     * @throws \NetDNS2\Exception
      */
     abstract protected function rrFromString(array $_rdata): bool;
 
@@ -106,6 +107,7 @@ abstract class RR implements \Stringable
      *
      * @param \NetDNS2\Packet &$_packet a \NetDNS2\Packet packet to parse the RR from
      *
+     * @throws \NetDNS2\Exception
      */
     abstract protected function rrSet(\NetDNS2\Packet &$_packet): bool;
 
@@ -114,8 +116,9 @@ abstract class RR implements \Stringable
      *
      * @param \NetDNS2\Packet &$_packet a \NetDNS2\Packet packet
      *
-     * @return string                   either returns a binary packed string or empty string on failure
+     * @return string either returns a binary packed string or empty string on failure
      *
+     * @throws \NetDNS2\Exception
      */
     abstract protected function rrGet(\NetDNS2\Packet &$_packet): string;
 
@@ -123,24 +126,23 @@ abstract class RR implements \Stringable
      * Constructor - builds a new \NetDNS2\RR object
      *
      * @param \NetDNS2\Packet     &$_packet a \NetDNS2\Packet packet or null to create an empty object
-     * @param array<string,mixed> $_rr      an array with RR parse values or null to create an empty object
      *
      * @throws \NetDNS2\Exception
      *
      */
-    public function __construct(?\NetDNS2\Packet &$_packet = null, ?array $_rr = null)
+    public function __construct(?\NetDNS2\Packet &$_packet = null)
     {
-        if ( (is_null($_packet) == false) && (is_null($_rr) == false) )
+        if (is_null($_packet) == false)
         {
-            if ($this->set($_packet, $_rr) == false)
+            if ($this->set($_packet) == false)
             {
-                throw new \NetDNS2\Exception('failed to generate resource record', \NetDNS2\ENUM\Error::RR_INVALID);
+                throw new \NetDNS2\Exception('failed to generate resource record.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
             }
 
         } else
         {
-            $this->type  = \NetDNS2\ENUM\RRType::set(str_replace('NetDNS2\\RR\\', '', get_class($this)));
-            $this->class = \NetDNS2\ENUM\RRClass::set('IN');
+            $this->type  = \NetDNS2\ENUM\RR\Type::set(str_replace('NetDNS2\\RR\\', '', get_class($this)));
+            $this->class = \NetDNS2\ENUM\RR\Classes::set('IN');
             $this->ttl   = 86400;
         }
     }
@@ -155,7 +157,7 @@ abstract class RR implements \Stringable
     {
         if (property_exists(get_called_class(), $_name) == false)
         {
-            throw new \NetDNS2\Exception('undefined property: ' . $_name, \NetDNS2\ENUM\Error::RR_INVALID);
+            throw new \NetDNS2\Exception(sprintf('undefined property: %s', $_name), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         //
@@ -170,14 +172,14 @@ abstract class RR implements \Stringable
 
         if (($type instanceof \ReflectionNamedType) == false)
         {
-            throw new \NetDNS2\Exception('property is not accessible via Reflection: ' . $_name, \NetDNS2\ENUM\Error::RR_INVALID);
+            throw new \NetDNS2\Exception(sprintf('property is not accessible via Reflection: %s', $_name), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         switch($type->getName())
         {
             case 'NetDNS2\Data\Domain':
             {
-                $this->$_name = new \NetDNS2\Data\Domain($_value);
+                $this->$_name = new \NetDNS2\Data\Domain($_value->type(), $_value);
             }
             break;
             case 'NetDNS2\Data\Mailbox':
@@ -207,7 +209,7 @@ abstract class RR implements \Stringable
     {
         if (property_exists(get_called_class(), $_name) == false)
         {
-            throw new \NetDNS2\Exception('undefined property: ' . $_name, \NetDNS2\ENUM\Error::RR_INVALID);
+            throw new \NetDNS2\Exception(sprintf('undefined property: %s', $_name), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         return $this->$_name;
@@ -220,24 +222,6 @@ abstract class RR implements \Stringable
     public function __toString(): string
     {
         return strval($this->name) . '. ' . $this->ttl . ' ' . $this->class->label() . ' ' . $this->type->label() . ' ' . $this->rrToString();
-    }
-
-    /**
-     * return the same data as __toString(), but as an array, so each value can be used without having to parse the string.
-     *
-     * @return array<string,mixed>
-     *
-     */
-    public function asArray(): array
-    {
-        return [
-
-            'name'  => strval($this->name),
-            'ttl'   => $this->ttl,
-            'class' => $this->class->value,
-            'type'  => $this->type->value,
-            'rdata' => $this->rrToString()
-        ];
     }
 
     /**
@@ -314,32 +298,51 @@ abstract class RR implements \Stringable
      * builds a new \NetDNS2\RR object
      *
      * @param \NetDNS2\Packet     &$_packet a \NetDNS2\Packet packet or null to create an empty object
-     * @param array<string,mixed> $_rr      an array with RR parse values or null to create an empty object
      *
      * @throws \NetDNS2\Exception
      *
      */
-    public function set(\NetDNS2\Packet &$_packet, array $_rr): bool
+    public function set(\NetDNS2\Packet &$_packet): bool
     {
-        $this->name = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_rr['name']);
+        //
+        // expand the name
+        //
+        $this->name = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_packet, $_packet->offset);
 
-        $this->type = \NetDNS2\ENUM\RRType::set($_rr['type']);
+        //
+        // unpack the RR details
+        //
+        $this->type = \NetDNS2\ENUM\RR\Type::set(ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]));
+        $class      = ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]);
+        $this->ttl  = ord($_packet->rdata[$_packet->offset++]) << 24 | ord($_packet->rdata[$_packet->offset++]) << 16 | 
+                        ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]);
+
+        $this->rdlength = ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]);
+
+        //
+        // if the packet length is too small, then breka out
+        //
+        if ($_packet->rdlength < ($_packet->offset + $this->rdlength))
+        {
+            return false;
+        }
 
         //
         // for RR OPT (41), the class value includes the requestors UDP payload size, and not a class value
         //
-        if ($this->type == \NetDNS2\ENUM\RRType::OPT)
+        if ($this->type == \NetDNS2\ENUM\RR\Type::OPT)
         {
-            $this->udp_length = intval($_rr['class']);
+            $this->udp_length = intval($class);
         } else
         {
-            $this->class = \NetDNS2\ENUM\RRClass::set($_rr['class']);
+            $this->class = \NetDNS2\ENUM\RR\Classes::set($class);
         }
 
-        $this->ttl      = $_rr['ttl'];
-        $this->rdlength = $_rr['rdlength'];
-        $this->rdata    = substr($_packet->rdata, $_packet->offset, $_rr['rdlength']);
+        $this->rdata = substr($_packet->rdata, $_packet->offset, $this->rdlength);
 
+        //
+        // parse the rest of the RR object
+        //
         return $this->rrSet($_packet);
     }
 
@@ -364,7 +367,7 @@ abstract class RR implements \Stringable
         //
         // pack the main values
         //
-        if ($this->type == \NetDNS2\ENUM\RRType::OPT)
+        if ($this->type == \NetDNS2\ENUM\RR\Type::OPT)
         {
             //
             // pre-build the TTL value
@@ -412,14 +415,11 @@ abstract class RR implements \Stringable
      *
      * @param \NetDNS2\Packet &$_packet a \NetDNS2\Packet packet used for decompressing names
      *
-     * @return object                   returns a new \NetDNS2\RR\* object for the given RR
      * @throws \NetDNS2\Exception
      *
      */
-    public static function parse(\NetDNS2\Packet &$_packet): ?object
+    public static function parse(\NetDNS2\Packet &$_packet): ?\NetDNS2\RR
     {
-        $object = [];
-
         //
         // validate the packet size
         //
@@ -429,57 +429,63 @@ abstract class RR implements \Stringable
         }
         if ($_packet->rdlength < ($_packet->offset + 10))
         {
-            throw new \NetDNS2\Exception('failed to parse resource record: packet too small.', \NetDNS2\ENUM\Error::PARSE_ERROR);
+            throw new \NetDNS2\Exception('failed to parse resource record: packet too small.', \NetDNS2\ENUM\Error::INT_INVALID_PACKET);
         }
+
+        //
+        // store the offset so we don't increment the real value; we need to peek inside the packet just enough to figure
+        // out what type it is, and then pass it to the real constructor for parsing.
+        //
+        $offset = $_packet->offset;
 
         //
         // expand the name
         //
-        $object['name'] = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_packet, $_packet->offset);
+        $name = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_packet, $offset);
 
         //
-        // unpack the RR details
+        // unpack the RR type
         //
-        $object['type']  = ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]);
-        $object['class'] = ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]);
-        $object['ttl']   = ord($_packet->rdata[$_packet->offset++]) << 24 | ord($_packet->rdata[$_packet->offset++]) << 16 | 
-                           ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]);
+        $type = ord($_packet->rdata[$offset++]) << 8 | ord($_packet->rdata[$offset++]);
 
-        $object['rdlength'] = ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]);
+        /**
+          * @var \NetDNS2\RR $o
+          */
+        $o = new (\NetDNS2\ENUM\RR\Type::set($type)->class())($_packet);
 
-        if ($_packet->rdlength < ($_packet->offset + $object['rdlength']))
+        //
+        // increment the offset for the full object length; the underlying object doesn't increment
+        //
+        $_packet->offset += $o->rdlength;
+
+        //
+        // if it's an EDNS OPT object, then covert it so we can parse the values properly
+        //
+        if ($o->type == \NetDNS2\ENUM\RR\Type::OPT)
         {
-            return null;
+            /**
+             * @var \NetDNS2\RR\OPT $o
+             */
+            if ($o->option_code != \NetDNS2\ENUM\EDNS\Opt::NONE)
+            {
+                $o = $o->generate_edns($_packet);
+            }
         }
-
-        //
-        // lookup the class to use
-        //
-        $o = new (\NetDNS2\ENUM\RRType::set($object['type'])->class())($_packet, $object);
-
-        $_packet->offset += $object['rdlength'];
 
         return clone $o;
     }
 
     /**
      * does some basic sanitization
-     * 
      */
-    public function sanitize(?string $_data, bool $_strip_space = true): string
+    public function sanitize(?string $_data, bool $_lowercase = true): string
     {
         if (is_null($_data) == true)
         {
             return '';
         }
 
-        if ($_strip_space == true)
-        {
-            return strip_tags(strtolower(rtrim($_data, " \n\r\t\v\x00.")));
-        } else
-        {
-            return strtolower(rtrim($_data, '.'));
-        }
+        return ($_lowercase == true) ? strtolower(rtrim($_data, " \n\r\t\v\x00.")) : rtrim($_data, " \n\r\t\v\x00.");
     }
 
     /**
@@ -503,12 +509,12 @@ abstract class RR implements \Stringable
     {
         if (strlen($_line) == 0)
         {
-            throw new \NetDNS2\Exception('empty config line provided.', \NetDNS2\ENUM\Error::PARSE_ERROR);
+            throw new \NetDNS2\Exception('empty config line provided.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         $name  = '';
-        $type  = \NetDNS2\ENUM\RRType::set('SOA');
-        $class = \NetDNS2\ENUM\RRClass::set('IN');
+        $type  = \NetDNS2\ENUM\RR\Type::set('SOA');
+        $class = \NetDNS2\ENUM\RR\Classes::set('IN');
         $ttl   = 86400;
 
         //
@@ -517,7 +523,7 @@ abstract class RR implements \Stringable
         $values = preg_split('/[\s]+/', $_line);
         if ( ($values === false) || (count((array)$values) < 3) )
         {
-            throw new \NetDNS2\Exception('failed to parse config: minimum of name, type and rdata required.', \NetDNS2\ENUM\Error::PARSE_ERROR);
+            throw new \NetDNS2\Exception('failed to parse config: minimum of name, type and rdata required.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         //
@@ -534,7 +540,7 @@ abstract class RR implements \Stringable
             {
                 case is_numeric($value):
                 {
-                    $ttl = intval(array_shift($values));
+                    $ttl = intval(array_shift($values) ?? 86400);
                 }
                 break;
 
@@ -543,22 +549,22 @@ abstract class RR implements \Stringable
                 //
                 case ($value === 0): // @phpstan-ignore-line
                 {
-                    $ttl = intval(array_shift($values));
+                    $ttl = intval(array_shift($values) ?? 0);
                 }
                 break;
-                case (\NetDNS2\ENUM\RRClass::exists(strval($value)) == true):
+                case (\NetDNS2\ENUM\RR\Classes::exists(strval($value)) == true):
                 {
-                    $class = \NetDNS2\ENUM\RRClass::set(array_shift($values));
+                    $class = \NetDNS2\ENUM\RR\Classes::set(array_shift($values) ?? '');
                 }
                 break;
-                case (\NetDNS2\ENUM\RRType::exists(strval($value)) == true):
+                case (\NetDNS2\ENUM\RR\Type::exists(strval($value)) == true):
                 {
-                    $type = \NetDNS2\ENUM\RRType::set(array_shift($values));
+                    $type = \NetDNS2\ENUM\RR\Type::set(array_shift($values) ?? '');
                     break 2;
                 }
                 default:
                 {
-                    throw new \NetDNS2\Exception('invalid config line provided: unknown file: ' . $value, \NetDNS2\ENUM\Error::PARSE_ERROR);
+                    throw new \NetDNS2\Exception(sprintf('invalid config line provided: unknown file: %s', $value), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
                 }
             }
         }
@@ -580,7 +586,7 @@ abstract class RR implements \Stringable
         //
         if ($o->rrFromString($values) === false)
         {
-            throw new \NetDNS2\Exception('failed to parse rdata for config: ' . $_line, \NetDNS2\ENUM\Error::PARSE_ERROR);
+            throw new \NetDNS2\Exception(sprintf('failed to parse rdata for config: %s', $_line), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         return clone $o;

@@ -31,7 +31,7 @@ trait Base
             }
         }
 
-        throw new \NetDNS2\Exception(sprintf('invalid enum value %s specified.', $_id), \NetDNS2\ENUM\Error::CLASS_INVALID);
+        throw new \NetDNS2\Exception(sprintf('invalid enum value %s specified.', $_id), \NetDNS2\ENUM\Error::INT_INVALID_ENUM);
     }
     public static function exists(string|int $_id): bool
     {

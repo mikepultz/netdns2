@@ -36,8 +36,9 @@ spl_autoload_register(function($_class)
  *
  * This class provides functions to handle DNS notify requests as defined by RFC 1996.
  *
- * This is separate from the \NetDNS2\Resolver class, as while the underlying protocol is the same, the functionality is completely different. Generally, 
- * query (recursive) lookups are done against caching server, while notify requests are done against authoratative servers.
+ * This is separate from the \NetDNS2\Resolver class, as while the underlying protocol is the same, the functionality is 
+ * completely different. Generally, query (recursive) lookups are done against caching server, while notify requests are 
+ * done against authoratative servers.
  *
  */
 final class Notifier extends \NetDNS2\Client
@@ -68,7 +69,7 @@ final class Notifier extends \NetDNS2\Client
         //
         // make sure the opcode on the packet is set to NOTIFY
         //
-        $this->m_packet->header->opcode = \NetDNS2\Header::OPCODE_NOTIFY;
+        $this->m_packet->header->opcode = \NetDNS2\ENUM\OpCode::NOTIFY;
     }
 
     /**
@@ -83,8 +84,7 @@ final class Notifier extends \NetDNS2\Client
     {
         if (preg_match('/' . $this->m_packet->question[0]->qname . '$/', $_name) !== 1)
         {
-            throw new \NetDNS2\Exception('name provided (' . $_name . ') does not match zone name (' . $this->m_packet->question[0]->qname . ')',
-                \NetDNS2\ENUM\Error::PACKET_INVALID);
+            throw new \NetDNS2\Exception(sprintf('name %s does not match zone name %s.', $_name, $this->m_packet->question[0]->qname), \NetDNS2\ENUM\Error::INT_INVALID_PACKET);
         }
     
         return;
@@ -179,7 +179,7 @@ final class Notifier extends \NetDNS2\Client
         //
         if ($this->m_packet->header->qdcount == 0)
         {
-            throw new \NetDNS2\Exception('empty headers- nothing to send!', \NetDNS2\ENUM\Error::PACKET_INVALID);
+            throw new \NetDNS2\Exception('invalid or empty header data provided.', \NetDNS2\ENUM\Error::INT_INVALID_PACKET);
         }
 
         //

@@ -24,9 +24,12 @@ abstract class Data implements \Stringable
     /**
      * internal encoding types
      */
+    public const DATA_TYPE_NONE     = 0;
     public const DATA_TYPE_CANON    = 1;
     public const DATA_TYPE_RFC1035  = 2;
     public const DATA_TYPE_RFC2535  = 3;
+    public const DATA_TYPE_IPV4     = 10;
+    public const DATA_TYPE_IPV6     = 11;
 
     /**
      * the encoding type used by this object
@@ -50,7 +53,7 @@ abstract class Data implements \Stringable
      *
      * @param int   $_type   encoding type
      * @param mixed $_data   a string or \NetDNS2\Packet object to extract a value from
-     * @param int   $_offset an offset value used to seek inside the data provided.
+     * @param ?int  $_offset an offset value used to seek inside the data provided.
      *
      * @throws \NetDNS2\Exception
      */
@@ -64,21 +67,21 @@ abstract class Data implements \Stringable
         //
         // parse as a rdata
         //
-        if ( (is_null($_data) == false) && (is_null($_offset) == false) && (is_string($_data) == true) )
+        if ( (is_null($_data) == false) && (is_string($_data) == true) && (is_null($_offset) == false) )
         {
             $this->decode($_data, $_offset);
 
         //
         // store from a \NetDNS2\Packet object
         //
-        } else if ( (is_null($_data) == false) && (is_null($_offset) == false) && (($_data instanceof \NetDNS2\Packet) == true) )
+        } else if ( (is_null($_data) == false) && (($_data instanceof \NetDNS2\Packet) == true) )
         {
             $this->decode($_data->rdata, $_offset);
 
         //
         // assign as a string
         //
-        } else if ( (is_null($_data) == false) && (is_string($_data) == true) )
+        } else if ( (is_null($_data) == false) && (gettype($_data) == 'string') )
         {
             $this->m_value = trim($_data, '".');
 
@@ -129,7 +132,7 @@ abstract class Data implements \Stringable
      */
     abstract public function encode(?int &$_offset = null): string;
     abstract protected function decode(string $_rdata, int &$_offset): void;
-    
+
     /**
      * domain expansion function
      *
@@ -141,6 +144,9 @@ abstract class Data implements \Stringable
      */
     protected function _decode(string $_rdata, int &$_offset, bool $_escape = false): array
     {
+        /**
+         * @var array<int,string> $labels
+         */
         $labels = [];
 
         while($_offset < strlen($_rdata))
@@ -160,7 +166,11 @@ abstract class Data implements \Stringable
                 //
                 if ( ($_escape == true) && (strpos($label, '.') !== false) )
                 {
-                    $label = preg_replace('/(?<!\\\)\./', '\.', $label);
+                    $res = preg_replace('/(?<!\\\)\./', '\.', $label);
+                    if (is_null($res) == false)
+                    {
+                        $label = $res;
+                    }
                 }
 
                 $labels[] = $label;
@@ -200,7 +210,7 @@ abstract class Data implements \Stringable
      *
      * @throws \NetDNS2\Exception
      */
-    protected function encode_rfc1035(string $_value, ?int &$_offset = null): string
+    protected function encode_rfc1035(string $_value, int &$_offset): string
     {
         if (strlen($_value) == 0)
         {
@@ -216,7 +226,7 @@ abstract class Data implements \Stringable
         $labels = preg_split('/(?<!\\\)\./', $_value);
         if ($labels === false)
         {
-            throw new \NetDNS2\Exception('failed to parse local name value.', \NetDNS2\ENUM\Error::PARSE_ERROR);
+            throw new \NetDNS2\Exception('failed to parse local name value.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         while(count($labels) > 0)
@@ -270,7 +280,7 @@ abstract class Data implements \Stringable
         $labels = preg_split('/(?<!\\\)\./', strtolower($_value));
         if ($labels === false)
         {
-            throw new \NetDNS2\Exception('failed to parse local name value.', \NetDNS2\ENUM\Error::PARSE_ERROR);
+            throw new \NetDNS2\Exception('failed to parse local name value.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         foreach($labels as $label)

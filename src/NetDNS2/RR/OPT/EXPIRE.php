@@ -17,25 +17,28 @@
  *
  */
 
-namespace NetDNS2\RR;
+namespace NetDNS2\RR\OPT;
 
 /**
- * NULL Resource Record - undefined; the rdata is simply used as-is in it's binary format, so not process has to be done.
- *
+ * RFC 7314 - Extension Mechanisms for DNS (EDNS) EXPIRE Option
  */
-final class NULL extends \NetDNS2\RR
+final class EXPIRE extends \NetDNS2\RR\OPT
 {
+    /**
+     * the expire value (4 bytes)
+     */
+    protected int $expire = 0;
+
     /**
      * @see \NetDNS2\RR::rrToString()
      */
     protected function rrToString(): string
     {
-        return '';
+        return $this->option_code->label() . ' ' . $this->option_length . ' ' . $this->timeout;
     }
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
@@ -47,6 +50,19 @@ final class NULL extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
+        if ($this->option_length == 0)
+        {
+            return true;
+        }
+
+        $val = unpack('Nx', $this->option_data);
+        if ($val === false)
+        {
+            return false;
+        }
+
+        list('x' => $this->expire) = (array)$val;
+
         return true;
     }
 
@@ -55,6 +71,22 @@ final class NULL extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        return $this->rdata;
+        //
+        // build and add the local data
+        //
+        if ($this->expire > 0)
+        {
+            $this->option_length = 4;
+            $this->option_data   = pack('N', $this->expire);
+        } else
+        {
+            $this->option_length = 0;
+            $this->option_data   = '';
+        }
+
+        //
+        // build the parent OPT data
+        //
+        return parent::rrGet($_packet);
     }
 }

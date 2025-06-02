@@ -34,48 +34,10 @@ namespace NetDNS2\RR;
  */
 final class CERT extends \NetDNS2\RR
 {
-    /*
-     * format's allowed for certificates
-     */
-    public const CERT_FORMAT_RES       = 0;
-    public const CERT_FORMAT_PKIX      = 1;
-    public const CERT_FORMAT_SPKI      = 2;
-    public const CERT_FORMAT_PGP       = 3;
-    public const CERT_FORMAT_IPKIX     = 4;
-    public const CERT_FORMAT_ISPKI     = 5;
-    public const CERT_FORMAT_IPGP      = 6;
-    public const CERT_FORMAT_ACPKIX    = 7;
-    public const CERT_FORMAT_IACPKIX   = 8;
-    public const CERT_FORMAT_URI       = 253;
-    public const CERT_FORMAT_OID       = 254;
-
-    /**
-     * @var array<string,int>
-     */
-    public array $cert_format_name_to_id = [];
-
-    /**
-     * @var array<int,string>
-     */
-    public array $cert_format_id_to_name = [
-
-        self::CERT_FORMAT_RES       => 'Reserved',
-        self::CERT_FORMAT_PKIX      => 'PKIX',
-        self::CERT_FORMAT_SPKI      => 'SPKI',
-        self::CERT_FORMAT_PGP       => 'PGP',
-        self::CERT_FORMAT_IPKIX     => 'IPKIX',
-        self::CERT_FORMAT_ISPKI     => 'ISPKI',
-        self::CERT_FORMAT_IPGP      => 'IPGP',
-        self::CERT_FORMAT_ACPKIX    => 'ACPKIX',
-        self::CERT_FORMAT_IACPKIX   => 'IACPKIX',
-        self::CERT_FORMAT_URI       => 'URI',
-        self::CERT_FORMAT_OID       => 'OID'
-    ];
-
     /**
      * certificate format
      */
-    protected int $format;
+    protected \NetDNS2\ENUM\CertFormat $format;
 
     /**
      * key tag
@@ -93,65 +55,22 @@ final class CERT extends \NetDNS2\RR
     protected string $certificate = '';
 
     /**
-     * we have our own constructor so that we can load our certificate
-     * information for parsing.
-     *
-     * @param \NetDNS2\Packet     &$_packet a \NetDNS2\Packet packet to parse the RR from
-     * @param array<string,mixed> $_rr      a array with parsed RR values
-     *
-     */
-    public function __construct(?\NetDNS2\Packet &$_packet = null, ?array $_rr = null)
-    {
-        parent::__construct($_packet, $_rr);
-    
-        //
-        // load the lookup values
-        //
-        $this->cert_format_name_to_id = array_flip($this->cert_format_id_to_name);
-    }
-
-    /**
      * @see \NetDNS2\RR::rrToString()
      */
     protected function rrToString(): string
     {
-        return $this->format . ' ' . $this->keytag . ' ' . $this->algorithm->value . ' ' . base64_encode($this->certificate);
+        return $this->format->value . ' ' . $this->keytag . ' ' . $this->algorithm->value . ' ' . base64_encode($this->certificate);
     }
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
-        $format             = $this->sanitize(array_shift($_rdata));
+        $this->format       = \NetDNS2\ENUM\CertFormat::set($this->sanitize(array_shift($_rdata), false));
         $this->keytag       = intval($this->sanitize(array_shift($_rdata)));
         $this->algorithm    = \NetDNS2\ENUM\DNSSEC\Algorithm::set($this->sanitize(array_shift($_rdata)));
 
-        //
-        // check the format; can be an int, or a mnemonic symbol
-        //
-        if (is_numeric($format) == false)
-        {
-            $mnemonic = strtoupper(trim($format));
-
-            if (isset($this->cert_format_name_to_id[$mnemonic]) == false)
-            {
-                throw new \NetDNS2\Exception('invalid format value provided: ' . $format, \NetDNS2\ENUM\Error::PARSE_ERROR);
-            }
-
-            $this->format = $this->cert_format_name_to_id[$mnemonic];
-
-        } else
-        {
-            if (isset($this->cert_format_id_to_name[$format]) == false)
-            {
-                throw new \NetDNS2\Exception('invalid format value provided: ' . $format, \NetDNS2\ENUM\Error::PARSE_ERROR);
-            }
-
-            $this->format = intval($format);
-        }
-    
         //
         // parse and base64 decode the certificate
         //
@@ -161,7 +80,7 @@ final class CERT extends \NetDNS2\RR
 
         if ($this->certificate === false)
         {
-            throw new \NetDNS2\Exception('invalid certificate value provided: ' . $this->certificate, \NetDNS2\ENUM\Error::PARSE_ERROR);
+            throw new \NetDNS2\Exception(sprintf('invalid certificate value provided: %s', $this->certificate), \NetDNS2\ENUM\Error::INT_INVALID_CERTIFICATE);
         }
 
         return true;
@@ -186,8 +105,9 @@ final class CERT extends \NetDNS2\RR
             return false;
         }
 
-        list('x' => $this->format, 'y' => $this->keytag, 'z' => $algorithm) = (array)$val;
+        list('x' => $format, 'y' => $this->keytag, 'z' => $algorithm) = (array)$val;
 
+        $this->format    = \NetDNS2\ENUM\CertFormat::set($format);
         $this->algorithm = \NetDNS2\ENUM\DNSSEC\Algorithm::set($algorithm);
 
         //
@@ -210,6 +130,6 @@ final class CERT extends \NetDNS2\RR
         
         $_packet->offset += strlen($this->certificate) + 5;
 
-        return pack('nnC', $this->format, $this->keytag, $this->algorithm->value) . $this->certificate;
+        return pack('nnC', $this->format->value, $this->keytag, $this->algorithm->value) . $this->certificate;
     }
 }

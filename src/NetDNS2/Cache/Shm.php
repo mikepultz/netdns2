@@ -25,10 +25,12 @@ namespace NetDNS2\Cache;
  */
 final class Shm extends \NetDNS2\Cache
 {
+    use \NetDNS2\Cache\Model\Data;
+
     /**
      * resource id of the shared memory cache
      */
-    private \Shmop $m_cache_id;
+    private \Shmop $m_cache;
 
     /**
      * the IPC key
@@ -36,20 +38,30 @@ final class Shm extends \NetDNS2\Cache
     private int $m_cache_file_tok = -1;
 
     /**
-     * open a cache object
-     *
-     * @param string  $_cache_file path to a file to use for cache storage
-     * @param integer $_size       the size of the shared memory segment to create
-     * @param string  $_serializer the name of the cache serialize to use
-     *
-     * @throws \NetDNS2\Exception
-     *
-     */
-    public function open(string $_cache_file, int $_size, string $_serializer): void
-    {
-        $this->cache_file       = $_cache_file;
-        $this->cache_size       = $_size;
-        $this->cache_serializer = $_serializer;
+     * @see \NetDNS2\Cache::__construct()
+     */                 
+    public function __construct(array $_options = [])
+    {         
+        //
+        // copy over the options
+        //                        
+        $this->m_options = $_options;
+
+        //            
+        // make sure we have a file location
+        //
+        if (isset($this->m_options['file']) == false)     
+        {
+            throw new \NetDNS2\Exception('you must provide a file to cache dns results to.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
+        }
+
+        //
+        // check for a default max cache size
+        //
+        if (isset($this->m_options['size']) == false)
+        {
+            $this->m_options['size'] = \NetDNS2\Cache::CACHE_DEFAULT_MAX_SIZE;
+        }
 
         //
         // if we've already loaded the cache data, then just return right away
@@ -62,67 +74,50 @@ final class Shm extends \NetDNS2\Cache
         //
         // make sure the file exists first
         //
-        if (file_exists($this->cache_file) == false)
+        if (file_exists($this->m_options['file']) == false)
         {
-            if (file_put_contents($this->cache_file, '') === false)
+            if (file_put_contents($this->m_options['file'], '') === false)
             {
-                throw new \NetDNS2\Exception('failed to create empty SHM file: ' . $this->cache_file, \NetDNS2\ENUM\Error::CACHE_SHM_FILE);
+                throw new \NetDNS2\Exception(sprintf('failed to create empty SHM file: %s', $this->m_options['file']), \NetDNS2\ENUM\Error::INT_FAILED_SHMOP);
             }
         }
 
         //
         // convert the filename to a IPC key
         //
-        $this->m_cache_file_tok = ftok($this->cache_file, 't');
+        $this->m_cache_file_tok = ftok($this->m_options['file'], 't');
         if ($this->m_cache_file_tok == -1)
         {
-            throw new \NetDNS2\Exception('failed on ftok() file: ' . $this->m_cache_file_tok, \NetDNS2\ENUM\Error::CACHE_SHM_FILE);
+            throw new \NetDNS2\Exception(sprintf('failed on ftok() file: %s', $this->m_cache_file_tok), \NetDNS2\ENUM\Error::INT_FAILED_SHMOP);
         }
 
         //
-        // try to open an existing cache; if it doesn't exist, then there's no
-        // cache, and nothing to do.
+        // try to open an existing cache; if it doesn't exist, then there's no cache, and nothing to do.
         //
-        $cache_id = @shmop_open($this->m_cache_file_tok, 'w', 0, 0);
-        if ($cache_id === false)
+        $cache = @shmop_open($this->m_cache_file_tok, 'c', 0644, $this->m_options['size']);
+        if ($cache === false)
         {
-            throw new \NetDNS2\Exception('failed on shmop_open() file: ' . $this->m_cache_file_tok, \NetDNS2\ENUM\Error::CACHE_SHM_FILE);
+            throw new \NetDNS2\Exception(sprintf('failed on shmop_open() file: %s', $this->m_cache_file_tok), \NetDNS2\ENUM\Error::INT_FAILED_SHMOP);
         }
 
-        $this->m_cache_id = clone $cache_id;
+        $this->m_cache = $cache;
 
         //
         // this returns the size allocated, and not the size used, but it's still a good check to make sure there's space allocated.
         //
-        $allocated = shmop_size($this->m_cache_id);
+        $allocated = shmop_size($this->m_cache);
         if ($allocated > 0)
         {
             //
             // read the data from the shared memory segment
             //
-            $data = trim(shmop_read($this->m_cache_id, 0, $allocated));
+            $data = trim(shmop_read($this->m_cache, 0, $allocated));
             if (strlen($data) > 0)
             {
                 //
                 // unserialize and store the data
                 //
-                $decoded = null;
-
-                if ($this->cache_serializer == 'json')
-                {
-                    try
-                    {
-                        $decoded = @json_decode(strval($data), true, 512, JSON_THROW_ON_ERROR);
-
-                    } catch(\ValueError $e)
-                    {
-                        $decoded = null;
-                    }
-
-                } else
-                {
-                    $decoded = unserialize(strval($data));
-                }
+                $decoded = unserialize(strval($data));
 
                 if (is_array($decoded) == true)
                 {
@@ -146,20 +141,19 @@ final class Shm extends \NetDNS2\Cache
     }
 
     /**
-     * Destructor
-     *
+     * destructor
      */
     public function __destruct()
     {
         //
         // if there's no cache file set, then there's nothing to do
         //
-        if (strlen($this->cache_file) == 0)
+        if (strlen($this->m_options['file']) == 0)
         {
             return;
         }
 
-        $fp = fopen($this->cache_file, 'r');
+        $fp = fopen($this->m_options['file'], 'r');
         if ($fp !== false)
         {
             //
@@ -170,12 +164,12 @@ final class Shm extends \NetDNS2\Cache
             //
             // get the size allocated to the segment
             //
-            $allocated = shmop_size($this->m_cache_id);
+            $allocated = shmop_size($this->m_cache);
 
             //
             // read the contents
             //
-            $data = trim(shmop_read($this->m_cache_id, 0, $allocated));
+            $data = trim(shmop_read($this->m_cache, 0, $allocated));
 
             //
             // if there was some data
@@ -187,23 +181,7 @@ final class Shm extends \NetDNS2\Cache
                 //
                 $c = $this->cache_data;
 
-                $decoded = null;
-  
-                if ($this->cache_serializer == 'json')
-                {
-                    try
-                    {
-                        $decoded = @json_decode(strval($data), true, 512, JSON_THROW_ON_ERROR);
-
-                    } catch(\ValueError $e)
-                    {
-                        $decoded = null;
-                    }
-
-                } else
-                {
-                    $decoded = unserialize(strval($data));
-                }   
+                $decoded = unserialize(strval($data));
                          
                 if (is_array($decoded) == true)
                 {
@@ -214,7 +192,7 @@ final class Shm extends \NetDNS2\Cache
             //
             // delete the segment
             //
-            shmop_delete($this->m_cache_id);
+            shmop_delete($this->m_cache);
 
             //
             // clean the data
@@ -231,25 +209,13 @@ final class Shm extends \NetDNS2\Cache
                 //
                 // re-create segment
                 //
-                $cache_id = @shmop_open($this->m_cache_file_tok, 'c', 0644, $this->cache_size);
-                if ($cache_id === false)
+                $cache = @shmop_open($this->m_cache_file_tok, 'c', 0644, $this->m_options['size']);
+                if ($cache === false)
                 {
                     return;
                 }
 
-                $this->m_cache_id = clone $cache_id;
-
-                $o = shmop_write($this->m_cache_id, $data, 0);
-            }
-
-            //
-            // close the segment
-            //
-            // shmop_close() is deprecated in v8.0.0
-            //
-            if (version_compare(PHP_VERSION, '8.0.0', '<') == true)
-            {
-                shmop_close($this->m_cache_id);
+                $o = shmop_write($cache, $data, 0);
             }
 
             //

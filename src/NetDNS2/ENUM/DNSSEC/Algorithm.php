@@ -82,7 +82,7 @@ enum Algorithm: int
             self::RSASHA1       => OPENSSL_ALGO_SHA1,
             self::RSASHA256     => OPENSSL_ALGO_SHA256,
             self::RSASHA512     => OPENSSL_ALGO_SHA512,
-            default             => throw new \NetDNS2\Exception(sprintf('Algorithm %s does not have OpenSSL support.', $this->label()), \NetDNS2\ENUM\Error::OPENSSL_INV_ALGO)
+            default             => throw new \NetDNS2\Exception(sprintf('algorithm %s does not currently have openssl support.', $this->label()), \NetDNS2\ENUM\Error::INT_INVALID_ALGORITHM)
         };
     }
 }

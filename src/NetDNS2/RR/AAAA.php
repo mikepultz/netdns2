@@ -39,29 +39,22 @@ final class AAAA extends \NetDNS2\RR
     /**
      * the IPv6 address in the preferred hexadecimal values of the eight 16-bit pieces per RFC1884
      */
-    protected string $address;
+    protected \NetDNS2\Data\IPv6 $address;
 
     /**
      * @see \NetDNS2\RR::rrToString()
      */
     protected function rrToString(): string
     {
-        return $this->address;
+        return strval($this->address);
     }
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
-     * @throws \NetDNS2\Exception
      */
     protected function rrFromString(array $_rdata): bool
     {
-        $this->address = $this->sanitize(array_shift($_rdata));
-
-        if (\NetDNS2\Client::isIPv6($this->address) == false)
-        {
-            throw new \NetDNS2\Exception('address provided is not a valid IPv6 address: ' . $this->address, \NetDNS2\ENUM\Error::PARSE_ERROR);            
-        }
+        $this->address = new \NetDNS2\Data\IPv6(array_shift($_rdata) ?? '');
 
         return true;
     }
@@ -71,26 +64,16 @@ final class AAAA extends \NetDNS2\RR
      */
     protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
-        //
-        // must be 8 x 16bit chunks, or 16 x 8bit
-        //
         if ($this->rdlength != 16)
         {
             return false;
         }
 
-        //
-        // PHP's inet_ntop returns IPv6 addresses in their compressed form, but we want to keep with 
-        // the preferred standard, so we'll parse it manually.
-        //
-        $val = unpack('n8', $this->rdata);
-        if ($val !== false)
-        {
-            $this->address = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', (array)$val);
-            return true;
-        }
+        $offset = 0;
 
-        return false;
+        $this->address = new \NetDNS2\Data\IPv6($this->rdata, $offset);
+
+        return true;
     }
 
     /**
@@ -98,13 +81,6 @@ final class AAAA extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        $val = inet_pton($this->address);
-        if ($val !== false)
-        {
-            $_packet->offset += 16;
-            return strval($val);
-        }
-
-        return '';
+        return $this->address->encode($_packet->offset);
     }
 }

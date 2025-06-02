@@ -25,131 +25,125 @@ namespace NetDNS2;
 abstract class Cache
 {
     /**
-     * the filename of the cache file
+     * supported cache types
      */
-    protected string $cache_file = '';
+    public const CACHE_TYPE_NONE        = 0;
+    public const CACHE_TYPE_FILE        = 1;
+    public const CACHE_TYPE_SHM         = 2;
+    public const CACHE_TYPE_MEMCACHED   = 3;
+    public const CACHE_TYPE_REDIS       = 4;
 
     /**
-     * the local data store for the cache
-     *
-     * @var array<string,mixed>
+     * defaul max cache size
      */
-    protected array $cache_data = [];
+    public const CACHE_DEFAULT_MAX_SIZE = 50000;
 
     /**
-     * the size of the cache to use
+     * the stored options array
+     *
+     * @var array<mixed>
      */
-    protected int $cache_size = 0;
+    protected array $m_options = [];
 
     /**
-     * the cache serializer
-     */
-    protected string $cache_serializer = 'serialize';
-
-    /**
-     * an internal flag to make sure we don't load the cache content more than once per instance.
-     */ 
-    protected bool $cache_opened = false;
-
-    /**
-     * open a cache object
+     * create an instance of the cache objec
      *
-     * @param string  $_cache_file path to a file to use for cache storage
-     * @param integer $_size       the size of the shared memory segment to create
-     * @param string  $_serializer the name of the cache serialize to use
-     *
-     * @throws \NetDNS2\Exception
+     * @param array<mixed> $_options a list of caching options to be used by the underlying caching object
      *
      */
-    abstract public function open(string $_cache_file, int $_size, string $_serializer): void;
-
-    /**
-     * return an instance of a caching object based on the type selected
-     *
-     * @param string $_type the type name of the caching object to use
-     *
-     * @throws \NetDNS2\Exception
-     *
-     */
-    public static function factory(string $_type): mixed
-    {
-        switch(strtolower(trim($_type)))
-        {
-            case 'shared':
-            {
-                if (extension_loaded('shmop') == false)
-                {
-                    throw new \NetDNS2\Exception('shmop library is not available for cache', \NetDNS2\ENUM\Error::CACHE_SHM_UNAVAIL);
-                }
-
-                return new \NetDNS2\Cache\Shm;
-            }
-            case 'file':
-            {
-                return new \NetDNS2\Cache\File;
-            }
-            case 'none':
-            default:
-                ;            
-        }
-
-        return null;
-    }
-
-    /**
-     * returns true/false if the provided key is defined in the cache
-     * 
-     * @param string $_key the key to lookup in the local cache
-     *
-     */
-    public function has(string $_key): bool
-    {
-        return (isset($this->cache_data[$_key]) == true) ? true : false;
-    }
+    abstract public function __construct(array $_options = []);
 
     /**
      * returns the value for the given key
      * 
      * @param string $_key the key to lookup in the local cache
      *
-     * @return mixed returns the cache data on sucess, false on error
+     * @return \NetDNS2\Packet\Response returns the cache data on sucess, false on error
      *
      */
-    public function get(string $_key): mixed
-    {
-        if (isset($this->cache_data[$_key]) == true)
-        {
-            if ($this->cache_serializer == 'json')
-            {
-                return json_decode($this->cache_data[$_key]['object']);
-            } else
-            {
-                return unserialize($this->cache_data[$_key]['object']);
-            }
-        }
-
-        return false;
-    }
+    abstract public function get(string $_key): \NetDNS2\Packet\Response|false;
 
     /**
      * adds a new key/value pair to the cache
      * 
-     * @param string $_key  the key for the new cache entry
-     * @param mixed  $_data the data to store in cache
+     * @param string                   $_key  the key for the new cache entry
+     * @param \NetDNS2\Packet\Response $_data the data to store in cache
      *
      */
-    public function put(string $_key, mixed $_data): void
+    abstract public function put(string $_key, \NetDNS2\Packet\Response $_data): void;
+
+    /**
+     * return an instance of a caching object based on the type selected
+     *
+     * @param int $_type the type name of the caching object to use
+     * @param array<mixed> $_options options used by the underlying caching objects
+     *
+     * @throws \NetDNS2\Exception
+     *
+     */
+    public static function factory(int $_type, array $_options = []): \NetDNS2\Cache
     {
+        switch($_type)
+        {
+            case self::CACHE_TYPE_FILE:
+            {
+                return new \NetDNS2\Cache\File($_options);
+            }
+            case self::CACHE_TYPE_SHM:
+            {
+                if (extension_loaded('shmop') == false)
+                {
+                    throw new \NetDNS2\Exception('the shmop extension is not available for cache.', \NetDNS2\ENUM\Error::INT_INVALID_EXTENSION);
+                }
+
+                return new \NetDNS2\Cache\Shm($_options);
+            }
+            case self::CACHE_TYPE_MEMCACHED:
+            {
+                if (extension_loaded('memcached') == false)
+                {
+                    throw new \NetDNS2\Exception('the memcached extension is not available for cache.', \NetDNS2\ENUM\Error::INT_INVALID_EXTENSION);
+                }
+
+                return new \NetDNS2\Cache\Memcached($_options);
+            }
+            case self::CACHE_TYPE_REDIS:
+            {
+                if (extension_loaded('redis') == false)
+                {
+                    throw new \NetDNS2\Exception('the redis extension is not available for cache.', \NetDNS2\ENUM\Error::INT_INVALID_EXTENSION);
+                }
+
+                return new \NetDNS2\Cache\Redis($_options);
+            }
+            case self::CACHE_TYPE_NONE:
+            default:
+                ;            
+        }
+
+        throw new \NetDNS2\Exception(sprintf('invalid cache type %s defined.', $_type), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
+    }
+
+    /**
+     * find the right TTL to use for this object
+     *
+     * @param \NetDNS2\Packet\Response $_data the data to store in cache
+     *
+     */
+    protected function calcuate_ttl(\NetDNS2\Packet\Response $_data): int
+    {
+        //
+        // if there's an override for the TTL, use that instead
+        //
+        if (isset($this->m_options['ttl_override']) == true)
+        {
+            return $this->m_options['ttl_override'];
+        }
+
         //
         // default time to live
         //
         $ttl = 86400 * 365;
-
-        //
-        // clear the rdata values
-        //
-        $_data->rdata = '';
-        $_data->rdlength = 0;
 
         //
         // find the lowest TTL, and use that as the TTL for the whole cached object. The downside to using one TTL for the whole object, is that
@@ -164,151 +158,8 @@ abstract class Cache
             {
                 $ttl = $rr->ttl;
             }
-
-            $rr->rdata = '';
-            $rr->rdlength = 0;
-        }
-        foreach($_data->authority as $index => $rr)
-        {
-            $rr->rdata = '';
-            $rr->rdlength = 0;
-        }
-        foreach($_data->additional as $index => $rr)
-        {
-            $rr->rdata = '';
-            $rr->rdlength = 0;
         }
 
-        $this->cache_data[$_key] = [
-
-            'cache_date'    => time(),
-            'ttl'           => $ttl
-        ];
-
-        if ($this->cache_serializer == 'json')
-        {
-            $this->cache_data[$_key]['object'] = @json_encode($_data);
-            if ($this->cache_data[$_key]['object'] === false)
-            {
-                unset($this->cache_data[$_key]['object']);
-            }
-
-        } else
-        {
-            $this->cache_data[$_key]['object'] = serialize($_data);
-        }
-    }
-
-    /**
-     * runs a clean up process on the cache data
-     *
-     */
-    protected function clean(): void
-    {
-        if (count($this->cache_data) > 0)
-        {
-            //
-            // go through each entry and adjust their TTL, and remove entries that 
-            // have expired
-            //
-            $now = time();
-
-            foreach($this->cache_data as $key => $data)
-            {
-                $diff = $now - $data['cache_date'];
-
-                if ($data['ttl'] <= $diff)
-                {
-                    unset($this->cache_data[$key]);
-                } else
-                {
-                    $this->cache_data[$key]['ttl'] -= $diff;
-                    $this->cache_data[$key]['cache_date'] = $now;
-                }
-            }
-        }
-    }
-
-    /**
-     * runs a clean up process on the cache data
-     *
-     */
-    protected function resize(): ?string
-    {
-        if (count($this->cache_data) > 0)
-        {
-            //
-            // serialize the cache data
-            //
-            if ($this->cache_serializer == 'json')
-            {
-                $cache = @json_encode($this->cache_data);
-                if ($cache === false)
-                {
-                    return null;
-                }
-
-            } else
-            {
-                $cache = serialize($this->cache_data);
-            }
-
-            //
-            // only do this part if the size allocated to the cache storage
-            // is smaller than the actual cache data
-            //
-            if (strlen($cache) > $this->cache_size)
-            {
-                while(strlen($cache) > $this->cache_size)
-                {
-                    //
-                    // go through the data, and remove the entries closed to
-                    // their expiration date.
-                    //
-                    $smallest_ttl = time();
-                    $smallest_key = null;
-
-                    foreach($this->cache_data as $key => $data)
-                    {
-                        if ($data['ttl'] < $smallest_ttl)
-                        {
-                            $smallest_ttl = $data['ttl'];
-                            $smallest_key = $key;
-                        }
-                    }
-
-                    //
-                    // unset the key with the smallest TTL
-                    //
-                    unset($this->cache_data[$smallest_key]);
-
-                    //
-                    // re-serialize
-                    //
-                    if ($this->cache_serializer == 'json')
-                    {
-                        $cache = @json_encode($this->cache_data);
-                        if ($cache === false)
-                        {
-                            return null;
-                        }
-
-                    } else
-                    {
-                        $cache = serialize($this->cache_data);
-                    }
-                }
-            }
-
-            if ( ($cache == 'a:0:{}') || ($cache == '{}') )
-            {
-                return null;
-            } else
-            {
-                return $cache;
-            }
-        }
-
-        return null;
+        return $ttl;
     }
 }

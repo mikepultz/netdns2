@@ -70,14 +70,16 @@ namespace NetDNS2\RR;
 final class RRSIG extends \NetDNS2\RR
 {
     /**
-     * the RR type covered by this signature; the string value is provided here
+     * the RR type covered by this signature; the string value is provided here;
+     *
+     * TODO: we can't use the RR\Type ENUM here, since this RR supports undefined types (e.g. TYPE123)
      */
     protected string $typecovered;
 
     /**
      * the algorithm used for the signature
      */
-    protected int $algorithm;
+    protected \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm;
     
     /**
      * the number of labels in the name
@@ -87,7 +89,7 @@ final class RRSIG extends \NetDNS2\RR
     /**
      * the original TTL
      */
-    protected string $origttl;
+    protected int $origttl;
 
     /**
      * the signature expiration
@@ -119,20 +121,19 @@ final class RRSIG extends \NetDNS2\RR
      */
     protected function rrToString(): string
     {
-        return $this->typecovered . ' ' . $this->algorithm . ' ' . $this->labels . ' ' . $this->origttl . ' ' . $this->sigexp . ' ' . 
+        return $this->typecovered . ' ' . $this->algorithm->value . ' ' . $this->labels . ' ' . $this->origttl . ' ' . $this->sigexp . ' ' . 
             $this->sigincep . ' ' . $this->keytag . ' ' . $this->signname . '. ' . $this->signature;
     }
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
         $this->typecovered  = strtoupper($this->sanitize(array_shift($_rdata)));
-        $this->algorithm    = intval($this->sanitize(array_shift($_rdata)));
+        $this->algorithm    = \NetDNS2\ENUM\DNSSEC\Algorithm::set(intval($this->sanitize(array_shift($_rdata))));
         $this->labels       = intval($this->sanitize(array_shift($_rdata)));
-        $this->origttl      = $this->sanitize(array_shift($_rdata));
+        $this->origttl      = intval($this->sanitize(array_shift($_rdata)));
         $this->sigexp       = $this->sanitize(array_shift($_rdata));
         $this->sigincep     = $this->sanitize(array_shift($_rdata));
         $this->keytag       = intval($this->sanitize(array_shift($_rdata)));
@@ -167,17 +168,17 @@ final class RRSIG extends \NetDNS2\RR
             return false;
         }
 
-        list('a' => $a, 'b' => $this->algorithm, 'c' => $this->labels, 'd' => $d, 'e' => $e, 'f' => $f, 'g' => $this->keytag) = (array)$val;
+        list('a' => $typecovered, 'b' => $algorithm, 'c' => $this->labels, 'd' => $this->origttl, 'e' => $e, 'f' => $f, 'g' => $this->keytag) = (array)$val;
 
-        if (\NetDNS2\ENUM\RRType::exists($a) == true)
+        if (\NetDNS2\ENUM\RR\Type::exists($typecovered) == true)
         {
-            $this->typecovered = \NetDNS2\ENUM\RRType::set($a)->label();
+            $this->typecovered = \NetDNS2\ENUM\RR\Type::set($typecovered)->label();
         } else
         {
-            $this->typecovered = 'TYPE' . $a;
+            $this->typecovered = 'TYPE' . $typecovered;
         }
 
-        $this->origttl = \NetDNS2\Client::expandUint32($d);
+        $this->algorithm = \NetDNS2\ENUM\DNSSEC\Algorithm::set($algorithm);
 
         //
         // the dates are in GM time
@@ -212,8 +213,8 @@ final class RRSIG extends \NetDNS2\RR
         // pack the value
         //
         $data = pack('nCCNNNn',
-            \NetDNS2\ENUM\RRType::set($this->typecovered)->value,
-            $this->algorithm,
+            \NetDNS2\ENUM\RR\Type::set($this->typecovered)->value,
+            $this->algorithm->value,
             $this->labels,
             $this->origttl,
             gmmktime(intval($e[4]), intval($e[5]), intval($e[6]), intval($e[2]), intval($e[3]), intval($e[1])),

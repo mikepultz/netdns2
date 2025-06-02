@@ -69,7 +69,7 @@ final class Updater extends \NetDNS2\Client
         //
         // make sure the opcode on the packet is set to UPDATE
         //
-        $this->m_packet->header->opcode = \NetDNS2\Header::OPCODE_UPDATE;
+        $this->m_packet->header->opcode = \NetDNS2\ENUM\OpCode::UPDATE;
     }
 
     /**
@@ -84,8 +84,7 @@ final class Updater extends \NetDNS2\Client
     {
         if (preg_match('/' . $this->m_packet->question[0]->qname . '$/', $_name) !== 1)
         {
-            throw new \NetDNS2\Exception('name provided (' . $_name . ') does not match zone name (' . $this->m_packet->question[0]->qname . ')',
-                \NetDNS2\ENUM\Error::PACKET_INVALID);
+            throw new \NetDNS2\Exception(sprintf('name %s does not match zone name %s.', $_name, $this->m_packet->question[0]->qname), \NetDNS2\ENUM\Error::INT_INVALID_PACKET);
         }
     }
 
@@ -130,7 +129,7 @@ final class Updater extends \NetDNS2\Client
         $this->checkName(strval($_rr->name));
 
         $_rr->ttl   = 0;
-        $_rr->class = \NetDNS2\ENUM\RRClass::set('NONE');
+        $_rr->class = \NetDNS2\ENUM\RR\Classes::set('NONE');
 
         //
         // add the RR to the "update" section
@@ -161,11 +160,11 @@ final class Updater extends \NetDNS2\Client
         /**
          * @var \NetDNS2\RR $rr
          */
-        $rr = new (\NetDNS2\ENUM\RRType::set($_type)->class());
+        $rr = new (\NetDNS2\ENUM\RR\Type::set($_type)->class());
 
         $rr->name     = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_name);
         $rr->ttl      = 0;
-        $rr->class    = \NetDNS2\ENUM\RRClass::set('ANY');
+        $rr->class    = \NetDNS2\ENUM\RR\Classes::set('ANY');
         $rr->rdlength = -1;
         $rr->rdata    = '';    
 
@@ -201,8 +200,8 @@ final class Updater extends \NetDNS2\Client
 
         $rr->name     = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_name);
         $rr->ttl      = 0;
-        $rr->type     = \NetDNS2\ENUM\RRType::set('ANY');
-        $rr->class    = \NetDNS2\ENUM\RRClass::set('ANY');
+        $rr->type     = \NetDNS2\ENUM\RR\Type::set('ANY');
+        $rr->class    = \NetDNS2\ENUM\RR\Classes::set('ANY');
         $rr->rdlength = -1;
         $rr->rdata    = '';
 
@@ -237,11 +236,11 @@ final class Updater extends \NetDNS2\Client
         /**
          * @var \NetDNS2\RR $rr
          */
-        $rr = new (\NetDNS2\ENUM\RRType::set($_type)->class());
+        $rr = new (\NetDNS2\ENUM\RR\Type::set($_type)->class());
 
         $rr->name     = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_name);
         $rr->ttl      = 0;
-        $rr->class    = \NetDNS2\ENUM\RRClass::set('ANY');
+        $rr->class    = \NetDNS2\ENUM\RR\Classes::set('ANY');
         $rr->rdlength = -1;
         $rr->rdata    = '';    
 
@@ -305,11 +304,11 @@ final class Updater extends \NetDNS2\Client
         /**
          * @var \NetDNS2\RR $rr
          */
-        $rr = new (\NetDNS2\ENUM\RRType::set($_type)->class());
+        $rr = new (\NetDNS2\ENUM\RR\Type::set($_type)->class());
 
         $rr->name     = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_name);
         $rr->ttl      = 0;
-        $rr->class    = \NetDNS2\ENUM\RRClass::set('NONE');
+        $rr->class    = \NetDNS2\ENUM\RR\Classes::set('NONE');
         $rr->rdlength = -1;
         $rr->rdata    = '';    
 
@@ -349,8 +348,8 @@ final class Updater extends \NetDNS2\Client
 
         $rr->name     = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_name);
         $rr->ttl      = 0;
-        $rr->type     = \NetDNS2\ENUM\RRType::set('ANY');
-        $rr->class    = \NetDNS2\ENUM\RRClass::set('ANY');
+        $rr->type     = \NetDNS2\ENUM\RR\Type::set('ANY');
+        $rr->class    = \NetDNS2\ENUM\RR\Classes::set('ANY');
         $rr->rdlength = -1;
         $rr->rdata    = '';
 
@@ -388,8 +387,8 @@ final class Updater extends \NetDNS2\Client
 
         $rr->name     = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_name);
         $rr->ttl      = 0;
-        $rr->type     = \NetDNS2\ENUM\RRType::set('ANY');
-        $rr->class    = \NetDNS2\ENUM\RRClass::set('NONE');
+        $rr->type     = \NetDNS2\ENUM\RR\Type::set('ANY');
+        $rr->class    = \NetDNS2\ENUM\RR\Classes::set('NONE');
         $rr->rdlength = -1;
         $rr->rdata    = '';
 
@@ -473,7 +472,7 @@ final class Updater extends \NetDNS2\Client
         //
         if ( ($this->m_packet->header->qdcount == 0) || ($this->m_packet->header->nscount == 0) )
         {
-            throw new \NetDNS2\Exception('empty headers- nothing to send!', \NetDNS2\ENUM\Error::PACKET_INVALID);
+            throw new \NetDNS2\Exception('invalid or empty packet data provided.', \NetDNS2\ENUM\Error::INT_INVALID_PACKET);
         }
 
         //

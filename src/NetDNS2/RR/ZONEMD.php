@@ -78,7 +78,6 @@ final class ZONEMD extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
@@ -87,9 +86,11 @@ final class ZONEMD extends \NetDNS2\RR
         $this->hash_algorithm   = intval($this->sanitize(array_shift($_rdata)));
 
         //
-        // digest must be provided as base64 encoded.
+        // digest must be provided as hexadecimal
         //
-        $this->digest = implode('', $_rdata);
+        // bind presents this in uppercase, so we'll match that
+        //
+        $this->digest = strtoupper(implode('', $_rdata));
 
         return true;
     }
@@ -124,7 +125,12 @@ final class ZONEMD extends \NetDNS2\RR
             return false;
         }
 
-        $this->digest = implode('', (array)$val);
+        //
+        // digest must be provided as hexadecimal
+        //
+        // bind presents this in uppercase, so we'll match that
+        //
+        $this->digest = strtoupper(implode('', (array)$val));
 
         return true;
     }

@@ -43,54 +43,47 @@ final class Socket
     public float $date_last_used;
 
     /**
-     *
+     * if tls (DoT) is enabled
      */
     public bool $m_use_tls = false;
 
     /**
+     * TLS socket context values to customize the DoT connection
+     *
      * @var array<string,mixed>
      */
-    public array $m_use_tls_context = [];
+    public array $m_tls_context = [];
 
     /**
-     * @var resource $m_sock
-     */
-    private mixed $m_sock;
-
-    /**
+     * the local socket connection
      *
+     */
+    private mixed $m_sock = null;
+
+    /**
+     * the local context object for the socket connection
      */
     private mixed $m_context;
 
     /**
-     *
+     * the host (IPv4 or IPv6) to connect to
      */
     private string $m_host;
 
     /**
-     *
+     * the type of socket (TCP or UDP)
      */
     private int $m_type;
 
     /**
-     *
+     * the port to use when connecting
      */
     private int $m_port;
 
     /**
-     *
+     * socket timeout value, in <seconds>.<microseconds>
      */
     private float $m_timeout;
-
-    /**
-     *
-     */
-    private int $m_timeout_sec;
-
-    /**
-     *
-     */
-    private int $m_timeout_usec;
 
     /**
      * the local IP and port we'll send the request from
@@ -112,11 +105,7 @@ final class Socket
         $this->m_type           = $_type;
         $this->m_host           = $_host;
         $this->m_port           = $_port;
-
         $this->m_timeout        = $_timeout;
-        $this->m_timeout_sec    = intval(floor($_timeout));
-        $this->m_timeout_usec   = intval(ceil(($_timeout - $this->m_timeout_sec) * 1000000));
-
         $this->date_created     = microtime(true);
     }
 
@@ -202,9 +191,9 @@ final class Socket
         //
         // if TLS is enabled, then copy over any context values (if defined)
         //
-        if ( ($this->m_use_tls == true) && (count($this->m_use_tls_context) > 0) )
+        if ( ($this->m_use_tls == true) && (count($this->m_tls_context) > 0) )
         {
-            $opts['ssl'] = $this->m_use_tls_context;
+            $opts['ssl'] = $this->m_tls_context;
         }
 
         //
@@ -290,7 +279,7 @@ final class Socket
         // set it to non-blocking and set the timeout
         //
         stream_set_blocking($this->m_sock, false);
-        stream_set_timeout($this->m_sock, $this->m_timeout_sec, $this->m_timeout_usec);
+        stream_set_timeout($this->m_sock, 0, intval($this->m_timeout * 1000000));
 
         return true;
     }
@@ -335,7 +324,7 @@ final class Socket
         //
         // select on write
         //
-        $result = @stream_select($read, $write, $except, $this->m_timeout_sec, $this->m_timeout_usec);
+        $result = @stream_select($read, $write, $except, 0, intval($this->m_timeout * 1000000));
         if ($result === false)
         {
             $this->last_error = 'failed on write select()';
@@ -408,7 +397,7 @@ final class Socket
         //
         // select on read
         //
-        $result = @stream_select($read, $write, $except, $this->m_timeout_sec, $this->m_timeout_usec);
+        $result = @stream_select($read, $write, $except, 0, intval($this->m_timeout * 1000000));
         if ($result === false)
         {
             $this->last_error = 'error on read select()';

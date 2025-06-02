@@ -17,9 +17,9 @@
  *
  */
 
-namespace NetDNS2\ENUM;
+namespace NetDNS2\ENUM\RR;
 
-enum RRType: int
+enum Type: int
 {
     use \NetDNS2\ENUM\Base;
 
@@ -90,7 +90,9 @@ enum RRType: int
     case SVCB       = 64;       // RFC 9460
     case HTTPS      = 65;       // RFC 9460
     case DSYNC      = 66;       // https://datatracker.ietf.org/doc/draft-ietf-dnsop-generalized-notify/09/
-                                // 67 - 98 unassigned
+    case HHIT       = 67;       // Not Implemented yet
+    case BRID       = 68;       // Not Implemented yet
+                                // 69 - 98 unassigned
     case SPF        = 99;       // RFC 4408
     case UINFO      = 100;      // no RFC, Not implemented
     case UID        = 101;      // no RFC, Not implemented
@@ -214,7 +216,7 @@ enum RRType: int
            self::TA         => 'NetDNS2\RR\TA',
            self::DLV        => 'NetDNS2\RR\DLV',
            self::TYPE65534  => 'NetDNS2\RR\TYPE65534',
-           default          => throw new \NetDNS2\Exception(sprintf('unimplemented resource record %d specified.', $this->value), \NetDNS2\ENUM\Error::CLASS_INVALID)
+           default          => throw new \NetDNS2\Exception(sprintf('unknown or un-supported resource record type: %d', $this->value), \NetDNS2\ENUM\Error::INT_INVALID_TYPE)
         };
     }
 
@@ -288,6 +290,8 @@ enum RRType: int
            self::SVCB       => 'SVCB',
            self::HTTPS      => 'HTTPS',
            self::DSYNC      => 'DSYNC',
+           self::HHIT       => 'HHIT',
+           self::BRID       => 'BRID',
            self::SPF        => 'SPF',
            self::UINFO      => 'UINFO',
            self::UID        => 'UID',

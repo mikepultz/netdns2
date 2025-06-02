@@ -36,11 +36,17 @@ namespace NetDNS2\RR;
  */
 final class IPSECKEY extends \NetDNS2\RR
 {
+    /**
+     * allowed gateway type values
+     */
     public const GATEWAY_TYPE_NONE     = 0;
     public const GATEWAY_TYPE_IPV4     = 1;
     public const GATEWAY_TYPE_IPV6     = 2;
     public const GATEWAY_TYPE_DOMAIN   = 3;
 
+    /**
+     * supported algorithms
+     */
     public const ALGORITHM_NONE        = 0;
     public const ALGORITHM_DSA         = 1;
     public const ALGORITHM_RSA         = 2;
@@ -61,9 +67,9 @@ final class IPSECKEY extends \NetDNS2\RR
     protected int $algorithm;
 
     /**
-     * The gatway information 
+     * The gateway information 
      */
-    protected mixed $gateway;
+    protected \NetDNS2\Data $gateway;
 
     /**
      * the public key
@@ -106,7 +112,6 @@ final class IPSECKEY extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
@@ -124,27 +129,17 @@ final class IPSECKEY extends \NetDNS2\RR
         {
             case self::GATEWAY_TYPE_NONE:
             {
-                $this->gateway = strval('');
+                $this->gateway = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, '');
             }
             break;
             case self::GATEWAY_TYPE_IPV4:
             {
-                $this->gateway = $this->sanitize(array_shift($_rdata));
-
-                if (\NetDNS2\Client::isIPv4($this->gateway) == false)
-                {
-                    throw new \NetDNS2\Exception('gateway provided is not a valid IPv4 address: ' . $this->gateway, \NetDNS2\ENUM\Error::PARSE_ERROR);
-                }
+                $this->gateway = new \NetDNS2\Data\IPv4($this->sanitize(array_shift($_rdata) ?? ''));
             }
             break;
             case self::GATEWAY_TYPE_IPV6:
             {
-                $this->gateway = $this->sanitize(array_shift($_rdata));
-
-                if (\NetDNS2\Client::isIPv6($this->gateway) == false)
-                {
-                    throw new \NetDNS2\Exception('gateway provided is not a valid IP64 address: ' . $this->gateway, \NetDNS2\ENUM\Error::PARSE_ERROR);
-                }
+                $this->gateway = new \NetDNS2\Data\IPv6($this->sanitize(array_shift($_rdata) ?? ''));
             }
             break;
             case self::GATEWAY_TYPE_DOMAIN:
@@ -154,11 +149,11 @@ final class IPSECKEY extends \NetDNS2\RR
             break;
             default:
             {
-                throw new \NetDNS2\Exception('invalid gateway type value provided: ' . $this->gateway_type, \NetDNS2\ENUM\Error::PARSE_ERROR);
+                throw new \NetDNS2\Exception(sprintf('invalid gateway type value provided: %d', $this->gateway_type), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
             }
         }
 
-        $this->key = array_shift($_rdata);
+        $this->key = array_shift($_rdata) ?? '';
         
         //
         // check the algorithm and key
@@ -178,7 +173,7 @@ final class IPSECKEY extends \NetDNS2\RR
             break;
             default:
             {
-                throw new \NetDNS2\Exception('invalid algorithm value provided: ' . $this->algorithm, \NetDNS2\ENUM\Error::PARSE_ERROR);
+                throw new \NetDNS2\Exception(sprintf('invalid algorithm value provided: %d', $this->algorithm), \NetDNS2\ENUM\Error::INT_INVALID_ALGORITHM);
             }
         }
 
@@ -215,25 +210,17 @@ final class IPSECKEY extends \NetDNS2\RR
         {
             case self::GATEWAY_TYPE_NONE:
             {
-                $this->gateway = '';
+                $this->gateway = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, '');
             }
             break;
             case self::GATEWAY_TYPE_IPV4:
             {
-                $gateway = inet_ntop(substr($this->rdata, $offset, 4));
-                if ($gateway === false)
-                {
-                    return false;
-                }
-
-                $this->gateway = strval($gateway);
-                $offset += 4;
+                $this->gateway = new \NetDNS2\Data\IPv4($this->rdata, $offset);
             }
             break;
             case self::GATEWAY_TYPE_IPV6:
             {
-                $this->gateway = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', (array)unpack('n8', substr($this->rdata, $offset, 16)));
-                $offset += 16;
+                $this->gateway = new \NetDNS2\Data\IPv6($this->rdata, $offset);
             }
             break;
             case self::GATEWAY_TYPE_DOMAIN:
@@ -295,17 +282,7 @@ final class IPSECKEY extends \NetDNS2\RR
             }
             break;
             case self::GATEWAY_TYPE_IPV4:
-            {
-                $data .= inet_pton($this->gateway);
-                $_packet->offset += 4;
-            }
-            break;
             case self::GATEWAY_TYPE_IPV6:
-            {
-                $data .= inet_pton($this->gateway);
-                $_packet->offset += 16;
-            }
-            break;
             case self::GATEWAY_TYPE_DOMAIN:
             {
                 $data .= $this->gateway->encode($_packet->offset);

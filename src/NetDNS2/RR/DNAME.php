@@ -45,7 +45,6 @@ final class DNAME extends \NetDNS2\RR
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
@@ -63,7 +62,7 @@ final class DNAME extends \NetDNS2\RR
             return false;
         }
             
-        $offset      = $_packet->offset;
+        $offset = $_packet->offset;
         $this->dname = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC2535, $_packet, $offset);
 
         return true;

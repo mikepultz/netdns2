@@ -37,8 +37,6 @@ spl_autoload_register(function($_class)
  */
 final class Resolver extends Client
 {
-    use \NetDNS2\Opts;
-
     /**
      * Constructor - creates a new \NetDNS2\Resolver object
      *
@@ -101,7 +99,7 @@ final class Resolver extends Client
         //
         // check for an authentication method; either TSIG or SIG
         //
-        if ( ($this->auth_signature instanceof \NetDNS2\RR\TSIG) || ($this->auth_signature instanceof \NetDNS2\RR\SIG) )
+        if ( (is_null($this->auth_signature) == false) && (($this->auth_signature instanceof \NetDNS2\RR\TSIG) || ($this->auth_signature instanceof \NetDNS2\RR\SIG)) )
         {
             $packet->additional[]    = clone $this->auth_signature;
             $packet->header->arcount = count($packet->additional);
@@ -112,15 +110,15 @@ final class Resolver extends Client
         //
         if ($this->dnssec == true)
         {
-            $this->dnssec(true);    // @phpstan-ignore-line
+            $this->edns->dnssec(true);
         }
 
         //
-        // look for additional EDNS0 request objects
+        // look for additional EDNS request objects
         //
-        if (count($this->opts) > 0)
+        if (count($this->edns->opts) > 0)
         {
-            foreach($this->opts as $opt)
+            foreach($this->edns->opts as $opt)
             {
                 $packet->additional[] = clone $opt;
             }
@@ -150,19 +148,14 @@ final class Resolver extends Client
         if ( ($this->use_cache == true) && ($this->cacheable($_type) == true) )
         {
             //
-            // open the cache
-            //
-            $this->cache->open($this->cache_file, $this->cache_size, $this->cache_serializer);
-
-            //
             // build the key and check for it in the cache.
             //
             $packet_hash = md5($packet->question[0]->qname . '|' . $packet->question[0]->qtype->label());
 
-            if ($this->cache->has($packet_hash) == true)
+            $response = $this->cache->get($packet_hash);
+            if ($response !== false)
             {
-                // TODO: this returns an object instead of a NetDNS2\Packet\Response object
-                return $this->cache->get($packet_hash);
+                return $response;
             }
         }
 
@@ -259,7 +252,7 @@ final class Resolver extends Client
         //
         // set the opcode to IQUERY
         //
-        $packet->header->opcode = \NetDNS2\Header::OPCODE_IQUERY;
+        $packet->header->opcode = \NetDNS2\ENUM\OpCode::IQUERY;
 
         //
         // add the given RR as the answer

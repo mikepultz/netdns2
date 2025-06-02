@@ -50,7 +50,7 @@ final class Mailbox extends \NetDNS2\Data
                 //
         }
 
-        throw new \NetDNS2\Exception('invalid mailbox encoding type.', \NetDNS2\ENUM\Error::PARSE_ERROR);    
+        throw new \NetDNS2\Exception('invalid mailbox encoding type.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);    
     }
 
     /**

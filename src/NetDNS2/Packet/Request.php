@@ -35,7 +35,7 @@ final class Request extends \NetDNS2\Packet
      * @throws \NetDNS2\Exception
      *
      */
-    public function __construct(string $_name, ?string $_type = null, ?string $_class = null)
+    public function __construct(string $_name, string $_type = 'A', string $_class = 'IN')
     {
         $this->set($_name, $_type, $_class);
     }
@@ -78,18 +78,18 @@ final class Request extends \NetDNS2\Packet
         //
         // store the data
         //
-        $q->qtype  = \NetDNS2\ENUM\RRType::set($_type);
-        $q->qclass = \NetDNS2\ENUM\RRClass::set($_class);
+        $q->qtype  = \NetDNS2\ENUM\RR\Type::set($_type);
+        $q->qclass = \NetDNS2\ENUM\RR\Classes::set($_class);
 
         //
         // check that the input string has some data in it
         //
         if (strlen($_name) == 0)
         {
-            throw new \NetDNS2\Exception('empty query string provided', \NetDNS2\ENUM\Error::PACKET_INVALID);
+            throw new \NetDNS2\Exception('invalid or empty  query string provided.', \NetDNS2\ENUM\Error::INT_INVALID_PACKET);
         }
 
-        if ($q->qtype == \NetDNS2\ENUM\RRType::PTR)
+        if ($q->qtype == \NetDNS2\ENUM\RR\Type::PTR)
         {
             //
             // if it's a PTR request for an IP address, then make sure we tack on the arpa domain.

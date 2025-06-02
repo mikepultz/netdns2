@@ -67,7 +67,7 @@ class Client
      * @var array<string,mixed>
      *
      */
-    public array $use_tls_context = [];
+    public array $tls_context = [];
 
     /**
      * DNS Port to use (-1 means default of 53)
@@ -83,7 +83,7 @@ class Client
     /**
      * timeout value for socket connections
      */
-    public float $timeout = 5.0;
+    public float $timeout = 5.003;
 
     /**
      * randomize the name servers list
@@ -104,28 +104,16 @@ class Client
     public array $search_list = [];
 
     /**
-     * enable cache; either "shared", "file" or "none"
+     * enable cache using the const defined in the Cache object
      */
-    public string $cache_type = 'none';
+    public int $cache_type = \NetDNS2\Cache::CACHE_TYPE_NONE;
 
     /**
-     * file name to use for shared memory segment or file cache
-     */
-    public string $cache_file = '/tmp/net_dns2.cache';
-
-    /**
-     * the max size of the cache file (in bytes)
-     */
-    public int $cache_size = 50000;
-
-    /**
-     * the method to use for storing cache data; either "serialize" or "json"
+     * options to pass to the underlying caching objects
      *
-     * json is faster, but can't remember the class names (everything comes back as a "stdClass Object"; all the data is the same though. serialize 
-     * is slower, but will have all the class info.
-     *
+     * @var array<mixed>
      */
-    public string $cache_serializer = 'serialize';
+    public array $cache_options = [ 'file' => '/tmp/net_dns2.cache', 'size' => \NetDNS2\Cache::CACHE_DEFAULT_MAX_SIZE ];
 
     /**
      * by default, according to RFC 1034
@@ -187,6 +175,11 @@ class Client
     public int $dnssec_payload_size = 4000;
 
     /**
+     * a local instance of the \NetDNS2\EDNS object for adding EDN(0) options to requests.
+     */
+    public \NetDNS2\EDNS $edns;
+
+    /**
      * the last exeception that was generated
      */
     public ?\NetDNS2\Exception $last_exception = null;
@@ -218,13 +211,13 @@ class Client
     /**
      * the TSIG or SIG RR object for authentication
      */
-    protected mixed $auth_signature = null;
+    protected ?\NetDNS2\RR $auth_signature = null;
 
     /**
      * the shared memory segment id for the local cache
      *
      */
-    protected ?\NetDNS2\Cache $cache = null;
+    protected \NetDNS2\Cache $cache;
 
     /**
      * internal setting for enabling cache
@@ -241,6 +234,11 @@ class Client
      */
     public function __construct(?array $_options = null)
     {
+        //
+        //
+        //
+        $this->edns = new \NetDNS2\EDNS();
+
         //
         // load any options that were provided
         //
@@ -261,22 +259,25 @@ class Client
         //
         // if we're set to use the local shared memory cache, then make sure it's been initialized
         //
-        $this->cache = \NetDNS2\Cache::factory($this->cache_type);
-        if (is_null($this->cache) == false)
+        if ($this->cache_type != \NetDNS2\Cache::CACHE_TYPE_NONE)
         {
-            $this->use_cache = true;
+            $this->cache = \NetDNS2\Cache::factory($this->cache_type, $this->cache_options);
+            if (is_null($this->cache) == false)
+            {
+                $this->use_cache = true;
+            }
         }
     }
 
     /**
      * sets the name servers to be used
      *
-     * @param mixed $_nameservers either an array of name servers, or a file name to parse, assuming it's in the resolv.conf format
+     * @param array<string>|string $_nameservers either an array of name servers, or a file name to parse, assuming it's in the resolv.conf format
 
      * @throws \NetDNS2\Exception
      *
      */
-    public function setServers(mixed $_nameservers): bool
+    public function setServers(array|string $_nameservers): bool
     {
         //
         // if it's an array, then use it directly
@@ -292,7 +293,7 @@ class Client
             {
                 if ( (self::isIPv4($value) == false) && (self::isIPv6($value) == false) && (strncasecmp($value, 'https://', 8) != 0) )
                 {
-                    throw new \NetDNS2\Exception('invalid nameserver entry: ' . $value, \NetDNS2\ENUM\Error::NS_INVALID_ENTRY);
+                    throw new \NetDNS2\Exception(sprintf('invalid nameserver entry: %s', $value), \NetDNS2\ENUM\Error::INT_INVALID_NAMESERVER);
                 }
             }
 
@@ -314,7 +315,7 @@ class Client
                 $data = file_get_contents($_nameservers);
                 if ($data === false)
                 {
-                    throw new \NetDNS2\Exception('failed to read contents of file: ' . $_nameservers, \NetDNS2\ENUM\Error::NS_INVALID_FILE);
+                    throw new \NetDNS2\Exception(sprintf('failed to read contents of file: %s', $_nameservers), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
                 }
 
                 $lines = explode("\n", $data);
@@ -356,7 +357,7 @@ class Client
                                 $ns[] = $value;
                             } else
                             {
-                                throw new \NetDNS2\Exception('invalid nameserver entry: ' . $value, \NetDNS2\ENUM\Error::NS_INVALID_ENTRY);
+                                throw new \NetDNS2\Exception(sprintf('invalid nameserver entry: %s', $value), \NetDNS2\ENUM\Error::INT_INVALID_NAMESERVER);
                             }
                         }
                         break;
@@ -397,7 +398,7 @@ class Client
 
             } else
             {
-                throw new \NetDNS2\Exception('resolver file file provided is not readable: ' . $_nameservers, \NetDNS2\ENUM\Error::NS_INVALID_FILE);
+                throw new \NetDNS2\Exception(sprintf('resolver file file provided is not readable: %s', $_nameservers), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
             }
 
             //
@@ -509,8 +510,7 @@ class Client
                 $this->setServers($_default);
             } else
             {
-                throw new \NetDNS2\Exception('empty name servers list; you must provide a list of name servers, or the path to a resolv.conf file.',
-                    \NetDNS2\ENUM\Error::NS_INVALID_ENTRY);
+                throw new \NetDNS2\Exception('empty name servers list; you must provide a list of name servers, or the path to a resolv.conf file.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
             }
         }
     }
@@ -561,7 +561,7 @@ class Client
         //
         if (extension_loaded('openssl') === false)
         {
-            throw new \NetDNS2\Exception('the OpenSSL extension is required to use SIG(0).', \NetDNS2\ENUM\Error::OPENSSL_UNAVAIL);
+            throw new \NetDNS2\Exception('the openssl extension is required to use SIG(0).', \NetDNS2\ENUM\Error::INT_INVALID_EXTENSION);
         }
 
         //
@@ -588,7 +588,7 @@ class Client
             //
             $this->auth_signature->name         = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $private->signname);
             $this->auth_signature->ttl          = 0;
-            $this->auth_signature->class        = \NetDNS2\ENUM\RRClass::set('ANY');
+            $this->auth_signature->class        = \NetDNS2\ENUM\RR\Classes::set('ANY');
 
             //
             // these values are pulled from the private key
@@ -602,7 +602,7 @@ class Client
             //
             $this->auth_signature->typecovered  = 'SIG0';
             $this->auth_signature->labels       = 0;
-            $this->auth_signature->origttl      = '0';
+            $this->auth_signature->origttl      = 0;
 
             //
             // generate the dates
@@ -610,7 +610,7 @@ class Client
             $t = time();
 
             $this->auth_signature->sigincep     = gmdate('YmdHis', $t);
-            $this->auth_signature->sigexp       = gmdate('YmdHis', $t + 500);
+            $this->auth_signature->sigexp       = gmdate('YmdHis', $t + 600);
 
             //
             // store the private key in the SIG object for later.
@@ -632,7 +632,7 @@ class Client
             break;
             default:
             {
-                throw new \NetDNS2\Exception('only asymmetric algorithms work with SIG(0)!', \NetDNS2\ENUM\Error::OPENSSL_INV_ALGO);
+                throw new \NetDNS2\Exception('SIG(0) currently only supports asymmetric algorithms.', \NetDNS2\ENUM\Error::INT_INVALID_ALGORITHM);
             }
         }
 
@@ -658,25 +658,7 @@ class Client
             }
         }
 
-        return true;   
-    }
-
-    /**
-     * PHP doesn't support unsigned integers, but many of the RR's return unsigned values (like SOA), so there is the possibility that the
-     * value will overrun on 32bit systems, and you'll end up with a negative value.
-     *
-     * 64bit systems are not affected, as their PHP_IN_MAX value should be 64bit (ie 9223372036854775807)
-     *
-     * This function returns a negative integer value, as a string, with the correct unsigned value.
-     *
-     * @param int $_int the unsigned integer value to check
-     *
-     * @return string returns the unsigned value as a string.
-     *
-     */
-    public static function expandUint32(int $_int): string
-    {
-        return ( ($_int < 0) && (PHP_INT_MAX == 2147483647) ) ? sprintf('%u', $_int): strval($_int);
+        return true;
     }
 
     /**
@@ -741,7 +723,7 @@ class Client
         $data = $_request->get();
         if (strlen($data) < \NetDNS2\Header::DNS_HEADER_SIZE)
         {
-            throw new \NetDNS2\Exception('invalid or empty packet for sending!', \NetDNS2\ENUM\Error::PACKET_INVALID, null, $_request);
+            throw new \NetDNS2\Exception('invalid or empty packet data provided.', \NetDNS2\ENUM\Error::INT_INVALID_PACKET, null, $_request);
         }
 
         reset($this->nameservers);
@@ -768,14 +750,14 @@ class Client
             $ns = current($this->nameservers);
             next($this->nameservers);
 
-            if ($ns === false)
+            if ( ($ns === false) || (strlen($ns) == 0) )
             {
                 if ( ($this->last_exception instanceof \NetDNS2\Exception) == true)
                 {
                     throw $this->last_exception;
                 } else
                 {
-                    throw new \NetDNS2\Exception('every name server provided has failed', \NetDNS2\ENUM\Error::NS_FAILED);
+                    throw new \NetDNS2\Exception('every name server provided has failed', \NetDNS2\ENUM\Error::INT_FAILED_NAMESERVER);
                 }
             }
 
@@ -855,7 +837,7 @@ class Client
             if ($_request->header->id != $response->header->id)
             {
                 $this->last_exception = new \NetDNS2\Exception('invalid header: the request and response id do not match.',
-                    \NetDNS2\ENUM\Error::HEADER_INVALID, null, $_request, $response);
+                    \NetDNS2\ENUM\Error::INT_INVALID_PACKET, null, $_request, $response);
 
                 $this->last_exception_list[$ns] = $this->last_exception;
                 continue;
@@ -869,7 +851,7 @@ class Client
             if ($response->header->qr != \NetDNS2\Header::QR_RESPONSE)
             {
                 $this->last_exception = new \NetDNS2\Exception('invalid header: the response provided is not a response packet.',
-                    \NetDNS2\ENUM\Error::HEADER_INVALID, null, $_request, $response);
+                    \NetDNS2\ENUM\Error::INT_INVALID_PACKET, null, $_request, $response);
 
                 $this->last_exception_list[$ns] = $this->last_exception;
                 continue;
@@ -878,7 +860,7 @@ class Client
             //
             // make sure the response code in the header is ok
             //
-            if ($response->header->rcode != \NetDNS2\ENUM\RCode::NOERROR)
+            if ($response->header->rcode != \NetDNS2\ENUM\RR\Code::NOERROR)
             {
                 $this->last_exception = new \NetDNS2\Exception('DNS request failed: ' . $response->header->rcode->label(), 
                     \NetDNS2\ENUM\Error::set($response->header->rcode->value), null, $_request, $response);
@@ -907,14 +889,14 @@ class Client
     {
         if (isset($this->sock[$_proto][$_ns]) == false)
         {
-            throw new \NetDNS2\Exception('invalid socket referenced', \NetDNS2\ENUM\Error::NS_INVALID_SOCKET);
+            throw new \NetDNS2\Exception('invalid socket reference provided.', \NetDNS2\ENUM\Error::INT_INVALID_SOCKET);
         }
         
         //
         // grab the last error message off the socket
         //
         $last_error = $this->sock[$_proto][$_ns]->last_error;
-        
+
         //
         // remove it from the socket cache; this will call the destructor, which calls close() on the socket
         //
@@ -960,7 +942,7 @@ class Client
             if ($this->use_tls == true)
             {
                 $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->m_use_tls = true;
-                $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->m_use_tls_context = $this->use_tls_context;
+                $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->m_tls_context = $this->tls_context;
             }
 
             //
@@ -976,7 +958,7 @@ class Client
             //
             if ($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->open() === false)
             {
-                $this->generateError(\NetDNS2\Socket::SOCK_STREAM, $_ns, \NetDNS2\ENUM\Error::NS_SOCKET_FAILED);
+                $this->generateError(\NetDNS2\Socket::SOCK_STREAM, $_ns, \NetDNS2\ENUM\Error::INT_FAILED_SOCKET);
             }
         }
 
@@ -986,7 +968,7 @@ class Client
         //
         if ($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->write($_data) === false)
         {
-            $this->generateError(\NetDNS2\Socket::SOCK_STREAM, $_ns, \NetDNS2\ENUM\Error::NS_SOCKET_FAILED);
+            $this->generateError(\NetDNS2\Socket::SOCK_STREAM, $_ns, \NetDNS2\ENUM\Error::INT_FAILED_SOCKET);
         }
 
         //
@@ -1022,7 +1004,7 @@ class Client
                     //
                     // since there's no way to "reset" a socket, the only thing we can do it close it.
                     //
-                    $this->generateError(\NetDNS2\Socket::SOCK_STREAM, $_ns, \NetDNS2\ENUM\Error::NS_SOCKET_FAILED);
+                    $this->generateError(\NetDNS2\Socket::SOCK_STREAM, $_ns, \NetDNS2\ENUM\Error::INT_FAILED_SOCKET);
                 }
 
                 //
@@ -1042,7 +1024,7 @@ class Client
                     // look for a failed response; if the zone transfer failed, then we don't need to do anything else at this point, and we should 
                     // just break out.                 
                     //
-                    if ($response->header->rcode != \NetDNS2\ENUM\RCode::NOERROR)
+                    if ($response->header->rcode != \NetDNS2\ENUM\RR\Code::NOERROR)
                     {
                         break;
                     }
@@ -1113,7 +1095,7 @@ class Client
 
             if ( ($result === false) || ($size < \NetDNS2\Header::DNS_HEADER_SIZE) )   // @phpstan-ignore-line
             {
-                $this->generateError(\NetDNS2\Socket::SOCK_STREAM, $_ns, \NetDNS2\ENUM\Error::NS_SOCKET_FAILED);
+                $this->generateError(\NetDNS2\Socket::SOCK_STREAM, $_ns, \NetDNS2\ENUM\Error::INT_FAILED_SOCKET);
             }
 
             //
@@ -1179,7 +1161,7 @@ class Client
             //
             if ($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]->open() === false)
             {
-                $this->generateError(\NetDNS2\Socket::SOCK_DGRAM, $_ns, \NetDNS2\ENUM\Error::NS_SOCKET_FAILED);
+                $this->generateError(\NetDNS2\Socket::SOCK_DGRAM, $_ns, \NetDNS2\ENUM\Error::INT_FAILED_SOCKET);
             }
         }
 
@@ -1188,7 +1170,7 @@ class Client
         //
         if ($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]->write($_data) === false)
         {
-            $this->generateError(\NetDNS2\Socket::SOCK_DGRAM, $_ns, \NetDNS2\ENUM\Error::NS_SOCKET_FAILED);
+            $this->generateError(\NetDNS2\Socket::SOCK_DGRAM, $_ns, \NetDNS2\ENUM\Error::INT_FAILED_SOCKET);
         }
 
         //
@@ -1201,7 +1183,7 @@ class Client
 
         if (( $result === false) || ($size < \NetDNS2\Header::DNS_HEADER_SIZE))    // @phpstan-ignore-line
         {
-            $this->generateError(\NetDNS2\Socket::SOCK_DGRAM, $_ns, \NetDNS2\ENUM\Error::NS_SOCKET_FAILED);
+            $this->generateError(\NetDNS2\Socket::SOCK_DGRAM, $_ns, \NetDNS2\ENUM\Error::INT_FAILED_SOCKET);
         }
 
         //
@@ -1242,7 +1224,7 @@ class Client
         //
         if (extension_loaded('curl') === false)
         {
-            throw new \NetDNS2\Exception('the cURL extension is required to enable DoH.', \NetDNS2\ENUM\Error::CURL_UNAVAIL);
+            throw new \NetDNS2\Exception('the curl extension is required to enable DoH.', \NetDNS2\ENUM\Error::INT_INVALID_EXTENSION);
         }
 
         //
@@ -1251,26 +1233,29 @@ class Client
         $start_time = microtime(true);
 
         //
-        // the payload needs to be base64 encoded, with the trailing "=" padding removed.
-        //
-        $data = rtrim(base64_encode($_data), '=');
-
-        //
-        // set up cURL; right now we only support GET requests to "standard" RFC 8484 configured DoH endpoints
+        // set up cURL; right now we only support POST requests to "standard" RFC 8484 configured DoH endpoints
         //
         // the assumption is the DNS servers provided has as URL template that matches one defined in section 4.1.1,
-        // e.g. "https://cloudflare-dns.com/dns-query?dns"
+        // e.g. "https://cloudflare-dns.com/dns-query"
         //
         $c = curl_init();
 
-        curl_setopt($c, CURLOPT_URL, $_ns . '=' . $data);
+        curl_setopt($c, CURLOPT_URL, $_ns); // @phpstan-ignore-line
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);      // return the data
         curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);      // follow redirects by default
         curl_setopt($c, CURLOPT_MAXREDIRS, 5);              // but limit redirects to 5 so it doesn't get crazy
+        curl_setopt($c, CURLOPT_POST, true);
+        curl_setopt($c, CURLOPT_POSTFIELDS, $_data);
+        curl_setopt($c, CURLOPT_HTTPHEADER, [
 
-        // TODO: support our new timeout values
-        curl_setopt($c, CURLOPT_TIMEOUT, intval($this->timeout));
-        curl_setopt($c, CURLOPT_TIMEOUT_MS, 0);
+            'Accept: application/dns-message',
+            'Content-Type: application/dns-message'
+        ]);
+
+        //
+        // convert the seconds + microseconds float to milliseconds
+        //
+        curl_setopt($c, CURLOPT_TIMEOUT_MS, intval($this->timeout * 1000));
 
         //
         // if a local IP address / port is set, then have cURL bind to it for the request
@@ -1294,7 +1279,7 @@ class Client
 
                 } else
                 {
-                    throw new \NetDNS2\Exception('invalid bind address value: ' . $this->local_host, \NetDNS2\ENUM\Error::PARSE_ERROR);
+                    throw new \NetDNS2\Exception(sprintf('invalid bind address value: %s', $this->local_host), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
                 }
             }
 
@@ -1310,7 +1295,7 @@ class Client
         $result = curl_exec($c);
         if ($result === false)
         {
-            throw new \NetDNS2\Exception(sprintf('cURL failed with response: %s', curl_error($c)), \NetDNS2\ENUM\Error::CURL_ERROR);
+            throw new \NetDNS2\Exception(sprintf('curl failed with response: %s', curl_error($c)), \NetDNS2\ENUM\Error::INT_FAILED_CURL);
         }
         
         //
@@ -1319,7 +1304,7 @@ class Client
         $code = curl_getinfo($c, CURLINFO_HTTP_CODE);
         if ($code != 200)
         {
-            throw new \NetDNS2\Exception(sprintf('cURL failed with response code %d on host %s: %s', $code, $_ns, curl_error($c)), \NetDNS2\ENUM\Error::CURL_ERROR);
+            throw new \NetDNS2\Exception(sprintf('curl failed with response code %d on host %s: %s', $code, $_ns, curl_error($c)), \NetDNS2\ENUM\Error::INT_FAILED_CURL);
         }
 
         //
@@ -1367,7 +1352,7 @@ class Client
             //
             if (extension_loaded('openssl') === false)
             {
-                throw new \NetDNS2\Exception('the OpenSSL extension is required to enable DoT (TLS).', \NetDNS2\ENUM\Error::OPENSSL_UNAVAIL);
+                throw new \NetDNS2\Exception('the openssl extension is required to enable DoT (TLS).', \NetDNS2\ENUM\Error::INT_INVALID_EXTENSION);
             }
 
             //

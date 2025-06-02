@@ -42,12 +42,12 @@ class DS extends \NetDNS2\RR
     /**
      * algorithm number
      */
-    protected int $algorithm;
+    protected \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm;
 
     /**
      * algorithm used to construct the digest
      */
-    protected int $digesttype;
+    protected \NetDNS2\ENUM\DNSSEC\Digest $digesttype;
 
     /**
      * the digest data
@@ -59,18 +59,17 @@ class DS extends \NetDNS2\RR
      */
     protected function rrToString(): string
     {
-        return $this->keytag . ' ' . $this->algorithm . ' ' . $this->digesttype . ' ' . $this->digest;
+        return $this->keytag . ' ' . $this->algorithm->value . ' ' . $this->digesttype->value . ' ' . $this->digest;
     }
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
         $this->keytag     = intval($this->sanitize(array_shift($_rdata)));
-        $this->algorithm  = intval($this->sanitize(array_shift($_rdata)));
-        $this->digesttype = intval($this->sanitize(array_shift($_rdata)));
+        $this->algorithm  = \NetDNS2\ENUM\DNSSEC\Algorithm::set(intval($this->sanitize(array_shift($_rdata))));
+        $this->digesttype = \NetDNS2\ENUM\DNSSEC\Digest::set(intval($this->sanitize(array_shift($_rdata))));
         $this->digest     = $this->sanitize(implode('', $_rdata));
 
         return true;
@@ -95,7 +94,10 @@ class DS extends \NetDNS2\RR
             return false;
         }
 
-        list('w' => $this->keytag, 'x' => $this->algorithm, 'y' => $this->digesttype, 'z' => $this->digest) = (array)$val;
+        list('w' => $this->keytag, 'x' => $algorithm, 'y' => $digesttype, 'z' => $this->digest) = (array)$val;
+
+        $this->algorithm  = \NetDNS2\ENUM\DNSSEC\Algorithm::set($algorithm);
+        $this->digesttype = \NetDNS2\ENUM\DNSSEC\Digest::set($digesttype);
 
         return true;
     }
@@ -112,6 +114,6 @@ class DS extends \NetDNS2\RR
         
         $_packet->offset += strlen($this->digest) + 4;
 
-        return pack('nCCH*', $this->keytag, $this->algorithm, $this->digesttype, $this->digest);
+        return pack('nCCH*', $this->keytag, $this->algorithm->value, $this->digesttype->value, $this->digest);
     }
 }

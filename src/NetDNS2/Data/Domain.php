@@ -40,7 +40,7 @@ final class Domain extends \NetDNS2\Data
                 //
         }
 
-        throw new \NetDNS2\Exception('invalid domain encoding type.', \NetDNS2\ENUM\Error::PARSE_ERROR);
+        throw new \NetDNS2\Exception('invalid domain encoding type.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
     }
 
     /**

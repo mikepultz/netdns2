@@ -83,7 +83,11 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $rrs = [
 
             'AAAA'          => 'example.com. 300 IN AAAA 1080:0:0:0:8:800:200c:417a',
-            'AFSDB'         => 'example.com. 300 IN AFSDB 3 afsdb.example.com.',
+            'AFSDB'         => [
+                                    'example.com. 300 IN AFSDB 1 afsdb1.example.com.',
+                                    'example.com. 300 IN AFSDB 2 afsdb2.example.com.',
+                                    'example.com. 300 IN AFSDB 3 afsdb3.example.com.',
+                                ],
             'A'             => 'example.com. 300 IN A 172.168.0.50',
             'AMTRELAY'      => [
                                     'example.com. 300 IN AMTRELAY 10 0 0 .',
@@ -91,12 +95,25 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                                     'example.com. 300 IN AMTRELAY 30 0 2 2600:1f16:17c:3950:47ac:cb79:62ba:702e',
                                     'example.com. 300 IN AMTRELAY 40 1 3 test.google.com.'
                                 ],
-            'APL'           => 'example.com. 300 IN APL 1:224.0.0.0/4 2:a0:0:0:0:0:0:0:0/8 !1:192.168.38.0/28',
-            'AVC'           => 'example.com. 300 IN AVC "first record" "another records" "a third"',
-            'CAA'           => 'example.com. 300 IN CAA 0 issue "ca.example.net; policy=ev"',
+            'APL'           => [
+                                    'example.com. 300 IN APL 1:224.0.0.0/4 2:ff00::/8 2:a0::/8 !1:192.168.38.0/28',
+                                    'example.com. 300 IN APL 1:192.168.32.0/21 !1:192.168.38.0/28'
+                                ],
+            'AVC'           => 'example.com. 300 IN AVC "First Record" "Another Records" "a third"',
+            'CAA'           => [
+                                    'example.com. 300 IN CAA 0 issue "ca.example.net; policy=ev"',
+                                    'example.com. 300 IN CAA 0 issue ";"',
+                                    'example.com. 300 IN CAA 0 issue "ca1.example.net; account=230123"',
+                                    'example.com. 300 IN CAA 0 issuewild "ca2.example.org"',
+                                    'example.com. 300 IN CAA 0 iodef "mailto:security@example.com"',
+                                    'example.com. 300 IN CAA 128 tbs "Unknown"',
+                                ],
             'CDNSKEY'       => 'example.com. 300 IN CDNSKEY 256 3 7 AwEAAYCXh/ZABi8kiJIDXYmyUlHzC0CHeBzqcpyZAIjC7dK1wkRYVcUvIlpTOpnOVVfcC3Py9Ui/x45qKb0LytvK7WYAe3WyOOwk5klwIqRC/0p4luafbd2yhRMF7quOBVqYrLoHwv8i9LrV+r8dhB7rXv/lkTSI6mEZsg5rDfee8Yy1',
             'CDS'           => 'example.com. 300 IN CDS 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
-            'CERT'          => 'example.com. 300 IN CERT 3 0 0 TUlJQ1hnSUJBQUtCZ1FDcXlqbzNFMTU0dFU1Um43ajlKTFZsOGIwcUlCSVpGWENFelZvanVJT1BsMTM0by9zcHkxSE1hQytiUGh3Wk1UYVd4QlJpZHBFbUprNlEwNFJNTXdqdkFyLzFKWjhnWThtTzdCdTh1RUROVkNWeG5rQkUzMHhDSjhHRTNzL3EyN2VWSXBCUGFtU1lkNDVKZjNIeVBRRE4yaU45RjVHdGlIa2E2OXNhcmtKUnJ3SURBUUFCQW9HQkFJaUtDQ1NEM2FFUEFjQUx1MjdWN0JmR1BYN3lDTVg0OSsyVDVwNXNJdkduQjcrQ0NZZ09QaVQybmlpMGJPNVBBOTlnZnhPQXl1WCs5Z3llclVQbUFSc1ViUzcvUndkNGorRUlOVW1DanJSK2R6dGVXT0syeGxHamFOdGNPZU5jMkVtelQyMFRsekxVeUxTWGpzMzVlU2NQK0loeVptM2xJd21vbWtNb2d1QkFrRUE0a1FsOVBxaTJ2MVBDeGJCelU4Nnphblo2b0hsV0IzMUh4MllCNmFLYXhjNkVOZHhVejFzNjU2VncrRDhSVGpoSllyeDdMVkxzZDBRaVZJM0liSjVvUUpCQU1FN3k0aHg0SCtnQU40MEdrYjNjTFZGNHNpSEZrNnA2QVZRdlpzREwvVnh3bVlOdE4rM0txT3NVcG11WXZ3a3h0ajhIQnZtckxUYStXb3NmRDQwS1U4Q1FRQ1dvNmhob1R3cmI5bmdHQmFQQ2VDc2JCaVkrRUlvbUVsSm5mcEpuYWNxQlJ5emVid0pIeXdVOGsvalNUYXJIMk5HQzJ0bG5JMzRyS1VGeDZiTTJIWUJBa0VBbXBYSWZPNkZKL1NMM1RlWGNnQ1A5U1RraVlHd2NkdnhGeGVCcDlvRDZ2cElCN2FkWlgrMko5dzY5R0VUSlI0U3loSGVOdC95ZUhqWm9YdlhKVGc3ZHdKQVpEamxwL25wNEFZV3JYaGFrMVAvNGZlaDVNSU5WVHNXQkhTNlRZNW0xRmZMUEpybklHNW1FSHNidWkvdnhuQ1JmRUR4ZlU1V1E0cS9HUkZuaVl3SHB3PT0=',
+            'CERT'          => [
+                                    'example.com. 300 IN CERT 3 0 0 TUlJQ1hnSUJBQUtCZ1FDcXlqbzNFMTU0dFU1Um43ajlKTFZsOGIwcUlCSVpGWENFelZvanVJT1BsMTM0by9zcHkxSE1hQytiUGh3Wk1UYVd4QlJpZHBFbUprNlEwNFJNTXdqdkFyLzFKWjhnWThtTzdCdTh1RUROVkNWeG5rQkUzMHhDSjhHRTNzL3EyN2VWSXBCUGFtU1lkNDVKZjNIeVBRRE4yaU45RjVHdGlIa2E2OXNhcmtKUnJ3SURBUUFCQW9HQkFJaUtDQ1NEM2FFUEFjQUx1MjdWN0JmR1BYN3lDTVg0OSsyVDVwNXNJdkduQjcrQ0NZZ09QaVQybmlpMGJPNVBBOTlnZnhPQXl1WCs5Z3llclVQbUFSc1ViUzcvUndkNGorRUlOVW1DanJSK2R6dGVXT0syeGxHamFOdGNPZU5jMkVtelQyMFRsekxVeUxTWGpzMzVlU2NQK0loeVptM2xJd21vbWtNb2d1QkFrRUE0a1FsOVBxaTJ2MVBDeGJCelU4Nnphblo2b0hsV0IzMUh4MllCNmFLYXhjNkVOZHhVejFzNjU2VncrRDhSVGpoSllyeDdMVkxzZDBRaVZJM0liSjVvUUpCQU1FN3k0aHg0SCtnQU40MEdrYjNjTFZGNHNpSEZrNnA2QVZRdlpzREwvVnh3bVlOdE4rM0txT3NVcG11WXZ3a3h0ajhIQnZtckxUYStXb3NmRDQwS1U4Q1FRQ1dvNmhob1R3cmI5bmdHQmFQQ2VDc2JCaVkrRUlvbUVsSm5mcEpuYWNxQlJ5emVid0pIeXdVOGsvalNUYXJIMk5HQzJ0bG5JMzRyS1VGeDZiTTJIWUJBa0VBbXBYSWZPNkZKL1NMM1RlWGNnQ1A5U1RraVlHd2NkdnhGeGVCcDlvRDZ2cElCN2FkWlgrMko5dzY5R0VUSlI0U3loSGVOdC95ZUhqWm9YdlhKVGc3ZHdKQVpEamxwL25wNEFZV3JYaGFrMVAvNGZlaDVNSU5WVHNXQkhTNlRZNW0xRmZMUEpybklHNW1FSHNidWkvdnhuQ1JmRUR4ZlU1V1E0cS9HUkZuaVl3SHB3PT0=',
+                                    'example.com. 300 IN CERT 3 123 8 Q2VydGlmaWNhdGUgdHlwZXMgMHgwMDAwIHRocm91Z2ggMHgwMEZGIGFuZCAweEZGMDAgdGhyb3VnaCAweEZGRkY=',
+                                ],
             'CNAME'         => 'example.com. 300 IN CNAME www.shit.com.',
             'CSYNC'         => 'example.com. 300 IN CSYNC 1278700841 3 A NS AAAA',
             'DHCID'         => 'example.com. 300 IN DHCID AAIBY2/AuCccgoJbsaxcQc9TUapptP69lOjxfNuVAA2kjEA=',
@@ -158,7 +175,8 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             'TXT'           => 'example.com. 300 IN TXT "first record" "another records" "a third"',
             'URI'           => 'example.com. 300 IN URI 10 1 "https://netdns2.com/about"',
             'WKS'           => 'example.com. 300 IN WKS 128.8.1.14 6 21 25',
-            'X25'           => 'example.com. 300 IN X25 "311 06 17 0 09 56"'
+            'X25'           => 'example.com. 300 IN X25 "311 06 17 0 09 56"',
+            'ZONEMD'        => 'example.com. 300 IN ZONEMD 2018031500 1 1 FEBE3D4CE2EC2FFA4BA99D46CD69D6D29711E55217057BEE7EB1A7B641A47BA7FED2DD5B97AE499FAFA4F22C6BD647DE'
         ];
 
         foreach($rrs as $rr => $checks)

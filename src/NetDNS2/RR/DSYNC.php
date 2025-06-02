@@ -61,27 +61,28 @@ final class DSYNC extends \NetDNS2\RR
     /**
      * RR types supported by DSYNC
      *
-     * @var array<int,string>
+     * @var array<int,\NetDNS2\ENUM\RR\Type>
      */
-    public static array $supported_rr_types = [ 'CDS', 'CSYNC' ];    
+    public static array $supported_rr_types = [ \NetDNS2\ENUM\RR\Type::CDS, \NetDNS2\ENUM\RR\Type::CSYNC ];    
 
     /**
-     *
+     * The type of generalized NOTIFY that this DSYNC RR defines the desired target address for
      */
-    protected string $rrtype;
+    protected \NetDNS2\ENUM\RR\Type $rrtype;
 
     /**
-     *
+     * The mode used for contacting the desired notification address.
      */
     protected string $scheme;
 
     /**
-     *
+     * The port on the target host of the notification service.
      */
     protected int $port;
 
     /**
-     *
+     * The fully-qualified, uncompressed domain name of the target host providing the service of listening for generalized
+     * notifications of the specified type.
      */
     protected \NetDNS2\Data\Domain $target;
 
@@ -90,26 +91,22 @@ final class DSYNC extends \NetDNS2\RR
      */
     protected function rrToString(): string
     {
-        return $this->rrtype . ' ' . $this->scheme . ' ' . $this->port . ' ' . $this->target . '.';
+        return $this->rrtype->label() . ' ' . $this->scheme . ' ' . $this->port . ' ' . $this->target . '.';
     }
 
     /**
      * @see \NetDNS2\RR::rrFromString()
-     * @param array<string> $_rdata
      */
     protected function rrFromString(array $_rdata): bool
     {
         //
         // lookup and store the RR mnemonic
         //
-        $rrtype = strtoupper($this->sanitize(array_shift($_rdata)));
+        $this->rrtype = \NetDNS2\ENUM\RR\Type::set($this->sanitize(array_shift($_rdata), false));
 
-        if (in_array($rrtype, self::$supported_rr_types) == true)
+        if (in_array($this->rrtype, self::$supported_rr_types) == false)
         {
-            $this->rrtype = $rrtype;
-        } else
-        {
-            throw new \NetDNS2\Exception('unsupported RR type for DSYNC record: ' . $rrtype, \NetDNS2\ENUM\Error::RR_INVALID);
+            throw new \NetDNS2\Exception(sprintf('unsupported resource record type for DSYNC record: %s', $this->rrtype->label()), \NetDNS2\ENUM\Error::INT_INVALID_TYPE);
         }
 
         //
@@ -122,7 +119,7 @@ final class DSYNC extends \NetDNS2\RR
             $this->scheme = $scheme;
         } else
         {
-            throw new \NetDNS2\Exception('unsupported scheme value for DSYNC record: ' . $scheme, \NetDNS2\ENUM\Error::PARSE_ERROR);
+            throw new \NetDNS2\Exception(sprintf('unsupported scheme value for DSYNC record: %s', $scheme), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         $this->port   = intval($this->sanitize(array_shift($_rdata)));
@@ -153,14 +150,11 @@ final class DSYNC extends \NetDNS2\RR
         //
         // lookup the rrtype value
         //
-        $rr = \NetDNS2\ENUM\RRType::set($rrtype);
+        $this->rrtype = \NetDNS2\ENUM\RR\Type::set($rrtype);
 
-        if (in_array($rr->label(), self::$supported_rr_types) == true)
+        if (in_array($this->rrtype, self::$supported_rr_types) == false)
         {
-            $this->rrtype = $rr->label();
-        } else
-        {
-            throw new \NetDNS2\Exception('unsupported RR type for DSYNC record: ' . $rrtype, \NetDNS2\ENUM\Error::RR_INVALID);
+            throw new \NetDNS2\Exception(sprintf('unsupported resource record type for DSYNC record: %s', $this->rrtype->label()), \NetDNS2\ENUM\Error::INT_INVALID_TYPE);
         }
 
         //
@@ -171,7 +165,7 @@ final class DSYNC extends \NetDNS2\RR
             $this->scheme = self::$scheme_id_to_name[$scheme];
         } else
         {
-            throw new \NetDNS2\Exception('unsupported scheme value for DSYNC record: ' . $scheme, \NetDNS2\ENUM\Error::PARSE_ERROR);
+            throw new \NetDNS2\Exception(sprintf('unsupported scheme value for DSYNC record: %d', $scheme), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         $this->target = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $_packet, $offset);
@@ -186,7 +180,6 @@ final class DSYNC extends \NetDNS2\RR
     {
         $_packet->offset += 5;
 
-        return pack('nCn', \NetDNS2\ENUM\RRType::set($this->rrtype)->value, 
-            self::$scheme_name_to_id[$this->scheme], $this->port) . $this->target->encode();
+        return pack('nCn', $this->rrtype->value, self::$scheme_name_to_id[$this->scheme], $this->port) . $this->target->encode();
     }
 }
