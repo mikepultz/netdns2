@@ -26,29 +26,29 @@ enum Error: int
     //
     // error conditions mapped to DNS response codes
     //
-    case NONE               = \NetDNS2\ENUM\RR\Code::NOERROR->value;
-    case DNS_FORMERR        = \NetDNS2\ENUM\RR\Code::FORMERR->value;
-    case DNS_SERVFAIL       = \NetDNS2\ENUM\RR\Code::SERVFAIL->value;
-    case DNS_NXDOMAIN       = \NetDNS2\ENUM\RR\Code::NXDOMAIN->value;
-    case DNS_NOTIMP         = \NetDNS2\ENUM\RR\Code::NOTIMP->value;
-    case DNS_REFUSED        = \NetDNS2\ENUM\RR\Code::REFUSED->value;
-    case DNS_YXDOMAIN       = \NetDNS2\ENUM\RR\Code::YXDOMAIN->value;
-    case DNS_YXRRSET        = \NetDNS2\ENUM\RR\Code::YXRRSET->value;
-    case DNS_NXRRSET        = \NetDNS2\ENUM\RR\Code::NXRRSET->value;
-    case DNS_NOTAUTH        = \NetDNS2\ENUM\RR\Code::NOTAUTH->value;
-    case DNS_NOTZONE        = \NetDNS2\ENUM\RR\Code::NOTZONE->value;
-    case DNS_DSOTYPENI      = \NetDNS2\ENUM\RR\Code::DSOTYPENI->value;
+    case NONE               = 0;    // \NetDNS2\ENUM\RR\Code::NOERROR
+    case DNS_FORMERR        = 1;    // \NetDNS2\ENUM\RR\Code::FORMERR
+    case DNS_SERVFAIL       = 2;    // \NetDNS2\ENUM\RR\Code::SERVFAIL
+    case DNS_NXDOMAIN       = 3;    // \NetDNS2\ENUM\RR\Code::NXDOMAIN
+    case DNS_NOTIMP         = 4;    // \NetDNS2\ENUM\RR\Code::NOTIMP
+    case DNS_REFUSED        = 5;    // \NetDNS2\ENUM\RR\Code::REFUSED
+    case DNS_YXDOMAIN       = 6;    // \NetDNS2\ENUM\RR\Code::YXDOMAIN
+    case DNS_YXRRSET        = 7;    // \NetDNS2\ENUM\RR\Code::YXRRSET
+    case DNS_NXRRSET        = 8;    // \NetDNS2\ENUM\RR\Code::NXRRSET
+    case DNS_NOTAUTH        = 9;    // \NetDNS2\ENUM\RR\Code::NOTAUTH
+    case DNS_NOTZONE        = 10;   // \NetDNS2\ENUM\RR\Code::NOTZONE
+    case DNS_DSOTYPENI      = 11;   // \NetDNS2\ENUM\RR\Code::DSOTYPENI
 
     // 12-15 reserved
 
-    case DNS_BADSIG         = \NetDNS2\ENUM\RR\Code::BADSIG->value;
-    case DNS_BADKEY         = \NetDNS2\ENUM\RR\Code::BADKEY->value;
-    case DNS_BADTIME        = \NetDNS2\ENUM\RR\Code::BADTIME->value;
-    case DNS_BADMODE        = \NetDNS2\ENUM\RR\Code::BADMODE->value;
-    case DNS_BADNAME        = \NetDNS2\ENUM\RR\Code::BADNAME->value;
-    case DNS_BADALG         = \NetDNS2\ENUM\RR\Code::BADALG->value;
-    case DNS_BADTRUNC       = \NetDNS2\ENUM\RR\Code::BADTRUNC->value;    
-    case DNS_BADCOOKIE      = \NetDNS2\ENUM\RR\Code::BADCOOKIE->value;
+    case DNS_BADSIG         = 16;   // \NetDNS2\ENUM\RR\Code::BADSIG
+    case DNS_BADKEY         = 17;   // \NetDNS2\ENUM\RR\Code::BADKEY
+    case DNS_BADTIME        = 18;   // \NetDNS2\ENUM\RR\Code::BADTIME
+    case DNS_BADMODE        = 19;   // \NetDNS2\ENUM\RR\Code::BADMODE
+    case DNS_BADNAME        = 20;   // \NetDNS2\ENUM\RR\Code::BADNAME
+    case DNS_BADALG         = 21;   // \NetDNS2\ENUM\RR\Code::BADALG
+    case DNS_BADTRUNC       = 22;   // \NetDNS2\ENUM\RR\Code::BADTRUNC    
+    case DNS_BADCOOKIE      = 23;   // \NetDNS2\ENUM\RR\Code::BADCOOKIE
 
     //
     // other internal error conditions - 3841-4095
