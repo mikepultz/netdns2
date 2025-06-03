@@ -16,6 +16,7 @@ jobs:
     - name: PHPStan Static Analysis
       uses: php-actions/phpstan@v3
       with:
+        version: version: 2
         level: 8
         memory_limit: 2G
         configuration: tests/phpstan.neon
