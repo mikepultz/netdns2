@@ -28,8 +28,8 @@ final class Socket
     /**
      * type of sockets
      */
-    public const SOCK_STREAM = \SOCK_STREAM;
-    public const SOCK_DGRAM  = \SOCK_DGRAM;
+    public const SOCK_STREAM = 1;
+    public const SOCK_DGRAM  = 2;
 
     /**
      * the last error message on the object
