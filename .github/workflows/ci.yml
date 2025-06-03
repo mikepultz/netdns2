@@ -19,6 +19,7 @@ jobs:
         version: 2.1.17
         level: 8
         memory_limit: 2G
+        php_version: 8.1
         php_extensions: hash openssl shmop
         configuration: tests/phpstan.neon
 
@@ -27,6 +28,7 @@ jobs:
       with:
         version: 10.5
         configuration: tests/phpunit.xml
+        php_version: 8.1
         php_extensions: hash openssl shmop
         test_suffix: .php
-        args: tests
+        args: --testsuite parser

@@ -261,7 +261,6 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
 
         } catch(\NetDNS2\Exception $e)
         {
-print_r($e);
             $this->assertTrue(false, sprintf('ResolverTest::testInternalResolver(): exception thrown: %s', $e->getMessage()));
         }
     }
