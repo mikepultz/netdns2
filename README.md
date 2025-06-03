@@ -64,6 +64,16 @@ v2.x
 
 While all the underlying objects have been reorganized into namespaces, the majority of the class, function, and property names have remained the same, so upgrading should not require too many changes.
 
+To continue using NetDNS2 v1.x, update your `composer.json` file to specify 1.x, e.g.:
+
+    {
+        "require": {
+            "pear/net_dns2": "1.*"
+        }
+    }
+
+Version 1.x will be maintained for the foreseeable  future.
+
 ## Requirements
 
 * PHP 8.1+ - this version uses strong typing, ENUMs, and other modern PHP features, and will not work with older versions of PHP.
