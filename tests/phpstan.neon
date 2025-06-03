@@ -1,0 +1,10 @@
+parameters:
+    universalObjectCratesClasses:
+        - NetDNS2\RR\SIG
+        - NetDNS2\RR\OPT
+    paths:
+        - ../src
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        - '*expects int, int\|null given*'
+        - '*does not accept int\|null*'
