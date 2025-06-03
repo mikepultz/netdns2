@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -38,7 +31,7 @@ class Client
     /**
      * override options from the resolv.conf file
      *
-     * if this is set, then certain values from the resolv.conf file will override local settings. This is disabled by default to remain 
+     * if this is set, then certain values from the resolv.conf file will override local settings. This is disabled by default to remain
      * backwards compatible.
      *
      */
@@ -125,7 +118,7 @@ class Client
      * this can cause "unexpected" behavious, since i'm sure *most* people don't know DNS does this; there may be cases where NetDNS2 returns a
      * positive response, even though the hostname the user looked up did not actually exist.
      *
-     * strict_query_mode means that if the hostname that was looked up isn't actually in the answer section of the response, NetDNS2 will return an 
+     * strict_query_mode means that if the hostname that was looked up isn't actually in the answer section of the response, NetDNS2 will return an
      * empty answer section, instead of an answer section that could contain CNAME records.
      *
      */
@@ -134,7 +127,7 @@ class Client
     /**
      * if we should set the recursion desired bit to 1 or 0.
      *
-     * by default this is set to true, we want the DNS server to perform a recursive request. If set to false, the RD bit will be set to 0, and the 
+     * by default this is set to true, we want the DNS server to perform a recursive request. If set to false, the RD bit will be set to 0, and the
      * server will not perform recursion on the request.
      *
      */
@@ -148,17 +141,17 @@ class Client
     public bool $dnssec = false;
 
     /**
-     * set the DNSSEC AD (Authentic Data) bit on/off; the AD bit on the request side was previously undefined, and resolvers we instructed to always clear 
+     * set the DNSSEC AD (Authentic Data) bit on/off; the AD bit on the request side was previously undefined, and resolvers we instructed to always clear
      * the AD bit when sending a request.
      *
-     * RFC6840 section 5.7 defines setting the AD bit in the query as a signal to the server that it wants the value of the AD bit, without needed to 
+     * RFC6840 section 5.7 defines setting the AD bit in the query as a signal to the server that it wants the value of the AD bit, without needed to
      * request all the DNSSEC data via the DO bit.
      *
      */
     public bool $dnssec_ad_flag = false;
 
     /**
-     * set the DNSSEC CD (Checking Disabled) bit on/off; turning this off, means that the DNS resolver will perform it's own signature validation- so 
+     * set the DNSSEC CD (Checking Disabled) bit on/off; turning this off, means that the DNS resolver will perform it's own signature validation- so
      * the DNS servers simply pass through all the details.
      *
      */
@@ -302,7 +295,7 @@ class Client
         } else
         {
             //
-            // temporary list of name servers; do it this way rather than just resetting the local nameservers value, just incase an exception 
+            // temporary list of name servers; do it this way rather than just resetting the local nameservers value, just incase an exception
             // is thrown here; this way we might avoid ending up with an empty namservers list.
             //
             $ns = [];
@@ -435,7 +428,7 @@ class Client
     }
 
     /**
-     * give users access to close all open sockets on the resolver object; resetting each array, calls the destructor on the \NetDNS2\Socket 
+     * give users access to close all open sockets on the resolver object; resetting each array, calls the destructor on the \NetDNS2\Socket
      * object, which calls the close() method on each object.
      *
      */
@@ -491,7 +484,7 @@ class Client
         }
 
         return true;
-    }    
+    }
 
     /**
      * checks the list of name servers to make sure they're set
@@ -535,13 +528,13 @@ class Client
         } else
         {
             //
-            // otherwise create the TSIG RR, but don't add it just yet; TSIG needs to be added as the last additional entry- so we'll add 
+            // otherwise create the TSIG RR, but don't add it just yet; TSIG needs to be added as the last additional entry- so we'll add
             // it just before we send.
             //
             $this->auth_signature = new \NetDNS2\RR\TSIG();
             $this->auth_signature->factory($_keyname, $_algorithm, $_signature);
         }
-          
+
         return true;
     }
 
@@ -550,7 +543,7 @@ class Client
      *
      * @param \NetDNS2\RR\SIG|string $_filename the name of a file to load the signature from, or an instance of a \NetDNS2\RR\SIG
      *                                          object that we copy from.
-     * 
+     *
      * @throws \NetDNS2\Exception
      *
      */
@@ -673,7 +666,7 @@ class Client
     {
         return (filter_var($_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true) ? true : false;
     }
-    
+
     /**
      * returns true/false if the given address is a valid IPv6 address
      *
@@ -702,7 +695,7 @@ class Client
         {
             return $_address;
         }
-    
+
         return substr(preg_replace('/([A-f0-9]{4})/', "$1:", ((array)$hex)['hex']), 0, -1);
     }
 
@@ -727,7 +720,7 @@ class Client
         }
 
         reset($this->nameservers);
-        
+
         //
         // randomize the name server list if it's asked for
         //
@@ -788,7 +781,7 @@ class Client
                 }
 
             //
-            // if the use TCP flag (force TCP) is set, or the packet is bigger than our max allowed UDP size- which is either 512, or if this 
+            // if the use TCP flag (force TCP) is set, or the packet is bigger than our max allowed UDP size- which is either 512, or if this
             // is DNSSEC request, then whatever the configured dnssec_payload_size is.
             //
             } else if ( ($_use_tcp == true) || (strlen($data) > $max_udp_size) )
@@ -845,7 +838,7 @@ class Client
 
             //
             // make sure the response is actually a response
-            // 
+            //
             // 0 = query, 1 = response
             //
             if ($response->header->qr != \NetDNS2\Header::QR_RESPONSE)
@@ -862,7 +855,7 @@ class Client
             //
             if ($response->header->rcode != \NetDNS2\ENUM\RR\Code::NOERROR)
             {
-                $this->last_exception = new \NetDNS2\Exception('DNS request failed: ' . $response->header->rcode->label(), 
+                $this->last_exception = new \NetDNS2\Exception('DNS request failed: ' . $response->header->rcode->label(),
                     \NetDNS2\ENUM\Error::set($response->header->rcode->value), null, $_request, $response);
 
                 $this->last_exception_list[$ns] = $this->last_exception;
@@ -891,7 +884,7 @@ class Client
         {
             throw new \NetDNS2\Exception('invalid socket reference provided.', \NetDNS2\ENUM\Error::INT_INVALID_SOCKET);
         }
-        
+
         //
         // grab the last error message off the socket
         //
@@ -928,7 +921,7 @@ class Client
         //
         // see if we already have an open socket from a previous request; if so, try to use that instead of opening a new one.
         //
-        if ( (isset($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]) == false) || 
+        if ( (isset($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]) == false) ||
             ( ($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns] instanceof \NetDNS2\Socket) == false) )
         {
             //
@@ -990,16 +983,16 @@ class Client
                 //
                 // read the data off the socket
                 //
-                $result = $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->read($size, 
+                $result = $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->read($size,
                     ($this->dnssec == true) ? $this->dnssec_payload_size : \NetDNS2\Header::DNS_MAX_UDP_SIZE);
 
                 if ( ($result === false) || ($size < \NetDNS2\Header::DNS_HEADER_SIZE) )   // @phpstan-ignore-line
                 {
                     //
-                    // if we get an error, then keeping this socket around for a future request, could cause an error- for example, 
+                    // if we get an error, then keeping this socket around for a future request, could cause an error- for example,
                     // https://github.com/mikepultz/netdns2/issues/61
                     //
-                    // in this case, the connection was timing out, which once it did finally respond, left data on the socket, which could be captured 
+                    // in this case, the connection was timing out, which once it did finally respond, left data on the socket, which could be captured
                     // on a subsequent request.
                     //
                     // since there's no way to "reset" a socket, the only thing we can do it close it.
@@ -1013,7 +1006,7 @@ class Client
                 $chunk = new \NetDNS2\Packet\Response($result, $size);
 
                 //
-                // if this is the first packet, then clone it directly, then go through it to see if there are two SOA records (indicating that it's 
+                // if this is the first packet, then clone it directly, then go through it to see if there are two SOA records (indicating that it's
                 // the only packet)
                 //
                 if (is_null($response) == true)
@@ -1021,15 +1014,15 @@ class Client
                     $response = clone $chunk;
 
                     //
-                    // look for a failed response; if the zone transfer failed, then we don't need to do anything else at this point, and we should 
-                    // just break out.                 
+                    // look for a failed response; if the zone transfer failed, then we don't need to do anything else at this point, and we should
+                    // just break out.
                     //
                     if ($response->header->rcode != \NetDNS2\ENUM\RR\Code::NOERROR)
                     {
                         break;
                     }
 
-                    //   
+                    //
                     // go through each answer
                     //
                     foreach($response->answer as $index => $rr)
@@ -1066,13 +1059,13 @@ class Client
                         //
                         if ($rr->type == 'SOA')
                         {
-                            $soa_count++;           
+                            $soa_count++;
                         }
 
                         //
                         // add the records to a single response object
                         //
-                        $response->answer[] = clone $rr;                  
+                        $response->answer[] = clone $rr;
                     }
 
                     //
@@ -1090,7 +1083,7 @@ class Client
         //
         } else
         {
-            $result = $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->read($size, 
+            $result = $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->read($size,
                 ($this->dnssec == true) ? $this->dnssec_payload_size : \NetDNS2\Header::DNS_MAX_UDP_SIZE);
 
             if ( ($result === false) || ($size < \NetDNS2\Header::DNS_HEADER_SIZE) )   // @phpstan-ignore-line
@@ -1140,7 +1133,7 @@ class Client
         //
         // see if we already have an open socket from a previous request; if so, try to use that instead of opening a new one.
         //
-        if ( (isset($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]) == false) || 
+        if ( (isset($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]) == false) ||
             ( ($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns] instanceof \NetDNS2\Socket) == false) )
         {
             //
@@ -1178,7 +1171,7 @@ class Client
         //
         $size = 0;
 
-        $result = $this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]->read($size, 
+        $result = $this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]->read($size,
             ($this->dnssec == true) ? $this->dnssec_payload_size : \NetDNS2\Header::DNS_MAX_UDP_SIZE);
 
         if (( $result === false) || ($size < \NetDNS2\Header::DNS_HEADER_SIZE))    // @phpstan-ignore-line
@@ -1297,7 +1290,7 @@ class Client
         {
             throw new \NetDNS2\Exception(sprintf('curl failed with response: %s', curl_error($c)), \NetDNS2\ENUM\Error::INT_FAILED_CURL);
         }
-        
+
         //
         // get the response code
         //

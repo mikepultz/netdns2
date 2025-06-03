@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -23,7 +16,7 @@ namespace NetDNS2\RR;
  * TKEY Resource Record - RFC 2930 section 2
  *
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *    /                   ALGORITHM                   / 
+ *    /                   ALGORITHM                   /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *    |                   INCEPTION                   |
  *    |                                               |
@@ -53,7 +46,7 @@ final class TKEY extends \NetDNS2\RR
     protected \NetDNS2\Data\Domain $algorithm;
 
     /*
-     * The inception time and expiration times are in number of seconds since the beginning of 1 January 1970 GMT 
+     * The inception time and expiration times are in number of seconds since the beginning of 1 January 1970 GMT
      * ignoring leap seconds
      */
     protected int $inception;
@@ -70,7 +63,7 @@ final class TKEY extends \NetDNS2\RR
     protected \NetDNS2\ENUM\RR\Code $error;
 
     /*
-     * The key data size field is an unsigned 16 bit integer in network order which specifies the size of the key 
+     * The key data size field is an unsigned 16 bit integer in network order which specifies the size of the key
      * exchange data field in octets.
      */
     protected int $key_size;
@@ -106,7 +99,7 @@ final class TKEY extends \NetDNS2\RR
     protected function rrFromString(array $_rdata): bool
     {
         $this->algorithm = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, array_shift($_rdata));
-        $this->mode      = \NetDNS2\ENUM\TKEYMode::set(intval($this->sanitize(array_shift($_rdata))));        
+        $this->mode      = \NetDNS2\ENUM\TKEYMode::set(intval($this->sanitize(array_shift($_rdata))));
         $this->key_data  = $this->sanitize(array_shift($_rdata));
 
         //
@@ -135,7 +128,7 @@ final class TKEY extends \NetDNS2\RR
         $offset = $_packet->offset;
 
         $this->algorithm = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $_packet->rdata, $offset);
-            
+
         //
         // unpack inception, expiration, mode, error and key size
         //
@@ -171,7 +164,7 @@ final class TKEY extends \NetDNS2\RR
         {
             return false;
         }
-        
+
         list('x' => $this->other_size) = (array)$val;
         $offset += 2;
 
@@ -195,7 +188,7 @@ final class TKEY extends \NetDNS2\RR
         {
             return '';
         }
-            
+
         //
         // make sure the size values are correct
         //

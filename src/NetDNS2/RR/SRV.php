@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -73,7 +66,7 @@ final class SRV extends \NetDNS2\RR
         $this->port     = intval($this->sanitize(array_shift($_rdata)));
 
         $this->target   = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC2535, array_shift($_rdata));
-        
+
         return true;
     }
 
@@ -96,7 +89,7 @@ final class SRV extends \NetDNS2\RR
         list('x' => $this->priority, 'y' => $this->weight, 'z' => $this->port) = (array)$val;
 
         $offset = $_packet->offset + 6;
-            
+
         $this->target = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC2535, $_packet, $offset);
 
         return true;

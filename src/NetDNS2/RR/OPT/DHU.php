@@ -1,25 +1,28 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2025, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2025 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     1.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
 namespace NetDNS2\RR\OPT;
 
 /**
+ * RFC 6875 - Signaling Cryptographic Algorithm Understanding in DNS Security Extensions (DNSSEC)
+ *
+ *  0                       8                      16
+ *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *  |                  OPTION-CODE                  |
+ *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *  |                  LIST-LENGTH                  |
+ *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+ *  |       ALG-CODE        |        ...            /
+ *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
  */
 final class DHU extends \NetDNS2\RR\OPT\DAU

@@ -1,26 +1,19 @@
 <?php
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link      https://netdns2.com/
- * @since     File available since Release 1.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
 namespace NetDNS2\Tests;
 
 /**
- * this test does a basic DNS lookup, and test the file caching feature 
+ * this test does a basic DNS lookup, and test the file caching feature
  *
  */
 class CacheTest extends \PHPUnit\Framework\TestCase
@@ -46,7 +39,7 @@ class CacheTest extends \PHPUnit\Framework\TestCase
                 'nameservers'   => [ '8.8.8.8', '8.8.4.4' ],
                 'cache_type'    => \NetDNS2\Cache::CACHE_TYPE_FILE,
                 'cache_options' => [
- 
+
                    'file' => $cache_file,
                    'size' => 50000
                 ]
@@ -102,7 +95,7 @@ class CacheTest extends \PHPUnit\Framework\TestCase
                 'nameservers'   => [ '8.8.8.8', '8.8.4.4' ],
                 'cache_type'    => \NetDNS2\Cache::CACHE_TYPE_SHM,
                 'cache_options' => [
- 
+
                    'file' => $cache_file,
                    'size' => 50000
                 ]

@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -67,7 +60,7 @@ final class IPSECKEY extends \NetDNS2\RR
     protected int $algorithm;
 
     /**
-     * The gateway information 
+     * The gateway information
      */
     protected \NetDNS2\Data $gateway;
 
@@ -82,7 +75,7 @@ final class IPSECKEY extends \NetDNS2\RR
     protected function rrToString(): string
     {
         $out = $this->precedence . ' ' . $this->gateway_type . ' ' . $this->algorithm . ' ';
-        
+
         switch($this->gateway_type)
         {
             case self::GATEWAY_TYPE_NONE:
@@ -154,7 +147,7 @@ final class IPSECKEY extends \NetDNS2\RR
         }
 
         $this->key = array_shift($_rdata) ?? '';
-        
+
         //
         // check the algorithm and key
         //
@@ -320,7 +313,7 @@ final class IPSECKEY extends \NetDNS2\RR
                 return '';
             }
         }
-        
+
         return $data;
     }
 }

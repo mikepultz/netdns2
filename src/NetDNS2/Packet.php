@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -54,7 +47,7 @@ class Packet implements \Stringable
 
     /**
      * array of \NetDNS2\RR Objects for Answers
-     * 
+     *
      * used as "prerequisite" for updates per RFC2136
      *
      * @var array<int,\NetDNS2\RR>
@@ -120,7 +113,7 @@ class Packet implements \Stringable
 
         $data = $this->header->get($this);
 
-        foreach($this->question as $x) 
+        foreach($this->question as $x)
         {
             $data .= $x->get($this);
         }

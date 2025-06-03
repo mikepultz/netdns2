@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2025, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2025 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     1.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -78,7 +71,7 @@ final class ECS extends \NetDNS2\RR\OPT
 
         if (strpos($_address, '/') !== false)
         {
-            list($address, $prefix) = explode('/', $_address);   
+            list($address, $prefix) = explode('/', $_address);
         } else
         {
             $address = $_address;
@@ -126,7 +119,7 @@ final class ECS extends \NetDNS2\RR\OPT
 
             return true;
 
-        } else          
+        } else
         {
             throw new \NetDNS2\Exception('EDNS client subnet requires a valid IPv4 or IPv6 address.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
@@ -146,7 +139,7 @@ final class ECS extends \NetDNS2\RR\OPT
     protected function rrSet(\NetDNS2\Packet &$_packet): bool
     {
         if ($this->option_length == 0)
-        {            
+        {
             return true;
         }
 
@@ -164,7 +157,7 @@ final class ECS extends \NetDNS2\RR\OPT
         //
         $address = unpack('C*', substr($this->option_data, $offset));
         if ($address === false)
-        {                         
+        {
             return false;
         }
 
@@ -221,6 +214,6 @@ final class ECS extends \NetDNS2\RR\OPT
         //
         // build the parent OPT data
         //
-        return parent::rrGet($_packet);        
+        return parent::rrGet($_packet);
     }
 }

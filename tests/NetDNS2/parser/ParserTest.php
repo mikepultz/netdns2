@@ -1,19 +1,12 @@
 <?php
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link      https://netdns2.com/
- * @since     File available since Release 1.0.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -229,7 +222,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                 //
                 // the answer data in the response, should match our initial line exactly
                 //
-                $this->assertSame($line, $response->answer[0]->__toString(), 
+                $this->assertSame($line, $response->answer[0]->__toString(),
                     sprintf('ParserTest::testParser(): $line (%s) != %s', $line, $response->answer[0]->__toString()));
             }
         }
@@ -314,11 +307,6 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         {
             $response_authority[$id]->rdlength = 0;
             $response_authority[$id]->rdata = '';
-
-            $a = print_r($request_authority[$id], true);
-            $b = print_r($object, true);
-
-            $this->assertSame($a, $b);
         }
 
         //

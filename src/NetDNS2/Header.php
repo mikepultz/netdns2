@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -23,7 +16,7 @@ namespace NetDNS2;
  * DNS Packet Header class
  *
  * This class handles parsing and constructing DNS Packet Headers as defined by section 4.1.1 of RFC1035.
- * 
+ *
  * DNS header format - RFC1035 section 4.1.1
  * DNS header format - RFC4035 section 3.2
  *
@@ -177,7 +170,7 @@ final class Header implements \Stringable
         $this->ad       = (ord($_packet->rdata[$offset]) >> 5) & 0x1;
         $this->cd       = (ord($_packet->rdata[$offset]) >> 4) & 0x1;
         $this->rcode    = \NetDNS2\ENUM\RR\Code::set(ord($_packet->rdata[$offset]) & 0xf);
-            
+
         $this->qdcount  = ord($_packet->rdata[++$offset]) << 8 | ord($_packet->rdata[++$offset]);
         $this->ancount  = ord($_packet->rdata[++$offset]) << 8 | ord($_packet->rdata[++$offset]);
         $this->nscount  = ord($_packet->rdata[++$offset]) << 8 | ord($_packet->rdata[++$offset]);
@@ -200,7 +193,7 @@ final class Header implements \Stringable
         $_packet->offset += self::DNS_HEADER_SIZE;
 
         return pack('n', $this->id) . chr(($this->qr << 7) | ($this->opcode->value << 3) | ($this->aa << 2) | ($this->tc << 1) | ($this->rd)) .
-            chr(($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode->value) . 
+            chr(($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode->value) .
             pack('n4', $this->qdcount, $this->ancount, $this->nscount, $this->arcount);
     }
 }

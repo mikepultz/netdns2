@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -91,7 +84,7 @@ final class Updater extends \NetDNS2\Client
     /**
      * 2.5.1 - Add To An RRset
      *
-     * RRs are added to the Update Section whose NAME, TYPE, TTL, RDLENGTH and RDATA are those being added, and CLASS is the same as the zone class. Any 
+     * RRs are added to the Update Section whose NAME, TYPE, TTL, RDLENGTH and RDATA are those being added, and CLASS is the same as the zone class. Any
      * duplicate RRs will be silently ignored by the primary master.
      *
      * @param \NetDNS2\RR $_rr the \NetDNS2\RR object to be added to the zone
@@ -115,8 +108,8 @@ final class Updater extends \NetDNS2\Client
     /**
      * 2.5.4 - Delete An RR From An RRset
      *
-     * RRs to be deleted are added to the Update Section. The NAME, TYPE, RDLENGTH and RDATA must match the RR being deleted. TTL must be specified as 
-     * zero (0) and will otherwise be ignored by the primary master. CLASS must be specified as NONE to distinguish this from an RR addition. If no 
+     * RRs to be deleted are added to the Update Section. The NAME, TYPE, RDLENGTH and RDATA must match the RR being deleted. TTL must be specified as
+     * zero (0) and will otherwise be ignored by the primary master. CLASS must be specified as NONE to distinguish this from an RR addition. If no
      * such RRs exist, then this Update RR will be silently ignored by the primary master.
      *
      * @param \NetDNS2\RR $_rr the \NetDNS2\RR object to be deleted from the zone
@@ -143,8 +136,8 @@ final class Updater extends \NetDNS2\Client
     /**
      * 2.5.2 - Delete An RRset
      *
-     * One RR is added to the Update Section whose NAME and TYPE are those of the RRset to be deleted. TTL must be specified as zero (0) and is otherwise 
-     * not used by the primary master. CLASS must be specified as ANY. RDLENGTH must be zero (0) and RDATA must therefore be empty. If no such RRset 
+     * One RR is added to the Update Section whose NAME and TYPE are those of the RRset to be deleted. TTL must be specified as zero (0) and is otherwise
+     * not used by the primary master. CLASS must be specified as ANY. RDLENGTH must be zero (0) and RDATA must therefore be empty. If no such RRset
      * exists, then this Update RR will be silently ignored by the primary master
      *
      * @param string $_name the RR name to be removed from the zone
@@ -166,7 +159,7 @@ final class Updater extends \NetDNS2\Client
         $rr->ttl      = 0;
         $rr->class    = \NetDNS2\ENUM\RR\Classes::set('ANY');
         $rr->rdlength = -1;
-        $rr->rdata    = '';    
+        $rr->rdata    = '';
 
         //
         // add the RR to the "update" section
@@ -180,8 +173,8 @@ final class Updater extends \NetDNS2\Client
     /**
      * 2.5.3 - Delete All RRsets From A Name
      *
-     * One RR is added to the Update Section whose NAME is that of the name to be cleansed of RRsets. TYPE must be specified as ANY. TTL must be specified 
-     * as zero (0) and is otherwise not used by the primary master. CLASS must be specified as ANY. RDLENGTH must be zero (0) and RDATA must therefore be 
+     * One RR is added to the Update Section whose NAME is that of the name to be cleansed of RRsets. TYPE must be specified as ANY. TTL must be specified
+     * as zero (0) and is otherwise not used by the primary master. CLASS must be specified as ANY. RDLENGTH must be zero (0) and RDATA must therefore be
      * empty. If no such RRsets exist, then this Update RR will be silently ignored by the primary master.
      *
      * @param string $_name the RR name to be removed from the zone
@@ -219,8 +212,8 @@ final class Updater extends \NetDNS2\Client
      *
      * At least one RR with a specified NAME and TYPE (in the zone and class specified in the Zone Section) must exist.
      *
-     * For this prerequisite, a requestor adds to the section a single RR whose NAME and TYPE are equal to that of the zone RRset whose existence is 
-     * required. RDLENGTH is zero and RDATA is therefore empty. CLASS must be specified as ANY to differentiate this condition from that of an actual RR 
+     * For this prerequisite, a requestor adds to the section a single RR whose NAME and TYPE are equal to that of the zone RRset whose existence is
+     * required. RDLENGTH is zero and RDATA is therefore empty. CLASS must be specified as ANY to differentiate this condition from that of an actual RR
      * whose RDLENGTH is naturally zero (0) (e.g., NULL). TTL is specified as zero (0).
      *
      * @param string $_name the RR name for the prerequisite
@@ -242,7 +235,7 @@ final class Updater extends \NetDNS2\Client
         $rr->ttl      = 0;
         $rr->class    = \NetDNS2\ENUM\RR\Classes::set('ANY');
         $rr->rdlength = -1;
-        $rr->rdata    = '';    
+        $rr->rdata    = '';
 
         //
         // add the RR to the "prerequisite" section
@@ -256,10 +249,10 @@ final class Updater extends \NetDNS2\Client
     /**
      * 2.4.2 - RRset Exists (Value Dependent)
      *
-     * A set of RRs with a specified NAME and TYPE exists and has the same members with the same RDATAs as the RRset specified here in this section. While 
+     * A set of RRs with a specified NAME and TYPE exists and has the same members with the same RDATAs as the RRset specified here in this section. While
      * RRset ordering is undefined and therefore not significant to this comparison, the sets be identical in their extent.
      *
-     * For this prerequisite, a requestor adds to the section an entire RRset whose preexistence is required. NAME and TYPE are that of the RRset being 
+     * For this prerequisite, a requestor adds to the section an entire RRset whose preexistence is required. NAME and TYPE are that of the RRset being
      * denoted. CLASS is that of the zone. TTL must be specified as zero (0) and is ignored when comparing RRsets for identity.
      *
      * @param \NetDNS2\RR $_rr the RR object to be used as a prerequisite
@@ -287,8 +280,8 @@ final class Updater extends \NetDNS2\Client
      *
      * No RRs with a specified NAME and TYPE (in the zone and class denoted by the Zone Section) can exist.
      *
-     * For this prerequisite, a requestor adds to the section a single RR whose NAME and TYPE are equal to that of the RRset whose nonexistence is 
-     * required. The RDLENGTH of this record is zero (0), and RDATA field is therefore empty. CLASS must be specified as NONE in order to distinguish 
+     * For this prerequisite, a requestor adds to the section a single RR whose NAME and TYPE are equal to that of the RRset whose nonexistence is
+     * required. The RDLENGTH of this record is zero (0), and RDATA field is therefore empty. CLASS must be specified as NONE in order to distinguish
      * this condition from a valid RR whose RDLENGTH is naturally zero (0) (for example, the NULL RR). TTL must be specified as zero (0).
      *
      * @param string $_name the RR name for the prerequisite
@@ -310,7 +303,7 @@ final class Updater extends \NetDNS2\Client
         $rr->ttl      = 0;
         $rr->class    = \NetDNS2\ENUM\RR\Classes::set('NONE');
         $rr->rdlength = -1;
-        $rr->rdata    = '';    
+        $rr->rdata    = '';
 
         //
         // add the RR to the "prerequisite" section
@@ -324,12 +317,12 @@ final class Updater extends \NetDNS2\Client
     /**
      * 2.4.4 - Name Is In Use
      *
-     * Name is in use.  At least one RR with a specified NAME (in the zone and class specified by the Zone Section) must exist. Note that this 
+     * Name is in use.  At least one RR with a specified NAME (in the zone and class specified by the Zone Section) must exist. Note that this
      * prerequisite is NOT satisfied by empty nonterminals.
      *
-     * For this prerequisite, a requestor adds to the section a single RR whose NAME is equal to that of the name whose ownership of an RR is required. 
-     * RDLENGTH is zero and RDATA is therefore empty. CLASS must be specified as ANY to differentiate this condition from that of an actual RR whose 
-     * RDLENGTH is naturally zero (0) (e.g., NULL). TYPE must be specified as ANY to differentiate this case from that of an RRset existence test. TTL 
+     * For this prerequisite, a requestor adds to the section a single RR whose NAME is equal to that of the name whose ownership of an RR is required.
+     * RDLENGTH is zero and RDATA is therefore empty. CLASS must be specified as ANY to differentiate this condition from that of an actual RR whose
+     * RDLENGTH is naturally zero (0) (e.g., NULL). TYPE must be specified as ANY to differentiate this case from that of an RRset existence test. TTL
      * is specified as zero (0).
      *
      * @param string $_name the RR name for the prerequisite
@@ -367,8 +360,8 @@ final class Updater extends \NetDNS2\Client
      *
      * Name is not in use.  No RR of any type is owned by a specified NAME. Note that this prerequisite IS satisfied by  empty nonterminals.
      *
-     * For this prerequisite, a requestor adds to the section a single RR whose NAME is equal to that of the name whose nonownership of any RRs is 
-     * required. RDLENGTH is zero and RDATA is therefore empty. CLASS must be specified as NONE. TYPE must be specified as ANY. TTL must be specified 
+     * For this prerequisite, a requestor adds to the section a single RR whose NAME is equal to that of the name whose nonownership of any RRs is
+     * required. RDLENGTH is zero and RDATA is therefore empty. CLASS must be specified as NONE. TYPE must be specified as ANY. TTL must be specified
      * as zero (0).
      *
      * @param string $_name the RR name for the prerequisite

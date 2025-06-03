@@ -1,4 +1,4 @@
-# NetDNS2 - Native PHP DNS Resolver and Updater
+# NetDNS2 - PHP DNS Resolver and Updater
 
 [![PHP version](https://img.shields.io/badge/php-%3E%3D%208.1-8892BF.svg)](https://github.com/mikepultz/netdns2) ![Packagist Downloads](https://img.shields.io/packagist/dt/pear/net_dns2)
 

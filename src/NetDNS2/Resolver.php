@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -191,7 +184,7 @@ final class Resolver extends Client
             //
             foreach($response->answer as $index => $object)
             {
-                if ( (strcasecmp(trim($object->name->value(), '.'), trim($packet->question[0]->qname->value(), '.')) == 0) && 
+                if ( (strcasecmp(trim($object->name->value(), '.'), trim($packet->question[0]->qname->value(), '.')) == 0) &&
                     ($object->type == $packet->question[0]->qtype) && ($object->class == $packet->question[0]->qclass) )
                 {
                     $found = true;
@@ -200,7 +193,7 @@ final class Resolver extends Client
             }
 
             //
-            // if it's not found, then unset the answer section; it's not correct to throw an exception here; if the hostname didn't exist, then 
+            // if it's not found, then unset the answer section; it's not correct to throw an exception here; if the hostname didn't exist, then
             // sendPacket() would have already thrown an NXDOMAIN error- so the host *exists*, but just not the request type/class.
             //
             // the correct response in this case, is an empty answer section; the authority section may still have usual information, like a SOA record.
@@ -227,7 +220,7 @@ final class Resolver extends Client
      * does an inverse query for the given RR; most DNS servers do not implement inverse queries, but they should be able to return "not implemented"
      *
      * @param \NetDNS2\RR $_rr the RR object to lookup
-     * 
+     *
      * @throws \NetDNS2\Exception
      *
      */

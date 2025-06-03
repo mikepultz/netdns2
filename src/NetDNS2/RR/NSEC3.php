@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -42,22 +35,22 @@ final class NSEC3 extends \NetDNS2\RR
      * TODO: NSEC3 uses a limit set of the DNSSEC algorithms, per RFC 5514 section 11
      */
     protected int $algorithm;
- 
+
     /**
      * flags
      */
     protected int $flags;
- 
+
     /**
      *  defines the number of additional times the hash is performed.
      */
     protected int $iterations;
- 
+
     /**
      * the length of the salt- not displayed
      */
     protected int $salt_length;
- 
+
     /**
      * the salt
      */
@@ -86,7 +79,7 @@ final class NSEC3 extends \NetDNS2\RR
     protected function rrToString(): string
     {
         $out = $this->algorithm . ' ' . $this->flags . ' ' . $this->iterations . ' ';
- 
+
         //
         // per RFC5155, the salt_length value isn't displayed, and if the salt is empty, the salt is displayed as '-'
         //
@@ -111,7 +104,7 @@ final class NSEC3 extends \NetDNS2\RR
         $this->algorithm  = intval($this->sanitize(array_shift($_rdata)));
         $this->flags      = intval($this->sanitize(array_shift($_rdata)));
         $this->iterations = intval($this->sanitize(array_shift($_rdata)));
-     
+
         //
         // an empty salt is represented as '-' per RFC5155 section 3.3
         //
@@ -157,7 +150,7 @@ final class NSEC3 extends \NetDNS2\RR
         {
             return false;
         }
-            
+
         //
         // unpack the first values
         //
@@ -219,7 +212,7 @@ final class NSEC3 extends \NetDNS2\RR
         //
         $salt = pack('H*', $this->salt);
         $this->salt_length = strlen($salt);
-            
+
         //
         // pack the algorithm, flags, iterations and salt length
         //
@@ -245,7 +238,7 @@ final class NSEC3 extends \NetDNS2\RR
         $data .= \NetDNS2\BitMap::arrayToBitMap($this->type_bit_maps);
 
         $_packet->offset += strlen($data);
-     
+
         return $data;
     }
 }

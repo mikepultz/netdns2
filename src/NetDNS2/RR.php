@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -24,7 +17,7 @@ namespace NetDNS2;
  *
  * Each resource record type (defined in RR/*.php) extends this class for base functionality.
  *
- * This class handles parsing and constructing the common parts of the DNS resource records, while the RR specific functionality is handled in each 
+ * This class handles parsing and constructing the common parts of the DNS resource records, while the RR specific functionality is handled in each
  * child class.
  *
  * DNS resource record format - RFC1035 section 4.1.3
@@ -153,7 +146,7 @@ abstract class RR implements \Stringable
      * @throws \NetDNS2\Exception
      *
      */
-    public function __set(string $_name, mixed $_value): void 
+    public function __set(string $_name, mixed $_value): void
     {
         if (property_exists(get_called_class(), $_name) == false)
         {
@@ -205,7 +198,7 @@ abstract class RR implements \Stringable
      * @throws \NetDNS2\Exception
      *
      */
-    public function __get(string $_name): mixed 
+    public function __get(string $_name): mixed
     {
         if (property_exists(get_called_class(), $_name) == false)
         {
@@ -234,7 +227,7 @@ abstract class RR implements \Stringable
     {
         return '"' . str_replace('"', '\"', trim($_string, '"')) . '"';
     }
-    
+
     /**
      * builds an array of strings from an array of chunks of text split by spaces
      *
@@ -271,7 +264,7 @@ abstract class RR implements \Stringable
             } else if ( ($r[strlen($r) - 1] == '"') && ($r[strlen($r) - 2] != '\\') )
             {
                 $data[$c] .= ' ' . $r;
-                ++$c;  
+                ++$c;
                 $in = false;
 
             } else
@@ -284,7 +277,7 @@ abstract class RR implements \Stringable
                     $data[$c++] = $r;
                 }
             }
-        }        
+        }
 
         foreach($data as $index => $string)
         {
@@ -314,7 +307,7 @@ abstract class RR implements \Stringable
         //
         $this->type = \NetDNS2\ENUM\RR\Type::set(ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]));
         $class      = ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]);
-        $this->ttl  = ord($_packet->rdata[$_packet->offset++]) << 24 | ord($_packet->rdata[$_packet->offset++]) << 16 | 
+        $this->ttl  = ord($_packet->rdata[$_packet->offset++]) << 24 | ord($_packet->rdata[$_packet->offset++]) << 16 |
                         ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]);
 
         $this->rdlength = ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]);
@@ -499,7 +492,7 @@ abstract class RR implements \Stringable
      *
      * name, title, class and type are parsed by this function, rdata is passed to the RR specific classes for parsing.
      *
-     * @param string $_line a standard DNS config line 
+     * @param string $_line a standard DNS config line
      *
      * @return object       returns a new \NetDNS2\RR\* object for the given RR
      * @throws \NetDNS2\Exception

@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
-/**               
- * DNS Library for handling lookups and updates.
+/**
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
- *       
- * See LICENSE for more details.
- *                  
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * (c) Mike Pultz <mike@mikepultz.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -232,7 +225,7 @@ final class BitMap
                 // if it's not found, then it must be defined as TYPE<id>, per RFC3845 section 2.2, if it's not, we ignore it.
                 //
                 list($name, $type) = explode('TYPE', $rr);
-                
+
                 $type = intval($type);
                 if ($type <= 0)
                 {
@@ -244,7 +237,7 @@ final class BitMap
             // build the current window
             //
             $current_window = (int)($type / 256);
-            
+
             $val = $type - $current_window * 256.0;
             if ($val > $max)
             {
@@ -291,12 +284,12 @@ final class BitMap
 
         $bin    = substr(chunk_split(strrev($_number), 4, '-'), 0, -1);
         $temp   = (array)preg_split('[-]', $bin, -1, PREG_SPLIT_DELIM_CAPTURE);
-        
+
         for($i = count($temp) - 1; $i >= 0; $i--)
         {
             $result = $result . base_convert(strrev(strval($temp[$i])), 2, 16);
         }
-        
+
         return strtoupper($result);
     }
 }

@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     1.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -36,7 +29,7 @@ final class IPv6 extends \NetDNS2\Data
     public function encode(?int &$_offset = null): string
     {
         $val = inet_pton($this->m_value);
-        if ($val !== false)        
+        if ($val !== false)
         {
             $_offset += 16;
             return strval($val);
@@ -56,13 +49,13 @@ final class IPv6 extends \NetDNS2\Data
         // the preferred standard, so we'll parse it manually.
         //
         $ar = unpack('n8', $_rdata, $_offset);
-        if ($ar !== false)                
+        if ($ar !== false)
         {
             $val = vsprintf('%x:%x:%x:%x:%x:%x:%x:%x', (array)$ar);
 
-            if (\NetDNS2\Client::isIPv6($val) == false)            
+            if (\NetDNS2\Client::isIPv6($val) == false)
             {
-                throw new \NetDNS2\Exception(sprintf('invalid IPv6 address: %s', $val), \NetDNS2\ENUM\Error::INT_INVALID_IPV6);                                  
+                throw new \NetDNS2\Exception(sprintf('invalid IPv6 address: %s', $val), \NetDNS2\ENUM\Error::INT_INVALID_IPV6);
             }
 
             $this->m_value = $val;

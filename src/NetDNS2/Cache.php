@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.  
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     1.1.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -55,7 +48,7 @@ abstract class Cache
 
     /**
      * returns the value for the given key
-     * 
+     *
      * @param string $_key the key to lookup in the local cache
      *
      * @return \NetDNS2\Packet\Response returns the cache data on sucess, false on error
@@ -65,7 +58,7 @@ abstract class Cache
 
     /**
      * adds a new key/value pair to the cache
-     * 
+     *
      * @param string                   $_key  the key for the new cache entry
      * @param \NetDNS2\Packet\Response $_data the data to store in cache
      *
@@ -118,7 +111,7 @@ abstract class Cache
             }
             case self::CACHE_TYPE_NONE:
             default:
-                ;            
+                ;
         }
 
         throw new \NetDNS2\Exception(sprintf('invalid cache type %s defined.', $_type), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);

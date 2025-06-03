@@ -1,26 +1,19 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  * This file contains code based off the Net::DNS::SEC Perl module by Olaf M. Kolkman
  *
  * This is the copyright notice from the PERL Net::DNS::SEC module:
  *
- * Copyright (c) 2001 - 2005  RIPE NCC.  Author Olaf M. Kolkman 
- * Copyright (c) 2007 - 2008  NLnet Labs.  Author Olaf M. Kolkman 
+ * Copyright (c) 2001 - 2005  RIPE NCC.  Author Olaf M. Kolkman
+ * Copyright (c) 2007 - 2008  NLnet Labs.  Author Olaf M. Kolkman
  * <olaf@net-dns.org>
  *
  * All Rights Reserved
@@ -85,7 +78,7 @@ final class SIG extends \NetDNS2\RR
      * the algorithm used for the signature
      */
     protected \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm;
-    
+
     /**
      * the number of labels in the name
      */
@@ -126,7 +119,7 @@ final class SIG extends \NetDNS2\RR
      */
     protected function rrToString(): string
     {
-        return $this->typecovered . ' ' . $this->algorithm->value . ' ' . $this->labels . ' ' . $this->origttl . ' ' . $this->sigexp . ' ' . 
+        return $this->typecovered . ' ' . $this->algorithm->value . ' ' . $this->labels . ' ' . $this->origttl . ' ' . $this->sigexp . ' ' .
             $this->sigincep . ' ' . $this->keytag . ' ' . $this->signname . '. ' . $this->signature;
     }
 

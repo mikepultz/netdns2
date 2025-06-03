@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -37,7 +30,7 @@ final class Socket
     public ?string $last_error;
 
     /**
-     * date the socket connection was created, and the date it was last used 
+     * date the socket connection was created, and the date it was last used
      */
     public float $date_created;
     public float $date_last_used;
@@ -91,14 +84,14 @@ final class Socket
     private string $m_local_host = '';
     private int $m_local_port = 0;
 
-    /**   
+    /**
      * constructor - set the port details
      *
      * @param integer $_type    the socket type
      * @param string  $_host    the IP address of the DNS server to connect to
      * @param integer $_port    the port of the DNS server to connect to
      * @param float   $_timeout the timeout value to use for socket functions
-     *       
+     *
      */
     public function __construct(int $_type, string $_host, int $_port, float $_timeout)
     {
@@ -118,12 +111,12 @@ final class Socket
         $this->close();
     }
 
-    /**   
+    /**
      * sets the local address/port for the socket to bind to
      *
      * @param string $_address the local IP address to bind to
      * @param int    $_port    the local port to bind to, or 0 to let the socket function select a port
-     *       
+     *
      */
     public function bindAddress(string $_address, int $_port = 0): void
     {
@@ -138,10 +131,10 @@ final class Socket
     public function open(): bool
     {
         //
-        // create a list of options for the context 
+        // create a list of options for the context
         //
         $opts = [ 'socket' => [] ];
-        
+
         //
         // bind to a local IP/port if it's set
         //
@@ -230,7 +223,7 @@ final class Socket
                 }
             }
             break;
-        
+
             //
             // UDP socket
             //
@@ -251,7 +244,7 @@ final class Socket
                 }
             }
             break;
-            
+
             default:
             {
                 $this->last_error = 'Invalid socket type: ' . $this->m_type;
@@ -285,8 +278,8 @@ final class Socket
     }
 
     /**
-     * closes a socket connection to the DNS server  
-     *     
+     * closes a socket connection to the DNS server
+     *
      */
     public function close(): void
     {
@@ -360,14 +353,14 @@ final class Socket
         return true;
     }
 
-    /**   
+    /**
      * reads a response from a DNS server
      *
      * @param integer &$_size    the size of the DNS packet read is passed back
      * @param integer $_max_size the max data size returned.
      *
      * @return mixed         returns the data on success and false on error
-     *       
+     *
      */
     public function read(int &$_size, int $_max_size): mixed
     {
@@ -413,7 +406,7 @@ final class Socket
         $length = $_max_size;
 
         //
-        // if it's a TCP socket, then the first two bytes is the length of the DNS packet- we need to read that off first, then use that value for 
+        // if it's a TCP socket, then the first two bytes is the length of the DNS packet- we need to read that off first, then use that value for
         // the packet read.
         //
         if ($this->m_type == \NetDNS2\Socket::SOCK_STREAM)
@@ -449,7 +442,7 @@ final class Socket
 
         //
         // the streams socket is weird for TCP sockets; it doesn't seem to always return all the data properly; but the looping code I added broke UDP
-        // packets- my fault- 
+        // packets- my fault-
         //
         if ($this->m_type == \NetDNS2\Socket::SOCK_STREAM)
         {
@@ -489,7 +482,7 @@ final class Socket
                 return false;
             }
         }
-        
+
         $_size = strlen(strval($data));
 
         return $data;

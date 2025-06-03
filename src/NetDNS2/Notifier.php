@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -36,8 +29,8 @@ spl_autoload_register(function($_class)
  *
  * This class provides functions to handle DNS notify requests as defined by RFC 1996.
  *
- * This is separate from the \NetDNS2\Resolver class, as while the underlying protocol is the same, the functionality is 
- * completely different. Generally, query (recursive) lookups are done against caching server, while notify requests are 
+ * This is separate from the \NetDNS2\Resolver class, as while the underlying protocol is the same, the functionality is
+ * completely different. Generally, query (recursive) lookups are done against caching server, while notify requests are
  * done against authoratative servers.
  *
  */
@@ -86,7 +79,7 @@ final class Notifier extends \NetDNS2\Client
         {
             throw new \NetDNS2\Exception(sprintf('name %s does not match zone name %s.', $_name, $this->m_packet->question[0]->qname), \NetDNS2\ENUM\Error::INT_INVALID_PACKET);
         }
-    
+
         return;
     }
 

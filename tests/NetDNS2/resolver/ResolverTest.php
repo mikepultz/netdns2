@@ -1,19 +1,12 @@
 <?php
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link      https://netdns2.com/
- * @since     File available since Release 1.0.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -41,10 +34,10 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
 
             $res = $r->query('google.com', 'MX');
 
-            $this->assertSame($res->header->qr, \NetDNS2\Header::QR_RESPONSE, 
+            $this->assertSame($res->header->qr, \NetDNS2\Header::QR_RESPONSE,
                 sprintf('ResolverTest::testResolver(): %d != %d', $res->header->qr, \NetDNS2\Header::QR_RESPONSE));
 
-            $this->assertSame(count($res->question), 1, 
+            $this->assertSame(count($res->question), 1,
                 sprintf('ResolverTest::testResolver(): question count (%d) != 1', count($res->question)));
 
             $this->assertTrue(count($res->answer) > 0,
@@ -203,7 +196,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
                 'res'   => 'c93f1e400f26708f98cb19d936620da35eec8f72e57f9eec01c1afd6._smimecert.netdns2.com. 86400 IN SMIMEA 1 1 2 92003ba34942dc74152e2f2c408d29eca5a520e7f2e06bb944f4dca346baf63c1b177615d466f6c4b71c216a50292bd58c9ebdd2f74e38fe51ffd48c43326cbc'
             ],
             'SOA'           => [
-            
+
                 'name'  => 'netdns2.com',
                 'res'   => 'netdns2.com. 86400 IN SOA ns1.mrdns.com. dns\.admin.netdns2.com. 2025051843 43200 900 345600 7200'
             ],

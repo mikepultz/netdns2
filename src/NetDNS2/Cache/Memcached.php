@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     1.1.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -30,12 +23,12 @@ final class Memcached extends \NetDNS2\Cache
      */
     private \Memcached $m_cache;
 
-    /**           
+    /**
      * @see \NetDNS2\Cache::__construct()
      */
-    public function __construct(array $_options = []) 
+    public function __construct(array $_options = [])
     {
-        //                 
+        //
         // copy over the options
         //
         $this->m_options = $_options;
@@ -57,8 +50,8 @@ final class Memcached extends \NetDNS2\Cache
             //
             $this->m_cache->addServers($this->m_options['server']);
 
-            //  
-            // pass the options array in as Memcache options; 
+            //
+            // pass the options array in as Memcache options;
             //
             if ( (isset($_options['options']) == true) && (count($_options['options']) > 0) )
             {

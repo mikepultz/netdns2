@@ -1,19 +1,12 @@
 <?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates.
+ * This file is part of the NetDNS2 package.
  *
- * Copyright (c) 2023, Mike Pultz <mike@mikepultz.com>. All rights reserved.
+ * (c) Mike Pultz <mike@mikepultz.com>
  *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   NetDNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2023 Mike Pultz <mike@mikepultz.com>
- * @license   https://opensource.org/license/bsd-3-clause/ BSD-3-Clause
- * @link      https://netdns2.com/
- * @since     0.6.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
  */
 
@@ -21,7 +14,7 @@ namespace NetDNS2\Packet;
 
 /**
  * This class handles building new DNS response packets; it parses binary packed packets that come off the wire
- * 
+ *
  */
 final class Response extends \NetDNS2\Packet
 {
@@ -73,7 +66,7 @@ final class Response extends \NetDNS2\Packet
 
         //
         // parse the header
-        // 
+        //
         // we don't bother checking the size earlier, because the first thing the header class does, is check the size and throw and exception if it's
         // invalid.
         //
@@ -83,7 +76,7 @@ final class Response extends \NetDNS2\Packet
         // if the truncation bit is set, then just return right here, because the rest of the packet is probably empty; and there's no point in processing
         // anything else.
         //
-        // we also don't need to worry about checking to see if the the header is null or not, since the \NetDNS2\Header() constructor will throw an 
+        // we also don't need to worry about checking to see if the the header is null or not, since the \NetDNS2\Header() constructor will throw an
         // exception if the packet is invalid.
         //
         if ($this->header->tc == 1)
@@ -110,7 +103,7 @@ final class Response extends \NetDNS2\Packet
             {
                 $this->answer[] = clone $o;
             }
-        } 
+        }
 
         //
         // parse the authority section
