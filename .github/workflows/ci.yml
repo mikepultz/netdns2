@@ -25,4 +25,5 @@ jobs:
       uses: php-actions/phpunit@v3
       with:
         configuration: tests/phpunit.xml
+        test_suffix: .php
         args: tests
