@@ -16,7 +16,6 @@ jobs:
     - name: PHPStan Static Analysis
       uses: php-actions/phpstan@v3
       with:
-        version: 2.1.17
         level: 8
         memory_limit: 2G
         configuration: tests/phpstan.neon
@@ -24,6 +23,7 @@ jobs:
     - name: PHPUnit Tests
       uses: php-actions/phpunit@v3
       with:
+        version: 10.5
         configuration: tests/phpunit.xml
         test_suffix: .php
         args: tests
