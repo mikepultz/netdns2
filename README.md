@@ -1,6 +1,6 @@
 # NetDNS2 - PHP DNS Resolver and Updater
 
-[![PHP version](https://img.shields.io/badge/php-%3E%3D%208.1-8892BF.svg)](https://github.com/mikepultz/netdns2) ![Packagist Downloads](https://img.shields.io/packagist/dt/pear/net_dns2)
+[![PHP version](https://img.shields.io/badge/php-%3E%3D%208.1-8892BF.svg)](https://github.com/mikepultz/netdns2) ![Packagist Downloads](https://img.shields.io/packagist/dt/pear/net_dns2) ![Tests](https://github.com/mikepultz/netdns2/actions/workflows/ci.yml/badge.svg)
 
 The NetDNS2 library is a pure PHP DNS Resolver library, that supports local caching, dynamic DNS updates, and almost every feature currently supported by modern DNS servers.
 
