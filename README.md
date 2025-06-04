@@ -68,7 +68,7 @@ To continue using NetDNS2 v1.x, update your `composer.json` file to specify 1.x,
 
     {
         "require": {
-            "pear/net_dns2": "1.*"
+            "pear/net_dns2": "^1.5"
         }
     }
 
@@ -77,12 +77,12 @@ Version 1.x will be maintained for the foreseeable  future.
 ## Requirements
 
 * PHP 8.1+ - this version uses strong typing, ENUMs, and other modern PHP features, and will not work with older versions of PHP.
-* (OPTIONAL) [OpenSSL](https://www.php.net/manual/en/book.openssl.php) - for DNS over TLS (DoT) and certain resource record types.
-* (OPTIONAL) [cURL](https://www.php.net/manual/en/book.curl.php) - for DNS over HTTP (DoH).
-* (OPTIONAL) [Hash](https://www.php.net/manual/en/ref.hash.php) - for TSIG request authentication.
-* (OPTIONAL) [Shmop](https://www.php.net/manual/en/book.shmop.php) - for local caching
-* (OPTIONAL) [Memcached](https://www.php.net/manual/en/book.memcached.php) - for local caching.
-* (OPTIONAL) [Redis](https://github.com/phpredis/phpredis/) - for local caching.
+* (OPTIONAL) <a href="https://www.php.net/manual/en/book.openssl.php" target="_blank">OpenSSL</a> - for DNS over TLS (DoT) and certain resource record types.
+* (OPTIONAL) <a href="https://www.php.net/manual/en/book.curl.php" target="_blank">cURL</a> - for DNS over HTTP (DoH).
+* (OPTIONAL) <a href="https://www.php.net/manual/en/ref.hash.php" target="_blank">Hash</a> - for TSIG request authentication.
+* (OPTIONAL) <a href="https://www.php.net/manual/en/book.shmop.php" target="_blank">Shmop</a> - for local caching
+* (OPTIONAL) <a href="https://www.php.net/manual/en/book.memcached.php" target="_blank">Memcached</a> - for local caching.
+* (OPTIONAL) <a href="https://github.com/phpredis/phpredis/" target="_blank">Redis</a> - for local caching.
 
 ## Using NetDNS2
 
@@ -92,10 +92,16 @@ Version 1.x will be maintained for the foreseeable  future.
 * [DNS over HTTP (DoH)](#doh)
 * [IPv6 Support](#ipv6)
 * [Local Cache](#cache)
+    * [Flat File](#file)
+    * [Shared Memory (SHM)](#shm)
+    * [Memcached](#memcached)
+    * [Redis](#redis)
 * [DNS Updates](#updates)
 * [DNS Notifications](#notifications)
 * [EDNS(0) Support](#edns)
-* [Request Signing - TSIG & SIG(0)](#signing)
+* [Request Signing](#signing)
+    * [TSIG](#tsig)
+    * [SIG(0)](#sig)
 
 ### <a name="config-options"></a>Config Options 
 
@@ -149,7 +155,7 @@ Configuration options can be passed to the `NetDNS2\Resolver`, `NetDNS2\Updater`
         'use_tls'       => true,
 
         //
-        // if set, these values are pased to stream_context_create() as the 'ssl' transport 
+        // if set, these values are passed to stream_context_create() as the 'ssl' transport 
         // section, which lets you customize TLS connection settings.
         //
         // only applies when use_tls = true
@@ -282,7 +288,7 @@ Configuration options can also be set as properties after the object is initiali
 
 The main `NetDNS2\Resolver` class is used to look up DNS records.
 
-#### Do a Simple A Record Lookup on facebook.com
+#### Perform a Simple A Record Lookup on facebook.com
 
     try
     {
@@ -323,7 +329,7 @@ The main `NetDNS2\Resolver` class is used to look up DNS records.
         $res = $r->query('google.com', 'MX');
 
         //
-        // loop through the answer, printing out the MX servers retured.
+        // loop through the answer, printing out the MX servers returned.
         //
         foreach($res->answer as $mxrr)
         {
@@ -371,7 +377,7 @@ The main `NetDNS2\Resolver` class is used to look up DNS records.
 
 ### <a name="dot"></a>DNS over TLS (DoT)
 
-DNS over TLS (DoT) is supported since NetDNS2 v2.0, and requires the [OpenSSL](https://www.php.net/manual/en/book.openssl.php) extension.
+DNS over TLS (DoT) is supported since NetDNS2 v2.0, and requires the <a href="https://www.php.net/manual/en/book.openssl.php" target="_blank">OpenSSL</a> extension.
 
 To enable DoT, simply set the `use_tls` option to true, for example:
 
@@ -403,7 +409,7 @@ To enable DoT, simply set the `use_tls` option to true, for example:
         echo "::query() failed: " . $e->getMessage() . "\n";
     }
 
-Setting this option will change the default port to 853 (this can be overidden by setting the `dns_port` option), and change the library to use TCP sockets instead of UDP.
+Setting this option will change the default port to 853 (this can be overridden by setting the `dns_port` option), and change the library to use TCP sockets instead of UDP.
 
 Additional TLS specific options can be passed using the `tls_context` array, which are passed directly to the `stream_context_create()` function when setting up the TLS socket. For example, to disable TLS peer verifications on requests:
 
@@ -411,11 +417,11 @@ Additional TLS specific options can be passed using the `tls_context` array, whi
 
     $r->tls_context = [ 'verify_peer' => false, 'verify_peer_name' => false ];
 
-For more details, see the [SSL Context Options](https://www.php.net/manual/en/context.ssl.php) documentation. 
+For more details, see the <a href="https://www.php.net/manual/en/context.ssl.php" target="_blank">SSL Context Options</a> documentation. 
 
 ### <a name="doh"></a>DNS over HTTP (DoH)
 
-DNS over HTTP (DoH) is supported since v2.0, and requires the [cURL](https://www.php.net/manual/en/book.curl.php) extension.
+DNS over HTTP (DoH) is supported since v2.0, and requires the <a href="https://www.php.net/manual/en/book.curl.php" target="_blank">cURL</a> extension.
 
 To enable DoH, simple pass name server values as URLs instead of IP addresses, for example:
 
@@ -442,7 +448,7 @@ To enable DoH, simple pass name server values as URLs instead of IP addresses, f
         echo "::query() failed: " . $e->getMessage() . "\n";
     }
     
-NetDNS2 performs DoH requests according to [RFC 8484](https://datatracker.ietf.org/doc/html/rfc8484), using `application/dns-message` (wire format) formatted messages (not using JSON), over HTTPS (HTTP is not supported).
+NetDNS2 performs DoH requests according to <a href="https://datatracker.ietf.org/doc/html/rfc8484" target="_blank">RFC 8484</a>, using `application/dns-message` (wire format) formatted messages (not using JSON), over HTTPS (HTTP is not supported).
 
 >DoH has not currently be tested with DNS Updates - support for this is undefined.
 
@@ -475,9 +481,9 @@ All resource records that support IPv6 (AMTRELAY, APL, SVCB, IPSECKEY, etc.) are
 NetDNS2 includes a built-in local cache to improve query performance. The cache is disabled by default, and currently supports:
 
 * flat file cache (local disk)
-* shared memory (using the [Shmop](https://www.php.net/manual/en/book.shmop.php) extension)
-* memcache (using the [Memcached](https://www.php.net/manual/en/book.memcached.php) extension)
-* redis (using the [Redis](https://github.com/phpredis/phpredis/) extension)
+* shared memory <a href="https://www.php.net/manual/en/book.shmop.php" target="_blank">Shmop</a> extension)
+* memcache (using the <a href="https://www.php.net/manual/en/book.memcached.php" target="_blank">Memcached</a> extension)
+* redis (using the <a href="https://github.com/phpredis/phpredis/" target="_blank">Redis</a> extension)
 
 The local cache is only used for lookup queries, and is disabled for Updates.
 
@@ -485,7 +491,7 @@ Cached data is stored as a serialized string, using the standard PHP serialize()
 
 >Previous version of NetDNS2 supported using JSON as the data serializer, but this functionality was removed in v2.0.
 
-#### Flat File
+#### <a name="file"></a>Flat File
 
 NetDNS2 can use a flat file to store the cache information. The `file` must be in a location PHP can write to, and has enough space to hold a file `size` bytes big.
 
@@ -508,9 +514,9 @@ NetDNS2 can use a flat file to store the cache information. The `file` must be i
 
 The `ttl_override` option is supported by all Caching extensions, and lets you override the Cache duration, which normally defaults to the TTL value on the response.
 
-#### Shared Memory (Shm)
+#### <a name="shm"></a>Shared Memory (Shm)
 
-NetDNS2 uses the [Shmop](https://www.php.net/manual/en/book.shmop.php) Extension. If you do not have the extension installed, and you specify to use the shared memory cache, NetDNS2 will throw an exception.
+NetDNS2 uses the <a href="https://www.php.net/manual/en/book.shmop.php" target="_blank">Shmop</a> Extension. If you do not have the extension installed, and you specify to use the shared memory cache, NetDNS2 will throw an exception.
 
     //
     // create a new Resolver object
@@ -529,9 +535,9 @@ NetDNS2 uses the [Shmop](https://www.php.net/manual/en/book.shmop.php) Extension
 
 `file` is used as an System V IPC key (using ftok())
 
-#### Memcache
+#### <a name="memcached"></a>Memcached
 
-NetDNS2 v2.x and up support caching DNS results in memcache, using the [Memcached](https://www.php.net/manual/en/book.memcached.php) extension.
+NetDNS2 v2.x and up support caching DNS results in memcache, using the <a href="https://www.php.net/manual/en/book.memcached.php" target="_blank">Memcached</a> extension.
 
     //
     // create a new Resolver object
@@ -554,13 +560,11 @@ NetDNS2 v2.x and up support caching DNS results in memcache, using the [Memcache
         ]
     ]);
 
-The `server` section of the `cache_options` property is passed directly to the [\Memcached::addServers()](https://www.php.net/manual/en/memcached.addservers.php) function, and lets you specify one or more Memcached servers to use.
+The `server` section of the `cache_options` property is passed directly to the <a href="https://www.php.net/manual/en/memcached.addservers.php" target="_blank">\Memcached::addServers()</a> function, and lets you specify one or more Memcached servers to use. The `options` section of the `cache_options` property is passed directly to the <a href="https://www.php.net/manual/en/memcached.setoptions.php" target="_blank">\Memcached::setOptions()</a> function, and lets you pass any of the available Memcache options.
 
-The `options` section of the `cache_options` property is passed directly to the [`\Memcached::setOptions()](https://www.php.net/manual/en/memcached.setoptions.php) function, and lets you pass any of the available Memcache options.
+#### <a name="redis"></a>Redis
 
-#### Redis
-
-NetDNS2 v2.x and up support caching DNS results in Redis, usin the [Redis](https://github.com/phpredis/phpredis) extension. The current implementation does not support the RedisCluster object yet.
+NetDNS2 v2.x and up support caching DNS results in Redis, using the <a href="https://github.com/phpredis/phpredis/" target="_blank">Redis</a> extension. The current implementation does not support the RedisCluster object yet.
 
     $r = new \NetDNS2\Resolver(
     [ 
@@ -574,13 +578,13 @@ NetDNS2 v2.x and up support caching DNS results in Redis, usin the [Redis](https
         ]
     ]);
 
-The `cache_options` array is passed directly to the `Redis` constructor, so all configuration options are supported. See [phpredis documentation](https://github.com/phpredis/phpredis/?tab=readme-ov-file#class-redis) for the full list of configuration options.
+The `cache_options` array is passed directly to the `Redis` constructor, so all configuration options are supported. See <a href="https://github.com/phpredis/phpredis/?tab=readme-ov-file#class-redis" target="_blank">phpredis documentation</a> for the full list of configuration options.
 
 ### <a name="updates"></a>DNS Updates
 
-NetDNS2 supports dynamic DNS updates per [RFC 2136](https://datatracker.ietf.org/doc/html/rfc2136) using the `NetDNS2\Updater` object.
+NetDNS2 supports dynamic DNS updates per <a href="https://datatracker.ietf.org/doc/html/rfc2136" target="_blank">RFC 2136</a> using the `NetDNS2\Updater` object.
 
-When creating the object, you must pass the domain (zone) you'll be modifying, as well as the primary authoratative DNS server hosting the zone.
+When creating the object, you must pass the domain (zone) you'll be modifying, as well as the primary authoritative DNS server hosting the zone.
 
     //
     // create a new Updater object
@@ -643,9 +647,9 @@ You can add multiple queries in a single object; once you're ready to submit, yo
 
 ### <a name="notifications"></a>DNS Notifications
 
-The `NetDNS2\Notifier` class provides functionality to perform DNS notify requests as defined by [RFC 1996](https://datatracker.ietf.org/doc/html/rfc1996).
+The `NetDNS2\Notifier` class provides functionality to perform DNS notify requests as defined by <a href="https://datatracker.ietf.org/doc/html/rfc1996" target="_blank">RFC 1996</a>.
 
-This is separate from the `\NetDNS2\Resolver` class, as while the underlying protocol is the same, the functionality is completely different. Generally, query (recursive) lookups are done against caching server, while notify requests are done against authoratative servers.
+This is separate from the `\NetDNS2\Resolver` class, as while the underlying protocol is the same, the functionality is completely different. Generally, query (recursive) lookups are done against caching server, while notify requests are done against authoritative servers.
 
 A simple example:
 
@@ -655,7 +659,7 @@ A simple example:
     $n = new \NetDNS2\Notifier('netdns2.com', ['nameservers' => [ '192.168.0.1' ]]);
 
     //
-    // add a optional TSIG to authenticate the request
+    // add an optional TSIG to authenticate the request
     //
     $n->signTSIG('mykey', '9dnf93asdf39fs');
 
@@ -669,7 +673,7 @@ A simple example:
     //
     $n->notify();
 
-This functionality is often triggered directly from the primary DNS server, but using this object, you can trigger a DNS sync programatically.
+This functionality is often triggered directly from the primary DNS server, but using this object, you can trigger a DNS sync programmatically.
 
 ### <a name="edns"></a>EDNS(0) Support
 
@@ -677,7 +681,7 @@ NetDNS2 support most EDNS(0) options via an `edns` object included in the main C
 
 #### Examples
 
-Include a client subnet in a query (RFC 7871):
+Include a client subnet in a query (<a href="https://datatracker.ietf.org/doc/html/rfc7871" target="_blank">RFC 7871</a>):
 
     //
     // create a new Resolver object
@@ -752,14 +756,14 @@ You can also remove a previously added option if needed, before you execute the 
     //
     $u->edns->update_lease(true, time());
 
-##### DNS Name Server Identifier (NSID) - [RFC 5001](https://datatracker.ietf.org/doc/html/rfc5001)
+##### DNS Name Server Identifier (NSID) - <a href="https://datatracker.ietf.org/doc/html/rfc5001" target="_blank">RFC 5001</a>
 
     //
     // nsid(boolean enable)
     //
     $r->edns->nsid(true);
 
-##### DAU, DHU, and N3U - [RFC 6975](https://datatracker.ietf.org/doc/html/rfc6975)
+##### DAU, DHU, and N3U - <a href="https://datatracker.ietf.org/doc/html/rfc6975" target="_blank">RFC 6975</a>
 
     //
     // dau(boolean enable, array supported_dnssec_algorithms)
@@ -776,7 +780,7 @@ You can also remove a previously added option if needed, before you execute the 
     //
     $r->edns->n3u(true, [ 6, 7 ]);
 
-##### Client Subnet in DNS Queries - [RFC 7871](https://datatracker.ietf.org/doc/html/rfc7871)
+##### Client Subnet in DNS Queries - <a href="https://datatracker.ietf.org/doc/html/rfc7871" target="_blank">RFC 7871</a>
 
 You can pass an IPv4 or IPv6 host `10.10.10.10` or subnet `10.10.10.0/24`, or `0.0.0.0/0` to signal to the resolver that client's address information must not be used when resolving this query.
 
@@ -785,14 +789,14 @@ You can pass an IPv4 or IPv6 host `10.10.10.10` or subnet `10.10.10.0/24`, or `0
     //
     $r->edns->client_subnet(true, '2607:f8b0:4009:81a::200e/56');
 
-##### Expire - [RFC 7314](https://datatracker.ietf.org/doc/html/rfc7314)
+##### Expire - <a href="https://datatracker.ietf.org/doc/html/rfc7314" target="_blank">RFC 7314</a>
 
     //
     // expire(boolean enable)
     //
     $r->edns->expire(true);
 
-##### Cookies - [RFC 7873](https://datatracker.ietf.org/doc/html/rfc7873)
+##### Cookies - <a href="https://datatracker.ietf.org/doc/html/rfc7873" target="_blank">RFC 7873</a>
 
     //
     // cookie(boolean enable, string cookie_string)
@@ -803,7 +807,7 @@ The cookie value should be provided as a 8 character fixed-size value, hex-encod
 
 >The Client Cookie SHOULD be a pseudorandom function of the Client IP Address, the Server IP Address, and a secret quantity known only to the client.  This Client Secret SHOULD have at least 64 bits of entropy [RFC4086] and be changed periodically (see Section 7.1).
 
-##### TCP Keepalive - [RFC 7828](https://datatracker.ietf.org/doc/html/rfc7828)
+##### TCP Keepalive - <a href="https://datatracker.ietf.org/doc/html/rfc7828" target="_blank">RFC 7828</a>
 
 The `timeout` value is the idle timeout value for the TCP connection, specified in units of 100 milliseconds.
 
@@ -814,48 +818,48 @@ The `timeout` value is the idle timeout value for the TCP connection, specified 
 
 This option only makes sense when `use_tcp` is also set to true.
 
-##### Chain - [RFC 7901](https://datatracker.ietf.org/doc/html/rfc7901)
+##### Chain - <a href="https://datatracker.ietf.org/doc/html/rfc7901" target="_blank">RFC 7901</a>
 
     //
     // chain(boolean enable, string fqdn_of_closest_trust_point)
     //
     $r->edns->chain(true, 'com.');
 
-##### Key Tag - [RFC 8145](https://datatracker.ietf.org/doc/html/rfc8145)
+##### Key Tag - <a href="https://datatracker.ietf.org/doc/html/rfc8145" target="_blank">RFC 8145</a>
 
     //
-    // key_tag(boolean enable, array lis
+    // key_tag(boolean enable, array list_of_key_tags)
     //
     $r->edns->key_tag(true, [ 12345, 67890 ]);
 
-##### Extended DNS Errors - [RFC 8914](https://datatracker.ietf.org/doc/html/rfc8914)
+##### Extended DNS Errors - <a href="https://datatracker.ietf.org/doc/html/rfc8914" target="_blank">RFC 8914</a>
 
     //
     // extended_error(boolean enable)
     //
     $r->edns->extended_error(true);
 
-##### DNS Error Reporting - [RFC 9567](https://datatracker.ietf.org/doc/html/rfc9567)
+##### DNS Error Reporting - <a href="https://datatracker.ietf.org/doc/html/rfc9567" target="_blank">RFC 9567</a>
 
     //
     // report_channel(boolean enable, string agent_domain)
     //
     $r->edns->report_channel(true, 'example.com');
 
-##### DNS Zone Version - [RFC 9660](https://datatracker.ietf.org/doc/html/rfc9660)
+##### DNS Zone Version - <a href="https://datatracker.ietf.org/doc/html/rfc9660" target="_blank">RFC 9660</a>
 
     //
     // zone_version(boolean enable)
     //
     $r->edns->zone_version(true);
 
-### <a name="signing"></a>Request Signing - TSIG & SIG(0)
+### <a name="signing"></a>Request Signing
 
 NetDNS2 has support to sign outgoing requests using `TSIG` and `SIG(0)` (asymmetric private/public key) authentication. `NetDNS2\Resolver` (for zone transfers), `NetDNS2\Updater` (dynamic DNS updates), and `NetDNS2\Notifier` requests can be signed using either authentication type.
 
-#### TSIG
+#### <a name="tsig"></a>TSIG
 
-A TSIG (Transaction SIGnature) can be added to the request to authenticate the request. See [RFC 2845](https://datatracker.ietf.org/doc/html/rfc2845) for more details.
+A TSIG (Transaction SIGnature) can be added to the request to authenticate the request. See <a href="https://datatracker.ietf.org/doc/html/rfc2845" target="_blank">RFC 2845</a> for more details.
 
 In BIND, a zone can be setup to allow updates using a TSIG like:
 
@@ -895,10 +899,10 @@ Then, using NetDNS2, you can execute:
     $u->update();
 
 
-#### SIG(0)
-Signing using SIG(0) is more complicated. It requires a private/public key to be generated. Both can be generated using the dnssec-keygen tool. This tool produces both the public key, which will be advertised via the domain zone, and a private key which is passed to the signSIG0() function.
+#### <a name="sig"></a>SIG(0)
+Signing using SIG(0) is more complicated. It requires a private/public key to be generated. Both can be generated using the `dnssec-keygen` tool. This tool produces both the public key, which will be advertised via the domain zone, and a private key which is passed to the `signSIG0()` function.
 
-NetDNS2 uses the PHP OpenSSL Extension to support SIG(0). NetDNS2 will throw an exception if you try to sign requests using SIG(0) and you do not have OpenSSL installed.
+NetDNS2 uses the PHP <a href="https://www.php.net/manual/en/book.openssl.php" target="_blank">OpenSSL</a> Extension to support SIG(0). NetDNS2 will throw an exception if you try to sign requests using SIG(0) and you do not have OpenSSL installed.
 
     //
     // create a new Updater object
@@ -908,7 +912,7 @@ NetDNS2 uses the PHP OpenSSL Extension to support SIG(0). NetDNS2 will throw an 
     //
     // add a SIG(0) to authenticate the request; this is the path to the private key file
     //
-    $u->signSIG0('/etc/namedb/Kexample.com.+001+15765.private');
+    $u->signSIG0('/etc/named/Kexample.com.+001+15765.private');
 
     //
     // send the update request.
@@ -928,7 +932,7 @@ The sign `signTSIG()` and `signSIG0()` functions can be used to authenticate zon
     //
     // add a SIG(0) to authenticate the request
     //
-    $r->signSIG0('/etc/namedb/Kexample.com.+001+15765.private');
+    $r->signSIG0('/etc/named/Kexample.com.+001+15765.private');
 
     //
     // request the zone transfer
