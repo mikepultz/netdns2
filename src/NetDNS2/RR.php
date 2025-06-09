@@ -180,9 +180,19 @@ abstract class RR implements \Stringable
                 $this->$_name = new \NetDNS2\Data\Mailbox($_value);
             }
             break;
-            case '\NetDNS2\Data\Text':
+            case 'NetDNS2\Data\Text':
             {
                 $this->$_name = new \NetDNS2\Data\Text($_value);
+            }
+            break;
+            case 'NetDNS2\Data\IPv4':
+            {
+                $this->$_name = new \NetDNS2\Data\IPv4($_value);
+            }
+            break;
+            case 'NetDNS2\Data\IPv6':
+            {
+                $this->$_name = new \NetDNS2\Data\IPv6($_value);
             }
             break;
             default:

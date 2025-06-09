@@ -90,6 +90,7 @@ Version 1.x will be maintained for the foreseeable  future.
 * [Basic Examples](#basic-examples)
 * [DNS over TLS (DoT)](#dot)
 * [DNS over HTTP (DoH)](#doh)
+* [Data Objects](#objects)
 * [IPv6 Support](#ipv6)
 * [Local Cache](#cache)
     * [Flat File](#file)
@@ -433,7 +434,7 @@ To enable DoH, simple pass name server values as URLs instead of IP addresses, f
         $r = new \NetDNS2\Resolver(['nameservers' => [ 'https://cloudflare-dns.com/dns-query' ]]);
 
         //
-        // execute the query request for the google.com MX servers
+        // execute the query request for the facebook A record
         //
         $res = $r->query('facebook.com', 'A');
 
@@ -451,6 +452,29 @@ To enable DoH, simple pass name server values as URLs instead of IP addresses, f
 NetDNS2 performs DoH requests according to [RFC 8484](https://datatracker.ietf.org/doc/html/rfc8484), using `application/dns-message` (wire format) formatted messages (not using JSON), over HTTPS (HTTP is not supported).
 
 >DoH has not currently be tested with DNS Updates - support for this is undefined.
+
+### <a name="objects"></a>Data Objects
+
+NetDNS2 v2.0 uses data objects to store domain names, IPv4 & IPv6 addresses, text entries, and mailboxes, extended from the `\NetDNS2\Data` class.
+
+For example:
+
+    $res = $r->query('facebook.com', 'A');
+
+    echo "facebook resolves to: " . $res->answer[0]->address;
+
+The `$address` value is an instance of a `\NetDNS2\Data\IPv4` object; to get the value, you can echo it (e.g. using the Stringable interface):
+
+    echo $res->answer[0]->address;
+
+The only time this may cause a problem is cases where you're passing the `$address` value to a function that takes a string as an argument. In those cases, you can use the built-in `value()` function to return the value as a string:
+
+    do_something($res->answer[0]->address->value());
+
+Or you can cast the value to a string using `strval()`:
+
+    do_something(strval($res->answer[0]->address));
+
 
 ### <a name="ipv6"></a>IPv6 Support
 
