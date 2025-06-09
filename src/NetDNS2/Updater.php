@@ -189,7 +189,7 @@ final class Updater extends \NetDNS2\Client
         //
         // the \NetDNS2\RR\ANY class is just an empty stub class used for these cases only
         //
-        $rr = new \NetDNS2\RR\ANY;
+        $rr = new \NetDNS2\RR\ANY();
 
         $rr->name     = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_name);
         $rr->ttl      = 0;
@@ -337,7 +337,7 @@ final class Updater extends \NetDNS2\Client
         //
         // the \NetDNS2\RR\ANY class is just an empty stub class used for these cases only
         //
-        $rr = new \NetDNS2\RR\ANY;
+        $rr = new \NetDNS2\RR\ANY();
 
         $rr->name     = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_name);
         $rr->ttl      = 0;
@@ -376,7 +376,7 @@ final class Updater extends \NetDNS2\Client
         //
         // the \NetDNS2\RR\ANY class is just an empty stub class used for these cases only
         //
-        $rr = new \NetDNS2\RR\ANY;
+        $rr = new \NetDNS2\RR\ANY();
 
         $rr->name     = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, $_name);
         $rr->ttl      = 0;
@@ -432,7 +432,7 @@ final class Updater extends \NetDNS2\Client
      * @throws \NetDNS2\Exception
      *
      */
-    public function update(?\NetDNS2\Packet\Response &$_response = null): bool  // @phpstan-ignore-line
+    public function update(\NetDNS2\Packet\Response &$_response): bool
     {
         //
         // init some network settings

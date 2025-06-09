@@ -132,7 +132,7 @@ final class TSIG extends \NetDNS2\RR
      */
     protected function rrToString(): string
     {
-        $out = $this->algorithm . '. ' . $this->time_signed . ' ' . $this->fudge . ' ' . $this->mac_size . ' ' . base64_encode($this->mac) . ' ' .
+        $out = $this->algorithm . '. ' . $this->time_signed . ' ' . $this->fudge . ' ' . $this->mac_size . ' ' . base64_encode($this->mac) . ' ' . 
             $this->original_id . ' ' . $this->error . ' '. $this->other_length;
 
         if ($this->other_length > 0)

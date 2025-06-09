@@ -77,7 +77,7 @@ final class UL extends \NetDNS2\RR\OPT
         //
         // if it's 4, then there's only the lease value
         //
-        } else if ($this->option_length == 4)
+        } elseif ($this->option_length == 4)
         {
             $val = unpack('Nx', $this->option_data);
             if ($val === false)

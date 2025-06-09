@@ -26,11 +26,18 @@ final class Domain extends \NetDNS2\Data
     {
         switch($this->m_type)
         {
-            case self::DATA_TYPE_CANON:      return $this->encode_canonical($this->m_value);
-            case self::DATA_TYPE_RFC1035:    return $this->encode_rfc1035($this->m_value, $_offset);
-            case self::DATA_TYPE_RFC2535:    return $this->encode_rfc2535($this->m_value, $_offset);
-            default:
-                //
+            case self::DATA_TYPE_CANON:
+            {
+                return $this->encode_canonical($this->m_value);
+            }
+            case self::DATA_TYPE_RFC1035:
+            {
+                return $this->encode_rfc1035($this->m_value, $_offset);
+            }
+            case self::DATA_TYPE_RFC2535:
+            {
+                return $this->encode_rfc2535($this->m_value, $_offset);
+            }
         }
 
         throw new \NetDNS2\Exception('invalid domain encoding type.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);

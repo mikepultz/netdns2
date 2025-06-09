@@ -477,7 +477,7 @@ class Client
             //
             // the rotate option just enabled the ns_random option
             //
-            } else if (strncmp($option, 'rotate', 6) == 0)
+            } elseif (strncmp($option, 'rotate', 6) == 0)
             {
                 $this->ns_random = true;
             }
@@ -621,7 +621,8 @@ class Client
             case \NetDNS2\ENUM\DNSSEC\Algorithm::RSASHA256:
             case \NetDNS2\ENUM\DNSSEC\Algorithm::RSASHA512:
             case \NetDNS2\ENUM\DNSSEC\Algorithm::DSA:
-                ;
+            {
+            }
             break;
             default:
             {
@@ -784,7 +785,7 @@ class Client
             // if the use TCP flag (force TCP) is set, or the packet is bigger than our max allowed UDP size- which is either 512, or if this
             // is DNSSEC request, then whatever the configured dnssec_payload_size is.
             //
-            } else if ( ($_use_tcp == true) || (strlen($data) > $max_udp_size) )
+            } elseif ( ($_use_tcp == true) || (strlen($data) > $max_udp_size) )
             {
                 try
                 {
@@ -1221,6 +1222,14 @@ class Client
         }
 
         //
+        // make sure we have a name server
+        //
+        if (strlen($_ns) == 0)
+        {
+            throw new \NetDNS2\Exception('you must pass a value URL to connect to.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
+        }
+
+        //
         // grab the start time
         //
         $start_time = microtime(true);
@@ -1233,7 +1242,7 @@ class Client
         //
         $c = curl_init();
 
-        curl_setopt($c, CURLOPT_URL, $_ns); // @phpstan-ignore-line
+        curl_setopt($c, CURLOPT_URL, $_ns);
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);      // return the data
         curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);      // follow redirects by default
         curl_setopt($c, CURLOPT_MAXREDIRS, 5);              // but limit redirects to 5 so it doesn't get crazy
@@ -1266,7 +1275,7 @@ class Client
                 {
                     curl_setopt($c, CURLOPT_INTERFACE, $host);
 
-                } else if (self::isIPv6($host) == true)
+                } elseif (self::isIPv6($host) == true)
                 {
                     curl_setopt($c, CURLOPT_INTERFACE, '[' . $host . ']');
 

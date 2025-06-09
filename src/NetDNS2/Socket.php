@@ -154,7 +154,7 @@ final class Socket
                 {
                     $opts['socket']['bindto'] = $host;
 
-                } else if (\NetDNS2\Client::isIPv6($host) == true)
+                } elseif (\NetDNS2\Client::isIPv6($host) == true)
                 {
                     $opts['socket']['bindto'] = '[' . $host . ']';
 
@@ -212,7 +212,7 @@ final class Socket
                 {
                     $urn = (($this->m_use_tls == true) ? 'tls' : 'tcp') . '://' . $this->m_host . ':' . $this->m_port;
 
-                } else if (\NetDNS2\Client::isIPv6($this->m_host) == true)
+                } elseif (\NetDNS2\Client::isIPv6($this->m_host) == true)
                 {
                     $urn = (($this->m_use_tls == true) ? 'tls' : 'tcp') . '://[' . $this->m_host . ']:' . $this->m_port;
 
@@ -233,7 +233,7 @@ final class Socket
                 {
                     $urn = 'udp://' . $this->m_host . ':' . $this->m_port;
 
-                } else if (\NetDNS2\Client::isIPv6($this->m_host) == true)
+                } elseif (\NetDNS2\Client::isIPv6($this->m_host) == true)
                 {
                     $urn = 'udp://[' . $this->m_host . ']:' . $this->m_port;
 
@@ -323,7 +323,7 @@ final class Socket
             $this->last_error = 'failed on write select()';
             return false;
 
-        } else if ($result == 0)
+        } elseif ($result == 0)
         {
             $this->last_error = 'timeout on write select()';
             return false;
@@ -396,7 +396,7 @@ final class Socket
             $this->last_error = 'error on read select()';
             return false;
 
-        } else if ($result == 0)
+        } elseif ($result == 0)
         {
             $this->last_error = 'timeout on read select()';
             return false;

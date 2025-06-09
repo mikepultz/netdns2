@@ -94,7 +94,7 @@ final class ECS extends \NetDNS2\RR\OPT
 
             return true;
 
-        } else if (\NetDNS2\Client::isIPv6($address) == true)
+        } elseif (\NetDNS2\Client::isIPv6($address) == true)
         {
             $this->family        = \NetDNS2\RR\APL::ADDRESS_FAMILY_IPV6;
             $this->source_prefix = intval($prefix ?? 128);

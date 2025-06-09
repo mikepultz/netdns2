@@ -48,7 +48,7 @@ final class Request extends \NetDNS2\Packet
         //
         // generate a new header
         //
-        $this->header = new \NetDNS2\Header;
+        $this->header = new \NetDNS2\Header();
 
         //
         // if the type is "*", rename it to "ANY"- both are acceptable.
@@ -93,7 +93,7 @@ final class Request extends \NetDNS2\Packet
             {
                 $q->qname = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, implode('.', array_reverse(explode('.', $_name))) . '.in-addr.arpa');
 
-            } else if (\NetDNS2\Client::isIPv6(strval($_name)) == true)
+            } elseif (\NetDNS2\Client::isIPv6(strval($_name)) == true)
             {
                 $q->qname = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035,
                     implode('.', array_reverse(str_split(str_replace(':', '', \NetDNS2\Client::expandIPv6($_name))))) . '.ip6.arpa');

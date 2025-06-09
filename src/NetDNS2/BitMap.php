@@ -76,7 +76,7 @@ final class BitMap
                 {
                     $out[] = $mnemonic;
 
-                } else if (strncmp($mnemonic, 'TYPE', 4) == 0)
+                } elseif (strncmp($mnemonic, 'TYPE', 4) == 0)
                 {
                     $value = intval(str_replace('TYPE', '', $mnemonic));
 

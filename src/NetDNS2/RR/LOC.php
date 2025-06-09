@@ -111,8 +111,8 @@ final class LOC extends \NetDNS2\RR
             // latitude
             //
             $latdeg     = floatval($x[1]);
-            $latmin     = floatval($x[3] ?? 0);     // @phpstan-ignore-line
-            $latsec     = floatval($x[5] ?? 0);     // @phpstan-ignore-line
+            $latmin     = floatval((strlen($x[3]) == 0) ? 0 : $x[3]);
+            $latsec     = floatval((strlen($x[5]) == 0) ? 0 : $x[5]);
             $lathem     = strtoupper($x[6]);
 
             $this->latitude = $this->dms2d($latdeg, $latmin, $latsec, $lathem);
@@ -121,8 +121,8 @@ final class LOC extends \NetDNS2\RR
             // longitude
             //
             $londeg     = floatval($x[7]);
-            $lonmin     = floatval($x[9] ?? 0);     // @phpstan-ignore-line
-            $lonsec     = floatval($x[11] ?? 0);    // @phpstan-ignore-line
+            $lonmin     = floatval((strlen($x[9]) == 0) ? 0 : $x[9]);
+            $lonsec     = floatval((strlen($x[11]) == 0) ? 0 : $x[11]);
             $lonhem     = strtoupper($x[12]);
 
             $this->longitude = $this->dms2d($londeg, $lonmin, $lonsec, $lonhem);

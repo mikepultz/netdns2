@@ -67,21 +67,21 @@ abstract class Data implements \Stringable
         //
         // store from a \NetDNS2\Packet object
         //
-        } else if ( (is_null($_data) == false) && (($_data instanceof \NetDNS2\Packet) == true) )
+        } elseif ( (is_null($_data) == false) && (($_data instanceof \NetDNS2\Packet) == true) )
         {
             $this->decode($_data->rdata, $_offset);
 
         //
         // assign as a string
         //
-        } else if ( (is_null($_data) == false) && (gettype($_data) == 'string') )
+        } elseif ( (is_null($_data) == false) && (gettype($_data) == 'string') )
         {
             $this->m_value = trim($_data, '".');
 
         //
         // copy constructor
         //
-        } else if ( (is_null($_data) == false) && ($_data instanceof \NetDNS2\Data) )
+        } elseif ( (is_null($_data) == false) && ($_data instanceof \NetDNS2\Data) )
         {
             $this->m_type  = $_data->type();
             $this->m_value = $_data->value();
@@ -150,7 +150,7 @@ abstract class Data implements \Stringable
             {
                 return $labels;
 
-            } else if ($length < 0x40)
+            } elseif ($length < 0x40)
             {
                 $label = substr($_rdata, $_offset, $length);
 

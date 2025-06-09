@@ -31,7 +31,7 @@ final class EDNS
         {
             return true;
 
-        } else if ($_enable == false)
+        } elseif ($_enable == false)
         {
             unset($this->opts[$_type]);
             return true;

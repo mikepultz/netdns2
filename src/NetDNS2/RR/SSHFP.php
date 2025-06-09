@@ -91,7 +91,8 @@ final class SSHFP extends \NetDNS2\RR
             case self::SSHFP_ALGORITHM_ECDSA:
             case self::SSHFP_ALGORITHM_ED25519:
             case self::SSHFP_ALGORITHM_ED448:
-                ;
+            {
+            }
             break;
             default:
             {
@@ -106,7 +107,8 @@ final class SSHFP extends \NetDNS2\RR
         {
             case self::SSHFP_FPTYPE_SHA1:
             case self::SSHFP_FPTYPE_SHA256:
-                ;
+            {
+            }
             break;
             default:
             {

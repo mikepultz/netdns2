@@ -256,12 +256,12 @@ abstract class RR implements \Stringable
                 ++$c;
                 $in = false;
 
-            } else if ($r[0] == '"')
+            } elseif ($r[0] == '"')
             {
                 $data[$c] = $r;
                 $in = true;
 
-            } else if ( ($r[strlen($r) - 1] == '"') && ($r[strlen($r) - 2] != '\\') )
+            } elseif ( ($r[strlen($r) - 1] == '"') && ($r[strlen($r) - 2] != '\\') )
             {
                 $data[$c] .= ' ' . $r;
                 ++$c;
@@ -365,7 +365,7 @@ abstract class RR implements \Stringable
             //
             // pre-build the TTL value
             //
-            $this->pre_build(); // @phpstan-ignore-line
+            $this->pre_build(); // @phpstan-ignore method.notFound
 
             //
             // the class value is different for OPT types
@@ -534,15 +534,6 @@ abstract class RR implements \Stringable
                 case is_numeric($value):
                 {
                     $ttl = intval(array_shift($values) ?? 86400);
-                }
-                break;
-
-                //
-                // this is here because of a bug in is_numeric() in certain versions of PHP on windows.
-                //
-                case ($value === 0): // @phpstan-ignore-line
-                {
-                    $ttl = intval(array_shift($values) ?? 0);
                 }
                 break;
                 case (\NetDNS2\ENUM\RR\Classes::exists(strval($value)) == true):
