@@ -25,7 +25,7 @@ final class PTR extends \NetDNS2\RR
     /**
      * the hostname of the PTR entry
      */
-    private \NetDNS2\Data\Domain $ptrdname;
+    protected \NetDNS2\Data\Domain $ptrdname;
 
     /**
      * @see \NetDNS2\RR::rrToString()
