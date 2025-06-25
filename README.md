@@ -90,6 +90,7 @@ Version 1.x will be maintained for the foreseeable  future.
 * [Basic Examples](#basic-examples)
 * [DNS over TLS (DoT)](#dot)
 * [DNS over HTTP (DoH)](#doh)
+* [DNNSEC Query with Signature validation](#dnssecval)
 * [Data Objects](#objects)
 * [IPv6 Support](#ipv6)
 * [Local Cache](#cache)
@@ -452,6 +453,33 @@ To enable DoH, simple pass name server values as URLs instead of IP addresses, f
 NetDNS2 performs DoH requests according to [RFC 8484](https://datatracker.ietf.org/doc/html/rfc8484), using `application/dns-message` (wire format) formatted messages (not using JSON), over HTTPS (HTTP is not supported).
 
 >DoH has not currently be tested with DNS Updates - support for this is undefined.
+
+### <a name="dnssecval"></a>DNNSEC Query with signage verification
+
+    try {
+        $resolver = new Resolver([ 
+            'nameservers'   => [ '1.1.1.1', '8.8.8.8' ],
+            'use_tls'       => true,
+            'dnssec'    => true,
+            'ns_random'     => true,
+            'dnssec_ad_flag'    => true,
+            'dnssec_cd_flag'    => false,
+        ]);
+        // Set AD Flag, disable CD flag
+        $resp = $resolver->query("cloudflare.com", "A");
+        $ad_flag = false;
+        if (isset($resp->header->ad) && $resp->header->ad) {
+            $ad_flag = true;
+        }
+        // if AD is set the domain is fully validated, the AD flag is valid for the whole request ( all records returned )
+        foreach ($resp->answer as $record) {
+            if ($record instanceof \NetDNS2\RR\A) {
+                $result[] = ['ip' => strval($record->address), 'ad' => $ad_flag ];
+            }
+        }
+    } catch (NetDns2Exception $e) {
+        $result = [];
+    }
 
 ### <a name="objects"></a>Data Objects
 
