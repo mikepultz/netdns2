@@ -471,7 +471,7 @@ NetDNS2 performs DoH requests according to [RFC 8484](https://datatracker.ietf.o
 
 ### <a name="dnssec"></a>DNSSEC with Signature Verification
 
-To request DNSSEC verification, simply set the `dnssec` flag to `true` when making and request, for example:
+To request DNSSEC verification, simply set the `dnssec` flag to `true` when making a request, for example:
 
     try
     {
@@ -488,7 +488,7 @@ To request DNSSEC verification, simply set the `dnssec` flag to `true` when maki
         //
         // execute the query
         //
-        $res = $r->query('facebook.com', 'A');
+        $res = $r->query('org', 'SOA');
 
         //
         // check the ad flag; if it's set to 1, then the upstream resolver is confirming that
@@ -496,7 +496,7 @@ To request DNSSEC verification, simply set the `dnssec` flag to `true` when maki
         //
         if ($res->header->ad == 1)
         {
-            echo "facebook resolves to: " . $res->answer[0]->address;
+            echo "DNSSEC verification success!";
         } else
         {
             echo "DNSSEC verification failure; we can't trust this response.";
