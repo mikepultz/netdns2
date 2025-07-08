@@ -11,6 +11,7 @@ The NetDNS2 library is a pure PHP DNS Resolver library, that supports local cach
   * Support for DNS over TLS (DoT).
   * Support for DNS over HTTP (DoH) using RFC 8484 application/dns-message format.
   * Support for all defined (and not obsoleted) resource record types.
+  * Support for Internationalized Domain Names (IDN) (e.g. Punycode)
   * Support for DNSSEC requests and resource records.
   * Support for EDNS(0) features (client subnet,  cookies, TCP keepalive, etc.)
   * Support zone signing using TSIG and SIG(0) for updates and zone transfers.
@@ -80,6 +81,7 @@ Version 1.x will be maintained for the foreseeable  future.
 * (OPTIONAL) [OpenSSL](https://www.php.net/manual/en/book.openssl.php) - for DNS over TLS (DoT) and certain resource record types.
 * (OPTIONAL) [cURL](https://www.php.net/manual/en/book.curl.php) - for DNS over HTTP (DoH).
 * (OPTIONAL) [Hash](https://www.php.net/manual/en/ref.hash.php) - for TSIG request authentication.
+* (OPTIONAL) [Intl](https://www.php.net/manual/en/book.intl.php) - for decoding Unicode domains.
 * (OPTIONAL) [Shmop](https://www.php.net/manual/en/book.shmop.php) - for local caching
 * (OPTIONAL) [Memcached](https://www.php.net/manual/en/book.memcached.php) - for local caching.
 * (OPTIONAL) [Redis](https://github.com/phpredis/phpredis/) - for local caching.
@@ -91,6 +93,7 @@ Version 1.x will be maintained for the foreseeable  future.
 * [DNS over TLS (DoT)](#dot)
 * [DNS over HTTP (DoH)](#doh)
 * [Data Objects](#objects)
+* [Internationalized Domain Names (IDN)](#unicode)
 * [IPv6 Support](#ipv6)
 * [Local Cache](#cache)
     * [Flat File](#file)
@@ -475,6 +478,21 @@ Or you can cast the value to a string using `strval()`:
 
     do_something(strval($res->answer[0]->address));
 
+### <a name="unicode"></a>Internationalized Domain Names (IDN)
+
+NetDNS2 v2.0.2 supports Unicode domain names using the PHP Intl extension.
+
+For example:
+
+    $res = $r->query('域名.中国', 'CNAME');
+
+    echo "域名.中国 resolves to: " . $res->answer[0]->cname;
+
+The `$name` value is converted to the Punycode value `xn--eqrt2g.xn--fiqs8s` internally. The value is converted back to Unicode when when used or printed:
+
+    echo "The name value is: " . $res->answer[0]->name;
+
+If the `$name` value is already ASCII, or the Intl extension is not installed, then the value is left as-is.
 
 ### <a name="ipv6"></a>IPv6 Support
 

@@ -323,7 +323,7 @@ abstract class RR implements \Stringable
         $this->rdlength = ord($_packet->rdata[$_packet->offset++]) << 8 | ord($_packet->rdata[$_packet->offset++]);
 
         //
-        // if the packet length is too small, then breka out
+        // if the packet length is too small break out
         //
         if ($_packet->rdlength < ($_packet->offset + $this->rdlength))
         {

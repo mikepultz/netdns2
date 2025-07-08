@@ -80,13 +80,15 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                                     'example.com. 300 IN AFSDB 1 afsdb1.example.com.',
                                     'example.com. 300 IN AFSDB 2 afsdb2.example.com.',
                                     'example.com. 300 IN AFSDB 3 afsdb3.example.com.',
+                                    'example.com. 300 IN AFSDB 3 域名.中国.',
                                 ],
             'A'             => 'example.com. 300 IN A 172.168.0.50',
             'AMTRELAY'      => [
                                     'example.com. 300 IN AMTRELAY 10 0 0 .',
                                     'example.com. 300 IN AMTRELAY 20 0 1 203.0.113.15',
                                     'example.com. 300 IN AMTRELAY 30 0 2 2600:1f16:17c:3950:47ac:cb79:62ba:702e',
-                                    'example.com. 300 IN AMTRELAY 40 1 3 test.google.com.'
+                                    'example.com. 300 IN AMTRELAY 40 1 3 test.google.com.',
+                                    'example.com. 300 IN AMTRELAY 40 1 3 日本.jp.'
                                 ],
             'APL'           => [
                                     'example.com. 300 IN APL 1:224.0.0.0/4 2:ff00::/8 2:a0::/8 !1:192.168.38.0/28',
@@ -107,7 +109,10 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                                     'example.com. 300 IN CERT 3 0 0 TUlJQ1hnSUJBQUtCZ1FDcXlqbzNFMTU0dFU1Um43ajlKTFZsOGIwcUlCSVpGWENFelZvanVJT1BsMTM0by9zcHkxSE1hQytiUGh3Wk1UYVd4QlJpZHBFbUprNlEwNFJNTXdqdkFyLzFKWjhnWThtTzdCdTh1RUROVkNWeG5rQkUzMHhDSjhHRTNzL3EyN2VWSXBCUGFtU1lkNDVKZjNIeVBRRE4yaU45RjVHdGlIa2E2OXNhcmtKUnJ3SURBUUFCQW9HQkFJaUtDQ1NEM2FFUEFjQUx1MjdWN0JmR1BYN3lDTVg0OSsyVDVwNXNJdkduQjcrQ0NZZ09QaVQybmlpMGJPNVBBOTlnZnhPQXl1WCs5Z3llclVQbUFSc1ViUzcvUndkNGorRUlOVW1DanJSK2R6dGVXT0syeGxHamFOdGNPZU5jMkVtelQyMFRsekxVeUxTWGpzMzVlU2NQK0loeVptM2xJd21vbWtNb2d1QkFrRUE0a1FsOVBxaTJ2MVBDeGJCelU4Nnphblo2b0hsV0IzMUh4MllCNmFLYXhjNkVOZHhVejFzNjU2VncrRDhSVGpoSllyeDdMVkxzZDBRaVZJM0liSjVvUUpCQU1FN3k0aHg0SCtnQU40MEdrYjNjTFZGNHNpSEZrNnA2QVZRdlpzREwvVnh3bVlOdE4rM0txT3NVcG11WXZ3a3h0ajhIQnZtckxUYStXb3NmRDQwS1U4Q1FRQ1dvNmhob1R3cmI5bmdHQmFQQ2VDc2JCaVkrRUlvbUVsSm5mcEpuYWNxQlJ5emVid0pIeXdVOGsvalNUYXJIMk5HQzJ0bG5JMzRyS1VGeDZiTTJIWUJBa0VBbXBYSWZPNkZKL1NMM1RlWGNnQ1A5U1RraVlHd2NkdnhGeGVCcDlvRDZ2cElCN2FkWlgrMko5dzY5R0VUSlI0U3loSGVOdC95ZUhqWm9YdlhKVGc3ZHdKQVpEamxwL25wNEFZV3JYaGFrMVAvNGZlaDVNSU5WVHNXQkhTNlRZNW0xRmZMUEpybklHNW1FSHNidWkvdnhuQ1JmRUR4ZlU1V1E0cS9HUkZuaVl3SHB3PT0=',
                                     'example.com. 300 IN CERT 3 123 8 Q2VydGlmaWNhdGUgdHlwZXMgMHgwMDAwIHRocm91Z2ggMHgwMEZGIGFuZCAweEZGMDAgdGhyb3VnaCAweEZGRkY=',
                                 ],
-            'CNAME'         => 'example.com. 300 IN CNAME www.shit.com.',
+            'CNAME'         => [
+                                'example.com. 300 IN CNAME www.stuff.com.',
+                                'example.com. 300 IN CNAME россия.рф.'
+                                ],
             'CSYNC'         => 'example.com. 300 IN CSYNC 1278700841 3 A NS AAAA',
             'DHCID'         => 'example.com. 300 IN DHCID AAIBY2/AuCccgoJbsaxcQc9TUapptP69lOjxfNuVAA2kjEA=',
             'DLV'           => 'example.com. 300 IN DLV 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
@@ -116,7 +121,8 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             'DS'            => 'example.com. 300 IN DS 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
             'DSYNC'         => [
                                     'example.com. 300 IN DSYNC CDS NOTIFY 1234 rr-endpoint.example.com.',
-                                    'example.com. 300 IN DSYNC CSYNC NOTIFY 5555 another.endpoint.example.com.'
+                                    'example.com. 300 IN DSYNC CSYNC NOTIFY 5555 another.endpoint.example.com.',
+                                    'example.com. 300 IN DSYNC CSYNC NOTIFY 5555 bücher.de.'
                                 ],
             'EUI48'         => 'example.com. 300 IN EUI48 00-00-5e-00-53-2a',
             'EUI64'         => 'example.com. 300 IN EUI64 00-00-5e-ef-10-00-00-2a',
@@ -124,6 +130,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             'HINFO'         => 'example.com. 300 IN HINFO "PC-Intel-700mhz" "Redhat \"Linux\" 7.1"',
             'HTTPS'         => [
                                     'example.com. 300 IN HTTPS 0 alt3.example.com.',
+                                    'example.com. 300 IN HTTPS 0 россия.рф.',
                                     'example.com. 300 IN HTTPS 1 . port=8080 ohttp',
                                 ],
             'HIP'           => 'example.com. 300 IN HIP 2 200100107B1A74DF365639CC39F1D578 AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQb1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D rvs.example.com. another.example.com. test.domain.org.',
@@ -135,7 +142,10 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             'L64'           => 'example.com. 300 IN L64 10 2001:db8:1140:1000',
             'LOC'           => 'example.com. 300 IN LOC 42 21 54.675 N 71 06 18.343 W 24.12m 30.00m 40.00m 5.00m',
             'LP'            => 'example.com. 300 IN LP 10 l64-subnet1.example.com.',
-            'MX'            => 'example.com. 300 IN MX 10 mx1.netdns2.com.',
+            'MX'            => [
+                                    'example.com. 300 IN MX 10 mx1.netdns2.com.',
+                                    'example.com. 300 IN MX 20 mx1.日本語は難しいですか.jp.',
+                                ],
             'NAPTR'         => 'example.com. 300 IN NAPTR 100 10 "S" "SIP+D2U" "!^.*$!sip:customer-service@example.com!" _sip._udp.example.com.',
             'NID'           => 'example.com. 300 IN NID 10 14:4fff:ff20:ee64',
             'NSEC3PARAM'    => 'example.com. 300 IN NSEC3PARAM 1 0 1 D399EAAB',

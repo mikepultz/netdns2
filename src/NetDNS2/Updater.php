@@ -432,7 +432,7 @@ final class Updater extends \NetDNS2\Client
      * @throws \NetDNS2\Exception
      *
      */
-    public function update(\NetDNS2\Packet\Response &$_response): bool
+    public function update(?\NetDNS2\Packet\Response &$_response = null): bool  // @phpstan-ignore-line
     {
         //
         // init some network settings

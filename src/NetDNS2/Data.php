@@ -76,7 +76,30 @@ abstract class Data implements \Stringable
         //
         } elseif ( (is_null($_data) == false) && (gettype($_data) == 'string') )
         {
-            $this->m_value = trim($_data, '".');
+            $value = trim($_data, '".');
+
+            if (strlen($value) > 0)
+            {
+                //
+                // if the Intl extension is loaded, then automatically convert the domain if it contains unicode characters; we
+                // only use it for the Domain type, and not Text or IPv4/6.
+                //
+                if ( (extension_loaded('intl') == true) && (($this instanceof \NetDNS2\Data\Domain) == true) )
+                {
+                    $res = idn_to_ascii($value, IDNA_NONTRANSITIONAL_TO_ASCII, INTL_IDNA_VARIANT_UTS46);
+                    if ($res !== false)
+                    {
+                        $this->m_value = $res;
+                    } else
+                    {
+                        $this->m_value = $value;
+                    }
+
+                } else
+                {
+                    $this->m_value = $value;
+                }
+            }
 
         //
         // copy constructor
@@ -109,7 +132,19 @@ abstract class Data implements \Stringable
      */
     public function value(): string
     {
-        return $this->m_value;
+        //
+        // only convert it if we have the Intl extension installed, and it looks like a Punycode string
+        //
+        if ( (extension_loaded('intl') == true) && (strpos($this->m_value, 'xn--') !== false) )
+        {
+            $res = idn_to_utf8($this->m_value);
+
+            return ($res === false) ? $this->m_value : $res;
+
+        } else
+        {
+            return $this->m_value;
+        }
     }
 
     /**
@@ -117,7 +152,7 @@ abstract class Data implements \Stringable
      */
     public function length(): int
     {
-        return strlen($this->m_value);
+        return strlen($this->value());
     }
 
     /**
@@ -192,7 +227,15 @@ abstract class Data implements \Stringable
             return pack('C', 0);
         }
 
-        return pack('Ca*x', strlen($_value), $_value);
+        $labels = explode('.', strtolower($_value));
+        $data = '';
+
+        foreach($labels as $label)
+        {
+            $data .= pack('Ca*', strlen($label), $label);
+        }
+
+        return $data . pack('x');
     }
 
     /**

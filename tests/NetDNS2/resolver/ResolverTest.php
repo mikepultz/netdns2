@@ -121,6 +121,51 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * function to test unicode domain names against our internal bind instance
+     *
+     * @return void
+     * @access public
+     *
+     */
+    public function testIDNResolver(): void
+    {
+        $hosts = [
+
+            'täst.netdns2.com',
+            'こんにちは.netdns2.com'
+        ];
+
+        try
+        {
+            $r = new \NetDNS2\Resolver([ 'nameservers' => [ '3.136.56.244' ] ]);
+
+            foreach($hosts as $host)
+            {
+                $res = $r->query($host, 'A');
+
+                //
+                // we should get one result
+                //
+                $this->assertCount(1, $res->answer, "Expected one result only for host=$host");
+
+                //
+                // that resolves to localhost (for testing)
+                //
+                $this->assertSame($res->answer[0]->address->value(), '127.0.0.1');
+
+                //
+                // and the extract (converted back to unicode) name should match the name going in
+                //
+                $this->assertSame($res->answer[0]->name->value(), $host);
+            }
+
+        } catch(\NetDNS2\Exception $e)
+        {
+            $this->assertTrue(false, sprintf('ResolverTest::testIDNResolver(): exception thrown: %s', $e->getMessage()));
+        }
+    }
+
+    /**
      * function to test the resolver against our internal bind instance
      *
      * @return void

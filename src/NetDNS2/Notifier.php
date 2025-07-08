@@ -144,7 +144,7 @@ final class Notifier extends \NetDNS2\Client
      * @throws \NetDNS2\Exception
      *
      */
-    public function notify(\NetDNS2\Packet\Response &$_response): void
+    public function notify(?\NetDNS2\Packet\Response &$_response = null): void  // @phpstan-ignore-line
     {
         //
         // init some network settings
