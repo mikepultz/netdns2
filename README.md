@@ -92,6 +92,7 @@ Version 1.x will be maintained for the foreseeable  future.
 * [Basic Examples](#basic-examples)
 * [DNS over TLS (DoT)](#dot)
 * [DNS over HTTP (DoH)](#doh)
+* [DNSSEC with Signature Verification](#dnssec)
 * [Data Objects](#objects)
 * [Internationalized Domain Names (IDN)](#unicode)
 * [IPv6 Support](#ipv6)
@@ -252,6 +253,9 @@ Configuration options can be passed to the `NetDNS2\Resolver`, `NetDNS2\Updater`
         //
         // request DNSSEC values, by setting the DO flag to 1
         //
+        // this instructs the upstream resolvers that we want to include DNSSEC details
+        // with our request, if supported by the zone.
+        //
         // boolean, defaults to false
         //
         'dnssec'    => false,
@@ -259,12 +263,21 @@ Configuration options can be passed to the `NetDNS2\Resolver`, `NetDNS2\Updater`
         //
         // set the DNSSEC AD (Authentic Data) bit on/off.
         //
+        // this isn't used by client connections, as the upstream resolver is responsible
+        // for verifying the DNSSEC signatures and setting this bit.
+        //
         // boolean, defaults to false
         //
         'dnssec_ad_flag'    => false,
 
         //
         // set the DNSSEC CD (Checking Disabled) bit on/off
+        //
+        // this instructs the upstream resolvers to validate DNSSEC signatures in the
+        // response (when the dnssec option is true).
+        //
+        // if set to true, it signals the upstream resolvers to return the DNS records
+        // regardless of whether they are cryptographically verifiable. 
         //
         // boolean, defaults to false
         //
@@ -302,7 +315,7 @@ The main `NetDNS2\Resolver` class is used to look up DNS records.
         $r = new \NetDNS2\Resolver(['nameservers' => [ '1.1.1.1' ]]);
 
         //
-        // execute the query request for the google.com MX servers
+        // execute the query
         //
         $res = $r->query('facebook.com', 'A');
 
@@ -456,6 +469,55 @@ NetDNS2 performs DoH requests according to [RFC 8484](https://datatracker.ietf.o
 
 >DoH has not currently be tested with DNS Updates - support for this is undefined.
 
+### <a name="dnssec"></a>DNSSEC with Signature Verification
+
+To request DNSSEC verification, simply set the `dnssec` flag to `true` when making and request, for example:
+
+    try
+    {
+        //
+        // create new resolver object, passing in an array of name servers to use for lookups
+        //
+        $r = new \NetDNS2\Resolver(['nameservers' => [ '1.1.1.1' ]]);
+
+        //
+        // request DNSSEC records
+        //
+        $r->dnssec = true;
+
+        //
+        // execute the query
+        //
+        $res = $r->query('facebook.com', 'A');
+
+        //
+        // check the ad flag; if it's set to 1, then the upstream resolver is confirming that
+        // the DNSSEC verification was successful and we can trust the results.
+        //
+        if ($res->header->ad == 1)
+        {
+            echo "facebook resolves to: " . $res->answer[0]->address;
+        } else
+        {
+            echo "DNSSEC verification failure; we can't trust this response.";
+        }
+
+    } catch(\NetDNS2\Exception $e)
+    {
+        echo "::query() failed: " . $e->getMessage() . "\n";
+    }
+
+If the zone supports DNSSEC, then the additional DNSSEC records will be returned, and the `ad` bit will be adjusted in the header to indicate if the verification was successful.
+
+The `dnssec_cd_flag` argument (aka "DNSSEC Checking Disabled") flag is unset by default. You can optionally set this flag to `true` to have the upstream resolver return the DNS records regardless of whether they are cryptographically verifiable.
+
+    //
+    // allow unverifiable DNSSEC results
+    //
+    $r->dnssec_cd_flag = true;
+
+Keep in mind, many zones do not support DNSSEC, so failing because the `ad` bit is 0 for all domains may not be what you want.
+
 ### <a name="objects"></a>Data Objects
 
 NetDNS2 v2.0 uses data objects to store domain names, IPv4 & IPv6 addresses, text entries, and mailboxes, extended from the `\NetDNS2\Data` class.
@@ -488,7 +550,7 @@ For example:
 
     echo "域名.中国 resolves to: " . $res->answer[0]->cname;
 
-The `$name` value is converted to the Punycode value `xn--eqrt2g.xn--fiqs8s` internally. The value is converted back to Unicode when when used or printed:
+The `$name` value is converted to the Punycode value `xn--eqrt2g.xn--fiqs8s` internally. The value is converted back to Unicode when used or printed:
 
     echo "The name value is: " . $res->answer[0]->name;
 
