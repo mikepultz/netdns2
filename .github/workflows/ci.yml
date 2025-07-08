@@ -20,7 +20,7 @@ jobs:
         level: 8
         memory_limit: 2G
         php_version: 8.1
-        php_extensions: hash openssl shmop
+        php_extensions: hash openssl shmop intl
         configuration: tests/phpstan.neon
 
     - name: PHPUnit Tests
@@ -29,6 +29,6 @@ jobs:
         version: 10.5
         configuration: tests/phpunit.xml
         php_version: 8.1
-        php_extensions: hash openssl shmop
+        php_extensions: hash openssl shmop intl
         test_suffix: .php
         args: --testsuite parser
