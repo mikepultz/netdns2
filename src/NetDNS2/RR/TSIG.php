@@ -287,7 +287,7 @@ final class TSIG extends \NetDNS2\RR
         //
         // add the name without compressing
         //
-        $sig_data .= new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $this->name->value())->encode();
+        $sig_data .= (new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $this->name->value()))->encode();
 
         //
         // add the class and TTL
