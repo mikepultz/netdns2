@@ -21,7 +21,7 @@ class Client
     /**
      * the current version of this library
      */
-    public const VERSION = '2.0.2';
+    public const VERSION = '2.0.3';
 
     /**
      * the default path to a resolv.conf file
