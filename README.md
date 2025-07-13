@@ -585,7 +585,7 @@ All resource records that support IPv6 (AMTRELAY, APL, SVCB, IPSECKEY, etc.) are
 NetDNS2 includes a built-in local cache to improve query performance. The cache is disabled by default, and currently supports:
 
 * flat file cache (local disk)
-* shared memory [Shmop](https://www.php.net/manual/en/book.shmop.php) extension)
+* shared memory (using the [Shmop](https://www.php.net/manual/en/book.shmop.php) extension)
 * memcache (using the [Memcached](https://www.php.net/manual/en/book.memcached.php) extension)
 * redis (using the [Redis](https://github.com/phpredis/phpredis/) extension)
 
@@ -593,7 +593,7 @@ The local cache is only used for lookup queries, and is disabled for Updates.
 
 Cached data is stored as a serialized string, using the standard PHP serialize().
 
->Previous version of NetDNS2 supported using JSON as the data serializer, but this functionality was removed in v2.0.
+>Previous versions of NetDNS2 supported using JSON as the data serializer, but this functionality was removed in v2.0.
 
 #### <a name="file"></a>Flat File
 

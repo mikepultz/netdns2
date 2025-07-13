@@ -46,11 +46,11 @@ abstract class Data implements \Stringable
      *
      * @param int   $_type   encoding type
      * @param mixed $_data   a string or \NetDNS2\Packet object to extract a value from
-     * @param ?int  $_offset an offset value used to seek inside the data provided.
+     * @param int   $_offset an offset value used to seek inside the data provided.
      *
      * @throws \NetDNS2\Exception
      */
-    public function __construct(int $_type, mixed $_data = null, ?int &$_offset = null)
+    public function __construct(int $_type, mixed $_data = null, int &$_offset = -1)
     {
         //
         // store the encoding type
@@ -60,7 +60,7 @@ abstract class Data implements \Stringable
         //
         // parse as a rdata
         //
-        if ( (is_null($_data) == false) && (is_string($_data) == true) && (is_null($_offset) == false) )
+        if ( (is_null($_data) == false) && (is_string($_data) == true) && ($_offset != -1) )
         {
             $this->decode($_data, $_offset);
 
@@ -158,7 +158,7 @@ abstract class Data implements \Stringable
     /**
      * underlying derived classes need to implement an encode & decode function
      */
-    abstract public function encode(?int &$_offset = null): string;
+    abstract public function encode(int &$_offset = -1): string;
     abstract protected function decode(string $_rdata, int &$_offset): void;
 
     /**

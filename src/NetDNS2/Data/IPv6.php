@@ -17,7 +17,7 @@ namespace NetDNS2\Data;
  */
 final class IPv6 extends \NetDNS2\Data
 {
-    public function __construct(mixed $_data = null, ?int &$_offset = null)
+    public function __construct(mixed $_data = null, int &$_offset = -1)
     {
         parent::__construct(self::DATA_TYPE_IPV4, $_data, $_offset);
     }
@@ -26,7 +26,7 @@ final class IPv6 extends \NetDNS2\Data
       * encode the stored value and return it
       *
       */
-    public function encode(?int &$_offset = null): string
+    public function encode(int &$_offset = -1): string
     {
         $val = inet_pton($this->m_value);
         if ($val !== false)

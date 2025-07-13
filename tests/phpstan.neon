@@ -5,6 +5,3 @@ parameters:
     paths:
         - ../src
     treatPhpDocTypesAsCertain: false
-    ignoreErrors:
-        - '*expects int, int\|null given*'
-        - '*does not accept int\|null*'

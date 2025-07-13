@@ -28,7 +28,7 @@ final class Mailbox extends \NetDNS2\Data
       *
       * @throws \NetDNS2\Exception
       */
-    public function encode(?int &$_offset = null): string
+    public function encode(int &$_offset = -1): string
     {
         //
         // format the current value

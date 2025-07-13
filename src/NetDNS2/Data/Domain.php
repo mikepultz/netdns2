@@ -22,7 +22,7 @@ final class Domain extends \NetDNS2\Data
       *
       * @throws \NetDNS2\Exception
       */
-    public function encode(?int &$_offset = null): string
+    public function encode(int &$_offset = -1): string
     {
         switch($this->m_type)
         {

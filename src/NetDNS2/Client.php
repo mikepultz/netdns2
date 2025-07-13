@@ -987,7 +987,7 @@ class Client
                 $result = $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->read($size,
                     ($this->dnssec == true) ? $this->dnssec_payload_size : \NetDNS2\Header::DNS_MAX_UDP_SIZE);
 
-                if ( ($result === false) || ($size < \NetDNS2\Header::DNS_HEADER_SIZE) )   // @phpstan-ignore-line
+                if ( ($result === false) || ($size < \NetDNS2\Header::DNS_HEADER_SIZE) )    // @phpstan-ignore-line
                 {
                     //
                     // if we get an error, then keeping this socket around for a future request, could cause an error- for example,

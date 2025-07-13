@@ -177,7 +177,7 @@ abstract class RR implements \Stringable
             break;
             case 'NetDNS2\Data\Mailbox':
             {
-                $this->$_name = new \NetDNS2\Data\Mailbox($_value);
+                $this->$_name = new \NetDNS2\Data\Mailbox($_value->type(), $_value);
             }
             break;
             case 'NetDNS2\Data\Text':
