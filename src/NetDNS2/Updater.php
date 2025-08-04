@@ -428,11 +428,12 @@ final class Updater extends \NetDNS2\Client
      * executes the update request with the object informaton
      *
      * @param \NetDNS2\Packet\Response &$_response ref to the response object
+     * @param-out \NetDNS2\Packet\Response $_response
      *
      * @throws \NetDNS2\Exception
      *
      */
-    public function update(?\NetDNS2\Packet\Response &$_response = null): bool  // @phpstan-ignore parameterByRef.unusedType
+    public function update(?\NetDNS2\Packet\Response &$_response = null): bool
     {
         //
         // init some network settings

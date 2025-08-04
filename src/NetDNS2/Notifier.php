@@ -140,11 +140,12 @@ final class Notifier extends \NetDNS2\Client
      * executes the notify request
      *
      * @param \NetDNS2\Packet\Response &$_response ref to the response object
+     * @param-out \NetDNS2\Packet\Response $_response
      *
      * @throws \NetDNS2\Exception
      *
      */
-    public function notify(?\NetDNS2\Packet\Response &$_response = null): void  // @phpstan-ignore parameterByRef.unusedType
+    public function notify(?\NetDNS2\Packet\Response &$_response = null): void
     {
         //
         // init some network settings
