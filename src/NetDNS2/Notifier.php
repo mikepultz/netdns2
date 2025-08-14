@@ -44,8 +44,8 @@ final class Notifier extends \NetDNS2\Client
     /**
      * Constructor - builds a new \NetDNS2\Notifier objected used for doing DNS notification for a changed zone
      *
-     * @param string           $_zone    the domain name to use for DNS updates
-     * @param array<int,mixed> $_options an array of config options or null
+     * @param string              $_zone    the domain name to use for DNS updates
+     * @param array<string,mixed> $_options an array of config options or null
      *
      * @throws \NetDNS2\Exception
      *

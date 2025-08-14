@@ -33,7 +33,7 @@ final class Resolver extends Client
     /**
      * Constructor - creates a new \NetDNS2\Resolver object
      *
-     * @param array<int,mixed> $_options either an array with options or null
+     * @param array<string,mixed> $_options either an array with options or null
      *
      */
     public function __construct(?array $_options = null)

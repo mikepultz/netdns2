@@ -44,8 +44,8 @@ final class Updater extends \NetDNS2\Client
     /**
      * Constructor - builds a new \NetDNS2\Updater objected used for doing dynamic DNS updates
      *
-     * @param string           $_zone    the domain name to use for DNS updates
-     * @param array<int,mixed> $_options an array of config options or null
+     * @param string              $_zone    the domain name to use for DNS updates
+     * @param array<string,mixed> $_options an array of config options or null
      *
      * @throws \NetDNS2\Exception
      *

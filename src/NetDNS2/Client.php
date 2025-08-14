@@ -21,7 +21,7 @@ class Client
     /**
      * the current version of this library
      */
-    public const VERSION = '2.0.3';
+    public const VERSION = '2.0.4';
 
     /**
      * the default path to a resolv.conf file
@@ -220,7 +220,7 @@ class Client
     /**
      * Constructor - base constructor for the Resolver and Updater
      *
-     * @param array<int,mixed> $_options array of options or null for none
+     * @param array<string,mixed> $_options array of options or null for none
      *
      * @throws \NetDNS2\Exception
      *

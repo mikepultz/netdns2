@@ -402,24 +402,43 @@ final class Socket
             return false;
         }
 
+        //
+        // at this point, we know that there is data on the socket to be read so the easiest thing to do, is just turn off socket 
+        // blocking, and wait for the data.
+        //
+        stream_set_blocking($this->m_sock, true);
+
         $data = '';
         $length = $_max_size;
 
         //
-        // if it's a TCP socket, then the first two bytes is the length of the DNS packet- we need to read that off first, then use that value for
-        // the packet read.
+        // if it's a TCP socket, then the first two bytes is the length of the DNS packet- we need to read that off first, then 
+        // use that value for the packet read.
         //
         if ($this->m_type == \NetDNS2\Socket::SOCK_STREAM)
         {
-            if (($data = fread($this->m_sock, 2)) === false)
+            $chunk = '';
+            $chunk_size = 2;
+
+            //
+            // loop so we make sure we read all the data
+            //
+            while(1)
             {
-                $this->last_error = 'failed on fread() for data length';
-                return false;
-            }
-            if (strlen($data) < 2)
-            {
-                $this->last_error = 'failed on fread() for data length';
-                return false;
+                $chunk = fread($this->m_sock, $chunk_size);
+                if ($chunk === false)
+                {
+                    $this->last_error = 'failed on fread() for data length';
+                    return false;
+                }
+
+                $data .= $chunk;
+                $chunk_size -= strlen($chunk);
+
+                if ( (strlen($data) >= $length) || ($chunk_size <= 0) )
+                {
+                    break;
+                }
             }
 
             $length = ord($data[0]) << 8 | ord($data[1]);
@@ -428,12 +447,6 @@ final class Socket
                 return false;
             }
         }
-
-        //
-        // at this point, we know that there is data on the socket to be read, because we've already extracted the length from the first two bytes.
-        // so the easiest thing to do, is just turn off socket blocking, and wait for the data.
-        //
-        stream_set_blocking($this->m_sock, true);
 
         //
         // read the data from the socket
