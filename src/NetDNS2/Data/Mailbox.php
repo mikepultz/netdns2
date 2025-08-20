@@ -81,7 +81,14 @@ final class Mailbox extends \NetDNS2\Data
             return $_mailbox;
         }
 
-        return str_replace('\.', '.', $x[0]) . '@' . $x[1];
+        //
+        // according to RFC1035, the RNAME value in an SOA record has to be an email address, but practically, DNS servers don't
+        // enforce this value, so you can set it to a value like "root." and it would be considered valid.
+        //
+        // this takes into account cases where there's a "." (e.g. @) in the value, and when there isn't- both cases are 
+        // accepted by the DNS server.
+        //
+        return (count($x) == 2) ? str_replace('\.', '.', $x[0]) . '@' . $x[1] : $x[0];
     }
 
     /**
