@@ -97,6 +97,7 @@ enum Type: int
     case LP         = 107;      // RFC 6742
     case EUI48      = 108;      // RFC 7043
     case EUI64      = 109;      // RFC 7043
+                                // 110 - 127 unassigned
     case NXNAME     = 128;      // Not Implemented yet
                                 // 129 - 248 unassigned
     case TKEY       = 249;      // RFC 2930

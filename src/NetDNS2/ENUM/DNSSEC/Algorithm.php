@@ -16,32 +16,32 @@ enum Algorithm: int
 {
     use \NetDNS2\ENUM\Base;
 
-    case RES                = 0;    // Reserved
+    case DELETE             = 0;    // RFC 4034
     case RSAMD5             = 1;    // RFC 2538 - Not Recommended
     case DH                 = 2;    // RFC 2539
-    case DSA                = 3;    // RFC 2536 - Optional
+    case DSA                = 3;    // RFC 2536
     case ECC                = 4;    // TBA
-    case RSASHA1            = 5;    // RFC3110  - Mandatory
-    case DSANSEC3SHA1       = 6;
-    case RSASHA1NSEC3SHA1   = 7;
-    case RSASHA256          = 8;
-    case RSASHA512          = 10;
-    case ECCGOST            = 12;
-    case ECDSAP256SHA256    = 13;
-    case ECDSAP384SHA384    = 14;
-    case ED25519            = 15;
-    case ED448              = 16;
-    case SM2SM3             = 17;
-    case ECCGOST12          = 23;
-    case INDIRECT           = 252;
-    case PRIVATEDNS         = 253;
-    case PRIVATEOID         = 254;
+    case RSASHA1            = 5;    // RFC 3110
+    case DSANSEC3SHA1       = 6;    // RFC 5155
+    case RSASHA1NSEC3SHA1   = 7;    // RFC 5155
+    case RSASHA256          = 8;    // RFC 5702
+    case RSASHA512          = 10;   // RFC 5702
+    case ECCGOST            = 12;   // RFC 5933 - Deprecated
+    case ECDSAP256SHA256    = 13;   // RFC 6605
+    case ECDSAP384SHA384    = 14;   // RFC 6605
+    case ED25519            = 15;   // RFC 8080
+    case ED448              = 16;   // RFC 8080
+    case SM2SM3             = 17;   // RFC 9563
+    case ECCGOST12          = 23;   // RFC 9558
+    case INDIRECT           = 252;  // RFC 4034
+    case PRIVATEDNS         = 253;  // RFC 4034
+    case PRIVATEOID         = 254;  // RFC 4034
 
     public function label(): string
     {
         return match($this)
         {
-            self::RES               => 'RES',
+            self::DELETE            => 'DELETE',
             self::RSAMD5            => 'RSAMD5',
             self::DH                => 'DH',
             self::DSA               => 'DSA',
