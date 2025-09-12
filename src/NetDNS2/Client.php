@@ -789,7 +789,7 @@ class Client
             {
                 try
                 {
-                    $response = $this->sendTCPRequest($ns, $data, ($_request->question[0]->qtype == 'AXFR') ? true : false);
+                    $response = $this->sendTCPRequest($ns, $data, ($_request->question[0]->qtype == \NetDNS2\ENUM\RR\Type::AXFR) ? true : false);
 
                 } catch(\NetDNS2\Exception $e)
                 {

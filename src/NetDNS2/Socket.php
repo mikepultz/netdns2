@@ -435,12 +435,24 @@ final class Socket
                 $data .= $chunk;
                 $chunk_size -= strlen($chunk);
 
-                if ( (strlen($data) >= $length) || ($chunk_size <= 0) )
+                if ( (strlen($data) >= $length) || ($chunk_size <= 0) || (feof($this->m_sock) == true) )
                 {
                     break;
                 }
             }
 
+            //
+            // if we don't get at least two bytes, then the request failed
+            //
+            if (strlen($data) != 2)
+            {
+                $this->last_error = 'empty data on fread() for data length';
+                return false;
+            }
+
+            //
+            // build the length value
+            //
             $length = ord($data[0]) << 8 | ord($data[1]);
             if ($length < \NetDNS2\Header::DNS_HEADER_SIZE)
             {
@@ -477,7 +489,7 @@ final class Socket
                 $data .= $chunk;
                 $chunk_size -= strlen($chunk);
 
-                if ( (strlen($data) >= $length) || ($chunk_size <= 0) )
+                if ( (strlen($data) >= $length) || ($chunk_size <= 0) || (feof($this->m_sock) == true) )
                 {
                     break;
                 }
