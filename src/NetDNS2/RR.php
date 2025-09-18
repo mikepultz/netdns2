@@ -203,6 +203,16 @@ abstract class RR implements \Stringable
     }
 
     /**
+     * magic method to check a value exists and is defined from \NetDNS2\RR objects
+     *
+     */
+    public function __isset(string $_name): bool
+    {
+        return property_exists(get_called_class(), $_name)
+            && isset($this->$_name);
+    }
+
+    /**
      * magic method to return values from \NetDNS2\RR objects
      *
      * @throws \NetDNS2\Exception
