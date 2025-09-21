@@ -219,6 +219,21 @@ abstract class RR implements \Stringable
     }
 
     /**
+     * magic isset() method for \NetDNS2\RR objects
+     *
+     */
+    public function __isset(string $_name): bool
+    {
+        return ( (property_exists(get_called_class(), $_name) == true) && (isset($this->$_name) == true) ) ? true : false;
+    }
+
+    /**
+     * magic unset() method for \NetDNS2\RR objects
+     *
+     * not implemented; unsetting member properties would lead to undefined behavior- why would you do this?
+     */
+
+    /**
      * magic __toString() method to return the \NetDNS2\RR object object as a string
      *
      */
