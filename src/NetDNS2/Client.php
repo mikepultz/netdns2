@@ -21,7 +21,7 @@ class Client
     /**
      * the current version of this library
      */
-    public const VERSION = '2.0.5';
+    public const VERSION = '2.0.6';
 
     /**
      * the default path to a resolv.conf file
@@ -303,12 +303,14 @@ class Client
             //
             // check to see if the file is readable
             //
-            if (is_readable($_nameservers) === true)
+            $resolv_conf = realpath($_nameservers);
+
+            if ( ($resolv_conf !== false) && (is_readable($_nameservers) === true) )
             {
-                $data = file_get_contents($_nameservers);
+                $data = file_get_contents($resolv_conf);
                 if ($data === false)
                 {
-                    throw new \NetDNS2\Exception(sprintf('failed to read contents of file: %s', $_nameservers), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
+                    throw new \NetDNS2\Exception(sprintf('failed to read contents of file: \'%s\'', $resolv_conf), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
                 }
 
                 $lines = explode("\n", $data);
@@ -391,7 +393,7 @@ class Client
 
             } else
             {
-                throw new \NetDNS2\Exception(sprintf('resolver file file provided is not readable: %s', $_nameservers), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
+                throw new \NetDNS2\Exception(sprintf('resolver file \'%s\' provided is not readable.', $_nameservers), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
             }
 
             //

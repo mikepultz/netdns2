@@ -154,7 +154,7 @@ class Packet implements \Stringable
      */
     public function reset(): void
     {
-        $this->header->id = mt_rand(0, 65535);
+        $this->header->id = random_int(0, 65535);
         $this->rdata      = '';
         $this->rdlength   = 0;
         $this->offset     = 0;

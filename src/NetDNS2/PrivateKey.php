@@ -150,7 +150,9 @@ final class PrivateKey
         //
         // check to make sure the file exists
         //
-        if (is_readable($_file) == false)
+        $file = realpath($_file);
+
+        if ( ($file == false) || (is_readable($file) == false) )
         {
             throw new \NetDNS2\Exception(sprintf('invalid private key file: %s', $_file), \NetDNS2\ENUM\Error::INT_INVALID_PRIVATE_KEY);
         }
@@ -158,11 +160,11 @@ final class PrivateKey
         //
         // get the base filename, and parse it for the local value
         //
-        $keyname = basename($_file);
+        $keyname = basename($file);
 
         if (strlen($keyname) == 0)
         {
-            throw new \NetDNS2\Exception(sprintf('failed to get basename() for: %s', $_file), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
+            throw new \NetDNS2\Exception(sprintf('failed to get basename() for: %s', $file), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         //
@@ -182,7 +184,7 @@ final class PrivateKey
         //
         // read all the data from the
         //
-        $data = file($_file, FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
+        $data = file($file, FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
         if ( ($data === false) || (count($data) == 0) )
         {
             throw new \NetDNS2\Exception(sprintf('file %s is empty.', $keyname), \NetDNS2\ENUM\Error::INT_INVALID_PRIVATE_KEY);
@@ -361,7 +363,7 @@ final class PrivateKey
         //
         // store the filename incase we need it for something
         //
-        $this->filename = $_file;
+        $this->filename = $file;
 
         return true;
     }

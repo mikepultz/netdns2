@@ -132,7 +132,7 @@ final class Resolver extends Client
         }
 
         //
-        // if caching is turned on, then check then hash the question, and do a cache lookup.
+        // if caching is turned on, then hash the question and do a cache lookup.
         //
         // don't use the cache for zone transfers
         //
@@ -143,7 +143,7 @@ final class Resolver extends Client
             //
             // build the key and check for it in the cache.
             //
-            $packet_hash = md5($packet->question[0]->qname . '|' . $packet->question[0]->qtype->label());
+            $packet_hash = hash('sha256', $packet->question[0]->qname . '|' . $packet->question[0]->qtype->label());
 
             $response = $this->cache->get($packet_hash);
             if ($response !== false)

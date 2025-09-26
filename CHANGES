@@ -2,6 +2,14 @@
 NetDNS2 - PHP DNS Resolver and Updater
 ======================================
 
+v2.0.6
+------
+* changed from mt_rand() to random_int(); provides the same value, but faster and produces less complaints from code scanners about
+  weak RNG, even though it doesn't actually matter since this isn't used for cryptography.
+* realpath() the resolv.conf and private key file path just-in-case; this isn't a real problem.
+* changed the resolver cache to use sha256 instead of md5(); againt, this isn't cryptographic, so it doesn't matter, but in my testing
+  the sha256 function is surprisingly slightly faster than md5(), and it kills the complaints from code scanners.
+
 v2.0.5
 ------
 * bugfix: fixed #169 - the Client.php was comparing the $qtype value to "AXFR" but should have been using the new ENUM value

@@ -89,7 +89,7 @@ final class Header implements \Stringable
 
         } else
         {
-            $this->id       = mt_rand(0, 65535);
+            $this->id       = random_int(0, 65535);
             $this->qr       = self::QR_QUERY;
             $this->opcode   = \NetDNS2\ENUM\OpCode::QUERY;
             $this->aa       = 0;

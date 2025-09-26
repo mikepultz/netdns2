@@ -253,6 +253,15 @@ final class Socket
         }
 
         //
+        // just make sure we built a valid URL to connect to
+        //
+        if (filter_var($urn, FILTER_VALIDATE_URL) == false)
+        {
+            $this->last_error = 'failed to build valid server URL to connect to: '. $urn;
+            return false;
+        }
+
+        //
         // create the socket
         //
         // TODO: when using tls://, if there's a TLS error of some kind, like the name doesn't match, we don't get
