@@ -36,7 +36,7 @@ final class Memcached extends \NetDNS2\Cache
         //
         // make sure we have at at least one server to connect to
         //
-        if ( (isset($this->m_options['server']) == false) || (count($this->m_options['server']) == 0) )
+        if ( (isset($this->m_options['server']) === false) || (count($this->m_options['server']) == 0) )
         {
             throw new \NetDNS2\Exception('you must provide a memcache server list to use.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
@@ -53,7 +53,7 @@ final class Memcached extends \NetDNS2\Cache
             //
             // pass the options array in as Memcache options;
             //
-            if ( (isset($_options['options']) == true) && (count($_options['options']) > 0) )
+            if ( (isset($_options['options']) === true) && (count($_options['options']) > 0) )
             {
                 $this->m_cache->setOptions($_options['options']);
             }

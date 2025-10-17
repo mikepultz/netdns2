@@ -43,7 +43,7 @@ final class Shm extends \NetDNS2\Cache
         //
         // make sure we have a file location
         //
-        if (isset($this->m_options['file']) == false)
+        if (isset($this->m_options['file']) === false)
         {
             throw new \NetDNS2\Exception('you must provide a file to cache dns results to.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
@@ -51,7 +51,7 @@ final class Shm extends \NetDNS2\Cache
         //
         // check for a default max cache size
         //
-        if (isset($this->m_options['size']) == false)
+        if (isset($this->m_options['size']) === false)
         {
             $this->m_options['size'] = \NetDNS2\Cache::CACHE_DEFAULT_MAX_SIZE;
         }

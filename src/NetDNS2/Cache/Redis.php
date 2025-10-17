@@ -36,7 +36,7 @@ final class Redis extends \NetDNS2\Cache
         //
         // make sure we have at at least one server to connect to
         //
-        if ( (isset($this->m_options['host']) == false) || (isset($this->m_options['port']) == false) )
+        if ( (isset($this->m_options['host']) === false) || (isset($this->m_options['port']) === false) )
         {
             throw new \NetDNS2\Exception('you must provide a redis server and port to connect to.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }

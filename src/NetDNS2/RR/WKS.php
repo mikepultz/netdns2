@@ -148,7 +148,7 @@ final class WKS extends \NetDNS2\RR
         }
         for($i=0; $i<ceil($n/8)*8; $i++)
         {
-            if (!isset($ports[$i]))
+            if (isset($ports[$i]) == false)
             {
                 $ports[$i] = 0;
             }

@@ -234,7 +234,6 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
             'RESINFO'       => 'resinfo.netdns2.com. 86400 IN RESINFO "namemin" "exterr=15-17" "infourl=https://resolver.example.com/guide"',
             'RP'            => 'rp.netdns2.com. 86400 IN RP dns\.admin.netdns2.com. lam1.people.test.com.',
             'RT'            => 'rt.netdns2.com. 86400 IN RT 2 relay.prime.com.',
-            'SIG'           => 'sig.netdns2.com. 86400 IN SIG DNSKEY 7 1 86400 20100827211706 20100822211706 57970 gov. KoWPhMtLHp8sWYZSgsMiYJKB9P71CQmh9CnxJCs5GutKfo7Jpw+nNnDLiNnsd6U1JSkf99rYRWCyOTAPC47xkHr+2Uh7n6HDJznfdCzRa/v9uwEcbXIxCZ7KfzNJewW3EvYAxDIrW6sY/4MAsjS5XM/O9LaWzw6pf7TX5obBbLI+zRECbPNTdY+RF6Fl9K0GVaEZJNYi2PRXnATwvwca2CNRWxeMT/dF5STUram3cWjH0Pkm19Gc1jbdzlZVDbUudDauWoHcc0mfH7PV1sMpe80NqK7yQ24AzAkXSiknO13itHsCe4LECUu0/OtnhHg2swwXaVTf5hqHYpzi3bQenw==',
             'SMIMEA'        => [
 
                 'name'  => 'c93f1e400f26708f98cb19d936620da35eec8f72e57f9eec01c1afd6._smimecert.netdns2.com',

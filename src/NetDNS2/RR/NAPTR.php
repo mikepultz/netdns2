@@ -130,7 +130,7 @@ final class NAPTR extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if ( (isset($this->order) == false) || ($this->services->length() == 0) )
+        if ( (isset($this->order) === false) || ($this->services->length() == 0) )
         {
             return '';
         }

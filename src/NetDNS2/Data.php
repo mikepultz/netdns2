@@ -269,7 +269,7 @@ abstract class Data implements \Stringable
         {
             $name = implode('.', $labels);
 
-            if (isset(self::$compressed[$name]) == true)
+            if (isset(self::$compressed[$name]) === true)
             {
                 return $data . pack('n', 0xC000 | self::$compressed[$name]);    // 0xC000 first two bits as 1
 

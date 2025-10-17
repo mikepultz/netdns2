@@ -27,7 +27,7 @@ final class EDNS
 
     private function check(string $_type, bool $_enable): bool
     {
-        if ( ($_enable == true) && (isset($this->opts[$_type]) == true) )
+        if ( ($_enable == true) && (isset($this->opts[$_type]) === true) )
         {
             return true;
 

@@ -107,7 +107,7 @@ final class DSYNC extends \NetDNS2\RR
         //
         $scheme = strtoupper($this->sanitize(array_shift($_rdata)));
 
-        if (isset(self::$scheme_name_to_id[$scheme]) == true)
+        if (isset(self::$scheme_name_to_id[$scheme]) === true)
         {
             $this->scheme = $scheme;
         } else
@@ -153,7 +153,7 @@ final class DSYNC extends \NetDNS2\RR
         //
         // lookup the scheme value
         //
-        if (isset(self::$scheme_id_to_name[$scheme]) == true)
+        if (isset(self::$scheme_id_to_name[$scheme]) === true)
         {
             $this->scheme = self::$scheme_id_to_name[$scheme];
         } else

@@ -224,7 +224,7 @@ abstract class RR implements \Stringable
      */
     public function __isset(string $_name): bool
     {
-        return ( (property_exists(get_called_class(), $_name) == true) && (isset($this->$_name) == true) ) ? true : false;
+        return ( (property_exists(get_called_class(), $_name) == true) && (isset($this->$_name) === true) ) ? true : false;
     }
 
     /**

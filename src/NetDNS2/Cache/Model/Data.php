@@ -34,7 +34,7 @@ trait Data
      */
     public function get(string $_key): \NetDNS2\Packet\Response|false
     {
-        if (isset($this->cache_data[$_key]) == true)
+        if (isset($this->cache_data[$_key]) === true)
         {
             return unserialize($this->cache_data[$_key]['object']);
         }
@@ -151,7 +151,10 @@ trait Data
                     //
                     // unset the key with the smallest TTL
                     //
-                    unset($this->cache_data[$smallest_key]);
+                    if (is_null($smallest_key) == false)
+                    {
+                        unset($this->cache_data[$smallest_key]);
+                    }
 
                     //
                     // re-serialize

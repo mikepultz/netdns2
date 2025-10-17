@@ -178,25 +178,21 @@ final class BitMap
     }
 
     /**
-     * builds a RR Bit map from an array of RR type names
+     * convert a list of RR type names (e.g., ["A","AAAA","TYPE123"]) to an NSEC/NSEC3 bitmap.
      *
-     * @param array<string> $_data a list of RR names
-     *
+     * @param  array<string> $_data a list of RR names
+     * @return string
+     * 
      */
     public static function arrayToBitMap(array $_data): string
     {
-        if (count($_data) == 0)
+        if (count($_data) === 0)
         {
             return '';
         }
 
-        $current_window = 0;
-
-        //
-        // go through each RR
-        //
-        $max = 0;
-        $bm  = [];
+        /** @phpstan-var array<int, array{length:int, bits: array<int, true>}> $bm */
+        $bm = [];
 
         foreach($_data as $rr)
         {
@@ -205,12 +201,8 @@ final class BitMap
             //
             // get the type id for the RR
             //
-            $type = null;
-
             if (\NetDNS2\ENUM\RR\Type::exists($rr) == true)
             {
-                $type = \NetDNS2\ENUM\RR\Type::set($rr)->value;
-
                 //
                 // skip meta types or qtypes
                 //
@@ -218,15 +210,20 @@ final class BitMap
                 {
                     continue;
                 }
+            
+                $type = \NetDNS2\ENUM\RR\Type::set($rr)->value;
 
             } else
             {
                 //
                 // if it's not found, then it must be defined as TYPE<id>, per RFC3845 section 2.2, if it's not, we ignore it.
                 //
-                list($name, $type) = explode('TYPE', $rr);
+                if (preg_match('/^TYPE(\d+)$/', $rr, $m) !== 1)
+                {
+                    continue;
+                }
 
-                $type = intval($type);
+                $type = intval($m[1]);
                 if ($type <= 0)
                 {
                     continue;
@@ -234,38 +231,45 @@ final class BitMap
             }
 
             //
-            // build the current window
+            // window and bit index (pure integer math)
             //
-            $current_window = (int)($type / 256);
+            $window = intdiv($type, 256);
+            $val    = $type % 256; // 0..255
 
-            $val = $type - $current_window * 256.0;
-            if ($val > $max)
+            if (isset($bm[$window]) == false)
             {
-                $max = $val;
+                $bm[$window] = ['length' => 0, 'bits' => []];
             }
 
-            $bm[$current_window][$val] = 1;
-            $bm[$current_window]['length'] = ceil(($max + 1) / 8);
+            //
+            // mark bit present
+            //
+            $bm[$window]['bits'][$val] = true;
+
+            //
+            // update per-window byte length: ceil((maxBitIndex+1)/8) via integer math
+            //
+            $needed_len = intdiv(($val + 1) + 7, 8);
+            if ($needed_len > $bm[$window]['length'])
+            {
+                $bm[$window]['length'] = $needed_len;
+            }
         }
 
         $output = '';
 
         foreach($bm as $window => $bitdata)
         {
+            /** @phpstan-var array{length:int, bits: array<int, true>} $bitdata */
             $bitstr = '';
+            $n = $bitdata['length'] * 8;
 
-            for($i=0; $i<$bm[$window]['length'] * 8; $i++)
+            for ($i=0; $i<$n; $i++)
             {
-                if (isset($bm[$window][$i]) == true)
-                {
-                    $bitstr .= '1';
-                } else
-                {
-                    $bitstr .= '0';
-                }
+                $bitstr .= (isset($bitdata['bits'][$i]) == true) ? '1' : '0';
             }
 
-            $output .= pack('CC', $window, $bm[$window]['length']);
+            $output .= pack('CC', intval($window), intval($bitdata['length']));
             $output .= pack('H*', self::bigBaseConvert($bitstr));
         }
 

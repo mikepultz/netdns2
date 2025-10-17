@@ -128,7 +128,7 @@ abstract class Cache
         //
         // if there's an override for the TTL, use that instead
         //
-        if (isset($this->m_options['ttl_override']) == true)
+        if (isset($this->m_options['ttl_override']) === true)
         {
             return $this->m_options['ttl_override'];
         }

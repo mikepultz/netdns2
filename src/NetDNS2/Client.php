@@ -883,7 +883,7 @@ class Client
      */
     private function generateError(int $_proto, string $_ns, \NetDNS2\ENUM\Error $_error): void
     {
-        if (isset($this->sock[$_proto][$_ns]) == false)
+        if (isset($this->sock[$_proto][$_ns]) === false)
         {
             throw new \NetDNS2\Exception('invalid socket reference provided.', \NetDNS2\ENUM\Error::INT_INVALID_SOCKET);
         }
@@ -924,7 +924,7 @@ class Client
         //
         // see if we already have an open socket from a previous request; if so, try to use that instead of opening a new one.
         //
-        if ( (isset($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]) == false) ||
+        if ( (isset($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]) === false) ||
             ( ($this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns] instanceof \NetDNS2\Socket) == false) )
         {
             //
@@ -1033,7 +1033,7 @@ class Client
                         //
                         // count the SOA records
                         //
-                        if ($rr->type == 'SOA')
+                        if ($rr->type == \NetDNS2\ENUM\RR\Type::SOA)
                         {
                             $soa_count++;
                         }
@@ -1060,7 +1060,7 @@ class Client
                         //
                         // count the number of SOA records we find
                         //
-                        if ($rr->type == 'SOA')
+                        if ($rr->type == \NetDNS2\ENUM\RR\Type::SOA)
                         {
                             $soa_count++;
                         }
@@ -1136,7 +1136,7 @@ class Client
         //
         // see if we already have an open socket from a previous request; if so, try to use that instead of opening a new one.
         //
-        if ( (isset($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]) == false) ||
+        if ( (isset($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]) === false) ||
             ( ($this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns] instanceof \NetDNS2\Socket) == false) )
         {
             //
@@ -1310,11 +1310,6 @@ class Client
         {
             throw new \NetDNS2\Exception(sprintf('curl failed with response code %d on host %s: %s', $code, $_ns, curl_error($c)), \NetDNS2\ENUM\Error::INT_FAILED_CURL);
         }
-
-        //
-        // clean up
-        //
-        curl_close($c);
 
         //
         // create the packet object

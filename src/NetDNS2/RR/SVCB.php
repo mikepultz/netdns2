@@ -99,7 +99,7 @@ class SVCB extends \NetDNS2\RR
         //
         // one of the defined values
         //
-        } elseif (isset(self::$param_id_to_name[$_service]) == true)
+        } elseif (isset(self::$param_id_to_name[$_service]) === true)
         {
             return self::$param_id_to_name[$_service];
         }
@@ -118,7 +118,7 @@ class SVCB extends \NetDNS2\RR
         //
         // one of the defined values
         //
-        } elseif (isset(self::$param_name_to_id[strtolower($_service)]) == true)
+        } elseif (isset(self::$param_name_to_id[strtolower($_service)]) === true)
         {
             return self::$param_name_to_id[strtolower($_service)];
         }

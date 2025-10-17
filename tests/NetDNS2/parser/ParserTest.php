@@ -330,4 +330,29 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         //
         $this->assertSame($a, $b, sprintf('ParserTest::testCompression(): $a (%s) != $b (%s)', $a, $b));
     }
+
+    /**
+     * function to test the RR BitMap functions
+     *
+     * @return void
+     * @access public
+     *
+     */
+    public function testRRBitMap()
+    {
+        //
+        // list of RR's
+        //
+        $rrs = [ 'A', 'CNAME', 'TYPE123', 'MX', 'NS', 'SOA', 'CSYNC', 'AAAA' ];
+
+        //
+        // convert the array to a bitmap, and then back to an array
+        //
+        $a = \NetDNS2\BitMap::bitMapToArray(\NetDNS2\BitMap::arrayToBitMap($rrs));
+
+        //
+        // there should be no differences in the original array and the result
+        //
+        $this->assertTrue(count(array_diff($rrs, $a)) == 0);
+    }
 }

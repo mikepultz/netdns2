@@ -52,7 +52,7 @@ final class ISDN extends \NetDNS2\RR
         {
             $this->isdnaddress = new \NetDNS2\Data\Text($data[0]);
 
-            if (isset($data[1]) == true)
+            if (isset($data[1]) === true)
             {
                 $this->sa = new \NetDNS2\Data\Text($data[1]);
             }
