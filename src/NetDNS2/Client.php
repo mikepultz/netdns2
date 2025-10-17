@@ -1033,7 +1033,7 @@ class Client
                         //
                         // count the SOA records
                         //
-                        if ($rr->type == 'SOA')
+                        if ($rr instanceof \NetDNS2\RR\SOA)
                         {
                             $soa_count++;
                         }
@@ -1060,7 +1060,7 @@ class Client
                         //
                         // count the number of SOA records we find
                         //
-                        if ($rr->type == 'SOA')
+                        if ($rr instanceof \NetDNS2\RR\SOA)
                         {
                             $soa_count++;
                         }
