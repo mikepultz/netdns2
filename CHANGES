@@ -2,6 +2,11 @@
 NetDNS2 - PHP DNS Resolver and Updater
 ======================================
 
+v2.0.7
+------
+* changed the hashing algorithm used for cache storage from sha256 -> xxh128; the xxHash algorithms are faster
+
+
 v2.0.6
 ------
 * bugfix: fixed #173 - the Client.php was comparing the $rr->type value to "SOA" but should have been using the new ENUM value. 

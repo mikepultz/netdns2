@@ -143,7 +143,7 @@ final class Resolver extends Client
             //
             // build the key and check for it in the cache.
             //
-            $packet_hash = hash('sha256', $packet->question[0]->qname . '|' . $packet->question[0]->qtype->label());
+            $packet_hash = hash('xxh128', $packet->question[0]->qname . '|' . $packet->question[0]->qtype->label());
 
             $response = $this->cache->get($packet_hash);
             if ($response !== false)
@@ -166,7 +166,7 @@ final class Resolver extends Client
         //
         // send the packet and get back the response
         //
-        // *always* use TCP for zone transfers- does this cause any problems?
+        // *always* use TCP for zone transfers
         //
         $response = $this->sendPacket($packet, ($_type == 'AXFR') ? true : $this->use_tcp);
 
