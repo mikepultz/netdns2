@@ -76,7 +76,23 @@ abstract class Data implements \Stringable
         //
         } elseif ( (is_null($_data) == false) && (gettype($_data) == 'string') )
         {
-            $value = trim($_data, '".');
+            $value = $_data;
+
+            //
+            // it's important that we trim off the trailing periods for domains and mailboxes, but we shouldn't
+            // do this for text strings
+            //
+            if ( (($this instanceof \NetDNS2\Data\Domain) == true) || (($this instanceof \NetDNS2\Data\Mailbox) == true) )
+            {
+                $value = rtrim($value, '.');
+
+            //
+            // but we should remove leading / trailing quotes from text entries
+            //
+            } else if (($this instanceof \NetDNS2\Data\Text) == true)
+            {
+                $value = trim($value, '"');
+            }
 
             if (strlen($value) > 0)
             {

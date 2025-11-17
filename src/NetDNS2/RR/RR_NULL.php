@@ -15,9 +15,12 @@ namespace NetDNS2\RR;
 /**
  * NULL Resource Record - undefined; the rdata is simply used as-is in it's binary format, so not process has to be done.
  *
- * TODO: this is named "NUL" and not "NULL" because "NULL" is a reserved word in PHP!
+ * This class is named "RR_NULL" because "NULL" is a reserved word in php.
+ *
+ * I had originally called this class "NUL", but that causes a problem in Windows, as it's a reserved word in NTFS.
+ *
  */
-class NUL extends \NetDNS2\RR
+class RR_NULL extends \NetDNS2\RR
 {
     /**
      * @see \NetDNS2\RR::rrToString()
@@ -48,6 +51,6 @@ class NUL extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        return $this->rdata;
+        return '';
     }
 }

@@ -124,6 +124,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                                     'example.com. 300 IN DSYNC CSYNC NOTIFY 5555 another.endpoint.example.com.',
                                     'example.com. 300 IN DSYNC CSYNC NOTIFY 5555 bücher.de.'
                                 ],
+            'EID'           => 'example.com. 300 IN EID ',
             'EUI48'         => 'example.com. 300 IN EUI48 00-00-5e-00-53-2a',
             'EUI64'         => 'example.com. 300 IN EUI64 00-00-5e-ef-10-00-00-2a',
             'GPOS'          => 'example.com. 300 IN GPOS -32.6882 116.8652 10.0',
@@ -148,6 +149,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                                 ],
             'NAPTR'         => 'example.com. 300 IN NAPTR 100 10 "S" "SIP+D2U" "!^.*$!sip:customer-service@example.com!" _sip._udp.example.com.',
             'NID'           => 'example.com. 300 IN NID 10 14:4fff:ff20:ee64',
+            'NIMLOC'        => 'example.com. 300 IN NIMLOC ',
             'NSEC3PARAM'    => 'example.com. 300 IN NSEC3PARAM 1 0 1 D399EAAB',
             'NSEC3'         => 'example.com. 300 IN NSEC3 1 1 12 AABBCCDD b4um86eghhds6nea196smvmlo4ors995 NS DS RRSIG',
             'NSEC'          => 'example.com. 300 IN NSEC test.host.com. A MX RRSIG NSEC TYPE123',
@@ -175,7 +177,10 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             'TA'            => 'example.com. 300 IN TA 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
             'TKEY'          => 'example.com. 300 IN TKEY gss.microsoft.com. 3 123456.',
             'TLSA'          => '_443._tcp.www.example.com. 300 IN TLSA 1 1 2 92003ba34942dc74152e2f2c408d29eca5a520e7f2e06bb944f4dca346baf63c1b177615d466f6c4b71c216a50292bd58c9ebdd2f74e38fe51ffd48c43326cbc',
-            'TXT'           => 'example.com. 300 IN TXT "first record" "another records" "a third"',
+            'TXT'           => [
+                                    'example.com. 300 IN TXT "first record" "another records" "a third"',
+                                    'example.com. 300 IN TXT "example with broken domain example" ".com; and another example." "com with the perio in the first block"'
+                                ],
             'URI'           => 'example.com. 300 IN URI 10 1 "https://netdns2.com/about"',
             'WKS'           => 'example.com. 300 IN WKS 128.8.1.14 6 21 25',
             'X25'           => 'example.com. 300 IN X25 "311 06 17 0 09 56"',

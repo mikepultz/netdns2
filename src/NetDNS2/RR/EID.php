@@ -16,6 +16,6 @@ namespace NetDNS2\RR;
  * EID Resource Record - undefined; the rdata is simply used as-is in it's binary format, so not process has to be done.
  *
  */
-final class EID extends \NetDNS2\RR\NUL
+final class EID extends \NetDNS2\RR\RR_NULL
 {
 }

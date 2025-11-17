@@ -5,7 +5,13 @@ NetDNS2 - PHP DNS Resolver and Updater
 v2.0.7
 ------
 * changed the hashing algorithm used for cache storage from sha256 -> xxh128; the xxHash algorithms are faster
-
+* bugfix: fixed #177 - the "NULL" resource record has an issue because the name conflicts with the PHP reserved word "null", so I
+  had originally named it "NUL" instead, but apparently this causes a problem for NTFS in Windows. I've changed it now to be
+  "RR_NULL", which is dumb looking, but shouldn't conflict with anything. It can still be created in the way using "NULL", just the
+  class name is named inconsistently.
+* bugfix: fixed #178 - I was trimming periods from names in the new Data class- which is correct for Domains and Mailboxes, but
+  not Text objects, as it can break when you have a domain that happens to line up just right. This fix only trims() the period
+  when it's a Domain or Mailbox class.
 
 v2.0.6
 ------

@@ -145,7 +145,7 @@ enum Type: int
             self::NS         => 'NetDNS2\RR\NS',
             self::CNAME      => 'NetDNS2\RR\CNAME',
             self::SOA        => 'NetDNS2\RR\SOA',
-            self::NULL       => 'NetDNS2\RR\NULL',
+            self::NULL       => 'NetDNS2\RR\RR_NULL',
             self::WKS        => 'NetDNS2\RR\WKS',
             self::PTR        => 'NetDNS2\RR\PTR',
             self::HINFO      => 'NetDNS2\RR\HINFO',

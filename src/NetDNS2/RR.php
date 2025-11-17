@@ -134,7 +134,7 @@ abstract class RR implements \Stringable
 
         } else
         {
-            $this->type  = \NetDNS2\ENUM\RR\Type::set(str_replace('NetDNS2\\RR\\', '', get_class($this)));
+            $this->type  = \NetDNS2\ENUM\RR\Type::set(str_replace([ 'NetDNS2\\RR\\RR_', 'NetDNS2\\RR\\' ], '', get_class($this)));
             $this->class = \NetDNS2\ENUM\RR\Classes::set('IN');
             $this->ttl   = 86400;
         }
