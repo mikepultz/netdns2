@@ -22,6 +22,8 @@ namespace NetDNS2\RR;
  *    /                                               /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read int $preference
+ * @property-read \NetDNS2\Data\Domain $intermediatehost
  */
 final class RT extends \NetDNS2\RR
 {

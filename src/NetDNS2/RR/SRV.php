@@ -25,6 +25,10 @@ namespace NetDNS2\RR;
  *    /                    TARGET                     /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read int $priority
+ * @property-read int $weight
+ * @property-read int $port
+ * @property-read \NetDNS2\Data\Domain $target
  */
 final class SRV extends \NetDNS2\RR
 {

@@ -31,6 +31,12 @@ namespace NetDNS2\RR;
  *   /                                               /
  *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read int $order
+ * @property-read int $preference
+ * @property-read \NetDNS2\Data\Text $flags
+ * @property-read \NetDNS2\Data\Text $services
+ * @property-read \NetDNS2\Data\Text $regexp
+ * @property-read \NetDNS2\Data\Domain $replacement
  */
 final class NAPTR extends \NetDNS2\RR
 {

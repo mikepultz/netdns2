@@ -23,6 +23,7 @@ namespace NetDNS2\RR;
  * |                               |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read string $address
  */
 final class EUI48 extends \NetDNS2\RR
 {

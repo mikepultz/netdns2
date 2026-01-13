@@ -21,6 +21,10 @@ namespace NetDNS2\RR;
  *                  | Target ...  /
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-/
  *
+ * @property-read \NetDNS2\ENUM\RR\Type $rrtype
+ * @property-read string $scheme
+ * @property-read int $port
+ * @property-read \NetDNS2\Data\Domain $target
  */
 final class DSYNC extends \NetDNS2\RR
 {

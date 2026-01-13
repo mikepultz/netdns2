@@ -22,6 +22,11 @@ namespace NetDNS2\RR;
  *  |  Salt Length  |                     Salt                      /
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read int $algorithm
+ * @property-read int $flags
+ * @property-read int $iterations
+ * @property-read int $salt_length
+ * @property-read string $salt
  */
 final class NSEC3PARAM extends \NetDNS2\RR
 {

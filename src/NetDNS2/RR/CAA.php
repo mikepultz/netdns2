@@ -23,6 +23,10 @@ namespace NetDNS2\RR;
  *    /                      DATA                     /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read int $flags
+ * @property-read int $tag_length
+ * @property-read \NetDNS2\Data\Text $tag
+ * @property-read \NetDNS2\Data\Text $value
  */
 final class CAA extends \NetDNS2\RR
 {

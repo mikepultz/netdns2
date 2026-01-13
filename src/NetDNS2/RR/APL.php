@@ -24,6 +24,15 @@ namespace NetDNS2\RR;
  *     |                                                               |
  *     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
+ * @phpstan-type AplItem array{
+ *     address_family: self::ADDRESS_FAMILY_*,
+ *     afd_part: \NetDNS2\Data\IPv4|\NetDNS2\Data\IPv6,
+ *     afd_length: integer,
+ *     prefix: string,
+ *     negate: integer,
+ * }
+ *
+ * @property-read array<int, AplItem> $apl_items
  */
 final class APL extends \NetDNS2\RR
 {
@@ -36,7 +45,7 @@ final class APL extends \NetDNS2\RR
     /**
      * a list of all the address prefix list items
      *
-     * @var array<int,mixed>
+     * @var array<int, AplItem>
      */
     protected array $apl_items = [];
 

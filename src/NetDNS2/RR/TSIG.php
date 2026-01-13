@@ -35,6 +35,15 @@ namespace NetDNS2\RR;
  *     /                          other data                           /
  *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read \NetDNS2\Data\Domain $algorithm
+ * @property-read int $time_signed
+ * @property-read int $fudge
+ * @property-read int $mac_size
+ * @property-read string $mac
+ * @property-read int $original_id
+ * @property-read int $error
+ * @property-read int $other_length
+ * @property-read string $other_data
  */
 final class TSIG extends \NetDNS2\RR
 {

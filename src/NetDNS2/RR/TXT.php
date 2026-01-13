@@ -19,6 +19,7 @@ namespace NetDNS2\RR;
  *    /                   TXT-DATA                    /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read array<int,\NetDNS2\Data\Text> $text
  */
 class TXT extends \NetDNS2\RR
 {

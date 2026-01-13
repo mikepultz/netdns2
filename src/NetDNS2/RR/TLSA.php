@@ -24,6 +24,10 @@ namespace NetDNS2\RR;
  *  /                                                               /
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read int $cert_usage
+ * @property-read int $selector
+ * @property-read int $matching_type
+ * @property-read string $certificate
  */
 class TLSA extends \NetDNS2\RR
 {

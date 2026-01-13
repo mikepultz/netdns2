@@ -24,6 +24,10 @@ namespace NetDNS2\RR;
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read int $keytag
+ * @property-read \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm
+ * @property-read \NetDNS2\ENUM\DNSSEC\Digest $digesttype
+ * @property-read string $digest
  */
 class DS extends \NetDNS2\RR
 {

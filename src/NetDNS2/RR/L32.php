@@ -22,6 +22,8 @@ namespace NetDNS2\RR;
  *  |     Locator32 (16 LSBs)       |
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read int $preference
+ * @property-read string $locator32
  */
 final class L32 extends \NetDNS2\RR
 {

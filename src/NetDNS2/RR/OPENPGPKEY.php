@@ -22,6 +22,7 @@ namespace NetDNS2\RR;
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read string $key
  */
 final class OPENPGPKEY extends \NetDNS2\RR
 {

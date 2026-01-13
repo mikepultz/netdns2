@@ -37,6 +37,15 @@ namespace NetDNS2\RR;
  *    /                   OTHER DATA                  /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read \NetDNS2\Data\Domain $algorithm
+ * @property-read int $inception
+ * @property-read int $expiration
+ * @property-read \NetDNS2\ENUM\TKEYMode $mode
+ * @property-read \NetDNS2\ENUM\RR\Code $error
+ * @property-read int $key_size
+ * @property-read string $key_data
+ * @property-read int $other_size
+ * @property-read string $other_data
  */
 final class TKEY extends \NetDNS2\RR
 {

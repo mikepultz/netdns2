@@ -26,6 +26,7 @@ namespace NetDNS2\RR;
  *    |                                               |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read \NetDNS2\Data\IPv6 $address
  */
 final class AAAA extends \NetDNS2\RR
 {

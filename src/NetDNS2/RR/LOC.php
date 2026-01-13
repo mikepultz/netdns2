@@ -30,6 +30,13 @@ namespace NetDNS2\RR;
  *      |                                               |
  *      +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read int $version
+ * @property-read string $size
+ * @property-read string $horiz_pre
+ * @property-read string $vert_pre
+ * @property-read float $latitude
+ * @property-read float $longitude
+ * @property-read float $altitude
  */
 final class LOC extends \NetDNS2\RR
 {

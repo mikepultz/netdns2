@@ -25,6 +25,9 @@ namespace NetDNS2\RR;
  *   /                                               /
  *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read \NetDNS2\Data\IPv4 $address
+ * @property-read int $protocol
+ * @property-read array<int,int> $bitmap
  */
 final class WKS extends \NetDNS2\RR
 {

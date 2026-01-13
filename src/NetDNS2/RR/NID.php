@@ -24,6 +24,8 @@ namespace NetDNS2\RR;
  *  |                               |
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read int $preference
+ * @property-read string $nodeid
  */
 final class NID extends \NetDNS2\RR
 {

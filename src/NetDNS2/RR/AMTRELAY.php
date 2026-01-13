@@ -22,6 +22,10 @@ namespace NetDNS2\RR;
  *  ~                            relay                              ~
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read int $precedence
+ * @property-read int $discovery
+ * @property-read int $relay_type
+ * @property-read \NetDNS2\Data $relay
  */
 final class AMTRELAY extends \NetDNS2\RR
 {

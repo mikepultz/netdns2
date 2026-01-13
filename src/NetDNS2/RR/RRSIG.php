@@ -59,6 +59,15 @@ namespace NetDNS2\RR;
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read string $typecovered
+ * @property-read \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm
+ * @property-read int $labels
+ * @property-read int $origttl
+ * @property-read string $sigexp
+ * @property-read string $sigincep
+ * @property-read int $keytag
+ * @property-read \NetDNS2\Data\Domain $signname
+ * @property-read string $signature
  */
 final class RRSIG extends \NetDNS2\RR
 {

@@ -20,6 +20,7 @@ namespace NetDNS2\RR;
  *    /                                               /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read \NetDNS2\Data\Domain $dname
  */
 final class DNAME extends \NetDNS2\RR
 {

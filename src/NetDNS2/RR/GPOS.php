@@ -26,6 +26,9 @@ namespace NetDNS2\RR;
  *      |                                               |
  *      +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read \NetDNS2\Data\Text $longitude
+ * @property-read \NetDNS2\Data\Text $latitude
+ * @property-read \NetDNS2\Data\Text $altitude
  */
 final class GPOS extends \NetDNS2\RR
 {

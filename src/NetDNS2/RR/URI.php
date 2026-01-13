@@ -24,6 +24,9 @@ namespace NetDNS2\RR;
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read int $priority
+ * @property-read int $weight
+ * @property-read \NetDNS2\Data\Text $target
  */
 final class URI extends \NetDNS2\RR
 {

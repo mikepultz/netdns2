@@ -38,6 +38,12 @@ namespace NetDNS2\RR;
  *  |             |
  *  +-+-+-+-+-+-+-+
  *
+ * @property-read int $hit_length
+ * @property-read int $pk_algorithm
+ * @property-read int $pk_length
+ * @property-read string $hit
+ * @property-read string $public_key
+ * @property-read array<int,\NetDNS2\Data\Domain> $rendezvous_servers
  */
 final class HIP extends \NetDNS2\RR
 {

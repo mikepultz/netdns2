@@ -37,6 +37,13 @@ namespace NetDNS2\RR;
  *    |                                               |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read \NetDNS2\Data\Domain $mname
+ * @property-read \NetDNS2\Data\Mailbox $rname
+ * @property-read int $serial
+ * @property-read int $refresh
+ * @property-read int $retry
+ * @property-read int $expire
+ * @property-read int $minimum
  */
 final class SOA extends \NetDNS2\RR
 {

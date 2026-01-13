@@ -22,6 +22,8 @@ namespace NetDNS2\RR;
  *   /                   List of Type Bit Map(s)                     /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read \NetDNS2\Data\Domain $next_domain_name
+ * @property-read array<int,string> $type_bit_maps
  */
 final class NSEC extends \NetDNS2\RR
 {

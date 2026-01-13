@@ -27,6 +27,10 @@ namespace NetDNS2\RR;
  * /                                                               /
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read int $serial
+ * @property-read int $scheme
+ * @property-read int $hash_algorithm
+ * @property-read string $digest
  */
 final class ZONEMD extends \NetDNS2\RR
 {

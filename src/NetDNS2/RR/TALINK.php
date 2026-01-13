@@ -23,6 +23,8 @@ namespace NetDNS2\RR;
  *    /                     NEXT                      /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read \NetDNS2\Data\Domain $previous
+ * @property-read \NetDNS2\Data\Domain $next
  */
 final class TALINK extends \NetDNS2\RR
 {

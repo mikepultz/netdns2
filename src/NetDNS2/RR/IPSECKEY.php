@@ -26,6 +26,11 @@ namespace NetDNS2\RR;
  *     /                                                               /
  *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
  *
+ * @property-read int $precedence
+ * @property-read int $gateway_type
+ * @property-read int $algorithm
+ * @property-read \NetDNS2\Data $gateway
+ * @property-read string $key
  */
 final class IPSECKEY extends \NetDNS2\RR
 {

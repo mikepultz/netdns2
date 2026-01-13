@@ -19,6 +19,7 @@ namespace NetDNS2\RR;
  *    |                    ADDRESS                    |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read \NetDNS2\Data\IPv4 $address
  */
 final class A extends \NetDNS2\RR
 {

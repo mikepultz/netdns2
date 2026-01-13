@@ -24,6 +24,8 @@ namespace NetDNS2\RR;
  *  |                               |
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read int $preference
+ * @property-read string $locator32
  */
 final class L64 extends \NetDNS2\RR
 {

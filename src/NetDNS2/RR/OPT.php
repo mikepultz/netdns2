@@ -25,6 +25,13 @@ namespace NetDNS2\RR;
  *    /                                                               /
  *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
+ * @property-read \NetDNS2\ENUM\EDNS\Opt $option_code
+ * @property-read int $option_length
+ * @property-read string $option_data
+ * @property-read int $extended_rcode
+ * @property-read int $version
+ * @property-read int $z
+ * @property-read int $do
  */
 class OPT extends \NetDNS2\RR
 {

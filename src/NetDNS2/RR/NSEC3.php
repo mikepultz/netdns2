@@ -26,6 +26,14 @@ namespace NetDNS2\RR;
  *  /                         Type Bit Maps                         /
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read int $algorithm
+ * @property-read int $flags
+ * @property-read int $iterations
+ * @property-read int $salt_length
+ * @property-read string $salt
+ * @property-read int $hash_length
+ * @property-read string $hashed_owner_name
+ * @property-read array<int,string> $type_bit_maps
  */
 final class NSEC3 extends \NetDNS2\RR
 {

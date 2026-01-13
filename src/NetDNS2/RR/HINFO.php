@@ -21,6 +21,8 @@ namespace NetDNS2\RR;
  *    /                       OS                      /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read \NetDNS2\Data\Text $cpu
+ * @property-read \NetDNS2\Data\Text $os
  */
 final class HINFO extends \NetDNS2\RR
 {

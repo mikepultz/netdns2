@@ -21,6 +21,8 @@ namespace NetDNS2\RR;
  *    /                    SA                         /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read \NetDNS2\Data\Text $isdnaddress
+ * @property-read \NetDNS2\Data\Text $sa
  */
 final class ISDN extends \NetDNS2\RR
 {

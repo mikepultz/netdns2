@@ -24,6 +24,9 @@ namespace NetDNS2\RR;
  *      /                                                               /
  *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read int $algorithm
+ * @property-read int $fp_type
+ * @property-read string $fingerprint
  */
 final class SSHFP extends \NetDNS2\RR
 {

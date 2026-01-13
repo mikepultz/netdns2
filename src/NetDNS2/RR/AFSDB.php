@@ -22,6 +22,8 @@ namespace NetDNS2\RR;
  *    /                                               /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read int $subtype
+ * @property-read \NetDNS2\Data\Domain $hostname
  */
 final class AFSDB extends \NetDNS2\RR
 {

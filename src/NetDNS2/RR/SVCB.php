@@ -14,6 +14,10 @@ namespace NetDNS2\RR;
 
 /**
  * SVCB Resource Record - RFC 9460 section 2.2
+ *
+ * @property-read int $svc_priority
+ * @property-read \NetDNS2\Data\Domain $target_name
+ * @property-read array<string,mixed> $svc_params
  */
 class SVCB extends \NetDNS2\RR
 {

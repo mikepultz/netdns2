@@ -24,6 +24,11 @@ namespace NetDNS2\RR;
  *    /                 Type Bit Map                  /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property-read int $serial
+ * @property-read int $flags
+ * @property-read bool $immediate
+ * @property-read bool $soaminimum
+ * @property-read array<int,string> $type_bit_maps
  */
 final class CSYNC extends \NetDNS2\RR
 {

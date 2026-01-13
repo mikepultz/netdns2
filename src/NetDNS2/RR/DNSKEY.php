@@ -24,6 +24,13 @@ namespace NetDNS2\RR;
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property-read int $flags
+ * @property-read bool $zone
+ * @property-read bool $sep
+ * @property-read bool $revoke
+ * @property-read int $protocol
+ * @property-read \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm
+ * @property-read string $key
  */
 class DNSKEY extends \NetDNS2\RR
 {
