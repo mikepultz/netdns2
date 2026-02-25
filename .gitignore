@@ -1,1 +1,2 @@
-TODO
+vendor/
+.phpunit.result.cache
