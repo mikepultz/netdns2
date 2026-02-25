@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
  * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
@@ -13,8 +13,6 @@
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
- *
  */
 
 /**
@@ -28,83 +26,41 @@
  *   /                            Digest                             /
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *
  */
 class Net_DNS2_RR_DS extends Net_DNS2_RR
 {
-    /*
-     * key tag
-     */
-    public $keytag;
+    public int $keytag = 0;
+    public int $algorithm = 0;
+    public int $digesttype = 0;
+    public string $digest = '';
 
-    /*
-     * algorithm number
-     */
-    public $algorithm;
-
-    /*
-     * algorithm used to construct the digest
-     */
-    public $digesttype;
-
-    /*
-     * the digest data
-     */
-    public $digest;
-
-    /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
-     */
-    protected function rrToString()
+    #[\Override]
+    protected function rrToString(): string
     {
         return $this->keytag . ' ' . $this->algorithm . ' ' . $this->digesttype . ' ' . $this->digest;
     }
 
-    /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
-     */
-    protected function rrFromString(array $rdata)
+    #[\Override]
+    protected function rrFromString(array $rdata): bool
     {
-        $this->keytag       = array_shift($rdata);
-        $this->algorithm    = array_shift($rdata);
-        $this->digesttype   = array_shift($rdata);
-        $this->digest       = implode('', $rdata);
+        $this->keytag     = (int) array_shift($rdata);
+        $this->algorithm  = (int) array_shift($rdata);
+        $this->digesttype = (int) array_shift($rdata);
+        $this->digest     = implode('', $rdata);
 
         return true;
     }
 
-    /**
-     * parses the rdata of the Net_DNS2_Packet object
-     *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
-     */
-    protected function rrSet(Net_DNS2_Packet &$packet)
+    #[\Override]
+    protected function rrSet(Net_DNS2_Packet &$packet): bool
     {
         if ($this->rdlength > 0) {
-
-            //
-            // unpack the keytag, algorithm and digesttype
-            //
             $x = unpack('nkeytag/Calgorithm/Cdigesttype/H*digest', $this->rdata);
 
-            $this->keytag       = $x['keytag'];
-            $this->algorithm    = $x['algorithm'];
-            $this->digesttype   = $x['digesttype'];
-            $this->digest       = $x['digest'];
+            $this->keytag     = $x['keytag'];
+            $this->algorithm  = $x['algorithm'];
+            $this->digesttype = $x['digesttype'];
+            $this->digest     = $x['digest'];
 
             return true;
         }
@@ -112,21 +68,10 @@ class Net_DNS2_RR_DS extends Net_DNS2_RR
         return false;
     }
 
-    /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
-     */
-    protected function rrGet(Net_DNS2_Packet &$packet)
+    #[\Override]
+    protected function rrGet(Net_DNS2_Packet &$packet): ?string
     {
         if (strlen($this->digest) > 0) {
-
             $data = pack('nCCH*', $this->keytag, $this->algorithm, $this->digesttype, $this->digest);
 
             $packet->offset += strlen($data);
