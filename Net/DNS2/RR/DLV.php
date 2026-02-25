@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
  * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
@@ -13,14 +13,10 @@
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link      https://netdns2.com/
- * @since     File available since Release 0.6.0
- *
  */
 
 /**
- * The DLV RR is implemented exactly like the DS RR; so we just extend that
- * class, and use all of it's methods
- *
+ * DLV RR - implemented exactly like DS (extends Net_DNS2_RR_DS)
  */
 class Net_DNS2_RR_DLV extends Net_DNS2_RR_DS
 {

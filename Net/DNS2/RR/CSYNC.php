@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * DNS Library for handling lookups and updates. 
+ * DNS Library for handling lookups and updates.
  *
  * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
  *
@@ -13,105 +13,51 @@
  * @copyright 2020 Mike Pultz <mike@mikepultz.com>
  * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link      https://netdns2.com/
- * @since     File available since Release 1.4.1
- *
  */
 
 /**
- * CSYNC Resource Record - RFC 7477 seciond 2.1.1
- *
- *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *    |                  SOA Serial                   |
- *    |                                               |
- *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *    |                    Flags                      |
- *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *    /                 Type Bit Map                  /
- *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
- *
+ * CSYNC Resource Record - RFC7477 section 2.1.1
  */
 class Net_DNS2_RR_CSYNC extends Net_DNS2_RR
 {
-    /*
-     * serial number
-     */
-    public $serial;
+    public int|string $serial = 0;
+    public int $flags = 0;
 
-    /*
-     * flags
-     */
-    public $flags;
+    /** @var array<int, string> */
+    public array $type_bit_maps = [];
 
-    /*
-     * array of RR type names
-     */
-    public $type_bit_maps = [];
-
-    /**
-     * method to return the rdata portion of the packet as a string
-     *
-     * @return  string
-     * @access  protected
-     *
-     */
-    protected function rrToString()
+    #[\Override]
+    protected function rrToString(): string
     {
         $out = $this->serial . ' ' . $this->flags;
 
-        //
-        // show the RR's
-        //
         foreach ($this->type_bit_maps as $rr) {
-
             $out .= ' ' . strtoupper($rr);
         }
 
         return $out;
     }
 
-    /**
-     * parses the rdata portion from a standard DNS config line
-     *
-     * @param array $rdata a string split line of values for the rdata
-     *
-     * @return boolean
-     * @access protected
-     *
-     */
-    protected function rrFromString(array $rdata)
+    #[\Override]
+    protected function rrFromString(array $rdata): bool
     {
         $this->serial   = array_shift($rdata);
-        $this->flags    = array_shift($rdata);
+        $this->flags    = (int) array_shift($rdata);
 
         $this->type_bit_maps = $rdata;
 
         return true;
     }
 
-    /**
-     * parses the rdata of the Net_DNS2_Packet object
-     *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet to parse the RR from
-     *
-     * @return boolean
-     * @access protected
-     *
-     */
-    protected function rrSet(Net_DNS2_Packet &$packet)
+    #[\Override]
+    protected function rrSet(Net_DNS2_Packet &$packet): bool
     {
         if ($this->rdlength > 0) {
-
-            //
-            // unpack the serial and flags values
-            //
             $x = unpack('@' . $packet->offset . '/Nserial/nflags', $packet->rdata);
 
             $this->serial   = Net_DNS2::expandUint32($x['serial']);
             $this->flags    = $x['flags'];
 
-            //
-            // parse out the RR bitmap                 
-            //
             $this->type_bit_maps = Net_DNS2_BitMap::bitMapToArray(
                 substr($this->rdata, 6)
             );
@@ -122,32 +68,13 @@ class Net_DNS2_RR_CSYNC extends Net_DNS2_RR
         return false;
     }
 
-    /**
-     * returns the rdata portion of the DNS packet
-     *
-     * @param Net_DNS2_Packet &$packet a Net_DNS2_Packet packet use for
-     *                                 compressed names
-     *
-     * @return mixed                   either returns a binary packed
-     *                                 string or null on failure
-     * @access protected
-     *
-     */
-    protected function rrGet(Net_DNS2_Packet &$packet)
+    #[\Override]
+    protected function rrGet(Net_DNS2_Packet &$packet): ?string
     {
-        //
-        // pack the serial and flags values
-        //
         $data = pack('Nn', $this->serial, $this->flags);
 
-        //
-        // convert the array of RR names to a type bitmap
-        //
         $data .= Net_DNS2_BitMap::arrayToBitMap($this->type_bit_maps);
 
-        //
-        // advance the offset
-        //
         $packet->offset += strlen($data);
 
         return $data;
