@@ -197,7 +197,7 @@ class SIG extends RR
 
             if (openssl_sign($sigdata, $this->signature, $this->private_key->instance, $algorithm) === false) {
                 throw new Exception(
-                    openssl_error_string(),
+                    openssl_error_string() ?: 'unknown OpenSSL error',
                     Lookups::E_OPENSSL_ERROR
                 );
             }

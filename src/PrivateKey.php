@@ -164,7 +164,7 @@ class PrivateKey
         $this->instance = openssl_pkey_new($args);
         if ($this->instance === false) {
             throw new Exception(
-                openssl_error_string(),
+                openssl_error_string() ?: 'unknown OpenSSL error',
                 \Net\DNS2\Lookups::E_OPENSSL_ERROR
             );
         }
