@@ -150,7 +150,7 @@ class Net_DNS2_RR_APL extends Net_DNS2_RR
                         );
 
                         foreach ($address as $b) {
-                            $data .= chr($b);
+                            $data .= chr((int)$b);
                         }
                         break;
 

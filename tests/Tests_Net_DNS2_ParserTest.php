@@ -274,7 +274,7 @@ class Tests_Net_DNS2_ParserTest extends PHPUnit\Framework\TestCase
 
         foreach ($response_authority as $id => $object) {
 
-            $response_authority[$id]->rdlength = '';
+            $response_authority[$id]->rdlength = 0;
             $response_authority[$id]->rdata = '';
         }
 

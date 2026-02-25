@@ -92,10 +92,10 @@ class Net_DNS2_RR_LOC extends Net_DNS2_RR
 
             $this->longitude = $this->_dms2d($londeg, $lonmin, $lonsec, $lonhem);
 
-            $this->size      = (isset($x[15])) ? $x[15] : 1;
-            $this->horiz_pre = ((isset($x[17])) ? $x[17] : 10000);
-            $this->vert_pre  = ((isset($x[19])) ? $x[19] : 10);
-            $this->altitude  = $x[13];
+            $this->size      = (float)(isset($x[15]) ? $x[15] : 1);
+            $this->horiz_pre = (float)(isset($x[17]) ? $x[17] : 10000);
+            $this->vert_pre  = (float)(isset($x[19]) ? $x[19] : 10);
+            $this->altitude  = (float)$x[13];
 
             return true;
         }
