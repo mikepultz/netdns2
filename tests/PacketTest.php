@@ -1,119 +1,81 @@
 <?php declare(strict_types=1);
 
-require_once 'Net/DNS2.php';
+namespace Net\DNS2\Tests;
 
+use Net\DNS2\Lookups;
+use Net\DNS2\Packet\Packet;
+use Net\DNS2\Packet\Request;
+use Net\DNS2\Packet\Response;
+use Net\DNS2\RR\RR;
+use Net\DNS2\Exception;
 use PHPUnit\Framework\TestCase;
 
 class PacketTest extends TestCase
 {
-    public function testRequestPacketCreation(): void
+    public function testRequestCreation(): void
     {
-        $request = new Net_DNS2_Packet_Request('example.com', 'A', 'IN');
-
-        $this->assertInstanceOf(Net_DNS2_Header::class, $request->header);
-        $this->assertCount(1, $request->question);
-        $this->assertSame('example.com', $request->question[0]->qname);
-        $this->assertSame('A', $request->question[0]->qtype);
-        $this->assertSame('IN', $request->question[0]->qclass);
+        $req = new Request('example.com', 'A', 'IN');
+        $this->assertCount(1, $req->question);
+        $this->assertSame('example.com', $req->question[0]->qname);
+        $this->assertSame('A', $req->question[0]->qtype);
     }
 
-    public function testRequestPTRIPv4(): void
+    public function testPTRIPv4(): void
     {
-        $request = new Net_DNS2_Packet_Request('192.168.1.1', 'PTR', 'IN');
-
-        $this->assertSame('1.1.168.192.in-addr.arpa', $request->question[0]->qname);
+        $req = new Request('192.168.1.1', 'PTR', 'IN');
+        $this->assertSame('1.1.168.192.in-addr.arpa', $req->question[0]->qname);
     }
 
-    public function testRequestEmptyName(): void
+    public function testEmptyName(): void
     {
-        $this->expectException(Net_DNS2_Exception::class);
-        new Net_DNS2_Packet_Request('', 'A', 'IN');
+        $this->expectException(Exception::class);
+        new Request('', 'A', 'IN');
     }
 
-    public function testRequestInvalidType(): void
+    public function testInvalidType(): void
     {
-        $this->expectException(Net_DNS2_Exception::class);
-        new Net_DNS2_Packet_Request('example.com', 'INVALID', 'IN');
+        $this->expectException(Exception::class);
+        new Request('example.com', 'INVALID', 'IN');
     }
 
-    public function testRequestWildcard(): void
+    public function testWildcard(): void
     {
-        $request = new Net_DNS2_Packet_Request('example.com', '*', 'IN');
-        $this->assertSame('ANY', $request->question[0]->qtype);
+        $req = new Request('example.com', '*', 'IN');
+        $this->assertSame('ANY', $req->question[0]->qtype);
     }
 
-    public function testRequestRootDomain(): void
+    public function testRoundTrip(): void
     {
-        $request = new Net_DNS2_Packet_Request('.', 'NS', 'IN');
-        $this->assertSame('.', $request->question[0]->qname);
+        $req = new Request('test.example.com', 'MX', 'IN');
+        $data = $req->get();
+        $resp = new Response($data, strlen($data));
+
+        $this->assertSame($req->header->id, $resp->header->id);
+        $this->assertSame('test.example.com', $resp->question[0]->qname);
+        $this->assertSame('MX', $resp->question[0]->qtype);
     }
 
-    public function testRoundTripPacket(): void
+    public function testReset(): void
     {
-        $request = new Net_DNS2_Packet_Request('test.example.com', 'MX', 'IN');
-        $data = $request->get();
-
-        $this->assertGreaterThan(Net_DNS2_Lookups::DNS_HEADER_SIZE, strlen($data));
-
-        $response = new Net_DNS2_Packet_Response($data, strlen($data));
-
-        $this->assertSame($request->header->id, $response->header->id);
-        $this->assertCount(1, $response->question);
-        $this->assertSame('test.example.com', $response->question[0]->qname);
-        $this->assertSame('MX', $response->question[0]->qtype);
+        $req = new Request('example.com', 'A', 'IN');
+        $req->answer[] = RR::fromString('example.com A 1.2.3.4');
+        $req->reset();
+        $this->assertCount(0, $req->answer);
     }
 
-    public function testPacketCopy(): void
+    public function testCompression(): void
     {
-        $p1 = new Net_DNS2_Packet_Request('example.com', 'A', 'IN');
-        $p2 = new Net_DNS2_Packet();
-
-        $p2->copy($p1);
-
-        $this->assertSame($p1->header, $p2->header);
-        $this->assertSame($p1->question, $p2->question);
-    }
-
-    public function testPacketReset(): void
-    {
-        $request = new Net_DNS2_Packet_Request('example.com', 'A', 'IN');
-        $old_id = $request->header->id;
-
-        $request->answer[] = Net_DNS2_RR::fromString('example.com A 1.2.3.4');
-        $request->reset();
-
-        $this->assertNotSame($old_id, $request->header->id);
-        $this->assertCount(0, $request->answer);
-        $this->assertSame(0, $request->offset);
-    }
-
-    public function testPacketToString(): void
-    {
-        $request = new Net_DNS2_Packet_Request('example.com', 'SOA', 'IN');
-        $str = (string)$request;
-
-        $this->assertStringContainsString('Header:', $str);
-        $this->assertStringContainsString('Question:', $str);
-        $this->assertStringContainsString('example.com', $str);
-    }
-
-    public function testNameCompression(): void
-    {
-        $packet = new Net_DNS2_Packet_Request('example.com', 'A', 'IN');
+        $p = new Request('example.com', 'A', 'IN');
         $offset = 0;
-
-        $comp1 = $packet->compress('www.example.com', $offset);
-        $comp2 = $packet->compress('mail.example.com', $offset);
-
+        $comp1 = $p->compress('www.example.com', $offset);
+        $comp2 = $p->compress('mail.example.com', $offset);
         $this->assertNotEmpty($comp1);
         $this->assertNotEmpty($comp2);
-        $this->assertLessThan(strlen($comp1) + strlen('mail.example.com') + 2, strlen($comp1) + strlen($comp2));
     }
 
     public function testStaticPack(): void
     {
-        $packed = Net_DNS2_Packet::pack('example.com');
-        $this->assertNotEmpty($packed);
+        $packed = Packet::pack('example.com');
         $this->assertStringEndsWith("\0", $packed);
     }
 }

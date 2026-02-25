@@ -5,9 +5,6 @@
          colors="true"
          cacheDirectory=".phpunit.cache"
 >
-    <php>
-        <ini name="include_path" value=".:./"/>
-    </php>
     <testsuites>
         <testsuite name="Net_DNS2 Tests">
             <directory>tests</directory>

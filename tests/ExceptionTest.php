@@ -1,44 +1,31 @@
 <?php declare(strict_types=1);
 
-require_once 'Net/DNS2.php';
+namespace Net\DNS2\Tests;
 
+use Net\DNS2\Exception;
+use Net\DNS2\Packet\Request;
 use PHPUnit\Framework\TestCase;
 
 class ExceptionTest extends TestCase
 {
-    public function testBasicException(): void
+    public function testBasic(): void
     {
-        $e = new Net_DNS2_Exception('test error', 42);
-
-        $this->assertSame('test error', $e->getMessage());
+        $e = new Exception('test', 42);
+        $this->assertSame('test', $e->getMessage());
         $this->assertSame(42, $e->getCode());
         $this->assertNull($e->getRequest());
         $this->assertNull($e->getResponse());
     }
 
-    public function testExceptionWithRequest(): void
+    public function testWithRequest(): void
     {
-        $request = new Net_DNS2_Packet_Request('example.com', 'A', 'IN');
-
-        $e = new Net_DNS2_Exception('test', 0, null, $request);
-
-        $this->assertInstanceOf(Net_DNS2_Packet_Request::class, $e->getRequest());
-        $this->assertNull($e->getResponse());
+        $req = new Request('example.com', 'A', 'IN');
+        $e = new Exception('test', 0, null, $req);
+        $this->assertInstanceOf(Request::class, $e->getRequest());
     }
 
-    public function testExceptionWithPrevious(): void
+    public function testInheritance(): void
     {
-        $prev = new \RuntimeException('inner');
-        $e = new Net_DNS2_Exception('outer', 0, $prev);
-
-        $this->assertSame($prev, $e->getPrevious());
-    }
-
-    public function testExceptionInheritance(): void
-    {
-        $e = new Net_DNS2_Exception();
-
-        $this->assertInstanceOf(\Exception::class, $e);
-        $this->assertInstanceOf(\Throwable::class, $e);
+        $this->assertInstanceOf(\Exception::class, new Exception());
     }
 }

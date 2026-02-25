@@ -6,6 +6,4 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Tests_Net_DNS2' => array($baseDir . '/tests'),
-    'Net_DNS2' => array($baseDir . '/'),
 );

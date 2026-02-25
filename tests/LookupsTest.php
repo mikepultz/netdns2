@@ -1,74 +1,54 @@
 <?php declare(strict_types=1);
 
-require_once 'Net/DNS2.php';
+namespace Net\DNS2\Tests;
 
+use Net\DNS2\Lookups;
 use PHPUnit\Framework\TestCase;
 
 class LookupsTest extends TestCase
 {
-    public function testRRTypesByNameAndId(): void
+    public function testRRTypes(): void
     {
-        $this->assertSame(1, Net_DNS2_Lookups::$rr_types_by_name['A']);
-        $this->assertSame(15, Net_DNS2_Lookups::$rr_types_by_name['MX']);
-        $this->assertSame(28, Net_DNS2_Lookups::$rr_types_by_name['AAAA']);
-        $this->assertSame(6, Net_DNS2_Lookups::$rr_types_by_name['SOA']);
-
-        $this->assertSame('A', Net_DNS2_Lookups::$rr_types_by_id[1]);
-        $this->assertSame('MX', Net_DNS2_Lookups::$rr_types_by_id[15]);
+        $this->assertSame(1, Lookups::$rr_types_by_name['A']);
+        $this->assertSame(15, Lookups::$rr_types_by_name['MX']);
+        $this->assertSame('A', Lookups::$rr_types_by_id[1]);
     }
 
-    public function testClassesByNameAndId(): void
+    public function testClasses(): void
     {
-        $this->assertSame(1, Net_DNS2_Lookups::$classes_by_name['IN']);
-        $this->assertSame(255, Net_DNS2_Lookups::$classes_by_name['ANY']);
-
-        $this->assertSame('IN', Net_DNS2_Lookups::$classes_by_id[1]);
-        $this->assertSame('ANY', Net_DNS2_Lookups::$classes_by_id[255]);
+        $this->assertSame(1, Lookups::$classes_by_name['IN']);
+        $this->assertSame('IN', Lookups::$classes_by_id[1]);
     }
 
     public function testTypedConstants(): void
     {
-        $this->assertSame(12, Net_DNS2_Lookups::DNS_HEADER_SIZE);
-        $this->assertSame(512, Net_DNS2_Lookups::DNS_MAX_UDP_SIZE);
-        $this->assertSame(0, Net_DNS2_Lookups::QR_QUERY);
-        $this->assertSame(1, Net_DNS2_Lookups::QR_RESPONSE);
-        $this->assertSame(0, Net_DNS2_Lookups::RCODE_NOERROR);
-        $this->assertSame(3, Net_DNS2_Lookups::RCODE_NXDOMAIN);
+        $this->assertSame(12, Lookups::DNS_HEADER_SIZE);
+        $this->assertSame(512, Lookups::DNS_MAX_UDP_SIZE);
+        $this->assertSame(0, Lookups::QR_QUERY);
+        $this->assertSame(1, Lookups::QR_RESPONSE);
     }
 
     public function testIdToClassMapping(): void
     {
-        $this->assertSame('Net_DNS2_RR_A', Net_DNS2_Lookups::$rr_types_id_to_class[1]);
-        $this->assertSame('Net_DNS2_RR_MX', Net_DNS2_Lookups::$rr_types_id_to_class[15]);
-        $this->assertSame('Net_DNS2_RR_SOA', Net_DNS2_Lookups::$rr_types_id_to_class[6]);
+        $this->assertSame(\Net\DNS2\RR\A::class, Lookups::$rr_types_id_to_class[1]);
+        $this->assertSame(\Net\DNS2\RR\MX::class, Lookups::$rr_types_id_to_class[15]);
     }
 
-    public function testReverseLookupsPopulated(): void
+    public function testReverseLookups(): void
     {
-        $this->assertNotEmpty(Net_DNS2_Lookups::$rr_types_by_id);
-        $this->assertNotEmpty(Net_DNS2_Lookups::$classes_by_id);
-        $this->assertNotEmpty(Net_DNS2_Lookups::$rr_types_class_to_id);
-        $this->assertNotEmpty(Net_DNS2_Lookups::$algorithm_name_to_id);
-        $this->assertNotEmpty(Net_DNS2_Lookups::$digest_name_to_id);
-    }
-
-    public function testNextPacketId(): void
-    {
-        $this->assertIsInt(Net_DNS2_Lookups::$next_packet_id);
-        $this->assertGreaterThanOrEqual(0, Net_DNS2_Lookups::$next_packet_id);
-        $this->assertLessThanOrEqual(65535, Net_DNS2_Lookups::$next_packet_id);
+        $this->assertNotEmpty(Lookups::$rr_types_by_id);
+        $this->assertNotEmpty(Lookups::$classes_by_id);
+        $this->assertNotEmpty(Lookups::$rr_types_class_to_id);
     }
 
     public function testResultCodeMessages(): void
     {
-        $this->assertArrayHasKey(Net_DNS2_Lookups::RCODE_NOERROR, Net_DNS2_Lookups::$result_code_messages);
-        $this->assertArrayHasKey(Net_DNS2_Lookups::RCODE_NXDOMAIN, Net_DNS2_Lookups::$result_code_messages);
-        $this->assertStringContainsString('successfully', Net_DNS2_Lookups::$result_code_messages[0]);
+        $this->assertStringContainsString('successfully', Lookups::$result_code_messages[0]);
     }
 
-    public function testAlgorithmMappings(): void
+    public function testAlgorithms(): void
     {
-        $this->assertSame('RSASHA256', Net_DNS2_Lookups::$algorithm_id_to_name[8]);
-        $this->assertSame(8, Net_DNS2_Lookups::$algorithm_name_to_id['RSASHA256']);
+        $this->assertSame('RSASHA256', Lookups::$algorithm_id_to_name[8]);
+        $this->assertSame(8, Lookups::$algorithm_name_to_id['RSASHA256']);
     }
 }

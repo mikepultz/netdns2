@@ -2,11 +2,7 @@
     "name": "pear/net_dns2",
     "type": "library",
     "description": "Native PHP DNS Resolver and Updater Library",
-    "keywords": [
-        "dns",
-        "network",
-        "pear"
-    ],
+    "keywords": ["dns", "network"],
     "homepage": "https://netdns2.com/",
     "license": "BSD-2-Clause",
     "support": {
@@ -28,13 +24,13 @@
         "phpunit/phpunit": "^11"
     },
     "autoload": {
-        "psr-0": {
-            "Net_DNS2": ""
+        "psr-4": {
+            "Net\\DNS2\\": "src/"
         }
     },
     "autoload-dev": {
-        "psr-0": {
-            "Tests_Net_DNS2": "tests/"
+        "psr-4": {
+            "Net\\DNS2\\Tests\\": "tests/"
         }
     }
 }

@@ -3,7 +3,7 @@
         'name' => 'pear/net_dns2',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '646984c780c485fe3a04b85ef2d3a6dfda82f458',
+        'reference' => '1ee7a34b1586cd5f7488f96e888c95ad6a990610',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -31,7 +31,7 @@
         'pear/net_dns2' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '646984c780c485fe3a04b85ef2d3a6dfda82f458',
+            'reference' => '1ee7a34b1586cd5f7488f96e888c95ad6a990610',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

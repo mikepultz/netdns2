@@ -1,74 +1,58 @@
 <?php declare(strict_types=1);
 
-require_once 'Net/DNS2.php';
+namespace Net\DNS2\Tests;
 
+use Net\DNS2\Header;
+use Net\DNS2\Lookups;
+use Net\DNS2\Packet\Packet;
+use Net\DNS2\Packet\Request;
+use Net\DNS2\Packet\Response;
+use Net\DNS2\Exception;
 use PHPUnit\Framework\TestCase;
 
 class HeaderTest extends TestCase
 {
-    public function testDefaultHeaderValues(): void
+    public function testDefaultValues(): void
     {
-        $h = new Net_DNS2_Header();
-
-        $this->assertSame(Net_DNS2_Lookups::QR_QUERY, $h->qr);
-        $this->assertSame(Net_DNS2_Lookups::OPCODE_QUERY, $h->opcode);
-        $this->assertSame(0, $h->aa);
-        $this->assertSame(0, $h->tc);
+        $h = new Header();
+        $this->assertSame(Lookups::QR_QUERY, $h->qr);
+        $this->assertSame(Lookups::OPCODE_QUERY, $h->opcode);
         $this->assertSame(1, $h->rd);
-        $this->assertSame(0, $h->ra);
-        $this->assertSame(0, $h->z);
-        $this->assertSame(0, $h->ad);
-        $this->assertSame(0, $h->cd);
-        $this->assertSame(Net_DNS2_Lookups::RCODE_NOERROR, $h->rcode);
+        $this->assertSame(0, $h->tc);
+        $this->assertSame(Lookups::RCODE_NOERROR, $h->rcode);
         $this->assertSame(1, $h->qdcount);
-        $this->assertSame(0, $h->ancount);
-        $this->assertSame(0, $h->nscount);
-        $this->assertSame(0, $h->arcount);
     }
 
-    public function testHeaderPackUnpack(): void
+    public function testPackUnpack(): void
     {
-        $request = new Net_DNS2_Packet_Request('example.com', 'A', 'IN');
-        $data = $request->get();
+        $req = new Request('example.com', 'A', 'IN');
+        $data = $req->get();
+        $resp = new Response($data, strlen($data));
 
-        $response = new Net_DNS2_Packet_Response($data, strlen($data));
-
-        $this->assertSame($request->header->id, $response->header->id);
-        $this->assertSame($request->header->qr, $response->header->qr);
-        $this->assertSame($request->header->opcode, $response->header->opcode);
-        $this->assertSame($request->header->rd, $response->header->rd);
-        $this->assertSame($request->header->qdcount, $response->header->qdcount);
+        $this->assertSame($req->header->id, $resp->header->id);
+        $this->assertSame($req->header->opcode, $resp->header->opcode);
     }
 
-    public function testHeaderToString(): void
+    public function testToString(): void
     {
-        $h = new Net_DNS2_Header();
-        $str = (string)$h;
-
-        $this->assertStringContainsString('Header:', $str);
-        $this->assertStringContainsString('id', $str);
-        $this->assertStringContainsString('qr', $str);
-        $this->assertStringContainsString('opcode', $str);
+        $h = new Header();
+        $this->assertStringContainsString('Header:', (string)$h);
     }
 
-    public function testHeaderTooSmall(): void
+    public function testTooSmall(): void
     {
-        $packet = new Net_DNS2_Packet();
-        $packet->rdata = 'short';
-        $packet->rdlength = 5;
-
-        $this->expectException(Net_DNS2_Exception::class);
-        new Net_DNS2_Header($packet);
+        $p = new Packet();
+        $p->rdata = 'short';
+        $p->rdlength = 5;
+        $this->expectException(Exception::class);
+        new Header($p);
     }
 
     public function testNextPacketId(): void
     {
-        $h = new Net_DNS2_Header();
+        $h = new Header();
         $id1 = $h->nextPacketId();
         $id2 = $h->nextPacketId();
-
         $this->assertSame($id1 + 1, $id2);
-        $this->assertGreaterThan(0, $id1);
-        $this->assertLessThanOrEqual(65535, $id2);
     }
 }

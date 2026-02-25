@@ -16,6 +16,11 @@ class ComposerStaticInitf82515904d34e67a54e6d4602b153183
         array (
             'PhpParser\\' => 10,
         ),
+        'N' =>
+        array (
+            'Net\\DNS2\\Tests\\' => 15,
+            'Net\\DNS2\\' => 9,
+        ),
         'D' =>
         array (
             'DeepCopy\\' => 9,
@@ -27,26 +32,17 @@ class ComposerStaticInitf82515904d34e67a54e6d4602b153183
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
+        'Net\\DNS2\\Tests\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/tests',
+        ),
+        'Net\\DNS2\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/src',
+        ),
         'DeepCopy\\' =>
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
-        ),
-    );
-
-    public static $prefixesPsr0 = array (
-        'T' =>
-        array (
-            'Tests_Net_DNS2' =>
-            array (
-                0 => __DIR__ . '/../..' . '/tests',
-            ),
-        ),
-        'N' =>
-        array (
-            'Net_DNS2' =>
-            array (
-                0 => __DIR__ . '/../..' . '/',
-            ),
         ),
     );
 
@@ -1284,7 +1280,6 @@ class ComposerStaticInitf82515904d34e67a54e6d4602b153183
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitf82515904d34e67a54e6d4602b153183::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitf82515904d34e67a54e6d4602b153183::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitf82515904d34e67a54e6d4602b153183::$prefixesPsr0;
             $loader->classMap = ComposerStaticInitf82515904d34e67a54e6d4602b153183::$classMap;
 
         }, null, ClassLoader::class);

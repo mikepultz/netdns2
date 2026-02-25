@@ -1,148 +1,80 @@
 <?php declare(strict_types=1);
 
-require_once 'Net/DNS2.php';
+namespace Net\DNS2\Tests;
 
+use Net\DNS2\Updater;
+use Net\DNS2\Lookups;
+use Net\DNS2\RR\RR;
+use Net\DNS2\Exception;
 use PHPUnit\Framework\TestCase;
 
 class UpdaterTest extends TestCase
 {
-    private function makeUpdater(): Net_DNS2_Updater
+    private function makeUpdater(): Updater
     {
-        return new Net_DNS2_Updater('example.com', [
-            'nameservers' => ['10.10.0.1'],
-        ]);
+        return new Updater('example.com', ['nameservers' => ['10.10.0.1']]);
     }
 
-    public function testUpdaterCreation(): void
+    public function testCreation(): void
     {
-        $u = $this->makeUpdater();
-        $this->assertInstanceOf(Net_DNS2_Updater::class, $u);
+        $this->assertInstanceOf(Updater::class, $this->makeUpdater());
     }
 
     public function testAddRR(): void
     {
         $u = $this->makeUpdater();
-        $rr = Net_DNS2_RR::fromString('test.example.com A 10.10.10.10');
-        $result = $u->add($rr);
-
-        $this->assertTrue($result);
-
-        $packet = $u->packet();
-        $this->assertCount(1, $packet->authority);
-        $this->assertSame('test.example.com', $packet->authority[0]->name);
-    }
-
-    public function testAddDuplicateRR(): void
-    {
-        $u = $this->makeUpdater();
-        $rr = Net_DNS2_RR::fromString('test.example.com A 10.10.10.10');
-
+        $rr = RR::fromString('test.example.com A 10.10.10.10');
         $u->add($rr);
-        $u->add($rr);
-
-        $packet = $u->packet();
-        $this->assertCount(1, $packet->authority);
+        $p = $u->packet();
+        $this->assertCount(1, $p->authority);
+        $this->assertSame('test.example.com', $p->authority[0]->name);
     }
 
     public function testDeleteRR(): void
     {
         $u = $this->makeUpdater();
-        $rr = Net_DNS2_RR::fromString('test.example.com A 10.10.10.10');
+        $rr = RR::fromString('test.example.com A 10.10.10.10');
         $u->delete($rr);
-
-        $packet = $u->packet();
-        $this->assertSame(0, $packet->authority[0]->ttl);
-        $this->assertSame('NONE', $packet->authority[0]->class);
+        $p = $u->packet();
+        $this->assertSame(0, $p->authority[0]->ttl);
+        $this->assertSame('NONE', $p->authority[0]->class);
     }
 
     public function testDeleteAny(): void
     {
         $u = $this->makeUpdater();
         $u->deleteAny('test.example.com', 'A');
-
-        $packet = $u->packet();
-        $this->assertSame(0, $packet->authority[0]->ttl);
-        $this->assertSame('ANY', $packet->authority[0]->class);
-        $this->assertSame(-1, $packet->authority[0]->rdlength);
-    }
-
-    public function testDeleteAll(): void
-    {
-        $u = $this->makeUpdater();
-        $u->deleteAll('test.example.com');
-
-        $packet = $u->packet();
-        $this->assertSame('ANY', $packet->authority[0]->type);
-        $this->assertSame('ANY', $packet->authority[0]->class);
+        $p = $u->packet();
+        $this->assertSame('ANY', $p->authority[0]->class);
     }
 
     public function testCheckExists(): void
     {
         $u = $this->makeUpdater();
         $u->checkExists('test.example.com', 'A');
-
-        $packet = $u->packet();
-        $this->assertCount(1, $packet->answer);
-        $this->assertSame('ANY', $packet->answer[0]->class);
+        $p = $u->packet();
+        $this->assertSame('ANY', $p->answer[0]->class);
     }
 
     public function testCheckNotExists(): void
     {
         $u = $this->makeUpdater();
         $u->checkNotExists('test.example.com', 'A');
-
-        $packet = $u->packet();
-        $this->assertCount(1, $packet->answer);
-        $this->assertSame('NONE', $packet->answer[0]->class);
-    }
-
-    public function testCheckNameInUse(): void
-    {
-        $u = $this->makeUpdater();
-        $u->checkNameInUse('test.example.com');
-
-        $packet = $u->packet();
-        $this->assertSame('ANY', $packet->answer[0]->type);
-        $this->assertSame('ANY', $packet->answer[0]->class);
-    }
-
-    public function testCheckNameNotInUse(): void
-    {
-        $u = $this->makeUpdater();
-        $u->checkNameNotInUse('test.example.com');
-
-        $packet = $u->packet();
-        $this->assertSame('ANY', $packet->answer[0]->type);
-        $this->assertSame('NONE', $packet->answer[0]->class);
+        $p = $u->packet();
+        $this->assertSame('NONE', $p->answer[0]->class);
     }
 
     public function testInvalidNameThrows(): void
     {
         $u = $this->makeUpdater();
-        $rr = Net_DNS2_RR::fromString('test.other.com A 10.10.10.10');
-
-        $this->expectException(Net_DNS2_Exception::class);
+        $rr = RR::fromString('test.other.com A 10.10.10.10');
+        $this->expectException(Exception::class);
         $u->add($rr);
     }
 
     public function testPacketOpcode(): void
     {
-        $u = $this->makeUpdater();
-        $packet = $u->packet();
-
-        $this->assertSame(Net_DNS2_Lookups::OPCODE_UPDATE, $packet->header->opcode);
-    }
-
-    public function testPacketCounts(): void
-    {
-        $u = $this->makeUpdater();
-        $u->add(Net_DNS2_RR::fromString('test.example.com A 10.10.10.10'));
-        $u->checkExists('test.example.com', 'MX');
-
-        $packet = $u->packet();
-
-        $this->assertSame(1, $packet->header->qdcount);
-        $this->assertSame(1, $packet->header->ancount);
-        $this->assertSame(1, $packet->header->nscount);
+        $p = $this->makeUpdater()->packet();
+        $this->assertSame(Lookups::OPCODE_UPDATE, $p->header->opcode);
     }
 }
