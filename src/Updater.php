@@ -2,31 +2,19 @@
 
 namespace Net\DNS2;
 
-
 use Net\DNS2\Packet\Request;
 use Net\DNS2\Packet\Response;
+use Net\DNS2\RR\ANY;
 use Net\DNS2\RR\RR;
-/**
- * DNS Library for handling lookups and updates.
- *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
- *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   \Net\DNS2\DNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link      https://netdns2.com/
- */
+use Net\DNS2\RR\SIG;
+use Net\DNS2\RR\TSIG;
 
 class Updater extends DNS2
 {
-    private \Net\DNS2\Packet\Request $packet;
+    private Request $packet;
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
     public function __construct(string $zone, ?array $options = null)
     {
@@ -35,18 +23,18 @@ class Updater extends DNS2
         $this->packet = new Packet\Request(
             strtolower(trim($zone, " \n\r\t.")), 'SOA', 'IN'
         );
-        $this->packet->header->opcode = \Net\DNS2\Lookups::OPCODE_UPDATE;
+        $this->packet->header->opcode = Lookups::OPCODE_UPDATE;
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
     private function checkName(string $name): bool
     {
         if (!preg_match('/' . $this->packet->question[0]->qname . '$/', $name)) {
             throw new Exception(
                 "name provided ({$name}) does not match zone name ({$this->packet->question[0]->qname})",
-                \Net\DNS2\Lookups::E_PACKET_INVALID
+                Lookups::E_PACKET_INVALID
             );
         }
 
@@ -60,9 +48,9 @@ class Updater extends DNS2
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
-    public function add(\Net\DNS2\RR\RR $rr): bool
+    public function add(RR $rr): bool
     {
         $this->checkName($rr->name);
 
@@ -74,9 +62,9 @@ class Updater extends DNS2
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
-    public function delete(\Net\DNS2\RR\RR $rr): bool
+    public function delete(RR $rr): bool
     {
         $this->checkName($rr->name);
 
@@ -91,17 +79,17 @@ class Updater extends DNS2
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
     public function deleteAny(string $name, string $type): bool
     {
         $this->checkName($name);
 
-        $class = \Net\DNS2\Lookups::$rr_types_id_to_class[\Net\DNS2\Lookups::$rr_types_by_name[$type]] ?? null;
+        $class = Lookups::$rr_types_id_to_class[Lookups::$rr_types_by_name[$type]] ?? null;
         if ($class === null) {
             throw new Exception(
                 "unknown or un-supported resource record type: {$type}",
-                \Net\DNS2\Lookups::E_RR_INVALID
+                Lookups::E_RR_INVALID
             );
         }
 
@@ -120,13 +108,13 @@ class Updater extends DNS2
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
     public function deleteAll(string $name): bool
     {
         $this->checkName($name);
 
-        $rr = new \Net\DNS2\RR\ANY();
+        $rr = new ANY();
         $rr->name     = $name;
         $rr->ttl      = 0;
         $rr->type     = 'ANY';
@@ -142,17 +130,17 @@ class Updater extends DNS2
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
     public function checkExists(string $name, string $type): bool
     {
         $this->checkName($name);
 
-        $class = \Net\DNS2\Lookups::$rr_types_id_to_class[\Net\DNS2\Lookups::$rr_types_by_name[$type]] ?? null;
+        $class = Lookups::$rr_types_id_to_class[Lookups::$rr_types_by_name[$type]] ?? null;
         if ($class === null) {
             throw new Exception(
                 "unknown or un-supported resource record type: {$type}",
-                \Net\DNS2\Lookups::E_RR_INVALID
+                Lookups::E_RR_INVALID
             );
         }
 
@@ -171,9 +159,9 @@ class Updater extends DNS2
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
-    public function checkValueExists(\Net\DNS2\RR\RR $rr): bool
+    public function checkValueExists(RR $rr): bool
     {
         $this->checkName($rr->name);
         $rr->ttl = 0;
@@ -186,17 +174,17 @@ class Updater extends DNS2
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
     public function checkNotExists(string $name, string $type): bool
     {
         $this->checkName($name);
 
-        $class = \Net\DNS2\Lookups::$rr_types_id_to_class[\Net\DNS2\Lookups::$rr_types_by_name[$type]] ?? null;
+        $class = Lookups::$rr_types_id_to_class[Lookups::$rr_types_by_name[$type]] ?? null;
         if ($class === null) {
             throw new Exception(
                 "unknown or un-supported resource record type: {$type}",
-                \Net\DNS2\Lookups::E_RR_INVALID
+                Lookups::E_RR_INVALID
             );
         }
 
@@ -215,13 +203,13 @@ class Updater extends DNS2
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
     public function checkNameInUse(string $name): bool
     {
         $this->checkName($name);
 
-        $rr = new \Net\DNS2\RR\ANY();
+        $rr = new ANY();
         $rr->name     = $name;
         $rr->ttl      = 0;
         $rr->type     = 'ANY';
@@ -237,13 +225,13 @@ class Updater extends DNS2
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
     public function checkNameNotInUse(string $name): bool
     {
         $this->checkName($name);
 
-        $rr = new \Net\DNS2\RR\ANY();
+        $rr = new ANY();
         $rr->name     = $name;
         $rr->ttl      = 0;
         $rr->type     = 'ANY';
@@ -258,12 +246,12 @@ class Updater extends DNS2
         return true;
     }
 
-    public function packet(): \Net\DNS2\Packet\Request
+    public function packet(): Request
     {
         $p = $this->packet;
 
-        if ($this->auth_signature instanceof \Net\DNS2\RR\TSIG
-            || $this->auth_signature instanceof \Net\DNS2\RR\SIG
+        if ($this->auth_signature instanceof TSIG
+            || $this->auth_signature instanceof SIG
         ) {
             $p->additional[] = $this->auth_signature;
         }
@@ -277,14 +265,14 @@ class Updater extends DNS2
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
-    public function update(?\Net\DNS2\Packet\Response &$response = null): bool
+    public function update(?Response &$response = null): bool
     {
-        $this->checkServers(\Net\DNS2\DNS2::RESOLV_CONF);
+        $this->checkServers(DNS2::RESOLV_CONF);
 
-        if ($this->auth_signature instanceof \Net\DNS2\RR\TSIG
-            || $this->auth_signature instanceof \Net\DNS2\RR\SIG
+        if ($this->auth_signature instanceof TSIG
+            || $this->auth_signature instanceof SIG
         ) {
             $this->packet->additional[] = $this->auth_signature;
         }
@@ -297,7 +285,7 @@ class Updater extends DNS2
         if ($this->packet->header->qdcount === 0 || $this->packet->header->nscount === 0) {
             throw new Exception(
                 'empty headers- nothing to send!',
-                \Net\DNS2\Lookups::E_PACKET_INVALID
+                Lookups::E_PACKET_INVALID
             );
         }
 

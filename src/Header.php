@@ -2,20 +2,7 @@
 
 namespace Net\DNS2;
 
-/**
- * DNS Library for handling lookups and updates.
- *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
- *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   \Net\DNS2\DNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link      https://netdns2.com/
- */
+use Net\DNS2\Packet\Packet;
 
 /**
  * DNS Packet Header - RFC1035 section 4.1.1, RFC4035 section 3.2
@@ -39,16 +26,16 @@ class Header
     public int $arcount;
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
-    public function __construct(?\Net\DNS2\Packet\Packet &$packet = null)
+    public function __construct(?Packet &$packet = null)
     {
         if ($packet !== null) {
             $this->set($packet);
         } else {
             $this->id      = $this->nextPacketId();
-            $this->qr      = \Net\DNS2\Lookups::QR_QUERY;
-            $this->opcode  = \Net\DNS2\Lookups::OPCODE_QUERY;
+            $this->qr      = Lookups::QR_QUERY;
+            $this->opcode  = Lookups::OPCODE_QUERY;
             $this->aa      = 0;
             $this->tc      = 0;
             $this->rd      = 1;
@@ -56,7 +43,7 @@ class Header
             $this->z       = 0;
             $this->ad      = 0;
             $this->cd      = 0;
-            $this->rcode   = \Net\DNS2\Lookups::RCODE_NOERROR;
+            $this->rcode   = Lookups::RCODE_NOERROR;
             $this->qdcount = 1;
             $this->ancount = 0;
             $this->nscount = 0;
@@ -66,11 +53,11 @@ class Header
 
     public function nextPacketId(): int
     {
-        if (++\Net\DNS2\Lookups::$next_packet_id > 65535) {
-            \Net\DNS2\Lookups::$next_packet_id = 1;
+        if (++Lookups::$next_packet_id > 65535) {
+            Lookups::$next_packet_id = 1;
         }
 
-        return \Net\DNS2\Lookups::$next_packet_id;
+        return Lookups::$next_packet_id;
     }
 
     public function __toString(): string
@@ -97,14 +84,14 @@ class Header
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
-    public function set(\Net\DNS2\Packet\Packet &$packet): bool
+    public function set(Packet &$packet): bool
     {
-        if ($packet->rdlength < \Net\DNS2\Lookups::DNS_HEADER_SIZE) {
+        if ($packet->rdlength < Lookups::DNS_HEADER_SIZE) {
             throw new Exception(
                 'invalid header data provided; too small',
-                \Net\DNS2\Lookups::E_HEADER_INVALID
+                Lookups::E_HEADER_INVALID
             );
         }
 
@@ -131,14 +118,14 @@ class Header
         $this->nscount = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
         $this->arcount = ord($packet->rdata[++$offset]) << 8 | ord($packet->rdata[++$offset]);
 
-        $packet->offset += \Net\DNS2\Lookups::DNS_HEADER_SIZE;
+        $packet->offset += Lookups::DNS_HEADER_SIZE;
 
         return true;
     }
 
-    public function get(\Net\DNS2\Packet\Packet &$packet): string
+    public function get(Packet &$packet): string
     {
-        $packet->offset += \Net\DNS2\Lookups::DNS_HEADER_SIZE;
+        $packet->offset += Lookups::DNS_HEADER_SIZE;
 
         return pack('n', $this->id) .
             chr(($this->qr << 7) | ($this->opcode << 3) | ($this->aa << 2) | ($this->tc << 1) | $this->rd) .
