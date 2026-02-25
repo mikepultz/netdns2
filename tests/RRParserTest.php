@@ -13,9 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class RRParserTest extends TestCase
 {
-    /**
-     * @dataProvider rrProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('rrProvider')]
     public function testRRRoundTrip(string $type, string $line, string $expectedClass): void
     {
         $a = RR::fromString($line);

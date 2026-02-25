@@ -8,21 +8,6 @@ use Net\DNS2\Exception;
 use Net\DNS2\Header;
 use Net\DNS2\Question;
 
-/**
- * DNS Library for handling lookups and updates.
- *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
- *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   DNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link      https://netdns2.com/
- */
-
 class Request extends Packet
 {
     /**

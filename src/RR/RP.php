@@ -2,16 +2,7 @@
 
 namespace Net\DNS2\RR;
 
-
-use Net\DNS2\DNS2;
 use Net\DNS2\Packet\Packet;
-
-/**
- * DNS Library for handling lookups and updates.
- *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
- * See LICENSE for more details.
- */
 
 /**
  * RP Resource Record - RFC1183 section 2.2

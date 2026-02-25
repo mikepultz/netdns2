@@ -10,34 +10,6 @@ use Net\DNS2\Packet\Packet;
 use Net\DNS2\Packet\Request;
 
 /**
- * DNS Library for handling lookups and updates.
- *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
- * See LICENSE for more details.
- *
- * This file contains code based off the Net::DNS::SEC Perl module by Olaf M. Kolkman
- *
- * Copyright (c) 2001 - 2005  RIPE NCC.  Author Olaf M. Kolkman
- * Copyright (c) 2007 - 2008  NLnet Labs.  Author Olaf M. Kolkman <olaf@net-dns.org>
- * All Rights Reserved
- *
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose and without fee is hereby granted,
- * provided that the above copyright notice appear in all copies and that
- * both that copyright notice and this permission notice appear in
- * supporting documentation, and that the name of the author not be
- * used in advertising or publicity pertaining to distribution of the
- * software without specific, written prior permission.
- *
- * THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
- * ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS; IN NO EVENT SHALL
- * AUTHOR BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
- * DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
- * AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
-
-/**
  * SIG Resource Record - RFC2535 section 4.1
  *
  *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1

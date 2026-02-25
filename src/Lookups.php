@@ -2,7 +2,6 @@
 
 namespace Net\DNS2;
 
-
 use Net\DNS2\RR\RR;
 class Lookups
 {

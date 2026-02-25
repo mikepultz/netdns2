@@ -2,23 +2,7 @@
 
 namespace Net\DNS2;
 
-
 use Net\DNS2\RR\RR;
-/**
- * DNS Library for handling lookups and updates.
- *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
- *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   \Net\DNS2\DNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link      https://netdns2.com/
- */
-
 /**
  * RR bitmap converter for NSEC and NSEC3 records (RFC3845)
  */
@@ -53,7 +37,7 @@ class BitMap
             for ($i = 0; $i < $blen; $i++) {
                 if ($bitstr[$i] === '1') {
                     $type = $x['window'] * 256 + $i;
-                    $output[] = \Net\DNS2\Lookups::$rr_types_by_id[$type] ?? ('TYPE' . $type);
+                    $output[] = Lookups::$rr_types_by_id[$type] ?? ('TYPE' . $type);
                 }
             }
         }
@@ -73,10 +57,10 @@ class BitMap
         foreach ($data as $rr) {
             $rr = strtoupper($rr);
 
-            $type = \Net\DNS2\Lookups::$rr_types_by_name[$rr] ?? null;
+            $type = Lookups::$rr_types_by_name[$rr] ?? null;
             if ($type !== null) {
-                if (isset(\Net\DNS2\Lookups::$rr_qtypes_by_id[$type])
-                    || isset(\Net\DNS2\Lookups::$rr_metatypes_by_id[$type])
+                if (isset(Lookups::$rr_qtypes_by_id[$type])
+                    || isset(Lookups::$rr_metatypes_by_id[$type])
                 ) {
                     continue;
                 }

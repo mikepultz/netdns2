@@ -2,21 +2,6 @@
 
 namespace Net\DNS2;
 
-/**
- * DNS Library for handling lookups and updates.
- *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
- *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   \Net\DNS2\DNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link      https://netdns2.com/
- */
-
 if (!defined('SOCK_STREAM')) {
     define('SOCK_STREAM', 1);
 }
@@ -88,9 +73,9 @@ class Socket
             return false;
         }
 
-        if (\Net\DNS2\DNS2::isIPv4($this->host)) {
+        if (DNS2::isIPv4($this->host)) {
             $target = "{$proto}://{$this->host}:{$this->port}";
-        } elseif (\Net\DNS2\DNS2::isIPv6($this->host)) {
+        } elseif (DNS2::isIPv6($this->host)) {
             $target = "{$proto}://[{$this->host}]:{$this->port}";
         } else {
             $this->last_error = "invalid address type: {$this->host}";
@@ -192,7 +177,7 @@ class Socket
             }
 
             $length = ord($data[0]) << 8 | ord($data[1]);
-            if ($length < \Net\DNS2\Lookups::DNS_HEADER_SIZE) {
+            if ($length < Lookups::DNS_HEADER_SIZE) {
                 return false;
             }
         }

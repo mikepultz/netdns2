@@ -2,26 +2,14 @@
 
 namespace Net\DNS2;
 
-
-use Net\DNS2\Packet\Response;
 use Net\DNS2\Cache\Cache;
 use Net\DNS2\Cache\File;
 use Net\DNS2\Cache\Shm;
+use Net\DNS2\Packet\Packet;
+use Net\DNS2\Packet\Response;
 use Net\DNS2\RR\RR;
-/**
- * DNS Library for handling lookups and updates.
- *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
- *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   \Net\DNS2\DNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link      https://netdns2.com/
- */
+use Net\DNS2\RR\SIG;
+use Net\DNS2\RR\TSIG;
 
 class DNS2
 {
@@ -36,10 +24,8 @@ class DNS2
     public int $timeout = 5;
     public bool $ns_random = false;
     public string $domain = '';
-
     /** @var array<string> */
     public array $search_list = [];
-
     public string $cache_type = 'none';
     public string $cache_file = '/tmp/net_dns2.cache';
     public int $cache_size = 50000;
@@ -50,19 +36,15 @@ class DNS2
     public bool $dnssec_ad_flag = false;
     public bool $dnssec_cd_flag = false;
     public int $dnssec_payload_size = 4000;
-
     public ?Exception $last_exception = null;
-
     /** @var array<string, Exception> */
     public array $last_exception_list = [];
-
     /** @var array<string> */
     public array $nameservers = [];
 
-    /** @var array<int, array<string, \Net\DNS2\Socket>> */
+    /** @var array<int, array<string, Socket>> */
     protected array $sock = [Socket::SOCK_DGRAM => [], Socket::SOCK_STREAM => []];
-
-    protected \Net\DNS2\RR\TSIG|\Net\DNS2\RR\SIG|null $auth_signature = null;
+    protected TSIG|SIG|null $auth_signature = null;
     protected ?Cache $cache = null;
     protected bool $use_cache = false;
 
@@ -85,19 +67,12 @@ class DNS2
             'shared' => extension_loaded('shmop')
                 ? new Shm()
                 : throw new Exception('shmop library is not available for cache', Lookups::E_CACHE_SHM_UNAVAIL),
-            'file' => new File(),
-            'none' => null,
-            default => throw new Exception("un-supported cache type: {$this->cache_type}", Lookups::E_CACHE_UNSUPPORTED),
+            'file'    => new File(),
+            'none'    => null,
+            default   => throw new Exception("un-supported cache type: {$this->cache_type}", Lookups::E_CACHE_UNSUPPORTED),
         };
 
         $this->use_cache = $this->cache !== null;
-    }
-
-    public static function autoload(string $name): void
-    {
-        if (str_starts_with($name, '\Net\DNS2\DNS2')) {
-            include str_replace('_', '/', $name) . '.php';
-        }
     }
 
     /**
@@ -112,18 +87,12 @@ class DNS2
             $ns = [];
 
             if (!is_readable($nameservers)) {
-                throw new Exception(
-                    "resolver file provided is not readable: {$nameservers}",
-                    Lookups::E_NS_INVALID_FILE
-                );
+                throw new Exception("resolver file provided is not readable: {$nameservers}", Lookups::E_NS_INVALID_FILE);
             }
 
             $data = file_get_contents($nameservers);
             if ($data === false) {
-                throw new Exception(
-                    "failed to read contents of file: {$nameservers}",
-                    Lookups::E_NS_INVALID_FILE
-                );
+                throw new Exception("failed to read contents of file: {$nameservers}", Lookups::E_NS_INVALID_FILE);
             }
 
             foreach (explode("\n", $data) as $line) {
@@ -132,7 +101,6 @@ class DNS2
                 if ($line === '' || $line[0] === '#' || $line[0] === ';') {
                     continue;
                 }
-
                 if (!str_contains($line, ' ')) {
                     continue;
                 }
@@ -145,17 +113,16 @@ class DNS2
                     'nameserver' => (self::isIPv4($value) || self::isIPv6($value))
                         ? $ns[] = $value
                         : throw new Exception("invalid nameserver entry: {$value}", Lookups::E_NS_INVALID_ENTRY),
-                    'domain' => $this->domain = $value,
-                    'search' => $this->search_list = preg_split('/\s+/', $value),
+                    'domain'  => $this->domain = $value,
+                    'search'  => $this->search_list = preg_split('/\s+/', $value),
                     'options' => $this->parseOptions($value),
-                    default => null,
+                    default   => null,
                 };
             }
 
             if ($this->domain === '' && count($this->search_list) > 0) {
                 $this->domain = $this->search_list[0];
             }
-
             if (count($ns) > 0) {
                 $this->nameservers = $ns;
             }
@@ -167,9 +134,7 @@ class DNS2
         return true;
     }
 
-    /**
-     * @return array<int, array<string, \Net\DNS2\Socket>>
-     */
+    /** @return array<int, array<string, Socket>> */
     public function getSockets(): array
     {
         return $this->sock;
@@ -179,7 +144,6 @@ class DNS2
     {
         $this->sock[Socket::SOCK_DGRAM]  = [];
         $this->sock[Socket::SOCK_STREAM] = [];
-
         return true;
     }
 
@@ -203,9 +167,7 @@ class DNS2
         return true;
     }
 
-    /**
-     * @throws Exception
-     */
+    /** @throws Exception */
     protected function checkServers(string|array|null $default = null): bool
     {
         if (empty($this->nameservers)) {
@@ -218,45 +180,33 @@ class DNS2
                 );
             }
         }
-
         return true;
     }
 
-    public function signTSIG(
-        \Net\DNS2\RR\TSIG|string $keyname,
-        string $signature = '',
-        string $algorithm = \Net\DNS2\RR\TSIG::HMAC_MD5,
-    ): bool {
-        if ($keyname instanceof \Net\DNS2\RR\TSIG) {
+    public function signTSIG(TSIG|string $keyname, string $signature = '', string $algorithm = TSIG::HMAC_MD5): bool
+    {
+        if ($keyname instanceof TSIG) {
             $this->auth_signature = $keyname;
         } else {
-            $this->auth_signature = \Net\DNS2\RR\RR::fromString(
-                strtolower(trim($keyname)) . ' TSIG ' . $signature
-            );
+            $this->auth_signature = RR::fromString(strtolower(trim($keyname)) . ' TSIG ' . $signature);
             $this->auth_signature->algorithm = $algorithm;
         }
-
         return true;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function signSIG0(\Net\DNS2\RR\SIG|string $filename): bool
+    /** @throws Exception */
+    public function signSIG0(SIG|string $filename): bool
     {
         if (!extension_loaded('openssl')) {
-            throw new Exception(
-                'the OpenSSL extension is required to use SIG(0).',
-                Lookups::E_OPENSSL_UNAVAIL
-            );
+            throw new Exception('the OpenSSL extension is required to use SIG(0).', Lookups::E_OPENSSL_UNAVAIL);
         }
 
-        if ($filename instanceof \Net\DNS2\RR\SIG) {
+        if ($filename instanceof SIG) {
             $this->auth_signature = $filename;
         } else {
             $private = new PrivateKey($filename);
 
-            $this->auth_signature = new \Net\DNS2\RR\SIG();
+            $this->auth_signature = new SIG();
             $this->auth_signature->name        = $private->signname;
             $this->auth_signature->ttl         = 0;
             $this->auth_signature->class       = 'ANY';
@@ -268,8 +218,8 @@ class DNS2
             $this->auth_signature->origttl     = 0;
 
             $t = time();
-            $this->auth_signature->sigincep  = gmdate('YmdHis', $t);
-            $this->auth_signature->sigexp    = gmdate('YmdHis', $t + 500);
+            $this->auth_signature->sigincep    = gmdate('YmdHis', $t);
+            $this->auth_signature->sigexp      = gmdate('YmdHis', $t + 500);
             $this->auth_signature->private_key = $private;
         }
 
@@ -279,10 +229,7 @@ class DNS2
             Lookups::DNSSEC_ALGORITHM_RSASHA256,
             Lookups::DNSSEC_ALGORITHM_RSASHA512,
             Lookups::DNSSEC_ALGORITHM_DSA => true,
-            default => throw new Exception(
-                'only asymmetric algorithms work with SIG(0)!',
-                Lookups::E_OPENSSL_INV_ALGO
-            ),
+            default => throw new Exception('only asymmetric algorithms work with SIG(0)!', Lookups::E_OPENSSL_INV_ALGO),
         };
 
         return true;
@@ -317,19 +264,12 @@ class DNS2
         return substr(preg_replace('/([A-f0-9]{4})/', '$1:', $hex['hex']), 0, -1);
     }
 
-    /**
-     * @throws Exception
-     */
-    protected function sendPacket(\Net\DNS2\Packet\Packet $request, bool $use_tcp): \Net\DNS2\Packet\Response
+    /** @throws Exception */
+    protected function sendPacket(Packet $request, bool $use_tcp): Response
     {
         $data = $request->get();
         if (strlen($data) < Lookups::DNS_HEADER_SIZE) {
-            throw new Exception(
-                'invalid or empty packet for sending!',
-                Lookups::E_PACKET_INVALID,
-                null,
-                $request
-            );
+            throw new Exception('invalid or empty packet for sending!', Lookups::E_PACKET_INVALID, null, $request);
         }
 
         reset($this->nameservers);
@@ -345,20 +285,14 @@ class DNS2
             next($this->nameservers);
 
             if ($ns === false) {
-                throw $this->last_exception ?? new Exception(
-                    'every name server provided has failed',
-                    Lookups::E_NS_FAILED
-                );
+                throw $this->last_exception ?? new Exception('every name server provided has failed', Lookups::E_NS_FAILED);
             }
 
             $max_udp_size = $this->dnssec ? $this->dnssec_payload_size : Lookups::DNS_MAX_UDP_SIZE;
 
             if ($use_tcp || strlen($data) > $max_udp_size) {
                 try {
-                    $response = $this->sendTCPRequest(
-                        $ns, $data,
-                        $request->question[0]->qtype === 'AXFR'
-                    );
+                    $response = $this->sendTCPRequest($ns, $data, $request->question[0]->qtype === 'AXFR');
                 } catch (Exception $e) {
                     $this->last_exception = $e;
                     $this->last_exception_list[$ns] = $e;
@@ -367,7 +301,6 @@ class DNS2
             } else {
                 try {
                     $response = $this->sendUDPRequest($ns, $data);
-
                     if ($response->header->tc === 1) {
                         $response = $this->sendTCPRequest($ns, $data);
                     }
@@ -411,9 +344,7 @@ class DNS2
         return $response;
     }
 
-    /**
-     * @throws Exception
-     */
+    /** @throws Exception */
     private function generateError(int $proto, string $ns, int $error): never
     {
         if (!isset($this->sock[$proto][$ns])) {
@@ -426,24 +357,19 @@ class DNS2
         throw new Exception($last_error, $error);
     }
 
-    /**
-     * @throws Exception
-     */
-    private function sendTCPRequest(string $ns, string $data, bool $axfr = false): \Net\DNS2\Packet\Response
+    /** @throws Exception */
+    private function sendTCPRequest(string $ns, string $data, bool $axfr = false): Response
     {
         $start_time = microtime(true);
 
         if (!isset($this->sock[Socket::SOCK_STREAM][$ns])
             || !($this->sock[Socket::SOCK_STREAM][$ns] instanceof Socket)
         ) {
-            $this->sock[Socket::SOCK_STREAM][$ns] = new Socket(
-                Socket::SOCK_STREAM, $ns, $this->dns_port, $this->timeout
-            );
+            $this->sock[Socket::SOCK_STREAM][$ns] = new Socket(Socket::SOCK_STREAM, $ns, $this->dns_port, $this->timeout);
 
             if ($this->local_host !== '') {
                 $this->sock[Socket::SOCK_STREAM][$ns]->bindAddress($this->local_host, $this->local_port);
             }
-
             if (!$this->sock[Socket::SOCK_STREAM][$ns]->open()) {
                 $this->generateError(Socket::SOCK_STREAM, $ns, Lookups::E_NS_SOCKET_FAILED);
             }
@@ -467,7 +393,7 @@ class DNS2
                     $this->generateError(Socket::SOCK_STREAM, $ns, Lookups::E_NS_SOCKET_FAILED);
                 }
 
-                $chunk = new Packet\Response($result, $size);
+                $chunk = new Response($result, $size);
 
                 if ($response === null) {
                     $response = clone $chunk;
@@ -506,7 +432,7 @@ class DNS2
                 $this->generateError(Socket::SOCK_STREAM, $ns, Lookups::E_NS_SOCKET_FAILED);
             }
 
-            $response = new Packet\Response($result, $size);
+            $response = new Response($result, $size);
         }
 
         $response->response_time      = microtime(true) - $start_time;
@@ -516,24 +442,19 @@ class DNS2
         return $response;
     }
 
-    /**
-     * @throws Exception
-     */
-    private function sendUDPRequest(string $ns, string $data): \Net\DNS2\Packet\Response
+    /** @throws Exception */
+    private function sendUDPRequest(string $ns, string $data): Response
     {
         $start_time = microtime(true);
 
         if (!isset($this->sock[Socket::SOCK_DGRAM][$ns])
             || !($this->sock[Socket::SOCK_DGRAM][$ns] instanceof Socket)
         ) {
-            $this->sock[Socket::SOCK_DGRAM][$ns] = new Socket(
-                Socket::SOCK_DGRAM, $ns, $this->dns_port, $this->timeout
-            );
+            $this->sock[Socket::SOCK_DGRAM][$ns] = new Socket(Socket::SOCK_DGRAM, $ns, $this->dns_port, $this->timeout);
 
             if ($this->local_host !== '') {
                 $this->sock[Socket::SOCK_DGRAM][$ns]->bindAddress($this->local_host, $this->local_port);
             }
-
             if (!$this->sock[Socket::SOCK_DGRAM][$ns]->open()) {
                 $this->generateError(Socket::SOCK_DGRAM, $ns, Lookups::E_NS_SOCKET_FAILED);
             }
@@ -551,7 +472,7 @@ class DNS2
             $this->generateError(Socket::SOCK_DGRAM, $ns, Lookups::E_NS_SOCKET_FAILED);
         }
 
-        $response = new Packet\Response($result, $size);
+        $response = new Response($result, $size);
         $response->response_time      = microtime(true) - $start_time;
         $response->answer_from        = $ns;
         $response->answer_socket_type = Socket::SOCK_DGRAM;

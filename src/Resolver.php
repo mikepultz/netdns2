@@ -2,24 +2,12 @@
 
 namespace Net\DNS2;
 
-
 use Net\DNS2\Packet\Request;
 use Net\DNS2\Packet\Response;
+use Net\DNS2\RR\OPT;
 use Net\DNS2\RR\RR;
-/**
- * DNS Library for handling lookups and updates.
- *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
- *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   \Net\DNS2\DNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link      https://netdns2.com/
- */
+use Net\DNS2\RR\SIG;
+use Net\DNS2\RR\TSIG;
 
 class Resolver extends DNS2
 {
@@ -28,12 +16,10 @@ class Resolver extends DNS2
         parent::__construct($options);
     }
 
-    /**
-     * @throws \Net\DNS2\Exception
-     */
-    public function query(string $name, string $type = 'A', string $class = 'IN'): \Net\DNS2\Packet\Response
+    /** @throws Exception */
+    public function query(string $name, string $type = 'A', string $class = 'IN'): Response
     {
-        $this->checkServers(\Net\DNS2\DNS2::RESOLV_CONF);
+        $this->checkServers(DNS2::RESOLV_CONF);
 
         if ($type === 'IXFR') {
             $type = 'AXFR';
@@ -43,17 +29,15 @@ class Resolver extends DNS2
             $name .= '.' . strtolower($this->domain);
         }
 
-        $packet = new Packet\Request($name, $type, $class);
+        $packet = new Request($name, $type, $class);
 
-        if ($this->auth_signature instanceof \Net\DNS2\RR\TSIG
-            || $this->auth_signature instanceof \Net\DNS2\RR\SIG
-        ) {
+        if ($this->auth_signature instanceof TSIG || $this->auth_signature instanceof SIG) {
             $packet->additional[]    = $this->auth_signature;
             $packet->header->arcount = count($packet->additional);
         }
 
         if ($this->dnssec) {
-            $opt = new \Net\DNS2\RR\OPT();
+            $opt = new OPT();
             $opt->do    = 1;
             $opt->class = $this->dnssec_payload_size;
 
@@ -72,7 +56,6 @@ class Resolver extends DNS2
 
         if ($this->use_cache && $this->cacheable($type)) {
             $this->cache->open($this->cache_file, $this->cache_size, $this->cache_serializer);
-
             $packet_hash = md5($packet->question[0]->qname . '|' . $packet->question[0]->qtype);
 
             if ($this->cache->has($packet_hash)) {
@@ -110,23 +93,19 @@ class Resolver extends DNS2
         return $response;
     }
 
-    /**
-     * @throws \Net\DNS2\Exception
-     */
-    public function iquery(\Net\DNS2\RR\RR $rr): \Net\DNS2\Packet\Response
+    /** @throws Exception */
+    public function iquery(RR $rr): Response
     {
-        $this->checkServers(\Net\DNS2\DNS2::RESOLV_CONF);
+        $this->checkServers(DNS2::RESOLV_CONF);
 
-        $packet = new Packet\Request($rr->name, 'A', 'IN');
+        $packet = new Request($rr->name, 'A', 'IN');
         $packet->question = [];
         $packet->header->qdcount = 0;
-        $packet->header->opcode  = \Net\DNS2\Lookups::OPCODE_IQUERY;
+        $packet->header->opcode  = Lookups::OPCODE_IQUERY;
         $packet->answer[]        = $rr;
         $packet->header->ancount = 1;
 
-        if ($this->auth_signature instanceof \Net\DNS2\RR\TSIG
-            || $this->auth_signature instanceof \Net\DNS2\RR\SIG
-        ) {
+        if ($this->auth_signature instanceof TSIG || $this->auth_signature instanceof SIG) {
             $packet->additional[]    = $this->auth_signature;
             $packet->header->arcount = count($packet->additional);
         }

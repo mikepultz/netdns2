@@ -2,21 +2,6 @@
 
 namespace Net\DNS2;
 
-/**
- * DNS Library for handling lookups and updates.
- *
- * Copyright (c) 2020, Mike Pultz <mike@mikepultz.com>. All rights reserved.
- *
- * See LICENSE for more details.
- *
- * @category  Networking
- * @package   \Net\DNS2\DNS2
- * @author    Mike Pultz <mike@mikepultz.com>
- * @copyright 2020 Mike Pultz <mike@mikepultz.com>
- * @license   http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link      https://netdns2.com/
- */
-
 class PrivateKey
 {
     public string $filename = '';
@@ -42,7 +27,7 @@ class PrivateKey
     public string $public_value = '';
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
     public function __construct(?string $file = null)
     {
@@ -52,21 +37,21 @@ class PrivateKey
     }
 
     /**
-     * @throws \Net\DNS2\Exception
+     * @throws Exception
      */
     public function parseFile(string $file): bool
     {
         if (!extension_loaded('openssl')) {
             throw new Exception(
                 'the OpenSSL extension is required to parse private key.',
-                \Net\DNS2\Lookups::E_OPENSSL_UNAVAIL
+                Lookups::E_OPENSSL_UNAVAIL
             );
         }
 
         if (!is_readable($file)) {
             throw new Exception(
                 "invalid private key file: {$file}",
-                \Net\DNS2\Lookups::E_OPENSSL_INV_PKEY
+                Lookups::E_OPENSSL_INV_PKEY
             );
         }
 
@@ -74,7 +59,7 @@ class PrivateKey
         if ($keyname === '') {
             throw new Exception(
                 "failed to get basename() for: {$file}",
-                \Net\DNS2\Lookups::E_OPENSSL_INV_PKEY
+                Lookups::E_OPENSSL_INV_PKEY
             );
         }
 
@@ -85,7 +70,7 @@ class PrivateKey
         } else {
             throw new Exception(
                 "file {$keyname} does not look like a private key file!",
-                \Net\DNS2\Lookups::E_OPENSSL_INV_PKEY
+                Lookups::E_OPENSSL_INV_PKEY
             );
         }
 
@@ -93,7 +78,7 @@ class PrivateKey
         if ($data === false || count($data) === 0) {
             throw new Exception(
                 "file {$keyname} is empty!",
-                \Net\DNS2\Lookups::E_OPENSSL_INV_PKEY
+                Lookups::E_OPENSSL_INV_PKEY
             );
         }
 
@@ -107,7 +92,7 @@ class PrivateKey
                 'algorithm'          => $this->algorithm !== (int)$value
                     ? throw new Exception(
                         "Algorithm mis-match! filename is {$this->algorithm}, contents say {$value}",
-                        \Net\DNS2\Lookups::E_OPENSSL_INV_ALGO
+                        Lookups::E_OPENSSL_INV_ALGO
                     )
                     : null,
                 'modulus'           => $this->modulus = $value,
@@ -125,16 +110,16 @@ class PrivateKey
                 'public_value(y)'   => $this->public_value = $value,
                 default             => throw new Exception(
                     "unknown private key data: {$key}: {$value}",
-                    \Net\DNS2\Lookups::E_OPENSSL_INV_PKEY
+                    Lookups::E_OPENSSL_INV_PKEY
                 ),
             };
         }
 
         $args = match ($this->algorithm) {
-            \Net\DNS2\Lookups::DNSSEC_ALGORITHM_RSAMD5,
-            \Net\DNS2\Lookups::DNSSEC_ALGORITHM_RSASHA1,
-            \Net\DNS2\Lookups::DNSSEC_ALGORITHM_RSASHA256,
-            \Net\DNS2\Lookups::DNSSEC_ALGORITHM_RSASHA512 => [
+            Lookups::DNSSEC_ALGORITHM_RSAMD5,
+            Lookups::DNSSEC_ALGORITHM_RSASHA1,
+            Lookups::DNSSEC_ALGORITHM_RSASHA256,
+            Lookups::DNSSEC_ALGORITHM_RSASHA512 => [
                 'rsa' => [
                     'n'    => base64_decode($this->modulus),
                     'e'    => base64_decode($this->public_exponent),
@@ -146,7 +131,7 @@ class PrivateKey
                     'iqmp' => base64_decode($this->coefficient),
                 ],
             ],
-            \Net\DNS2\Lookups::DNSSEC_ALGORITHM_DSA => [
+            Lookups::DNSSEC_ALGORITHM_DSA => [
                 'dsa' => [
                     'p'        => base64_decode($this->prime),
                     'q'        => base64_decode($this->subprime),
@@ -157,7 +142,7 @@ class PrivateKey
             ],
             default => throw new Exception(
                 'we only currently support RSAMD5 and RSASHA1 encryption.',
-                \Net\DNS2\Lookups::E_OPENSSL_INV_PKEY
+                Lookups::E_OPENSSL_INV_PKEY
             ),
         };
 
@@ -165,7 +150,7 @@ class PrivateKey
         if ($this->instance === false) {
             throw new Exception(
                 openssl_error_string() ?: 'unknown OpenSSL error',
-                \Net\DNS2\Lookups::E_OPENSSL_ERROR
+                Lookups::E_OPENSSL_ERROR
             );
         }
 
