@@ -722,6 +722,24 @@ class Client
             throw new \NetDNS2\Exception('invalid or empty packet data provided.', \NetDNS2\ENUM\Error::INT_INVALID_PACKET, null, $_request);
         }
 
+        //
+        // if the request was TSIG-signed, extract the request MAC from the encoded TSIG record.
+        // After get() encodes the packet, the cloned TSIG in additional has the computed MAC.
+        // This is needed for RFC 2845 §4.2 response MAC verification.
+        //
+        $request_mac = '';
+        if ($this->auth_signature instanceof \NetDNS2\RR\TSIG)
+        {
+            foreach($_request->additional as $rr)
+            {
+                if ($rr instanceof \NetDNS2\RR\TSIG)
+                {
+                    $request_mac = $rr->mac;
+                    break;
+                }
+            }
+        }
+
         reset($this->nameservers);
 
         //
@@ -891,7 +909,7 @@ class Client
                     continue;
                 }
 
-                if ($response_tsig->verify($response, $this->auth_signature->getKey()) == false)
+                if ($response_tsig->verify($response, $this->auth_signature->key, $request_mac) == false)
                 {
                     $this->last_exception = new \NetDNS2\Exception('TSIG response validation failed: invalid MAC or time window exceeded.',
                         \NetDNS2\ENUM\Error::INT_INVALID_PACKET, null, $_request, $response);

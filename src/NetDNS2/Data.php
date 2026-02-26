@@ -42,6 +42,16 @@ abstract class Data implements \Stringable
     public static array $compressed = [];
 
     /**
+     * when true, encode_rfc1035() skips both reading from and writing to the
+     * compression table, producing fully-expanded (uncompressed) wire names.
+     *
+     * RFC 2136 §1.2 forbids compression pointers in UPDATE message RDATA, so
+     * \NetDNS2\Packet::get() sets this flag after the question section when
+     * encoding an UPDATE packet.
+     */
+    public static bool $no_compress = false;
+
+    /**
      * create an new intance of the object; this needs
      *
      * @param int   $_type   encoding type
@@ -312,7 +322,7 @@ abstract class Data implements \Stringable
         {
             $name = implode('.', $labels);
 
-            if (isset(self::$compressed[$name]) === true)
+            if ( (isset(self::$compressed[$name]) === true) && (self::$no_compress == false) )
             {
                 $_offset += 2;
                 return $data . pack('n', 0xC000 | self::$compressed[$name]);    // 0xC000 first two bits as 1
@@ -333,7 +343,7 @@ abstract class Data implements \Stringable
                 }
 
                 $data .= pack('Ca*', strlen($label), $label);
-                if ($_offset < 0x4000)
+                if ( ($_offset < 0x4000) && (self::$no_compress == false) )
                 {
                     self::$compressed[$name] = $_offset;
                     $_offset += strlen($label) + 1;

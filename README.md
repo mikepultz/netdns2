@@ -10,7 +10,7 @@ The NetDNS2 library is a pure PHP DNS Resolver library, that supports local cach
   * Support for IPv4 and IPv6, UDP, TCP, and TLS sockets.
   * Support for DNS over TLS (DoT).
   * Support for DNS over HTTP (DoH) using RFC 8484 application/dns-message format.
-  * Support for all defined (and not obsoleted) resource record types.
+  * Support for all defined (and not obsoleted) resource record types — see [Supported Resource Records](RR.md).
   * Support for Internationalized Domain Names (IDN) (e.g. Punycode)
   * Support for DNSSEC requests and resource records.
   * Support for EDNS(0) features (client subnet,  cookies, TCP keepalive, etc.)

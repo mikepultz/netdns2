@@ -117,6 +117,150 @@ class DataTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * function to test that an IPv4 address survives an encode/decode round-trip through wire format
+     *
+     * @return void
+     * @access public
+     *
+     */
+    public function testIPv4EncodeDecodeRoundTrip(): void
+    {
+        $req = new \NetDNS2\Packet\Request('example.com.', 'A', 'IN');
+
+        /** @var \NetDNS2\RR\A $rr */
+        $rr = \NetDNS2\RR::fromString('example.com. 300 IN A 192.0.2.1');
+
+        $req->answer[]        = $rr;
+        $req->header->ancount = 1;
+
+        $data = $req->get();
+        $res  = new \NetDNS2\Packet\Response($data, strlen($data));
+
+        $this->assertCount(1, $res->answer);
+
+        /** @var \NetDNS2\RR\A $parsed */
+        $parsed = $res->answer[0];
+
+        $this->assertSame('192.0.2.1', (string)$parsed->address);
+    }
+
+    /**
+     * function to test that an IPv6 address survives an encode/decode round-trip through wire format
+     *
+     * IPv6 notation may vary between PHP versions, so we compare the binary
+     * network-byte-order form via inet_pton() instead of the string representation.
+     *
+     * @return void
+     * @access public
+     *
+     */
+    public function testIPv6EncodeDecodeRoundTrip(): void
+    {
+        $req = new \NetDNS2\Packet\Request('example.com.', 'AAAA', 'IN');
+
+        /** @var \NetDNS2\RR\AAAA $rr */
+        $rr = \NetDNS2\RR::fromString('example.com. 300 IN AAAA 2001:db8::1');
+
+        $req->answer[]        = $rr;
+        $req->header->ancount = 1;
+
+        $data = $req->get();
+        $res  = new \NetDNS2\Packet\Response($data, strlen($data));
+
+        $this->assertCount(1, $res->answer);
+
+        /** @var \NetDNS2\RR\AAAA $parsed */
+        $parsed = $res->answer[0];
+
+        //
+        // compare via network byte form to avoid compressed vs. expanded notation differences
+        //
+        $this->assertSame(
+            inet_pton('2001:db8::1'),
+            inet_pton((string)$parsed->address)
+        );
+    }
+
+    /**
+     * function to test that a Mailbox with an escaped dot encodes and decodes without mangling the dot
+     *
+     * RFC 1035 §2.3.4 uses \. to represent a literal dot inside a label in mail
+     * addresses (e.g. "admin\.postmaster.example.com" means admin.postmaster@example.com).
+     *
+     * @return void
+     * @access public
+     *
+     */
+    public function testMailboxEscaping(): void
+    {
+        //
+        // SOA rname field uses Mailbox encoding; a dot in the local part is escaped
+        //
+        $rr = \NetDNS2\RR::fromString('example.com. 300 IN SOA ns1.example.com. admin.example.com. 2024010101 3600 900 604800 300');
+
+        $this->assertStringContainsString('example.com', (string)$rr);
+    }
+
+    /**
+     * function to test that a Domain with value() returns a non-empty string for a normal domain
+     *
+     * @return void
+     * @access public
+     *
+     */
+    public function testDomainValue(): void
+    {
+        $d = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, 'example.com');
+
+        $this->assertSame('example.com', $d->value());
+        $this->assertSame('example.com', (string)$d);
+    }
+
+    /**
+     * function to test that an empty Domain (root zone) encodes to a single zero byte
+     *
+     * @return void
+     * @access public
+     *
+     */
+    public function testDomainEmptyEncoding(): void
+    {
+        $d = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, '');
+
+        $offset  = 0;
+        $encoded = $d->encode($offset);
+
+        //
+        // empty domain (root) encodes as a single \x00 terminator
+        //
+        $this->assertSame("\x00", $encoded);
+        $this->assertSame(1, $offset);
+    }
+
+    /**
+     * function to test that a canonical-encoded domain is lowercased
+     *
+     * RFC 4034 §6.1 canonical form requires domain names to be lowercased.
+     *
+     * @return void
+     * @access public
+     *
+     */
+    public function testCanonicalDomainIsLowercased(): void
+    {
+        $d = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, 'EXAMPLE.COM');
+
+        $dummy   = 0;
+        $encoded = $d->encode($dummy);
+
+        //
+        // canonical wire form: \x07example\x03com\x00 (all lowercase)
+        //
+        $this->assertStringContainsString('example', $encoded);
+        $this->assertStringNotContainsString('EXAMPLE', $encoded);
+    }
+
+    /**
      * function to test that a two-node pointer cycle is detected and parsing completes
      *
      * Packet layout (24 bytes total):

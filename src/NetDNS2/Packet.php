@@ -109,7 +109,8 @@ class Packet implements \Stringable
         //
         // clear name compression class first
         //
-        \NetDNS2\Data::$compressed = [];
+        \NetDNS2\Data::$compressed  = [];
+        \NetDNS2\Data::$no_compress = false;
 
         $data = $this->header->get($this);
 
@@ -117,17 +118,33 @@ class Packet implements \Stringable
         {
             $data .= $x->get($this);
         }
-        foreach($this->answer as $x)
+
+        //
+        // RFC 2136 §1.2 prohibits compression pointers in UPDATE message RDATA;
+        // disable compression after the question (zone) section for UPDATE packets.
+        //
+        if ($this->header->opcode == \NetDNS2\ENUM\OpCode::UPDATE)
         {
-            $data .= $x->get($this);
+            \NetDNS2\Data::$no_compress = true;
         }
-        foreach($this->authority as $x)
+
+        try
         {
-            $data .= $x->get($this);
-        }
-        foreach($this->additional as $x)
+            foreach($this->answer as $x)
+            {
+                $data .= $x->get($this);
+            }
+            foreach($this->authority as $x)
+            {
+                $data .= $x->get($this);
+            }
+            foreach($this->additional as $x)
+            {
+                $data .= $x->get($this);
+            }
+        } finally
         {
-            $data .= $x->get($this);
+            \NetDNS2\Data::$no_compress = false;
         }
 
         return $data;

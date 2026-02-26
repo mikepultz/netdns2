@@ -125,15 +125,6 @@ final class TSIG extends \NetDNS2\RR
     protected string $key;
 
     /**
-     * returns the base64-encoded shared secret key
-     *
-     */
-    public function getKey(): string
-    {
-        return $this->key;
-    }
-
-    /**
       * builds a new instance of a TSIG object directly
       */
     public function factory(string $_keyname, string $_algorithm, string $_signature): void
@@ -388,14 +379,19 @@ final class TSIG extends \NetDNS2\RR
      *
      * Validates both the time window (RFC 2845 section 4.4) and the HMAC (RFC 2845 section 4.2).
      *
-     * @param \NetDNS2\Packet\Response $_response the response packet to verify
-     * @param string                   $_key      the base64-encoded TSIG shared secret
+     * Per RFC 2845 §4.2, a response MAC is computed over a prior-MAC prefix (the request MAC,
+     * encoded as a 2-octet length followed by the MAC bytes) prepended to the message data.
+     * Pass the raw request MAC bytes via $_request_mac so that the same prefix is included here.
+     *
+     * @param \NetDNS2\Packet\Response $_response    the response packet to verify
+     * @param string                   $_key         the base64-encoded TSIG shared secret
+     * @param string                   $_request_mac the raw (binary) MAC from the matching request; empty for standalone checks
      *
      * @return bool returns true if the MAC and time window are both valid, false otherwise
      * @throws \NetDNS2\Exception
      *
      */
-    public function verify(\NetDNS2\Packet\Response $_response, string $_key): bool
+    public function verify(\NetDNS2\Packet\Response $_response, string $_key, string $_request_mac = ''): bool
     {
         //
         // validate the time window per RFC 2845 section 4.4
@@ -438,9 +434,19 @@ final class TSIG extends \NetDNS2\RR
         $new_packet->header->arcount = count($new_packet->additional);
 
         //
-        // rebuild the data that was signed, matching the structure built in rrGet()
+        // rebuild the data that was signed, matching the structure built in rrGet().
         //
-        $sig_data = $new_packet->get();
+        // Per RFC 2845 §4.2, a response MAC is computed over the request MAC prepended
+        // as a 2-octet length followed by the MAC bytes, then the response message data.
+        //
+        $sig_data = '';
+
+        if (strlen($_request_mac) > 0)
+        {
+            $sig_data .= pack('n', strlen($_request_mac)) . $_request_mac;
+        }
+
+        $sig_data .= $new_packet->get();
 
         //
         // add the name without compressing
