@@ -33,6 +33,9 @@
     "require-dev": {
         "phpunit/phpunit": "^10"
     },
+    "config": {
+        "vendor-dir": "tests/vendor"
+    },
     "suggest": {
         "ext-curl": "Used for DNS over HTTPS (DoH)",
         "ext-hash": "Used for TSIG authentication.",

@@ -1,6 +1,6 @@
 parameters:
     bootstrapFiles:
-        - /usr/local/sbin/phpunit
+        - vendor/autoload.php
     paths:
         - ../src
         - ./NetDNS2
