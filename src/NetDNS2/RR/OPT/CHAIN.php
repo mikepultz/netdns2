@@ -23,6 +23,7 @@ namespace NetDNS2\RR\OPT;
  * ~                Closest Trust Point (FQDN)                     ~
  * +---------------------------------------------------------------+
  *
+ * @property \NetDNS2\Data\Domain $closest_trust_point
  */
 final class CHAIN extends \NetDNS2\RR\OPT
 {

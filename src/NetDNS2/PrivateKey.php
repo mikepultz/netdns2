@@ -59,7 +59,7 @@ final class PrivateKey
     private string $m_public_exponent;
 
     /**
-     * RSA: rivate exponent
+     * RSA: private exponent
      */
     private string $m_private_exponent;
 
@@ -182,7 +182,7 @@ final class PrivateKey
         }
 
         //
-        // read all the data from the
+        // read all the data from the file
         //
         $data = file($file, FILE_IGNORE_NEW_LINES|FILE_SKIP_EMPTY_LINES);
         if ( ($data === false) || (count($data) == 0) )
@@ -345,7 +345,7 @@ final class PrivateKey
             break;
             default:
             {
-                throw new \NetDNS2\Exception('we only currently support RSAMD5 and RSASHA1 encryption.', \NetDNS2\ENUM\Error::INT_INVALID_PRIVATE_KEY);
+                throw new \NetDNS2\Exception('only RSA and DSA private key algorithms are currently supported.', \NetDNS2\ENUM\Error::INT_INVALID_PRIVATE_KEY);
             }
         }
 

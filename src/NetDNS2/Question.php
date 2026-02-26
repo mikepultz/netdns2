@@ -13,7 +13,7 @@
 namespace NetDNS2;
 
 /**
- * This class handles parsing and constructing the question sectino of DNS packets.
+ * This class handles parsing and constructing the question section of DNS packets.
  *
  * This is referred to as the "zone" for update per RFC2136
  *

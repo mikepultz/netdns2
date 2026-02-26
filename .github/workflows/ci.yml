@@ -1,14 +1,14 @@
 name: Tests
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  build-test:
+  phpstan:
     runs-on: ubuntu-latest
 
     steps:
     - name: Git Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: PHP Composer
       uses: php-actions/composer@v6
@@ -20,15 +20,29 @@ jobs:
         level: 8
         memory_limit: 2G
         php_version: 8.1
-        php_extensions: hash openssl shmop intl
+        php_extensions: hash openssl shmop intl sodium
         configuration: tests/phpstan.neon
+
+  phpunit:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php_version: ['8.1', '8.2', '8.3', '8.4', '8.5']
+
+    steps:
+    - name: Git Checkout
+      uses: actions/checkout@v4
+
+    - name: PHP Composer
+      uses: php-actions/composer@v6
 
     - name: PHPUnit Tests
       uses: php-actions/phpunit@v3
       with:
         version: 10.5
         configuration: tests/phpunit.xml
-        php_version: 8.1
-        php_extensions: hash openssl shmop intl
+        php_version: ${{ matrix.php_version }}
+        php_extensions: hash openssl shmop intl sodium
         test_suffix: .php
-        args: --testsuite parser
+        args: --exclude-group network

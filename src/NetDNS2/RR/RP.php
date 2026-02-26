@@ -23,6 +23,8 @@ namespace NetDNS2\RR;
  *    /                                               /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property \NetDNS2\Data\Mailbox $mboxdname
+ * @property \NetDNS2\Data\Domain $txtdname
  */
 final class RP extends \NetDNS2\RR
 {

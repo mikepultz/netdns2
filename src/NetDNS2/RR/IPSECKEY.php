@@ -26,6 +26,11 @@ namespace NetDNS2\RR;
  *     /                                                               /
  *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
  *
+ * @property int $precedence
+ * @property int $gateway_type
+ * @property int $algorithm
+ * @property \NetDNS2\Data $gateway
+ * @property string $key
  */
 final class IPSECKEY extends \NetDNS2\RR
 {
@@ -262,8 +267,6 @@ final class IPSECKEY extends \NetDNS2\RR
         //
         $data = pack('CCC', $this->precedence, $this->gateway_type, $this->algorithm);
 
-        $_packet->offset += 3;
-
         //
         // add the gateway based on the type
         //
@@ -278,7 +281,7 @@ final class IPSECKEY extends \NetDNS2\RR
             case self::GATEWAY_TYPE_IPV6:
             case self::GATEWAY_TYPE_DOMAIN:
             {
-                $data .= $this->gateway->encode($_packet->offset);
+                $data .= $this->gateway->encode();
             }
             break;
             default:
@@ -304,7 +307,6 @@ final class IPSECKEY extends \NetDNS2\RR
                 if ($decode !== false)
                 {
                     $data .= $decode;
-                    $_packet->offset += strlen($decode);
                 }
             }
             break;
@@ -313,6 +315,8 @@ final class IPSECKEY extends \NetDNS2\RR
                 return '';
             }
         }
+
+        $_packet->offset += strlen($data);
 
         return $data;
     }

@@ -2,6 +2,60 @@
 NetDNS2 - PHP DNS Resolver and Updater
 ======================================
 
+v2.0.8
+------
+* added new \NetDNS2\DNSSEC\Validator class for client-side DNSSEC signature validation; supports
+  RSA (RSAMD5/RSASHA1/RSASHA256/RSASHA512), ECDSA (P-256/P-384), and ED25519; includes built-in
+  IANA root trust anchors (KSK-2017 keytag 20326, KSK-2024 keytag 38696).
+* added two new resource record types: BRID and HHIT (RFC 9886 - HIP Intermediary Discovery).
+* added complete @property docblock tags to all RR subclasses and OPT subclasses.
+* added EDNS CO (Compact Answers OK) flag support per RFC 9824: OPT::$co property; EDNS::compact_ok() helper.
+* changed the default TSIG signing algorithm from HMAC-MD5 to HMAC-SHA256 (RFC 4635).
+* bugfix: RR/TLSA.php and RR/ZONEMD.php rrGet() used = instead of += for $_packet->offset.
+* bugfix: Data/IPv6.php passed DATA_TYPE_IPV4 to the parent Data constructor instead of DATA_TYPE_IPV6.
+* bugfix: RR/OPT/EXPIRE.php rrToString() referenced $this->timeout instead of $this->expire.
+* bugfix: RR/ISDN.php $sa was not always initialized before use in rrFromString() and rrSet().
+* bugfix: RR/L32.php, RR/L64.php, RR/NID.php did not validate the explode() result count.
+* bugfix: RR/SIG.php and RR/RRSIG.php did not check the preg_match() return before accessing captures.
+* bugfix: Cache/Model/Data.php $smallest_ttl was initialised to time() instead of PHP_INT_MAX,
+  producing a near-zero effective TTL for entries whose first RR had the largest TTL.
+* bugfix: Cache/Model/Data.php put() now deep-clones the response so the cached copy is independent
+  of the caller's object.
+* bugfix: RR/TSIG.php verify() now checks original_id before computing the HMAC.
+* bugfix: RR/TSIG.php rrGet() now throws on base64_decode() failure instead of silently using an
+  empty MAC.
+* security: Updater.php and Notifier.php now call preg_quote() on the zone name before use in regex.
+* security: Data.php _decode() now detects compression pointer cycles and throws rather than looping.
+* security: RR/TSIG.php incoming response MACs are now verified, not just decoded and stored.
+* security: Cache/Model/Data.php unserialize() now restricts allowed_classes to known NetDNS2 types.
+* Cache/Shm.php ftok() project ID is now configurable via $_options['id'] (defaults to 't').
+* Cache.php fixed typo: calcuate_ttl() renamed to calculate_ttl().
+* RR/TSIG.php $other_data is now a typed int; the full 48-bit time_signed timestamp is parsed and
+  encoded correctly; signHMAC() throws on unsupported algorithms.
+* Data.php encode_rfc1035() now throws when a label exceeds 63 octets (RFC 1035 §2.3.4).
+* expanded PHPUnit suite: TSIG sign/verify (all HMAC variants), compression pointer cycle detection,
+  Header round-trip, BitMap multi-window, RR::fromString() error paths, SIG(0), cache cases.
+* bugfix: RR/TKEY.php rrGet() used a hand-calculated offset increment that omitted the
+  variable-length ALGORITHM domain wire bytes; replaced with strlen($data).
+* bugfix: RR/DSYNC.php rrGet() only incremented $_packet->offset by 5 (fixed header), missing the
+  CANON-encoded TARGET domain bytes; build $data first, then use strlen($data).
+* bugfix: RR/IPSECKEY.php rrGet() piecemeal offset strategy silently dropped domain bytes for
+  GATEWAY_TYPE_DOMAIN (CANON encoding ignores the $_offset reference); unified to strlen($data).
+* bugfix: RR/AMTRELAY.php rrGet() double-counted IPv4/IPv6 relay bytes via encode($_packet->offset)
+  then strlen($data); removed the argument from encode().
+* bugfix: RR/DS.php rrGet() used strlen($this->digest) but $this->digest is a hex string so its
+  length is 2x the binary byte count; replaced with strlen($data) after packing.
+* bugfix: RR/APL.php trimZeros() IPv4 case dropped ALL zero octets instead of only trailing ones,
+  causing addresses with internal zeros (e.g. 10.0.2.0) to be encoded incorrectly as [10,2] instead
+  of [10,0,2]; added a $started flag matching the IPv6 $begin pattern.
+* bugfix: Data.php encode_rfc1035() did not increment $_offset by 2 when emitting a compression
+  pointer, causing subsequent compression table entries to record wrong packet offsets; added
+  $_offset += 2 before the early return.
+* bugfix: RR/SVCB.php rrFromString() applied strtolower() to the full key=value string before
+  splitting, corrupting base64-encoded ECH values; also explode('=', ...) without a limit dropped
+  base64 padding '=' characters from values. Fixed by splitting on the first '=' only (limit 2)
+  and lowercasing only the key name.
+
 v2.0.7
 ------
 * changed the hashing algorithm used for cache storage from sha256 -> xxh128; the xxHash algorithms are faster

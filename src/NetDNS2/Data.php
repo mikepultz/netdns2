@@ -180,13 +180,14 @@ abstract class Data implements \Stringable
     /**
      * domain expansion function
      *
-     * @param string $_rdata  the text to extract the values from.
-     * @param int    $_offset the offset in the text.
-     * @param bool   $_escape if we should escape periods in labels (used for mailboxes)
+     * @param string         $_rdata  the text to extract the values from.
+     * @param int            $_offset the offset in the text.
+     * @param bool           $_escape if we should escape periods in labels (used for mailboxes)
+     * @param array<int,bool> $_seen  pointer offsets already visited, used for cycle detection
      *
      * @return array<int,string>
      */
-    protected function _decode(string $_rdata, int &$_offset, bool $_escape = false): array
+    protected function _decode(string $_rdata, int &$_offset, bool $_escape = false, array $_seen = []): array
     {
         /**
          * @var array<int,string> $labels
@@ -222,9 +223,27 @@ abstract class Data implements \Stringable
 
             } else
             {
+                //
+                // bounds check the second byte of the pointer before reading it
+                //
+                if ($_offset >= strlen($_rdata))
+                {
+                    return $labels;
+                }
+
                 $pointer = (($length & 0x3f) << 8) + ord($_rdata[$_offset++]);
 
-                return array_merge($labels, $this->_decode($_rdata, $pointer, $_escape));
+                //
+                // cycle detection - if we've already followed this pointer, stop to prevent infinite recursion
+                //
+                if (isset($_seen[$pointer]) == true)
+                {
+                    return $labels;
+                }
+
+                $_seen[$pointer] = true;
+
+                return array_merge($labels, $this->_decode($_rdata, $pointer, $_escape, $_seen));
             }
         }
 
@@ -248,6 +267,14 @@ abstract class Data implements \Stringable
 
         foreach($labels as $label)
         {
+            if (strlen($label) > 63)
+            {
+                throw new \NetDNS2\Exception(
+                    sprintf('label "%s" exceeds the 63-octet limit defined in RFC 1035.', $label),
+                    \NetDNS2\ENUM\Error::INT_PARSE_ERROR
+                );
+            }
+
             $data .= pack('Ca*', strlen($label), $label);
         }
 
@@ -287,11 +314,23 @@ abstract class Data implements \Stringable
 
             if (isset(self::$compressed[$name]) === true)
             {
+                $_offset += 2;
                 return $data . pack('n', 0xC000 | self::$compressed[$name]);    // 0xC000 first two bits as 1
 
             } else
             {
                 $label = array_shift($labels);
+
+                //
+                // RFC 1035 §2.3.4: each label must be 63 octets or fewer
+                //
+                if (strlen($label) > 63)
+                {
+                    throw new \NetDNS2\Exception(
+                        sprintf('label "%s" exceeds the 63-octet limit defined in RFC 1035.', $label),
+                        \NetDNS2\ENUM\Error::INT_PARSE_ERROR
+                    );
+                }
 
                 $data .= pack('Ca*', strlen($label), $label);
                 if ($_offset < 0x4000)
@@ -337,6 +376,14 @@ abstract class Data implements \Stringable
 
         foreach($labels as $label)
         {
+            if (strlen($label) > 63)
+            {
+                throw new \NetDNS2\Exception(
+                    sprintf('label "%s" exceeds the 63-octet limit defined in RFC 1035.', $label),
+                    \NetDNS2\ENUM\Error::INT_PARSE_ERROR
+                );
+            }
+
             $data .= pack('Ca*', strlen($label), $label);
         }
 

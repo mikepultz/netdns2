@@ -22,6 +22,8 @@ namespace NetDNS2\RR;
  *  |     Locator32 (16 LSBs)       |
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property int $preference
+ * @property string $locator32
  */
 final class L32 extends \NetDNS2\RR
 {
@@ -102,6 +104,10 @@ final class L32 extends \NetDNS2\RR
         // break out the locator value
         //
         $n = explode('.', $this->locator32);
+        if (count($n) != 4)
+        {
+            return '';
+        }
 
         //
         // pack the data

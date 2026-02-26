@@ -14,6 +14,10 @@ namespace NetDNS2\RR;
 
 /**
  * SVCB Resource Record - RFC 9460 section 2.2
+ *
+ * @property int $svc_priority
+ * @property \NetDNS2\Data\Domain $target_name
+ * @property array<string,mixed> $svc_params
  */
 class SVCB extends \NetDNS2\RR
 {
@@ -192,7 +196,12 @@ class SVCB extends \NetDNS2\RR
 
             if (strpos($data, '=') !== false)
             {
-                list($service, $values) = explode('=', strtolower($data));
+                //
+                // limit to 2 parts so that base64 padding '=' in values (e.g. ECH) is preserved;
+                // only lowercase the key name, not the value (base64 is case-sensitive)
+                //
+                [$service, $values] = explode('=', $data, 2);
+                $service = strtolower($service);
             } else
             {
                 $service = strtolower($data);
@@ -282,7 +291,7 @@ class SVCB extends \NetDNS2\RR
             //
             $this->target_name = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $this->rdata, $offset);
 
-            $limit = $this->rdlength - 3;
+            $limit = $this->rdlength;
 
             while($offset < $limit)
             {

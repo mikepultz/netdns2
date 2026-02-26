@@ -1,7 +1,7 @@
 parameters:
-    universalObjectCratesClasses:
-        - NetDNS2\RR\SIG
-        - NetDNS2\RR\OPT
+    bootstrapFiles:
+        - /usr/local/sbin/phpunit
     paths:
         - ../src
+        - ./NetDNS2
     treatPhpDocTypesAsCertain: false

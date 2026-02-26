@@ -27,6 +27,10 @@ namespace NetDNS2\RR;
  * /                                                               /
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property int $serial
+ * @property int $scheme
+ * @property int $hash_algorithm
+ * @property string $digest
  */
 final class ZONEMD extends \NetDNS2\RR
 {
@@ -140,7 +144,7 @@ final class ZONEMD extends \NetDNS2\RR
 
         $digest = pack('H*', $this->digest);
 
-        $_packet->offset = strlen($digest) + 6;
+        $_packet->offset += strlen($digest) + 6;
 
         return pack('NCC', $this->serial, $this->scheme, $this->hash_algorithm) . $digest;
     }

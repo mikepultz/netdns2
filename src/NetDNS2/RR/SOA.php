@@ -37,6 +37,13 @@ namespace NetDNS2\RR;
  *    |                                               |
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property \NetDNS2\Data\Domain $mname
+ * @property \NetDNS2\Data\Mailbox $rname
+ * @property int $serial
+ * @property int $refresh
+ * @property int $retry
+ * @property int $expire
+ * @property int $minimum
  */
 final class SOA extends \NetDNS2\RR
 {
@@ -140,6 +147,10 @@ final class SOA extends \NetDNS2\RR
         $data = $this->mname->encode($_packet->offset) . $this->rname->encode($_packet->offset) .
             pack('N5', $this->serial, $this->refresh, $this->retry, $this->expire, $this->minimum);
 
+        //
+        // the mname and rname encode() calls above already advanced $_packet->offset; this adds the
+        // remaining 20 bytes for the five 4-byte integers (serial, refresh, retry, expire, minimum).
+        //
         $_packet->offset += 20;
 
         return $data;

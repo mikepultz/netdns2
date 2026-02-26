@@ -20,6 +20,7 @@ namespace NetDNS2\RR;
  *    /                                               /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property \NetDNS2\Data\Domain $nsdname
  */
 final class NS extends \NetDNS2\RR
 {

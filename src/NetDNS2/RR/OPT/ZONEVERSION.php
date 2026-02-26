@@ -22,6 +22,9 @@ namespace NetDNS2\RR\OPT;
  *    /                                                               /
  *   +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
+ * @property int $label_count
+ * @property int $zone_version_type
+ * @property string $zone_version
  */
 final class ZONEVERSION extends \NetDNS2\RR\OPT
 {

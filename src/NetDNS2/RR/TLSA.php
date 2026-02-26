@@ -24,6 +24,10 @@ namespace NetDNS2\RR;
  *  /                                                               /
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property int $cert_usage
+ * @property int $selector
+ * @property int $matching_type
+ * @property string $certificate
  */
 class TLSA extends \NetDNS2\RR
 {
@@ -115,7 +119,7 @@ class TLSA extends \NetDNS2\RR
 
         $cert = pack('H*', $this->certificate);
 
-        $_packet->offset = strlen($cert) + 3;
+        $_packet->offset += strlen($cert) + 3;
 
         return pack('CCC', $this->cert_usage, $this->selector, $this->matching_type) . $cert;
     }

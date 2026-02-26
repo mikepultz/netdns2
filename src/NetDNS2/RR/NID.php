@@ -24,6 +24,8 @@ namespace NetDNS2\RR;
  *  |                               |
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property int $preference
+ * @property string $nodeid
  */
 final class NID extends \NetDNS2\RR
 {
@@ -38,7 +40,7 @@ final class NID extends \NetDNS2\RR
     protected string $nodeid;
 
     /**
-     * @see \NetDNS2\RR::rrFromString()
+     * @see \NetDNS2\RR::rrToString()
      */
     protected function rrToString(): string
     {
@@ -99,10 +101,16 @@ final class NID extends \NetDNS2\RR
         // break out the node id
         //
         $n = explode(':', $this->nodeid);
+        if (count($n) != 4)
+        {
+            return '';
+        }
 
         //
         // pack the data
         //
+        $_packet->offset += 10;
+
         return pack('n5', $this->preference, hexdec($n[0]), hexdec($n[1]), hexdec($n[2]), hexdec($n[3]));
     }
 }

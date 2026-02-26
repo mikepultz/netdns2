@@ -21,6 +21,10 @@ namespace NetDNS2\RR;
  *                  | Target ...  /
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-/
  *
+ * @property \NetDNS2\ENUM\RR\Type $rrtype
+ * @property string $scheme
+ * @property int $port
+ * @property \NetDNS2\Data\Domain $target
  */
 final class DSYNC extends \NetDNS2\RR
 {
@@ -171,8 +175,10 @@ final class DSYNC extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        $_packet->offset += 5;
+        $data = pack('nCn', $this->rrtype->value, self::$scheme_name_to_id[$this->scheme], $this->port) . $this->target->encode();
 
-        return pack('nCn', $this->rrtype->value, self::$scheme_name_to_id[$this->scheme], $this->port) . $this->target->encode();
+        $_packet->offset += strlen($data);
+
+        return $data;
     }
 }

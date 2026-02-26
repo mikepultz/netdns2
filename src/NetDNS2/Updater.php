@@ -75,7 +75,7 @@ final class Updater extends \NetDNS2\Client
      */
     private function checkName(string $_name): void
     {
-        if (preg_match('/' . $this->m_packet->question[0]->qname . '$/', $_name) !== 1)
+        if (preg_match('/' . preg_quote(strval($this->m_packet->question[0]->qname), '/') . '$/', $_name) !== 1)
         {
             throw new \NetDNS2\Exception(sprintf('name %s does not match zone name %s.', $_name, $this->m_packet->question[0]->qname), \NetDNS2\ENUM\Error::INT_INVALID_PACKET);
         }

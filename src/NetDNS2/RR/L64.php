@@ -24,6 +24,8 @@ namespace NetDNS2\RR;
  *  |                               |
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property int $preference
+ * @property string $locator64
  */
 final class L64 extends \NetDNS2\RR
 {
@@ -99,6 +101,10 @@ final class L64 extends \NetDNS2\RR
         // break out the locator64
         //
         $n = explode(':', $this->locator64);
+        if (count($n) != 4)
+        {
+            return '';
+        }
 
         //
         // increment the offset

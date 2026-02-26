@@ -24,6 +24,8 @@ namespace NetDNS2\RR;
  *  /                                                               /
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property int $preference
+ * @property \NetDNS2\Data\Domain $fqdn
  */
 final class LP extends \NetDNS2\RR
 {

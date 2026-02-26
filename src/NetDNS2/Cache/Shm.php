@@ -78,10 +78,10 @@ final class Shm extends \NetDNS2\Cache
         //
         // convert the filename to a IPC key
         //
-        $this->m_cache_file_tok = ftok($this->m_options['file'], 't');
+        $this->m_cache_file_tok = ftok($this->m_options['file'], strval($this->m_options['id'] ?? 't'));
         if ($this->m_cache_file_tok == -1)
         {
-            throw new \NetDNS2\Exception(sprintf('failed on ftok() file: %s', $this->m_cache_file_tok), \NetDNS2\ENUM\Error::INT_FAILED_SHMOP);
+            throw new \NetDNS2\Exception(sprintf('failed on ftok() file: %s', $this->m_options['file']), \NetDNS2\ENUM\Error::INT_FAILED_SHMOP);
         }
 
         //
@@ -110,7 +110,7 @@ final class Shm extends \NetDNS2\Cache
                 //
                 // unserialize and store the data
                 //
-                $decoded = unserialize(strval($data));
+                $decoded = unserialize(strval($data), ['allowed_classes' => false]);
 
                 if (is_array($decoded) == true)
                 {
@@ -141,7 +141,7 @@ final class Shm extends \NetDNS2\Cache
         //
         // if there's no cache file set, then there's nothing to do
         //
-        if (strlen($this->m_options['file']) == 0)
+        if (strlen($this->m_options['file'] ?? '') == 0)
         {
             return;
         }
@@ -174,7 +174,7 @@ final class Shm extends \NetDNS2\Cache
                 //
                 $c = $this->cache_data;
 
-                $decoded = unserialize(strval($data));
+                $decoded = unserialize(strval($data), ['allowed_classes' => false]);
 
                 if (is_array($decoded) == true)
                 {
@@ -208,7 +208,7 @@ final class Shm extends \NetDNS2\Cache
                     return;
                 }
 
-                $o = shmop_write($cache, $data, 0);
+                shmop_write($cache, $data, 0);
             }
 
             //

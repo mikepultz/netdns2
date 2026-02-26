@@ -22,6 +22,7 @@ namespace NetDNS2\RR;
  * |                                                               |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property string $address
  */
 final class EUI64 extends \NetDNS2\RR
 {

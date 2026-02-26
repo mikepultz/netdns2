@@ -22,6 +22,7 @@ namespace NetDNS2\RR\OPT;
  * /                         AGENT DOMAIN                          /
  * +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
+ * @property \NetDNS2\Data\Domain $agent_domain
  */
 final class RCHANNEL extends \NetDNS2\RR\OPT
 {

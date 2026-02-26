@@ -14,6 +14,8 @@ namespace NetDNS2\RR\OPT;
 
 /**
  * RFC 7314 - Extension Mechanisms for DNS (EDNS) EXPIRE Option
+ *
+ * @property int $expire
  */
 final class EXPIRE extends \NetDNS2\RR\OPT
 {
@@ -27,7 +29,7 @@ final class EXPIRE extends \NetDNS2\RR\OPT
      */
     protected function rrToString(): string
     {
-        return $this->option_code->label() . ' ' . $this->option_length . ' ' . $this->timeout;
+        return $this->option_code->label() . ' ' . $this->option_length . ' ' . $this->expire;
     }
 
     /**

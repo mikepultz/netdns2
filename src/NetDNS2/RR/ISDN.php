@@ -55,6 +55,9 @@ final class ISDN extends \NetDNS2\RR
             if (isset($data[1]) === true)
             {
                 $this->sa = new \NetDNS2\Data\Text($data[1]);
+            } else
+            {
+                $this->sa = new \NetDNS2\Data\Text();
             }
 
             return true;
@@ -83,6 +86,9 @@ final class ISDN extends \NetDNS2\RR
         if ( ($this->isdnaddress->length() + 1) < $this->rdlength)
         {
             $this->sa = new \NetDNS2\Data\Text($_packet->rdata, $offset);
+        } else
+        {
+            $this->sa = new \NetDNS2\Data\Text();
         }
 
         return true;

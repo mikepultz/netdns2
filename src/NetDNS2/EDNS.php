@@ -58,9 +58,24 @@ final class EDNS
     }
 
     /**
-     * An EDNS(0) option to negotiate Leases on DNS Updates
-     *
-     * https://datatracker.ietf.org/doc/draft-ietf-dnssd-update-lease/08/
+     * RFC 9824 - signal Compact Denial of Existence support (CO bit)
+     */
+    public function compact_ok(bool $_enable): void
+    {
+        if ($this->check(__FUNCTION__, $_enable) == true)
+        {
+            return;
+        }
+
+        $opt = new \NetDNS2\RR\OPT();
+
+        $opt->co = 1;
+
+        $this->opts[__FUNCTION__] = clone $opt;
+    }
+
+    /**
+     * RFC 9664 - EDNS(0) option to negotiate Leases on DNS Updates
      */
     public function update_lease(bool $_enable, int $_lease, int $_key_lease = 0): void
     {
@@ -218,8 +233,10 @@ final class EDNS
 
     /**
      * RFC 7830 - The EDNS(0) Padding Option
+     *
+     * @param int $_length number of zero-padding bytes to add (0 = signal support only, no padding bytes)
      */
-    public function padding(bool $_enable, string $_padding = ''): void
+    public function padding(bool $_enable, int $_length = 0): void
     {
         if ($this->check(__FUNCTION__, $_enable) == true)
         {
@@ -228,7 +245,7 @@ final class EDNS
 
         $opt = new \NetDNS2\RR\OPT\PADDING();
 
-        $opt->padding = $_padding;
+        $opt->padding = str_repeat("\x00", $_length);
 
         $this->opts[__FUNCTION__] = clone $opt;
     }
@@ -316,5 +333,56 @@ final class EDNS
         $opt = new \NetDNS2\RR\OPT\ZONEVERSION();
 
         $this->opts[__FUNCTION__] = clone $opt;
+    }
+
+    /**
+     * Merges all configured EDNS options into a single \NetDNS2\RR\OPT record as required by RFC 6891 §6.1.1
+     * ("A DNS message carries at most one OPT RR in its additional data section").
+     *
+     * Flag-only options (DO, CO) are ORed into the merged record's flag fields.
+     * Options with RDATA are concatenated into a single RDATA block.
+     *
+     * @param int $_udp_length the UDP payload size to advertise in the OPT class field
+     *
+     * @throws \NetDNS2\Exception
+     *
+     */
+    public function build(int $_udp_length): ?\NetDNS2\RR\OPT
+    {
+        if (count($this->opts) == 0)
+        {
+            return null;
+        }
+
+        $opt = new \NetDNS2\RR\OPT();
+
+        $opt->udp_length = $_udp_length;
+
+        $rdata = '';
+
+        foreach($this->opts as $o)
+        {
+            if ($o->do)
+            {
+                $opt->do = 1;
+            }
+            if ($o->co)
+            {
+                $opt->co = 1;
+            }
+
+            $bytes = $o->packOption();
+            if (strlen($bytes) > 0)
+            {
+                $rdata .= $bytes;
+            }
+        }
+
+        if (strlen($rdata) > 0)
+        {
+            $opt->option_data = $rdata;
+        }
+
+        return $opt;
     }
 }

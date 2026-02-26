@@ -25,6 +25,9 @@ namespace NetDNS2\RR;
  *    /                                               /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property int $id_type
+ * @property int $digest_type
+ * @property string $digest
  */
 final class DHCID extends \NetDNS2\RR
 {

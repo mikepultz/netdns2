@@ -24,6 +24,10 @@ namespace NetDNS2\RR;
  *  /                                                               /
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-|
  *
+ * @property \NetDNS2\ENUM\CertFormat $format
+ * @property int $keytag
+ * @property \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm
+ * @property string $certificate
  */
 final class CERT extends \NetDNS2\RR
 {

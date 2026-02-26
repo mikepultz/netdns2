@@ -24,6 +24,10 @@ namespace NetDNS2\RR;
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property int $keytag
+ * @property \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm
+ * @property \NetDNS2\ENUM\DNSSEC\Digest $digesttype
+ * @property string $digest
  */
 class DS extends \NetDNS2\RR
 {
@@ -105,8 +109,10 @@ class DS extends \NetDNS2\RR
             return '';
         }
 
-        $_packet->offset += strlen($this->digest) + 4;
+        $data = pack('nCCH*', $this->keytag, $this->algorithm->value, $this->digesttype->value, $this->digest);
 
-        return pack('nCCH*', $this->keytag, $this->algorithm->value, $this->digesttype->value, $this->digest);
+        $_packet->offset += strlen($data);
+
+        return $data;
     }
 }

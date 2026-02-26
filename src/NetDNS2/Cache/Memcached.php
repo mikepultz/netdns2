@@ -93,7 +93,7 @@ final class Memcached extends \NetDNS2\Cache
         //
         // find the TTL
         //
-        $ttl = $this->calcuate_ttl($_data);
+        $ttl = $this->calculate_ttl($_data);
         try
         {
             $this->m_cache->set($_key, $_data, $ttl);

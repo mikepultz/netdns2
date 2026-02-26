@@ -19,6 +19,7 @@ namespace NetDNS2\RR;
  *    /                   PTRDNAME                    /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property \NetDNS2\Data\Domain $ptrdname
  */
 final class PTR extends \NetDNS2\RR
 {

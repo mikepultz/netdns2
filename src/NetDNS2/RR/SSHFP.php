@@ -24,6 +24,9 @@ namespace NetDNS2\RR;
  *      /                                                               /
  *      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property int $algorithm
+ * @property int $fp_type
+ * @property string $fingerprint
  */
 final class SSHFP extends \NetDNS2\RR
 {
@@ -101,13 +104,30 @@ final class SSHFP extends \NetDNS2\RR
         }
 
         //
-        // there are only two fingerprints defined
+        // validate the fingerprint type and its expected hex length; RFC 4255 §3.1
         //
         switch($this->fp_type)
         {
             case self::SSHFP_FPTYPE_SHA1:
+            {
+                if (strlen($this->fingerprint) !== 40)
+                {
+                    throw new \NetDNS2\Exception(
+                        sprintf('invalid SSHFP SHA-1 fingerprint length: expected 40 hex characters, got %d', strlen($this->fingerprint)),
+                        \NetDNS2\ENUM\Error::INT_PARSE_ERROR
+                    );
+                }
+            }
+            break;
             case self::SSHFP_FPTYPE_SHA256:
             {
+                if (strlen($this->fingerprint) !== 64)
+                {
+                    throw new \NetDNS2\Exception(
+                        sprintf('invalid SSHFP SHA-256 fingerprint length: expected 64 hex characters, got %d', strlen($this->fingerprint)),
+                        \NetDNS2\ENUM\Error::INT_PARSE_ERROR
+                    );
+                }
             }
             break;
             default:
@@ -136,6 +156,30 @@ final class SSHFP extends \NetDNS2\RR
         }
 
         list('x' => $this->algorithm, 'y' => $this->fp_type, 'z' => $this->fingerprint) = (array)$val;
+
+        //
+        // validate the fingerprint length matches the hash algorithm; RFC 4255 §3.1
+        //
+        $expected_len = 0;
+
+        switch($this->fp_type)
+        {
+            case self::SSHFP_FPTYPE_SHA1:
+            {
+                $expected_len = 40;
+            }
+            break;
+            case self::SSHFP_FPTYPE_SHA256:
+            {
+                $expected_len = 64;
+            }
+            break;
+        }
+
+        if ( ($expected_len > 0) && (strlen($this->fingerprint) !== $expected_len) )
+        {
+            return false;
+        }
 
         return true;
     }

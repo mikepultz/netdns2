@@ -37,6 +37,15 @@ namespace NetDNS2\RR;
  *    /                   OTHER DATA                  /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property \NetDNS2\Data\Domain $algorithm
+ * @property int $inception
+ * @property int $expiration
+ * @property \NetDNS2\ENUM\TKEYMode $mode
+ * @property \NetDNS2\ENUM\RR\Code $error
+ * @property int $key_size
+ * @property string $key_data
+ * @property int $other_size
+ * @property string $other_data
  */
 final class TKEY extends \NetDNS2\RR
 {
@@ -218,7 +227,7 @@ final class TKEY extends \NetDNS2\RR
             $data .= $this->other_data;
         }
 
-        $_packet->offset += 16 + $this->key_size + $this->other_size;
+        $_packet->offset += strlen($data);
 
         return $data;
     }

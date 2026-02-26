@@ -59,6 +59,16 @@ namespace NetDNS2\RR;
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property \NetDNS2\PrivateKey $private_key
+ * @property string $typecovered
+ * @property \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm
+ * @property int $labels
+ * @property int $origttl
+ * @property string $sigexp
+ * @property string $sigincep
+ * @property int $keytag
+ * @property \NetDNS2\Data\Domain $signname
+ * @property string $signature
  */
 final class SIG extends \NetDNS2\RR
 {
@@ -201,8 +211,15 @@ final class SIG extends \NetDNS2\RR
         //
         // parse the values out of the dates
         //
-        preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigexp, $e);
-        preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigincep, $i);
+        if (preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigexp, $e) !== 1)
+        {
+            return '';
+        }
+
+        if (preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigincep, $i) !== 1)
+        {
+            return '';
+        }
 
         //
         // pack the value
@@ -223,10 +240,10 @@ final class SIG extends \NetDNS2\RR
         $data .= $this->signname->encode($_packet->offset);
 
         //
-        // if the signature is empty, and $this->private_key is an instance of a private key object, and we have access to openssl, then assume this
-        // is a SIG(0), and generate a new signature
+        // if the signature is empty, we have a private key loaded, and openssl is available, then assume this
+        // is a SIG(0) and generate a new signature
         //
-        if ( (strlen($this->signature) == 0) && (extension_loaded('openssl') === true) )
+        if ( (strlen($this->signature) == 0) && (isset($this->private_key) === true) && (extension_loaded('openssl') === true) )
         {
             //
             // create a new packet for the signature-

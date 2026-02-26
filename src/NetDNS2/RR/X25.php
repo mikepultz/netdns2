@@ -19,6 +19,7 @@ namespace NetDNS2\RR;
  *    /                  PSDN-address                 /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property \NetDNS2\Data\Text $psdnaddress
  */
 final class X25 extends \NetDNS2\RR
 {

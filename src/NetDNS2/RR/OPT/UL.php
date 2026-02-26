@@ -13,8 +13,10 @@
 namespace NetDNS2\RR\OPT;
 
 /**
- * An EDNS(0) option to negotiate Leases on DNS Updates
+ * RFC 9664 - EDNS(0) option to negotiate Leases on DNS Updates
  *
+ * @property int $lease
+ * @property int $key_lease
  */
 final class UL extends \NetDNS2\RR\OPT
 {

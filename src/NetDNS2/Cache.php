@@ -27,9 +27,16 @@ abstract class Cache
     public const CACHE_TYPE_REDIS       = 4;
 
     /**
-     * defaul max cache size
+     * default max cache size
      */
     public const CACHE_DEFAULT_MAX_SIZE = 50000;
+
+    /**
+     * cached list of classes allowed for unserialize()
+     *
+     * @var array<int,string>|null
+     */
+    private static ?array $allowed_classes = null;
 
     /**
      * the stored options array
@@ -64,6 +71,53 @@ abstract class Cache
      *
      */
     abstract public function put(string $_key, \NetDNS2\Packet\Response $_data): void;
+
+    /**
+     * builds the list of classes allowed when deserializing cached DNS response objects
+     *
+     * @return array<int,string>
+     *
+     */
+    public static function allowedCacheClasses(): array
+    {
+        if (is_null(self::$allowed_classes) == false)
+        {
+            return self::$allowed_classes;
+        }
+
+        self::$allowed_classes = [
+
+            \NetDNS2\Packet\Response::class,
+            \NetDNS2\Header::class,
+            \NetDNS2\Question::class,
+            \NetDNS2\Data\Domain::class,
+            \NetDNS2\Data\IPv4::class,
+            \NetDNS2\Data\IPv6::class,
+            \NetDNS2\Data\Text::class,
+            \NetDNS2\Data\Mailbox::class,
+            \NetDNS2\ENUM\RR\Type::class,
+            \NetDNS2\ENUM\RR\Classes::class,
+            \NetDNS2\ENUM\RR\Code::class,
+            \NetDNS2\ENUM\OpCode::class,
+            \NetDNS2\ENUM\DNSSEC\Algorithm::class,
+            \NetDNS2\ENUM\DNSSEC\Digest::class,
+            \NetDNS2\ENUM\EDNS\Opt::class,
+        ];
+
+        //
+        // dynamically add all RR types so we don't need to maintain a hard-coded list
+        //
+        $files = glob(__DIR__ . '/RR/*.php');
+        if ($files !== false)
+        {
+            foreach($files as $file)
+            {
+                self::$allowed_classes[] = 'NetDNS2\\RR\\' . basename($file, '.php');
+            }
+        }
+
+        return self::$allowed_classes;
+    }
 
     /**
      * return an instance of a caching object based on the type selected
@@ -123,7 +177,7 @@ abstract class Cache
      * @param \NetDNS2\Packet\Response $_data the data to store in cache
      *
      */
-    protected function calcuate_ttl(\NetDNS2\Packet\Response $_data): int
+    protected function calculate_ttl(\NetDNS2\Packet\Response $_data): int
     {
         //
         // if there's an override for the TTL, use that instead

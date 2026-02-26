@@ -24,6 +24,8 @@ namespace NetDNS2\RR;
  *   /                                               /
  *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property int $preference
+ * @property \NetDNS2\Data\Domain $exchange
  */
 final class KX extends \NetDNS2\RR
 {

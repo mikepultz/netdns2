@@ -13,7 +13,7 @@
 namespace NetDNS2\RR\OPT;
 
 /**
- * RFC 6875 - Signaling Cryptographic Algorithm Understanding in DNS Security Extensions (DNSSEC)
+ * RFC 6975 - Signaling Cryptographic Algorithm Understanding in DNS Security Extensions (DNSSEC)
  *
  *  0                       8                      16
  *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
@@ -24,6 +24,7 @@ namespace NetDNS2\RR\OPT;
  *  |       ALG-CODE        |        ...            /
  *  +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property array<int,int> $alg_code
  */
 class DAU extends \NetDNS2\RR\OPT
 {

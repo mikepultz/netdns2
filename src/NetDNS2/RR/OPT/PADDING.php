@@ -24,11 +24,12 @@ namespace NetDNS2\RR\OPT;
  * |        (PADDING) ...        (PADDING) ...     /
  * +-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
  *
+ * @property string $padding
  */
 final class PADDING extends \NetDNS2\RR\OPT
 {
     /**
-     * padding value - should default to 0x00
+     * raw binary padding bytes (SHOULD be 0x00 per RFC 7830)
      */
     protected string $padding = '';
 
@@ -55,16 +56,10 @@ final class PADDING extends \NetDNS2\RR\OPT
     {
         if ($this->option_length == 0)
         {
-            return false;
+            return true;
         }
 
-        $val = unpack('H*', $this->option_data);
-        if ($val === false)
-        {
-            return false;
-        }
-
-        $this->padding = implode('', $val);
+        $this->padding = $this->option_data;
 
         return true;
     }
@@ -74,15 +69,8 @@ final class PADDING extends \NetDNS2\RR\OPT
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if (strlen($this->padding) > 0)
-        {
-            $this->option_data   = pack('H*', $this->padding);
-            $this->option_length = strlen($this->option_data);
-        } else
-        {
-            $this->option_data   = '';
-            $this->option_length = 0;
-        }
+        $this->option_data   = $this->padding;
+        $this->option_length = strlen($this->padding);
 
         //
         // build the parent OPT data

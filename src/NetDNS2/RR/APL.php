@@ -24,6 +24,7 @@ namespace NetDNS2\RR;
  *     |                                                               |
  *     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
+ * @property array<int,array<string,mixed>> $apl_items
  */
 final class APL extends \NetDNS2\RR
 {
@@ -132,7 +133,7 @@ final class APL extends \NetDNS2\RR
             // the negate value is the first bit from the length section
             //
             $val['negate']     = ($val['extra'] >> 7) & 0x1;
-            $val['afd_length'] = $val['extra'] & 0xf;
+            $val['afd_length'] = $val['extra'] & 0x7f;
 
             unset($val['extra']);
             $offset += 4;
@@ -230,12 +231,14 @@ final class APL extends \NetDNS2\RR
             case self::ADDRESS_FAMILY_IPV4:
             {
                 $a = array_reverse(explode('.', $_address));
+                $started = false;
 
                 foreach($a as $value)
                 {
-                    if ( ($value != 0) && (strlen($value) != 0) )
+                    if ($started || intval($value) != 0)
                     {
                         $out[] = intval($value);
+                        $started = true;
                     }
                 }
             }

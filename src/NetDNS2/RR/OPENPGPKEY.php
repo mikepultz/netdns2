@@ -13,7 +13,7 @@
 namespace NetDNS2\RR;
 
 /**
- * OPENPGPKEY Resource Record - https://tools.ietf.org/html/draft-ietf-dane-openpgpkey-01
+ * OPENPGPKEY Resource Record - RFC7929
  *
  *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -22,6 +22,7 @@ namespace NetDNS2\RR;
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property string $key
  */
 final class OPENPGPKEY extends \NetDNS2\RR
 {

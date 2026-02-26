@@ -82,6 +82,7 @@ Version 1.x will be maintained for the foreseeable  future.
 * (OPTIONAL) [cURL](https://www.php.net/manual/en/book.curl.php) - for DNS over HTTP (DoH).
 * (OPTIONAL) [Hash](https://www.php.net/manual/en/ref.hash.php) - for TSIG request authentication.
 * (OPTIONAL) [Intl](https://www.php.net/manual/en/book.intl.php) - for decoding Unicode domains.
+* (OPTIONAL) [Sodium](https://www.php.net/manual/en/book.sodium.php) - for ED25519 algorithm support in DNSSEC signature verification.
 * (OPTIONAL) [Shmop](https://www.php.net/manual/en/book.shmop.php) - for local caching
 * (OPTIONAL) [Memcached](https://www.php.net/manual/en/book.memcached.php) - for local caching.
 * (OPTIONAL) [Redis](https://github.com/phpredis/phpredis/) - for local caching.
@@ -374,7 +375,7 @@ The main `NetDNS2\Resolver` class is used to look up DNS records.
         $r->signTSIG('mykey', '9dnf93asdf39fs');
 
         //
-        // execute the query request for the google.com MX servers
+        // execute the zone transfer request for example.com
         //
         $res = $r->query('example.com', 'AXFR');
 
@@ -518,6 +519,44 @@ The `dnssec_cd_flag` argument (aka "DNSSEC Checking Disabled") flag is unset by 
 
 Keep in mind, many zones do not support DNSSEC, so failing because the `ad` bit is 0 for all domains may not be what you want.
 
+#### Client-side Signature Verification
+
+Relying on the upstream resolver's `ad` bit trusts that resolver to do the right thing. NetDNS2 also supports performing the full DNSSEC chain-of-trust validation locally, without trusting any intermediary, using the `\NetDNS2\DNSSEC\Validator` class.
+
+    try
+    {
+        $r = new \NetDNS2\Resolver(['nameservers' => [ '1.1.1.1' ]]);
+        $r->dnssec = true;
+
+        //
+        // create a validator and load the built-in IANA root trust anchors
+        //
+        $v = new \NetDNS2\DNSSEC\Validator($r);
+        $v->useRootTrustAnchor();
+
+        //
+        // query and validate — throws \NetDNS2\Exception on any failure
+        //
+        $res = $r->query('example.com', 'A');
+        $v->validate($res);
+
+        echo "signature chain verified successfully\n";
+
+    } catch(\NetDNS2\Exception $e)
+    {
+        echo "DNSSEC validation failed: " . $e->getMessage() . "\n";
+    }
+
+`validate()` walks the full RRSIG → DNSKEY → DS → … → root KSK chain for every RRset in the response. It throws a `\NetDNS2\Exception` on any failure (expired signature, broken chain, missing record, etc.) and returns normally on success.
+
+You can also supply your own trust anchor for a private or split-horizon zone:
+
+    $v->addTrustAnchor(\NetDNS2\RR::fromString(
+        'internal. 0 IN DS 12345 8 2 <hex-digest>'
+    ));
+
+Supported algorithms: RSA (RSAMD5 / RSASHA1 / RSASHA256 / RSASHA512), ECDSA (P-256 / P-384), and ED25519. Requires `ext-openssl`; `ext-sodium` is used for ED25519 when available.
+
 ### <a name="objects"></a>Data Objects
 
 NetDNS2 v2.0 uses data objects to store domain names, IPv4 & IPv6 addresses, text entries, and mailboxes, extended from the `\NetDNS2\Data` class.
@@ -626,18 +665,19 @@ NetDNS2 uses the [Shmop](https://www.php.net/manual/en/book.shmop.php) Extension
     // create a new Resolver object
     //
     $r = new \NetDNS2\Resolver(
-    [ 
+    [
         'nameservers'   => [ '192.168.0.1' ]
 
         'cache_type'    => \NetDNS2\Cache::CACHE_TYPE_SHM,
         'cache_options' => [
 
-            'file'  => '/tmp/cache.txt',    // the file to serialize cache content to
-            'size'  => 50000                // the max file size for this cache file
+            'file'  => '/tmp/cache.txt',    // the file to use as the System V IPC key (via ftok())
+            'size'  => 50000,               // the max shared memory segment size in bytes
+            'id'    => 't'                  // ftok() project ID; change to use multiple independent segments
         ]
     ]);
 
-`file` is used as an System V IPC key (using ftok())
+`file` is used as a System V IPC key (using `ftok()`). The optional `id` value (defaults to `'t'`) is the project ID passed to `ftok()`; set it to a different character to create an independent shared memory segment alongside an existing one.
 
 #### <a name="memcached"></a>Memcached
 
@@ -964,6 +1004,8 @@ NetDNS2 has support to sign outgoing requests using `TSIG` and `SIG(0)` (asymmet
 #### <a name="tsig"></a>TSIG
 
 A TSIG (Transaction SIGnature) can be added to the request to authenticate the request. See [RFC 2845](https://datatracker.ietf.org/doc/html/rfc2845) for more details.
+
+The default signing algorithm is HMAC-SHA256. HMAC-MD5, HMAC-SHA1, HMAC-SHA224, HMAC-SHA384, and HMAC-SHA512 are also supported and can be passed as an optional third argument to `signTSIG()`.
 
 In BIND, a zone can be setup to allow updates using a TSIG like:
 

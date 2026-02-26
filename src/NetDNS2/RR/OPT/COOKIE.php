@@ -29,6 +29,8 @@ namespace NetDNS2\RR\OPT;
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property string $client_cookie
+ * @property string $server_cookie
  */
 final class COOKIE extends \NetDNS2\RR\OPT
 {

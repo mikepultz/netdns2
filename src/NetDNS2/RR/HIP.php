@@ -38,6 +38,12 @@ namespace NetDNS2\RR;
  *  |             |
  *  +-+-+-+-+-+-+-+
  *
+ * @property int $hit_length
+ * @property int $pk_algorithm
+ * @property int $pk_length
+ * @property string $hit
+ * @property string $public_key
+ * @property array<int,\NetDNS2\Data\Domain> $rendezvous_servers
  */
 final class HIP extends \NetDNS2\RR
 {
@@ -229,7 +235,12 @@ final class HIP extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        if ( (strlen($this->hit) == 0) || (strlen($this->public_key) == 0) )
+        if (strlen($this->hit) == 0)
+        {
+            return '';
+        }
+
+        if ( ($this->pk_algorithm != self::ALGORITHM_NONE) && (strlen($this->public_key) == 0) )
         {
             return '';
         }

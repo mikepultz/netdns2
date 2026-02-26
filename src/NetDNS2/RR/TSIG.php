@@ -35,6 +35,16 @@ namespace NetDNS2\RR;
  *     /                          other data                           /
  *     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property \NetDNS2\Data\Domain $algorithm
+ * @property int $time_signed
+ * @property int $fudge
+ * @property int $mac_size
+ * @property string $mac
+ * @property int $original_id
+ * @property int $error
+ * @property int $other_length
+ * @property int $other_data
+ * @property string $key
  */
 final class TSIG extends \NetDNS2\RR
 {
@@ -107,12 +117,21 @@ final class TSIG extends \NetDNS2\RR
     /**
      * the other data; should only ever be a timestamp when there is the error RCODE_BADTIME
      */
-    protected string $other_data;
+    protected int $other_data = 0;
 
     /**
      * the key to use for signing - passed in, not included in the rdata
      */
     protected string $key;
+
+    /**
+     * returns the base64-encoded shared secret key
+     *
+     */
+    public function getKey(): string
+    {
+        return $this->key;
+    }
 
     /**
       * builds a new instance of a TSIG object directly
@@ -158,7 +177,7 @@ final class TSIG extends \NetDNS2\RR
         //
         // the rest of the data is set to default
         //
-        $this->algorithm    = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, self::HMAC_MD5);
+        $this->algorithm    = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, self::HMAC_SHA256);
         $this->time_signed  = time();
         $this->fudge        = 300;
         $this->mac_size     = 0;
@@ -166,7 +185,7 @@ final class TSIG extends \NetDNS2\RR
         $this->original_id  = 0;
         $this->error        = 0;
         $this->other_length = 0;
-        $this->other_data   = '';
+        $this->other_data   = 0;
 
         //
         // per RFC 2845 section 2.3
@@ -241,13 +260,14 @@ final class TSIG extends \NetDNS2\RR
             //
             // other data is a 48bit timestamp
             //
-            $val = unpack('nx/ny', $this->rdata, $offset + 6);
+            $val = unpack('nx/Ny', $this->rdata, $offset + 6);
             if ($val === false)
             {
                 return false;
             }
 
-            list('x' => $high, 'y' => $this->other_data) = (array)$val;
+            list('x' => $high, 'y' => $low) = (array)$val;
+            $this->other_data = ($high << 32) | $low;
         }
 
         return true;
@@ -306,7 +326,7 @@ final class TSIG extends \NetDNS2\RR
 
         if ($this->other_length > 0)
         {
-            $sig_data .= pack('nN', 0, $this->other_data);
+            $sig_data .= pack('nN', ($this->other_data >> 32) & 0xffff, $this->other_data & 0xffffffff);
         }
 
         //
@@ -315,7 +335,7 @@ final class TSIG extends \NetDNS2\RR
         $decode = base64_decode($this->key);
         if ($decode === false)
         {
-            $decode = '';
+            throw new \NetDNS2\Exception('failed to base64 decode the TSIG key.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         //
@@ -340,30 +360,128 @@ final class TSIG extends \NetDNS2\RR
         //
         if ($this->error == \NetDNS2\ENUM\RR\Code::BADTIME->value)
         {
-            $this->other_length = strlen($this->other_data);
-            if ($this->other_length != 6)
-            {
-                return '';
-            }
+            $this->other_length = 6;
 
         } else
         {
             $this->other_length = 0;
-            $this->other_data = '';
+            $this->other_data = 0;
         }
 
         //
-        // pack the id, error and other_length
+        // pack the id, error and other_length; also update the object so __toString() is consistent
         //
-        $data .= pack('nnn', $_packet->header->id, $this->error, $this->other_length);
+        $this->original_id = $_packet->header->id;
+        $data .= pack('nnn', $this->original_id, $this->error, $this->other_length);
         if ($this->other_length > 0)
         {
-            $data .= pack('nN', 0, $this->other_data);
+            $data .= pack('nN', ($this->other_data >> 32) & 0xffff, $this->other_data & 0xffffffff);
         }
 
         $_packet->offset += strlen($data);
 
         return $data;
+    }
+
+    /**
+     * verifies the MAC in this TSIG record against the given response packet and key
+     *
+     * Validates both the time window (RFC 2845 section 4.4) and the HMAC (RFC 2845 section 4.2).
+     *
+     * @param \NetDNS2\Packet\Response $_response the response packet to verify
+     * @param string                   $_key      the base64-encoded TSIG shared secret
+     *
+     * @return bool returns true if the MAC and time window are both valid, false otherwise
+     * @throws \NetDNS2\Exception
+     *
+     */
+    public function verify(\NetDNS2\Packet\Response $_response, string $_key): bool
+    {
+        //
+        // validate the time window per RFC 2845 section 4.4
+        //
+        if (abs(time() - $this->time_signed) > $this->fudge)
+        {
+            return false;
+        }
+
+        //
+        // verify the original_id matches the response message ID per RFC 2845 section 4.2
+        //
+        if ($this->original_id !== $_response->header->id)
+        {
+            return false;
+        }
+
+        //
+        // make sure the algorithm is one we support
+        //
+        if (isset(self::$hash_algorithms[strval($this->algorithm)]) == false)
+        {
+            return false;
+        }
+
+        //
+        // create a packet copy so we can strip the TSIG from the additional section
+        //
+        $new_packet = new \NetDNS2\Packet\Request('example.com', 'SOA', 'IN');
+
+        //
+        // copy the response data into the new packet
+        //
+        $new_packet->copy($_response);
+
+        //
+        // remove the TSIG object from the additional list
+        //
+        array_pop($new_packet->additional);
+        $new_packet->header->arcount = count($new_packet->additional);
+
+        //
+        // rebuild the data that was signed, matching the structure built in rrGet()
+        //
+        $sig_data = $new_packet->get();
+
+        //
+        // add the name without compressing
+        //
+        $sig_data .= (new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, $this->name->value()))->encode();
+
+        //
+        // add the class and TTL
+        //
+        $sig_data .= pack('nN', $this->class->value, $this->ttl);
+
+        //
+        // add the algorithm name without compression
+        //
+        $sig_data .= $this->algorithm->encode();
+
+        //
+        // add the time, fudge, error and other_length values
+        //
+        $sig_data .= pack('nNnnn', 0, $this->time_signed, $this->fudge, $this->error, $this->other_length);
+
+        if ($this->other_length > 0)
+        {
+            $sig_data .= pack('nN', ($this->other_data >> 32) & 0xffff, $this->other_data & 0xffffffff);
+        }
+
+        //
+        // base64 decode the key
+        //
+        $decode = base64_decode($_key);
+        if ($decode === false)
+        {
+            return false;
+        }
+
+        //
+        // compute the expected MAC and compare using a constant-time comparison to prevent timing attacks
+        //
+        $expected = $this->signHMAC($sig_data, $decode, $this->algorithm);
+
+        return hash_equals($expected, $this->mac);
     }
 
     /**
@@ -377,7 +495,7 @@ final class TSIG extends \NetDNS2\RR
      * @throws \NetDNS2\Exception
      *
      */
-    private function signHMAC(string $_data, string $_key, \NetDNS2\Data\Domain $_algorithm = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, self::HMAC_MD5)): string
+    private function signHMAC(string $_data, string $_key, \NetDNS2\Data\Domain $_algorithm = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_CANON, self::HMAC_SHA256)): string
     {
         //
         // the hash extension is required for this function
@@ -385,6 +503,14 @@ final class TSIG extends \NetDNS2\RR
         if (extension_loaded('hash') == false)
         {
             throw new \NetDNS2\Exception('the hash extension is required to use TSIG signing.', \NetDNS2\ENUM\Error::INT_INVALID_EXTENSION);
+        }
+
+        //
+        // make sure the algorithm is supported
+        //
+        if (isset(self::$hash_algorithms[strval($_algorithm)]) == false)
+        {
+            throw new \NetDNS2\Exception(sprintf('unsupported TSIG algorithm: %s', $_algorithm), \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
         return hash_hmac(self::$hash_algorithms[strval($_algorithm)], $_data, $_key, true);

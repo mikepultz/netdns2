@@ -36,7 +36,7 @@ trait Data
     {
         if (isset($this->cache_data[$_key]) === true)
         {
-            return unserialize($this->cache_data[$_key]['object']);
+            return unserialize($this->cache_data[$_key]['object'], ['allowed_classes' => \NetDNS2\Cache::allowedCacheClasses()]);
         }
 
         return false;
@@ -50,28 +50,32 @@ trait Data
         //
         // find the TTL
         //
-        $ttl = $this->calcuate_ttl($_data);
+        $ttl = $this->calculate_ttl($_data);
 
         //
-        // clear the rdata values
+        // clone the response so we don't mutate the caller's object when we clear rdata
         //
-        $_data->rdata = '';
-        $_data->rdlength = 0;
+        $data           = clone $_data;
+        $data->rdata    = '';
+        $data->rdlength = 0;
 
-        foreach($_data->answer as $index => $rr)
+        foreach($data->answer as $index => $rr)
         {
-            $rr->rdata = '';
-            $rr->rdlength = 0;
+            $data->answer[$index]           = clone $rr;
+            $data->answer[$index]->rdata    = '';
+            $data->answer[$index]->rdlength = 0;
         }
-        foreach($_data->authority as $index => $rr)
+        foreach($data->authority as $index => $rr)
         {
-            $rr->rdata = '';
-            $rr->rdlength = 0;
+            $data->authority[$index]           = clone $rr;
+            $data->authority[$index]->rdata    = '';
+            $data->authority[$index]->rdlength = 0;
         }
-        foreach($_data->additional as $index => $rr)
+        foreach($data->additional as $index => $rr)
         {
-            $rr->rdata = '';
-            $rr->rdlength = 0;
+            $data->additional[$index]           = clone $rr;
+            $data->additional[$index]->rdata    = '';
+            $data->additional[$index]->rdlength = 0;
         }
 
         $this->cache_data[$_key] = [
@@ -80,7 +84,7 @@ trait Data
             'ttl'           => $ttl
         ];
 
-        $this->cache_data[$_key]['object'] = serialize($_data);
+        $this->cache_data[$_key]['object'] = serialize($data);
     }
 
     /**
@@ -136,7 +140,7 @@ trait Data
                     // go through the data, and remove the entries closed to
                     // their expiration date.
                     //
-                    $smallest_ttl = time();
+                    $smallest_ttl = PHP_INT_MAX;
                     $smallest_key = null;
 
                     foreach($this->cache_data as $key => $data)

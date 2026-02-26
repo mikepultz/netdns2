@@ -19,7 +19,7 @@ namespace NetDNS2;
 final class BitMap
 {
     /**
-     * validate a list of RR's for NEC and NSEC bitmap fields
+     * validate a list of RR's for NSEC and NSEC3 bitmap fields
      *
      * @param array<int,int|string> $_data an array of RR id's or mnemonics to validate
      *
@@ -117,9 +117,9 @@ final class BitMap
 
         $output = [];
         $offset = 0;
-        $length = strlen($_data);
+        $total  = strlen($_data);
 
-        while($offset < $length)
+        while($offset < $total)
         {
             //
             // unpack the window and length values
@@ -130,19 +130,19 @@ final class BitMap
                 return [];
             }
 
-            list('x' => $window, 'y' => $length) = (array)$val;
+            list('x' => $window, 'y' => $bm_length) = (array)$val;
             $offset += 2;
 
             //
             // copy out the bitmap value
             //
-            $bitmap = unpack('C*', substr($_data, $offset, $length));
+            $bitmap = unpack('C*', substr($_data, $offset, $bm_length));
             if ($bitmap === false)
             {
                 return [];
             }
 
-            $offset += $length;
+            $offset += $bm_length;
 
             //
             // I'm not sure if there's a better way of doing this, but PHP doesn't

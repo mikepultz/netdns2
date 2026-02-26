@@ -26,6 +26,9 @@ namespace NetDNS2\RR;
  *      |                                               |
  *      +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property \NetDNS2\Data\Text $longitude
+ * @property \NetDNS2\Data\Text $latitude
+ * @property \NetDNS2\Data\Text $altitude
  */
 final class GPOS extends \NetDNS2\RR
 {
@@ -59,12 +62,14 @@ final class GPOS extends \NetDNS2\RR
     {
         $data = $this->buildString($_rdata);
 
-        if (count($data) > 0)
+        if (count($data) < 3)
         {
-            $this->longitude = new \NetDNS2\Data\Text(array_shift($data));
-            $this->latitude  = new \NetDNS2\Data\Text(array_shift($data));
-            $this->altitude  = new \NetDNS2\Data\Text(array_shift($data));
+            return false;
         }
+
+        $this->longitude = new \NetDNS2\Data\Text(array_shift($data));
+        $this->latitude  = new \NetDNS2\Data\Text(array_shift($data));
+        $this->altitude  = new \NetDNS2\Data\Text(array_shift($data));
 
         return true;
     }
@@ -94,6 +99,10 @@ final class GPOS extends \NetDNS2\RR
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
-        return $this->longitude->encode() . $this->latitude->encode() . $this->altitude->encode();
+        $data = $this->longitude->encode() . $this->latitude->encode() . $this->altitude->encode();
+
+        $_packet->offset += strlen($data);
+
+        return $data;
     }
 }

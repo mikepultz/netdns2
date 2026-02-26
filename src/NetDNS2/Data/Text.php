@@ -37,7 +37,7 @@ final class Text extends \NetDNS2\Data
       */
     protected function decode(string $_rdata, int &$_offset): void
     {
-        if ($_offset > strlen($_rdata))
+        if ($_offset >= strlen($_rdata))
         {
             return;
         }

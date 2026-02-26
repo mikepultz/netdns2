@@ -123,7 +123,7 @@ abstract class RR implements \Stringable
      * @throws \NetDNS2\Exception
      *
      */
-    public function __construct(?\NetDNS2\Packet &$_packet = null)
+    public function __construct(?\NetDNS2\Packet $_packet = null)
     {
         if (is_null($_packet) == false)
         {
@@ -429,6 +429,29 @@ abstract class RR implements \Stringable
     }
 
     /**
+     * Returns the RDATA portion of this RR in canonical wire form (RFC 4034 §6.2).
+     *
+     * Domain names are uncompressed and lowercase; no compression pointers are used.
+     * Called by \NetDNS2\DNSSEC\Validator to reconstruct the RRSIG signed-data block.
+     *
+     * @throws \NetDNS2\Exception
+     */
+    public function canonicalRdata(): string
+    {
+        //
+        // clear the compression table so no pointers can form; set the offset high
+        // enough (>= 0x4000) that encode_rfc1035() never stores new entries, ensuring
+        // every domain name in the RDATA is emitted as fully uncompressed labels.
+        //
+        \NetDNS2\Data::$compressed = [];
+
+        $tmp         = new \NetDNS2\Packet();
+        $tmp->offset = 0x4000;
+
+        return $this->rrGet($tmp);
+    }
+
+    /**
      * parses a binary packet, and returns the appropriate \NetDNS2\RR object, based on the RR type of the binary content.
      *
      * @param \NetDNS2\Packet &$_packet a \NetDNS2\Packet packet used for decompressing names
@@ -519,11 +542,11 @@ abstract class RR implements \Stringable
      *
      * @param string $_line a standard DNS config line
      *
-     * @return object       returns a new \NetDNS2\RR\* object for the given RR
+     * @return \NetDNS2\RR        returns a new \NetDNS2\RR\* object for the given RR
      * @throws \NetDNS2\Exception
      *
      */
-    public static function fromString(string $_line): object
+    public static function fromString(string $_line): \NetDNS2\RR
     {
         if (strlen($_line) == 0)
         {

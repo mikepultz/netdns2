@@ -64,7 +64,7 @@ class Packet implements \Stringable
     public array $authority = [];
 
     /**
-     * array of \NetDNS2\RR Objects for Addtitional
+     * array of \NetDNS2\RR Objects for Additional
      *
      * @var array<int,\NetDNS2\RR>
      */
@@ -141,7 +141,7 @@ class Packet implements \Stringable
      */
     public function copy(\NetDNS2\Packet $_packet): void
     {
-        $this->header     = $_packet->header;
+        $this->header     = clone $_packet->header;
         $this->question   = $_packet->question;
         $this->answer     = $_packet->answer;
         $this->authority  = $_packet->authority;

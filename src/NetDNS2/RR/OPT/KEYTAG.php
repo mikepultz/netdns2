@@ -26,6 +26,7 @@ namespace NetDNS2\RR\OPT;
  *   |                      ...                      /
  *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property array<int,int> $key_tag
  */
 final class KEYTAG extends \NetDNS2\RR\OPT
 {

@@ -79,7 +79,7 @@ final class Request extends \NetDNS2\Packet
         //
         if (strlen($_name) == 0)
         {
-            throw new \NetDNS2\Exception('invalid or empty  query string provided.', \NetDNS2\ENUM\Error::INT_INVALID_PACKET);
+            throw new \NetDNS2\Exception('invalid or empty query string provided.', \NetDNS2\ENUM\Error::INT_INVALID_PACKET);
         }
 
         if ($q->qtype == \NetDNS2\ENUM\RR\Type::PTR)

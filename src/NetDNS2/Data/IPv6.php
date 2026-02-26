@@ -19,7 +19,7 @@ final class IPv6 extends \NetDNS2\Data
 {
     public function __construct(mixed $_data = null, int &$_offset = -1)
     {
-        parent::__construct(self::DATA_TYPE_IPV4, $_data, $_offset);
+        parent::__construct(self::DATA_TYPE_IPV6, $_data, $_offset);
     }
 
     /**

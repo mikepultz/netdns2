@@ -25,6 +25,9 @@ namespace NetDNS2\RR;
  *   /                                               /
  *   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property \NetDNS2\Data\IPv4 $address
+ * @property int $protocol
+ * @property array<int,int> $bitmap
  */
 final class WKS extends \NetDNS2\RR
 {
@@ -146,7 +149,7 @@ final class WKS extends \NetDNS2\RR
                 $n = $port;
             }
         }
-        for($i=0; $i<ceil($n/8)*8; $i++)
+        for($i=0; $i<ceil(($n+1)/8)*8; $i++)
         {
             if (isset($ports[$i]) == false)
             {

@@ -18,7 +18,7 @@ enum Opt: int
 
     case NONE           = 0;
     case LLQ            = 1;        // Not Implemented
-    case UL             = 2;        // https://datatracker.ietf.org/doc/draft-ietf-dnssd-update-lease/08/
+    case UL             = 2;        // RFC 9664
     case NSID           = 3;        // RFC 5001
     case DAU            = 5;        // RFC 6975
     case DHU            = 6;        // RFC 6975

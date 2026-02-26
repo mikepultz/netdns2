@@ -68,6 +68,13 @@ enum Error: int
     case INT_FAILED_MEMCACHED       = 3859;
     case INT_FAILED_REDIS           = 3860;
 
+    case INT_DNSSEC_BOGUS           = 3861;  // signature cryptographically invalid
+    case INT_DNSSEC_UNSIGNED        = 3862;  // no RRSIG found for a required RRset
+    case INT_DNSSEC_NO_KEY          = 3863;  // DNSKEY not found (keytag/algo mismatch)
+    case INT_DNSSEC_TIME            = 3864;  // signature outside inception-expiration window
+    case INT_DNSSEC_NO_ANCHOR       = 3865;  // no trust anchor configured
+    case INT_DNSSEC_CHAIN           = 3866;  // DS/DNSKEY chain of trust broken
+
     public function label(): string
     {
         return match($this)

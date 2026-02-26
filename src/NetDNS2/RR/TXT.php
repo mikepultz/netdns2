@@ -19,6 +19,7 @@ namespace NetDNS2\RR;
  *    /                   TXT-DATA                    /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property array<int,\NetDNS2\Data\Text> $text
  */
 class TXT extends \NetDNS2\RR
 {
@@ -96,6 +97,8 @@ class TXT extends \NetDNS2\RR
         {
             $data .= $text->encode();
         }
+
+        $_packet->offset += strlen($data);
 
         return $data;
     }

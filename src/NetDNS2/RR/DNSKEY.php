@@ -24,6 +24,13 @@ namespace NetDNS2\RR;
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property int $flags
+ * @property bool $zone
+ * @property bool $sep
+ * @property bool $revoke
+ * @property int $protocol
+ * @property \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm
+ * @property string $key
  */
 class DNSKEY extends \NetDNS2\RR
 {
@@ -99,6 +106,51 @@ class DNSKEY extends \NetDNS2\RR
             throw new \NetDNS2\Exception('the DNSKEY protocol value must be 3.', \NetDNS2\ENUM\Error::INT_PARSE_ERROR);
         }
 
+        //
+        // validate the key length for fixed-length algorithms; RFC 6605 §4 and RFC 8080 §3
+        //
+        $decode = base64_decode($this->key);
+        if ($decode !== false)
+        {
+            $key_length = strlen($decode);
+            $expected   = 0;
+
+            switch($this->algorithm)
+            {
+                case \NetDNS2\ENUM\DNSSEC\Algorithm::ECDSAP256SHA256:
+                {
+                    $expected = 64;
+                }
+                break;
+                case \NetDNS2\ENUM\DNSSEC\Algorithm::ECDSAP384SHA384:
+                {
+                    $expected = 96;
+                }
+                break;
+                case \NetDNS2\ENUM\DNSSEC\Algorithm::ED25519:
+                {
+                    $expected = 32;
+                }
+                break;
+                case \NetDNS2\ENUM\DNSSEC\Algorithm::ED448:
+                {
+                    $expected = 57;
+                }
+                break;
+                default:
+                {
+                }
+            }
+
+            if ( ($expected > 0) && ($key_length !== $expected) )
+            {
+                throw new \NetDNS2\Exception(
+                    sprintf('invalid key length for algorithm %s: expected %d bytes, got %d', $this->algorithm->label(), $expected, $key_length),
+                    \NetDNS2\ENUM\Error::INT_PARSE_ERROR
+                );
+            }
+        }
+
         return true;
     }
 
@@ -147,6 +199,44 @@ class DNSKEY extends \NetDNS2\RR
         // get the key
         //
         $this->key = base64_encode(substr($this->rdata, 4));
+
+        //
+        // validate the key length for fixed-length algorithms; RFC 6605 §4 and RFC 8080 §3
+        //
+        $key_length = $this->rdlength - 4;
+        $expected   = 0;
+
+        switch($this->algorithm)
+        {
+            case \NetDNS2\ENUM\DNSSEC\Algorithm::ECDSAP256SHA256:
+            {
+                $expected = 64;
+            }
+            break;
+            case \NetDNS2\ENUM\DNSSEC\Algorithm::ECDSAP384SHA384:
+            {
+                $expected = 96;
+            }
+            break;
+            case \NetDNS2\ENUM\DNSSEC\Algorithm::ED25519:
+            {
+                $expected = 32;
+            }
+            break;
+            case \NetDNS2\ENUM\DNSSEC\Algorithm::ED448:
+            {
+                $expected = 57;
+            }
+            break;
+            default:
+            {
+            }
+        }
+
+        if ( ($expected > 0) && ($key_length !== $expected) )
+        {
+            return false;
+        }
 
         return true;
     }

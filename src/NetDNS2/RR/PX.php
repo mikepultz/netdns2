@@ -25,6 +25,9 @@ namespace NetDNS2\RR;
  *    /                                               /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--
  *
+ * @property int $preference
+ * @property \NetDNS2\Data\Domain $map822
+ * @property \NetDNS2\Data\Domain $mapx400
  */
 final class PX extends \NetDNS2\RR
 {

@@ -21,7 +21,7 @@ class Client
     /**
      * the current version of this library
      */
-    public const VERSION = '2.0.7';
+    public const VERSION = '2.0.8';
 
     /**
      * the default path to a resolv.conf file
@@ -518,7 +518,7 @@ class Client
      * @param string                  $_algorithm the algorithm to use
      *
      */
-    public function signTSIG(\NetDNS2\RR\TSIG|string $_keyname, string $_signature = '', string $_algorithm = \NetDNS2\RR\TSIG::HMAC_MD5): bool
+    public function signTSIG(\NetDNS2\RR\TSIG|string $_keyname, string $_signature = '', string $_algorithm = \NetDNS2\RR\TSIG::HMAC_SHA256): bool
     {
         //
         // if the TSIG was pre-created and passed in, then we can just used it as provided.
@@ -614,7 +614,8 @@ class Client
         }
 
         //
-        // only RSA algorithms are supported for SIG(0)
+        // only RSA algorithms are supported for SIG(0); DSA is intentionally excluded because
+        // Algorithm::openssl() has no DSA mapping and PrivateKey notes it doesn't work in PHP yet.
         //
         switch($this->auth_signature->algorithm)
         {
@@ -622,13 +623,12 @@ class Client
             case \NetDNS2\ENUM\DNSSEC\Algorithm::RSASHA1:
             case \NetDNS2\ENUM\DNSSEC\Algorithm::RSASHA256:
             case \NetDNS2\ENUM\DNSSEC\Algorithm::RSASHA512:
-            case \NetDNS2\ENUM\DNSSEC\Algorithm::DSA:
             {
             }
             break;
             default:
             {
-                throw new \NetDNS2\Exception('SIG(0) currently only supports asymmetric algorithms.', \NetDNS2\ENUM\Error::INT_INVALID_ALGORITHM);
+                throw new \NetDNS2\Exception('SIG(0) currently only supports RSA algorithms.', \NetDNS2\ENUM\Error::INT_INVALID_ALGORITHM);
             }
         }
 
@@ -758,10 +758,11 @@ class Client
             }
 
             //
-            // set the max UDP packet size
+            // set the max UDP packet size; use the extended payload size whenever any EDNS option is active
+            // (not just DNSSEC), since all EDNS OPT records advertise dnssec_payload_size to the server.
             //
             $max_udp_size = \NetDNS2\Header::DNS_MAX_UDP_SIZE;
-            if ($this->dnssec == true)
+            if ($this->dnssec == true || count($this->edns->opts) > 0)
             {
                 $max_udp_size = $this->dnssec_payload_size;
             }
@@ -863,6 +864,41 @@ class Client
 
                 $this->last_exception_list[$ns] = $this->last_exception;
                 continue;
+            }
+
+            //
+            // if we signed the request with TSIG, verify the response TSIG per RFC 2845 section 4.4
+            //
+            if ( ($this->auth_signature instanceof \NetDNS2\RR\TSIG) == true)
+            {
+                $response_tsig = null;
+
+                foreach($response->additional as $rr)
+                {
+                    if ($rr instanceof \NetDNS2\RR\TSIG)
+                    {
+                        $response_tsig = $rr;
+                        break;
+                    }
+                }
+
+                if (is_null($response_tsig) == true)
+                {
+                    $this->last_exception = new \NetDNS2\Exception('TSIG response validation failed: no TSIG record in response.',
+                        \NetDNS2\ENUM\Error::INT_INVALID_PACKET, null, $_request, $response);
+
+                    $this->last_exception_list[$ns] = $this->last_exception;
+                    continue;
+                }
+
+                if ($response_tsig->verify($response, $this->auth_signature->getKey()) == false)
+                {
+                    $this->last_exception = new \NetDNS2\Exception('TSIG response validation failed: invalid MAC or time window exceeded.',
+                        \NetDNS2\ENUM\Error::INT_INVALID_PACKET, null, $_request, $response);
+
+                    $this->last_exception_list[$ns] = $this->last_exception;
+                    continue;
+                }
             }
 
             break;
@@ -987,7 +1023,7 @@ class Client
                 // read the data off the socket
                 //
                 $result = $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->read($size,
-                    ($this->dnssec == true) ? $this->dnssec_payload_size : \NetDNS2\Header::DNS_MAX_UDP_SIZE);
+                    ($this->dnssec == true || count($this->edns->opts) > 0) ? $this->dnssec_payload_size : \NetDNS2\Header::DNS_MAX_UDP_SIZE);
 
                 if ( ($result === false) || ($size < \NetDNS2\Header::DNS_HEADER_SIZE) )    // @phpstan-ignore-line
                 {
@@ -1087,7 +1123,7 @@ class Client
         } else
         {
             $result = $this->sock[\NetDNS2\Socket::SOCK_STREAM][$_ns]->read($size,
-                ($this->dnssec == true) ? $this->dnssec_payload_size : \NetDNS2\Header::DNS_MAX_UDP_SIZE);
+                ($this->dnssec == true || count($this->edns->opts) > 0) ? $this->dnssec_payload_size : \NetDNS2\Header::DNS_MAX_UDP_SIZE);
 
             if ( ($result === false) || ($size < \NetDNS2\Header::DNS_HEADER_SIZE) )   // @phpstan-ignore-line
             {
@@ -1175,7 +1211,7 @@ class Client
         $size = 0;
 
         $result = $this->sock[\NetDNS2\Socket::SOCK_DGRAM][$_ns]->read($size,
-            ($this->dnssec == true) ? $this->dnssec_payload_size : \NetDNS2\Header::DNS_MAX_UDP_SIZE);
+            ($this->dnssec == true || count($this->edns->opts) > 0) ? $this->dnssec_payload_size : \NetDNS2\Header::DNS_MAX_UDP_SIZE);
 
         if (( $result === false) || ($size < \NetDNS2\Header::DNS_HEADER_SIZE))    // @phpstan-ignore-line
         {

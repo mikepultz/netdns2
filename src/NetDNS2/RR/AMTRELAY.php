@@ -22,6 +22,10 @@ namespace NetDNS2\RR;
  *  ~                            relay                              ~
  *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property int $precedence
+ * @property int $discovery
+ * @property int $relay_type
+ * @property \NetDNS2\Data $relay
  */
 final class AMTRELAY extends \NetDNS2\RR
 {
@@ -209,7 +213,7 @@ final class AMTRELAY extends \NetDNS2\RR
             case self::AMTRELAY_TYPE_IPV6:
             case self::AMTRELAY_TYPE_DOMAIN:
             {
-                $data .= $this->relay->encode($_packet->offset);
+                $data .= $this->relay->encode();
             }
             break;
             default:

@@ -13,7 +13,7 @@
 namespace NetDNS2\RR;
 
 /**
- * CAA Resource Record - http://tools.ietf.org/html/draft-ietf-pkix-caa-03
+ * CAA Resource Record - RFC6844
  *
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *    |          FLAGS        |      TAG LENGTH       |
@@ -23,6 +23,10 @@ namespace NetDNS2\RR;
  *    /                      DATA                     /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property int $flags
+ * @property int $tag_length
+ * @property \NetDNS2\Data\Text $tag
+ * @property \NetDNS2\Data\Text $value
  */
 final class CAA extends \NetDNS2\RR
 {

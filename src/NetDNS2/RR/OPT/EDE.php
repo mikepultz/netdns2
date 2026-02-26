@@ -26,6 +26,8 @@ namespace NetDNS2\RR\OPT;
  * 6: / EXTRA-TEXT ...                                                /
  *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
+ * @property int $info_code
+ * @property \NetDNS2\Data\Text $extra_text
  */
 final class EDE extends \NetDNS2\RR\OPT
 {

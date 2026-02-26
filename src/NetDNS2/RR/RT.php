@@ -22,6 +22,8 @@ namespace NetDNS2\RR;
  *    /                                               /
  *    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
  *
+ * @property int $preference
+ * @property \NetDNS2\Data\Domain $intermediatehost
  */
 final class RT extends \NetDNS2\RR
 {
@@ -79,7 +81,7 @@ final class RT extends \NetDNS2\RR
     }
 
     /**
-     * @see \NetDNS2\RR::rrSet()
+     * @see \NetDNS2\RR::rrGet()
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {

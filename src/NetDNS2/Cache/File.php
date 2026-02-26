@@ -77,7 +77,7 @@ final class File extends \NetDNS2\Cache
                 $data = fread($fp, $file_size);
                 if ($data !== false)
                 {
-                    $decoded = unserialize(strval($data));
+                    $decoded = unserialize(strval($data), ['allowed_classes' => false]);
 
                     if (is_array($decoded) == true)
                     {
@@ -119,7 +119,7 @@ final class File extends \NetDNS2\Cache
         //
         // if there's no cache file set, then there's nothing to do
         //
-        if (strlen($this->m_options['file']) == 0)
+        if (strlen($this->m_options['file'] ?? '') == 0)
         {
             return;
         }
@@ -159,7 +159,7 @@ final class File extends \NetDNS2\Cache
                     //
                     $c = $this->cache_data;
 
-                    $decoded = unserialize(strval($data));
+                    $decoded = unserialize(strval($data), ['allowed_classes' => false]);
 
                     if (is_array($decoded) == true)
                     {
@@ -169,7 +169,7 @@ final class File extends \NetDNS2\Cache
             }
 
             //
-            // trucate the file
+            // truncate the file
             //
             ftruncate($fp, 0);
 

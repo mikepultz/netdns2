@@ -193,7 +193,7 @@ final class Header implements \Stringable
         $_packet->offset += self::DNS_HEADER_SIZE;
 
         return pack('n', $this->id) . chr(($this->qr << 7) | ($this->opcode->value << 3) | ($this->aa << 2) | ($this->tc << 1) | ($this->rd)) .
-            chr(($this->ra << 7) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode->value) .
+            chr(($this->ra << 7) | ($this->z << 6) | ($this->ad << 5) | ($this->cd << 4) | $this->rcode->value) .
             pack('n4', $this->qdcount, $this->ancount, $this->nscount, $this->arcount);
     }
 }

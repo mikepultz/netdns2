@@ -22,6 +22,7 @@ namespace NetDNS2\RR\OPT;
  *   |           TIMEOUT             !
  *   +-------------------------------+
  *
+ * @property int $timeout
  */
 final class KEEPALIVE extends \NetDNS2\RR\OPT
 {

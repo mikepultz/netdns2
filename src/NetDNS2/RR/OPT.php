@@ -25,6 +25,14 @@ namespace NetDNS2\RR;
  *    /                                                               /
  *    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
+ * @property \NetDNS2\ENUM\EDNS\Opt $option_code
+ * @property int $option_length
+ * @property string $option_data
+ * @property int $extended_rcode
+ * @property int $version
+ * @property int $z
+ * @property int $do
+ * @property int $co
  */
 class OPT extends \NetDNS2\RR
 {
@@ -64,6 +72,11 @@ class OPT extends \NetDNS2\RR
     protected int $do;
 
     /**
+     * the CO bit used for compact denial of existence - RFC9824
+     */
+    protected int $co;
+
+    /**
      * Constructor - builds a new \NetDNS2\RR\OPT object; normally you wouldn't call this directly, but OPT RR's are a little different
      *
      * @param \NetDNS2\Packet &$_packet a \NetDNS2\Packet packet or null to create an empty object
@@ -80,7 +93,7 @@ class OPT extends \NetDNS2\RR
         $this->name           = new \NetDNS2\Data\Domain(\NetDNS2\Data::DATA_TYPE_RFC1035, '');
         $this->type           = \NetDNS2\ENUM\RR\Type::set('OPT');
         $this->class          = \NetDNS2\ENUM\RR\Classes::set('NONE');
-        $this->udp_length     = 4000; // TODO
+        $this->udp_length     = 4000; // default; overridden by Resolver with dnssec_payload_size
         $this->rdlength       = 0;
 
         $this->option_code    = \NetDNS2\ENUM\EDNS\Opt::NONE;
@@ -89,6 +102,7 @@ class OPT extends \NetDNS2\RR
         $this->version        = 0;
         $this->z              = 0;
         $this->do             = 0;
+        $this->co             = 0;
 
         //
         // if the current object is not an OPT type, then look it up in the EDNS
@@ -163,7 +177,8 @@ class OPT extends \NetDNS2\RR
 
         list('x' => $this->extended_rcode, 'y' => $this->version, 'z' => $this->z) = (array)$val;
 
-        $this->do = ($this->z >> 15);
+        $this->do = ($this->z >> 15) & 0x1;
+        $this->co = ($this->z >> 1) & 0x1;
 
         //
         // parse the data, if there is any
@@ -198,7 +213,7 @@ class OPT extends \NetDNS2\RR
      */
     protected function pre_build(): void
     {
-        $this->z = ($this->do << 15);
+        $this->z = ($this->do << 15) | ($this->co << 1);
 
         //
         // build the TTL value based on the local values
@@ -213,10 +228,34 @@ class OPT extends \NetDNS2\RR
     }
 
     /**
+     * serialises just the OPTION-CODE + OPTION-LENGTH + OPTION-DATA bytes for this option.
+     * Called by \NetDNS2\EDNS::build() to merge all options into one OPT record per RFC 6891 §6.1.1.
+     *
+     * @throws \NetDNS2\Exception
+     *
+     */
+    public function packOption(): string
+    {
+        $tmp = new \NetDNS2\Packet();
+
+        return $this->rrGet($tmp);
+    }
+
+    /**
      * @see \NetDNS2\RR::rrGet()
      */
     protected function rrGet(\NetDNS2\Packet &$_packet): string
     {
+        //
+        // if this is a merged OPT carrying pre-built combined option bytes, return them directly
+        //
+        if ( ($this->option_code == \NetDNS2\ENUM\EDNS\Opt::NONE) && (strlen($this->option_data) > 0) )
+        {
+            $_packet->offset += strlen($this->option_data);
+
+            return $this->option_data;
+        }
+
         if ($this->option_code == \NetDNS2\ENUM\EDNS\Opt::NONE)
         {
             return '';

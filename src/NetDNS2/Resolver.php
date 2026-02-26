@@ -107,15 +107,13 @@ final class Resolver extends Client
         }
 
         //
-        // look for additional EDNS request objects
+        // look for additional EDNS request objects; merge all options into a single OPT record
+        // per RFC 6891 §6.1.1 ("at most one OPT RR in the additional data section")
         //
-        if (count($this->edns->opts) > 0)
+        $merged_opt = $this->edns->build($this->dnssec_payload_size);
+        if ($merged_opt !== null)
         {
-            foreach($this->edns->opts as $opt)
-            {
-                $packet->additional[] = clone $opt;
-            }
-
+            $packet->additional[]    = $merged_opt;
             $packet->header->arcount = count($packet->additional);
         }
 

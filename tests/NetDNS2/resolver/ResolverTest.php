@@ -24,6 +24,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      * @access public
+     * @group network
      *
      */
     public function testResolver(): void
@@ -48,7 +49,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
 
         } catch(\NetDNS2\Exception $e)
         {
-            $this->assertTrue(false, sprintf('ResolverTest::testResolver(): exception thrown: %s', $e->getMessage()));
+            $this->fail(sprintf('ResolverTest::testResolver(): exception thrown: %s', $e->getMessage()));
         }
     }
 
@@ -57,6 +58,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      * @access public
+     * @group network
      *
      */
     public function testDOHResolver(): void
@@ -77,7 +79,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
             'A'             => 'a.phpunit.netdns2.com. 300 IN A 10.10.10.10',
             'AAAA'          => 'aaaa.phpunit.netdns2.com. 300 IN AAAA 2600:1f18:49b:5300:75db:4a8f:a46c:701c',
             'CNAME'         => 'cname.phpunit.netdns2.com. 300 IN CNAME a.phpunit.netdns2.com.',
-            'MX'            => 'mx.phpunit.netdns2.com. 300 IN MX 10 mx20.mrhost.ca.',
+            'MX'            => 'mx.phpunit.netdns2.com. 300 IN MX 10 smtp-in.mrhost.ca.',
             'TXT'           => 'txt.phpunit.netdns2.com. 300 IN TXT "PHPUnit Test Data"',
             'TLSA'          => 'tlsa.phpunit.netdns2.com. 300 IN TLSA 3 0 1 dad0c0de6217a75022bb83564318fb156f4f0f751cbf46399c83cb7b1fd81e54',
             'RP'            => 'rp.phpunit.netdns2.com. 300 IN RP dns\.admin.netdns2.com. lam1.people.test.com.'
@@ -85,21 +87,13 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
 
         foreach($nss as $ns)
         {
-            try
+            $r = new \NetDNS2\Resolver([ 'nameservers' => [ $ns ] ]);
+
+            foreach($rrs as $rr => $expect)
             {
-                $r = new \NetDNS2\Resolver([ 'nameservers' => [ $ns ] ]);
-
-                foreach($rrs as $rr => $expect)
+                try
                 {
-                    $res = null;
-
-                    if (is_array($expect) == true)
-                    {
-                        $res = $r->query($expect['name'], $rr);
-                    } else
-                    {
-                        $res = $r->query(strtolower($rr) . '.phpunit.netdns2.com', $rr);
-                    }
+                    $res = $r->query(strtolower($rr) . '.phpunit.netdns2.com', $rr);
 
                     $this->assertCount(1, $res->answer, "Expected one result only for RR=$rr ");
 
@@ -108,14 +102,14 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
                     //
                     $res->answer[0]->ttl = 300;
 
-                    $this->assertSame((is_array($expect) == true) ? $expect['res'] : $expect, strval($res->answer[0]));
+                    $this->assertSame($expect, strval($res->answer[0]));
 
                     usleep(5000);
-                }
 
-            } catch(\NetDNS2\Exception $e)
-            {
-                $this->assertTrue(false, sprintf('ResolverTest::testDOHResolver(): exception thrown while testing %s on %s: %s', $ns, $rr, $e->getMessage()));
+                } catch(\NetDNS2\Exception $e)
+                {
+                    $this->fail(sprintf('ResolverTest::testDOHResolver(): exception thrown while testing %s on %s: %s', $ns, $rr, $e->getMessage()));
+                }
             }
         }
     }
@@ -125,6 +119,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      * @access public
+     * @group network
      *
      */
     public function testIDNResolver(): void
@@ -149,19 +144,29 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
                 $this->assertCount(1, $res->answer, "Expected one result only for host=$host");
 
                 //
-                // that resolves to localhost (for testing)
+                // should be an A object
                 //
-                $this->assertSame($res->answer[0]->address->value(), '127.0.0.1');
+                if (($res->answer[0] instanceof \NetDNS2\RR\A) === true)
+                {
+                    //  
+                    // that resolves to localhost (for testing)
+                    //
+                    $this->assertSame($res->answer[0]->address->value(), '127.0.0.1');
 
-                //
-                // and the extract (converted back to unicode) name should match the name going in
-                //
-                $this->assertSame($res->answer[0]->name->value(), $host);
+                    //
+                    // and the extract (converted back to unicode) name should match the name going in
+                    //
+                    $this->assertSame($res->answer[0]->name->value(), $host);
+
+                } else
+                {
+                    $this->fail('ResolverTest::testIDNResolver(): returned value should be an \NetDNS2\RR\A object.');
+                }
             }
 
         } catch(\NetDNS2\Exception $e)
         {
-            $this->assertTrue(false, sprintf('ResolverTest::testIDNResolver(): exception thrown: %s', $e->getMessage()));
+            $this->fail(sprintf('ResolverTest::testIDNResolver(): exception thrown: %s', $e->getMessage()));
         }
     }
 
@@ -170,6 +175,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
      *
      * @return void
      * @access public
+     * @group network
      *
      */
     public function testInternalResolver(): void
@@ -288,7 +294,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
                 //
                 // for SOA records, force the serial number incase it changes on the remote server
                 //
-                if ($rr == 'SOA')
+                if ( ($rr == 'SOA') && (($res->answer[0] instanceof \NetDNS2\RR\SOA) == true) )
                 {
                     $res->answer[0]->serial = 2025051843;
                 }
@@ -298,7 +304,7 @@ final class ResolverTest extends \PHPUnit\Framework\TestCase
 
         } catch(\NetDNS2\Exception $e)
         {
-            $this->assertTrue(false, sprintf('ResolverTest::testInternalResolver(): exception thrown: %s', $e->getMessage()));
+            $this->fail(sprintf('ResolverTest::testInternalResolver(): exception thrown: %s', $e->getMessage()));
         }
     }
 }

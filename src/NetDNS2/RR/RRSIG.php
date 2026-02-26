@@ -59,6 +59,15 @@ namespace NetDNS2\RR;
  *   /                                                               /
  *   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
+ * @property string $typecovered
+ * @property \NetDNS2\ENUM\DNSSEC\Algorithm $algorithm
+ * @property int $labels
+ * @property int $origttl
+ * @property string $sigexp
+ * @property string $sigincep
+ * @property int $keytag
+ * @property \NetDNS2\Data\Domain $signname
+ * @property string $signature
  */
 final class RRSIG extends \NetDNS2\RR
 {
@@ -199,8 +208,15 @@ final class RRSIG extends \NetDNS2\RR
         //
         // parse the values out of the dates
         //
-        preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigexp, $e);
-        preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigincep, $i);
+        if (preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigexp, $e) !== 1)
+        {
+            return '';
+        }
+
+        if (preg_match('/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/', $this->sigincep, $i) !== 1)
+        {
+            return '';
+        }
 
         //
         // pack the value

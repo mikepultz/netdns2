@@ -18,6 +18,7 @@ namespace NetDNS2\RR;
  * Since Bind 9.8 beta, it use a private recode as documented in the Bind ARM, chapter 4, "Private-type records. Basically they store
  * signing process state.
  *
+ * @property string $private_data
  */
 final class TYPE65534 extends \NetDNS2\RR
 {

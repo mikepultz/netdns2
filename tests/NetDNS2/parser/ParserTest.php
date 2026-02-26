@@ -41,17 +41,21 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         //
         // add the TSIG as additional
         //
-        $request->additional[]      = \NetDNS2\RR::fromString('mykey TSIG Zm9vYmFy');
+        /** @var \NetDNS2\RR\TSIG $o */
+        $o = \NetDNS2\RR::fromString('mykey TSIG Zm9vYmFy');
+
+        $request->additional[]      = $o;
         $request->header->arcount   = 1;
-        $line = $request->additional[0]->name . '. ' . $request->additional[0]->ttl . ' ' .
-        $request->additional[0]->class->label() . ' ' . $request->additional[0]->type->label() . ' ' .
-        $request->additional[0]->algorithm . '. ' . $request->additional[0]->time_signed  . ' '.
-        $request->additional[0]->fudge;
 
         //
-        // get the binary packet data
+        // get the binary packet data (this triggers signing, which populates mac, mac_size, original_id)
         //
         $data = $request->get();
+
+        //
+        // build the expected line after signing
+        //
+        $line = $o->__toString();
 
         //
         // parse the binary
@@ -61,7 +65,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         //
         // the answer data in the response, should match our initial line exactly
         //
-        $this->assertSame($line, substr($response->additional[0]->__toString(), 0, 58));
+        $this->assertSame($line, $response->additional[0]->__toString());
     }
 
     /**
@@ -119,6 +123,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             'DNAME'         => 'example.com. 300 IN DNAME frobozz-division.acme.example.',
             'DNSKEY'        => 'example.com. 300 IN DNSKEY 256 3 7 AwEAAYCXh/ZABi8kiJIDXYmyUlHzC0CHeBzqcpyZAIjC7dK1wkRYVcUvIlpTOpnOVVfcC3Py9Ui/x45qKb0LytvK7WYAe3WyOOwk5klwIqRC/0p4luafbd2yhRMF7quOBVqYrLoHwv8i9LrV+r8dhB7rXv/lkTSI6mEZsg5rDfee8Yy1',
             'DS'            => 'example.com. 300 IN DS 21366 7 2 96eeb2ffd9b00cd4694e78278b5efdab0a80446567b69f634da078f0d90f01ba',
+            'BRID'          => 'example.com. 300 IN BRID dGVzdA==',
             'DSYNC'         => [
                                     'example.com. 300 IN DSYNC CDS NOTIFY 1234 rr-endpoint.example.com.',
                                     'example.com. 300 IN DSYNC CSYNC NOTIFY 5555 another.endpoint.example.com.',
@@ -128,6 +133,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
             'EUI48'         => 'example.com. 300 IN EUI48 00-00-5e-00-53-2a',
             'EUI64'         => 'example.com. 300 IN EUI64 00-00-5e-ef-10-00-00-2a',
             'GPOS'          => 'example.com. 300 IN GPOS -32.6882 116.8652 10.0',
+            'HHIT'          => 'example.com. 300 IN HHIT dGVzdA==',
             'HINFO'         => 'example.com. 300 IN HINFO "PC-Intel-700mhz" "Redhat \"Linux\" 7.1"',
             'HTTPS'         => [
                                     'example.com. 300 IN HTTPS 0 alt3.example.com.',
@@ -136,7 +142,10 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                                 ],
             'HIP'           => 'example.com. 300 IN HIP 2 200100107B1A74DF365639CC39F1D578 AwEAAbdxyhNuSutc5EMzxTs9LBPCIkOFH8cIvM4p9+LrV4e19WzK00+CI6zBCQTdtWsuxKbWIy87UOoJTwkUs7lBu+Upr1gsNrut79ryra+bSRGQb1slImA8YVJyuIDsj7kwzG7jnERNqnWxZ48AWkskmdHaVDP4BcelrTI3rMXdXF5D rvs.example.com. another.example.com. test.domain.org.',
             'IPSECKEY'      => 'example.com. 300 IN IPSECKEY 10 2 2 2001:db8:0:8002:0:0:2000:1 AQNRU3mG7TVTO2BkR47usntb102uFJtugbo6BSGvgqt4AQ==',
-            'ISDN'          => 'example.com. 300 IN ISDN "150 862 028 003 217" "42"',
+            'ISDN'          => [
+                                    'example.com. 300 IN ISDN "150 862 028 003 217" "42"',
+                                    'example.com. 300 IN ISDN "150 862 028 003 217" ""',
+                                ],
             'KEY'           => 'example.com. 300 IN KEY 256 3 7 AwEAAYCXh/ZABi8kiJIDXYmyUlHzC0CHeBzqcpyZAIjC7dK1wkRYVcUvIlpTOpnOVVfcC3Py9Ui/x45qKb0LytvK7WYAe3WyOOwk5klwIqRC/0p4luafbd2yhRMF7quOBVqYrLoHwv8i9LrV+r8dhB7rXv/lkTSI6mEZsg5rDfee8Yy1',
             'KX'            => 'example.com. 300 IN KX 10 mx1.mrhost.ca.',
             'L32'           => 'example.com. 300 IN L32 10 10.1.2.0',
@@ -325,15 +334,41 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         }
 
         //
-        // build the hashes
+        // both authority sections must contain the same records after zeroing rdlength/rdata
         //
-        $a = md5(print_r($request_authority, true));
-        $b = md5(print_r($response_authority, true));
+        $this->assertEquals($request_authority, $response_authority, 'ParserTest::testCompression(): authority sections do not match after round-trip');
+    }
 
+    /**
+     * function to test the NULL RR (class RR_NULL) round-trip
+     *
+     * The class is named RR_NULL because "null" is a PHP reserved word; the DNS
+     * type label remains "NULL".  This test verifies that fromString(), wire
+     * serialisation and re-parsing all produce consistent output.
+     *
+     * @return void
+     * @access public
+     *
+     */
+    public function testNullRRRoundTrip()
+    {
         //
-        // the new hashes should match.
+        // rrToString() for RR_NULL returns '', so __toString() ends with a trailing space
         //
-        $this->assertSame($a, $b, sprintf('ParserTest::testCompression(): $a (%s) != $b (%s)', $a, $b));
+        $line = 'example.com. 300 IN NULL ';
+
+        $a = \NetDNS2\RR::fromString($line);
+
+        $this->assertInstanceOf(\NetDNS2\RR\RR_NULL::class, $a, 'ParserTest::testNullRRRoundTrip(): $a is not an instance of \\NetDNS2\\RR\\RR_NULL');
+
+        $request = new \NetDNS2\Packet\Request('example.com', 'NULL', 'IN');
+        $request->answer[]        = $a;
+        $request->header->ancount = 1;
+
+        $data     = $request->get();
+        $response = new \NetDNS2\Packet\Response($data, strlen($data));
+
+        $this->assertSame($line, $response->answer[0]->__toString(), 'ParserTest::testNullRRRoundTrip(): round-trip string mismatch');
     }
 
     /**
@@ -356,8 +391,8 @@ class ParserTest extends \PHPUnit\Framework\TestCase
         $a = \NetDNS2\BitMap::bitMapToArray(\NetDNS2\BitMap::arrayToBitMap($rrs));
 
         //
-        // there should be no differences in the original array and the result
+        // the result must contain exactly the same elements as the original array
         //
-        $this->assertTrue(count(array_diff($rrs, $a)) == 0);
+        $this->assertEqualsCanonicalizing($rrs, $a);
     }
 }

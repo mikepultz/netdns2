@@ -27,6 +27,10 @@ namespace NetDNS2\RR\OPT;
  *  8: |                           ADDRESS...                          /
  *     +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
  *
+ * @property int $family
+ * @property int $source_prefix
+ * @property int $scope_prefix
+ * @property \NetDNS2\Data $address
  */
 final class ECS extends \NetDNS2\RR\OPT
 {
