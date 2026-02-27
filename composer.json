@@ -27,6 +27,9 @@
             "type": "github"
         }
     ],
+    "replace": {
+        "pear/net_dns2": "*"
+    },
     "require": {
         "php": ">=8.1"
     },
