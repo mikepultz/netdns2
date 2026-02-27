@@ -1,6 +1,6 @@
 # NetDNS2 - PHP DNS Resolver and Updater
 
-[![PHP version](https://img.shields.io/badge/php-%3E%3D%208.1-8892BF.svg)](https://github.com/mikepultz/netdns2) ![Packagist Downloads](https://img.shields.io/packagist/dt/pear/net_dns2) ![Tests](https://github.com/mikepultz/netdns2/actions/workflows/ci.yml/badge.svg)
+[![PHP version](https://img.shields.io/badge/php-%3E%3D%208.1-8892BF.svg)](https://github.com/mikepultz/netdns2) ![Packagist Downloads](https://img.shields.io/packagist/dt/mikepultz/netdns2) ![Tests](https://github.com/mikepultz/netdns2/actions/workflows/ci.yml/badge.svg)
 
 The NetDNS2 library is a pure PHP DNS Resolver library, that supports local caching, dynamic DNS updates, and almost every feature currently supported by modern DNS servers.
 
@@ -21,10 +21,10 @@ The NetDNS2 library is a pure PHP DNS Resolver library, that supports local cach
 
 ## Installing NetDNS2
 
-You can require it directly via Composer: https://packagist.org/packages/pear/net_dns2
+You can require it directly via Composer: https://packagist.org/packages/mikepultz/netdns2
 
 ```
-composer require pear/net_dns2
+composer require mikepultz/netdns2
 ```
 
 Or download the source above.
@@ -69,7 +69,7 @@ To continue using NetDNS2 v1.x, update your `composer.json` file to specify 1.x,
 
     {
         "require": {
-            "pear/net_dns2": "^1.5"
+            "mikepultz/netdns2": "^1.5"
         }
     }
 

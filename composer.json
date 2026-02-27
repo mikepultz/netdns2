@@ -1,5 +1,5 @@
 {
-    "name": "pear/net_dns2",
+    "name": "mikepultz/netdns2",
     "type": "library",
     "description": "PHP DNS Resolver and Updater Library",
     "keywords": [
